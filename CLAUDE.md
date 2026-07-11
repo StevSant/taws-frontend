@@ -94,12 +94,16 @@ bug needs a regression test — don't add test suites proactively.
 
 Shared engineering rules live in the root repo's `CLAUDE.md` — everyone follows the same
 conventions (Conventional Commits in English, no hardcoded values, direct-to-main in pairs, keep CI
-green). Frontend is led by Luis, with Kevin on branding/UI-UX and Marco supporting; see `CODEOWNERS`.
+green). Frontend is led by Luis; Kevin and Marco own branding & UI/UX design as cross-functional
+floaters. See `CODEOWNERS`.
 
 | Dev | Primary area | GitHub |
 |-----|--------------|--------|
 | Bryan | AI agent dev & project coordination | `@StevSant` |
 | Miquel | Backend | `@lesquel` |
 | Luis Figueroa | Frontend | `@DweskZ` |
-| Kevin Alonso | Branding & UI/UX | `@Tokioh` |
-| Marco Zambrano | Backend / Frontend / Data support | `@marco-zambrano` |
+| Kevin Alonso | Branding & UI/UX Design | `@Tokioh` |
+| Marco Zambrano | Branding & UI/UX Design & Data Engineering support | `@marco-zambrano` |
+
+**Collaboration:** Kevin and Marco alternate between their primary responsibilities and assisting
+other areas as needed, based on project priorities and workload.

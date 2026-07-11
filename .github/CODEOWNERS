@@ -1,8 +1,12 @@
 # taws-frontend code owners.
-#   Luis  @DweskZ          — frontend lead
-#   Kevin @Tokioh          — branding & UI/UX
-#   Marco @marco-zambrano  — frontend support
+#   Luis  @DweskZ          — frontend lead (primary reviewer)
+#   Kevin @Tokioh          — branding & UI/UX design
+#   Marco @marco-zambrano  — branding & UI/UX design + data engineering support
+# Kevin & Marco are cross-functional floaters; they co-own the design/UI-UX surface
+# (design system + styling), not a single folder.
 
 *                       @DweskZ
-/src/app/shared/        @Tokioh
-/src/styles.scss        @Tokioh
+
+# Branding & UI/UX design surface
+/src/app/shared/        @Tokioh @marco-zambrano @DweskZ
+/src/styles.scss        @Tokioh @marco-zambrano
