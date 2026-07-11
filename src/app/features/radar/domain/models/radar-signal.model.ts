@@ -11,12 +11,11 @@ import { NewsItem } from './news-item.model';
  * card still renders using the bare symbol instead of crashing or
  * fabricating a name/asset class.
  *
- * `impactClass`/`confidence`/`priceDelta` are `undefined` today — the live
- * API doesn't populate them yet (they'll come from a future
- * `/api/v1/signals`-style endpoint backed by the Analyst agent's `Signal`
- * entity, see `domain/signals/` on the backend). The UI renders an
- * "unclassified" state instead of a fabricated badge whenever they're
- * missing.
+ * `impactClass`/`confidence`/`priceDelta` come from the latest `Signal`
+ * recorded for this instrument (`GET /api/v1/signals`, see
+ * `RadarStore.loadSignals`) and stay `undefined` when the Analyst hasn't
+ * produced one yet for this instrument. The UI renders an "unclassified"
+ * state instead of a fabricated badge whenever they're missing.
  */
 export interface RadarSignal {
   symbol: string;

@@ -10,8 +10,11 @@ import {
   NewsItem,
   NewsRepository,
   RadarFilters,
+  Signal,
+  SignalRepository,
 } from '../domain';
 import { groupNewsByInstrument } from './group-news-by-instrument';
+import { latestSignalBySymbol } from './latest-signal-by-symbol';
 
 /**
  * Signal-based state + facade for the radar feature. Presentation components
@@ -40,6 +43,8 @@ export class RadarStore {
   private readonly filtersSignal = signal<RadarFilters>(DEFAULT_RADAR_FILTERS);
   private readonly newsSignal = signal<NewsItem[]>([]);
   private readonly instrumentsSignal = signal<Instrument[]>([]);
+  /** Latest signal per instrument symbol, populated alongside `newsSignal` (see `loadNews`/`pollNews`). */
+  private readonly signalsBySymbolSignal = signal<Map<string, Signal>>(new Map());
   private readonly loadingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   /** IDs from the last successful fetch (initial or poll). `null` until the
@@ -66,8 +71,22 @@ export class RadarStore {
     return groupNewsByInstrument(this.newsSignal(), instrumentsBySymbol);
   });
 
-  /** One card per instrument that has linked news in the active filter window. */
-  readonly signals = computed(() => this.grouped().signals);
+  /** One card per instrument that has linked news in the active filter window,
+   * enriched with the latest Analyst signal for that instrument when one exists. */
+  readonly signals = computed(() => {
+    const signalsBySymbol = this.signalsBySymbolSignal();
+    return this.grouped().signals.map((radarSignal) => {
+      const signal = signalsBySymbol.get(radarSignal.symbol);
+      return signal
+        ? {
+            ...radarSignal,
+            impactClass: signal.impactClass,
+            confidence: signal.confidence,
+            priceDelta: signal.priceDelta,
+          }
+        : radarSignal;
+    });
+  });
   /** News items fetched but not linked to any instrument — surfaced, not dropped silently. */
   readonly unlinkedNewsCount = computed(() => this.grouped().unlinkedCount);
   readonly isEmpty = computed(
@@ -77,6 +96,7 @@ export class RadarStore {
   constructor(
     private readonly newsRepository: NewsRepository,
     private readonly instrumentRepository: InstrumentRepository,
+    private readonly signalRepository: SignalRepository,
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
     private readonly destroyRef: DestroyRef,
@@ -141,12 +161,34 @@ export class RadarStore {
       // so switching filters never spams a "new signals" notification for
       // items that were simply outside the old filter.
       this.lastSeenNewsIds = new Set(news.map((item) => item.id));
+      await this.loadSignals(news);
     } catch (error: unknown) {
       this.errorSignal.set(this.toErrorMessage(error));
       this.newsSignal.set([]);
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  /**
+   * Fetches the latest signal for every instrument symbol referenced by
+   * `news` and merges the result into `signalsBySymbolSignal`. Swallowed on
+   * failure per symbol — a signal is enrichment on top of the news feed, so
+   * one instrument's fetch failing shouldn't blank out the others or the
+   * page itself (same posture as `loadInstruments`).
+   */
+  private async loadSignals(news: NewsItem[]): Promise<void> {
+    const symbols = new Set(news.flatMap((item) => item.relatedSymbols));
+    const fetched = await Promise.all(
+      Array.from(symbols).map(async (symbol) => {
+        try {
+          return await this.signalRepository.fetchSignals(symbol);
+        } catch {
+          return [];
+        }
+      }),
+    );
+    this.signalsBySymbolSignal.set(latestSignalBySymbol(fetched.flat()));
   }
 
   /** Starts the auto-refresh poll loop (once per `RadarStore` instance). */
@@ -186,6 +228,7 @@ export class RadarStore {
 
       this.lastSeenNewsIds = currentIds;
       this.newsSignal.set(news);
+      await this.loadSignals(news);
     } catch {
       // Silent by design (see class doc) — a background poll failure
       // shouldn't surface a page-level error banner over otherwise-good data.

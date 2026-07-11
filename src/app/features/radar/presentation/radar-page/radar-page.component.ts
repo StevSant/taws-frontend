@@ -2,8 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { TranslationService } from '../../../../core';
 import { ButtonComponent, SpinnerComponent } from '../../../../shared';
 import { RadarStore } from '../../application';
-import { InstrumentRepository, NewsRepository } from '../../domain';
-import { HttpInstrumentRepository, HttpNewsRepository } from '../../infrastructure';
+import { InstrumentRepository, NewsRepository, SignalRepository } from '../../domain';
+import {
+  HttpInstrumentRepository,
+  HttpNewsRepository,
+  HttpSignalRepository,
+} from '../../infrastructure';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { SignalCardComponent } from '../signal-card/signal-card.component';
 
@@ -25,6 +29,7 @@ import { SignalCardComponent } from '../signal-card/signal-card.component';
     RadarStore,
     { provide: NewsRepository, useClass: HttpNewsRepository },
     { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
+    { provide: SignalRepository, useClass: HttpSignalRepository },
   ],
   templateUrl: './radar-page.component.html',
   styleUrl: './radar-page.component.scss',

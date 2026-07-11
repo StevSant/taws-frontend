@@ -1,5 +1,6 @@
 export { NewsRepository } from './news-repository';
 export { InstrumentRepository } from './instrument-repository';
+export { SignalRepository } from './signal-repository';
 export type { AssetClass } from './models/asset-class.model';
 export { ASSET_CLASSES } from './models/asset-class.model';
 export type { Instrument } from './models/instrument.model';
@@ -8,3 +9,4 @@ export type { ImpactClass } from './models/impact-class.model';
 export type { RadarFilters } from './models/radar-filters.model';
 export { DEFAULT_RADAR_FILTERS, RECENCY_OPTIONS_HOURS } from './models/radar-filters.model';
 export type { RadarSignal } from './models/radar-signal.model';
+export type { Signal } from './models/signal.model';
