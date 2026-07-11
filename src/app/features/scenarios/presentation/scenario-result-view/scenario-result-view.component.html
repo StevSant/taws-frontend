@@ -10,6 +10,10 @@
   <p class="scenario-result__narrative">{{ result.narrative }}</p>
 
   <section class="scenario-result__section">
+    <app-impact-heatmap [impactMap]="result.impactMap" />
+  </section>
+
+  <section class="scenario-result__section">
     <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.impact.title') }}</h3>
     <div class="scenario-result__impact-grid">
       @for (impact of result.impactMap; track impact.assetClass) {
@@ -33,32 +37,7 @@
             {{ impact.confidence | percent: '1.0-0' }}
           </p>
 
-          <div class="scenario-result__evidence">
-            <span class="scenario-result__evidence-title">{{
-              i18n.t('scenarios.result.evidence.title')
-            }}</span>
-            <ul class="scenario-result__evidence-list">
-              @for (evidence of impact.evidence; track $index) {
-                <li class="scenario-result__evidence-item">
-                  <span
-                    class="scenario-result__evidence-tag"
-                    [class.scenario-result__evidence-tag--actual]="
-                      evidence.evidenceType === 'actual_data'
-                    "
-                    [class.scenario-result__evidence-tag--analog]="
-                      evidence.evidenceType === 'historical_analog'
-                    "
-                    [class.scenario-result__evidence-tag--reasoning]="
-                      evidence.evidenceType === 'reasoning'
-                    "
-                  >
-                    {{ evidenceTypeLabel(evidence.evidenceType) }}
-                  </span>
-                  <span class="scenario-result__evidence-detail">{{ evidence.detail }}</span>
-                </li>
-              }
-            </ul>
-          </div>
+          <app-evidence-panel [evidence]="impact.evidence" />
         </div>
       }
     </div>
@@ -66,38 +45,7 @@
 
   <section class="scenario-result__section">
     <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.chain.title') }}</h3>
-    <p class="scenario-result__chain-note">
-      {{ i18n.t('scenarios.result.chain.placeholderNote') }}
-    </p>
-
-    <div class="scenario-result__chain">
-      <div class="scenario-result__chain-column">
-        <span class="scenario-result__chain-subtitle">{{
-          i18n.t('scenarios.result.chain.nodes.title')
-        }}</span>
-        <ol class="scenario-result__chain-nodes">
-          @for (node of result.consequenceChain.nodes; track node.id) {
-            <li>{{ node.label }}</li>
-          }
-        </ol>
-      </div>
-
-      <div class="scenario-result__chain-column">
-        <span class="scenario-result__chain-subtitle">{{
-          i18n.t('scenarios.result.chain.edges.title')
-        }}</span>
-        <ul class="scenario-result__chain-edges">
-          @for (edge of result.consequenceChain.edges; track $index) {
-            <li>
-              <strong>{{ nodeLabel(edge.sourceNodeId) }}</strong>
-              →
-              <strong>{{ nodeLabel(edge.targetNodeId) }}</strong>
-              : {{ edge.mechanism }} ({{ edge.confidence | percent: '1.0-0' }})
-            </li>
-          }
-        </ul>
-      </div>
-    </div>
+    <app-causal-chain-view [chain]="result.consequenceChain" />
   </section>
 
   <section class="scenario-result__section">

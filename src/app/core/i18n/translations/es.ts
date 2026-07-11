@@ -77,7 +77,7 @@ export const ES_TRANSLATIONS = {
     'Solo informativo — no es asesoría financiera personalizada. Nunca ejecutamos operaciones.',
   'scenarios.title': 'Laboratorio de Escenarios',
   'scenarios.description':
-    '"¿Qué pasa si ocurre X?" Elegí un escenario preconfigurado o describí el tuyo, y obtené una cadena causal, impacto cuantificado por clase de activo y recomendaciones respaldadas por evidencia. La visualización completa de cadena causal/mapa de calor llega en una próxima actualización — esta es la vista básica de resultados.',
+    '"¿Qué pasa si ocurre X?" Elegí un escenario preconfigurado o describí el tuyo, y obtené una cadena causal interactiva, un mapa de calor de impacto por clase de activo y recomendaciones respaldadas por evidencia.',
   'scenarios.disclaimer.static':
     'Solo informativo — no es asesoría financiera personalizada. Nunca ejecutamos operaciones.',
   'scenarios.mode.preset': 'Escenarios preconfigurados',
@@ -113,14 +113,20 @@ export const ES_TRANSLATIONS = {
   'scenarios.result.impact.direction.uncertain': 'Incierto',
   'scenarios.result.impact.confidence.label': 'Confianza',
   'scenarios.result.evidence.title': 'Evidencia',
+  'scenarios.result.evidence.empty': 'No se citó evidencia para este impacto.',
   'scenarios.result.evidence.type.actual_data': 'Dato actual',
   'scenarios.result.evidence.type.historical_analog': 'Análogo histórico',
   'scenarios.result.evidence.type.reasoning': 'Razonamiento',
-  'scenarios.result.chain.title': 'Cadena causal (vista básica)',
+  'scenarios.result.heatmap.title': 'Mapa de calor de impacto',
+  'scenarios.result.heatmap.hint':
+    'Se muestran todas las clases de activo del universo curado — las celdas atenuadas son clases que este escenario no afecta directamente.',
+  'scenarios.result.heatmap.notAssessed': 'No evaluado',
+  'scenarios.result.chain.title': 'Cadena causal',
   'scenarios.result.chain.nodes.title': 'Pasos',
   'scenarios.result.chain.edges.title': 'Enlaces',
-  'scenarios.result.chain.placeholderNote':
-    'Se muestra como lista simple — el grafo visual completo de la cadena causal y el mapa de calor de impacto llegan en una próxima actualización.',
+  'scenarios.result.chain.interactionHint':
+    'Hacé clic en un paso para resaltar sus enlaces; hacé clic en un enlace para ver la explicación completa.',
+  'scenarios.result.chain.empty': 'No se generaron enlaces causales para este escenario.',
   'scenarios.result.actions.title': 'Acciones recomendadas',
   'scenarios.result.disclaimer.label': 'Descargo de responsabilidad',
   'scenarios.result.addToBriefing.action': 'Agregar a briefing',

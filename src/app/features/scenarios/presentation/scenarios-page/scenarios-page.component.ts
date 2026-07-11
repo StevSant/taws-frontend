@@ -11,13 +11,12 @@ import { ScenarioResultViewComponent } from '../scenario-result-view/scenario-re
 const FREE_TEXT_MAX_LENGTH = 1000;
 
 /**
- * Scenario Lab page (issue #13, T1 basic scope): pick a curated preset or
+ * Scenario Lab page (issue #13, extended by #20): pick a curated preset or
  * describe a free-form "what if X happens" scenario, run it against
  * `POST /api/v1/scenarios/generate`, and render the resulting
- * `ScenarioResult` (impact per asset class with evidence-type tags, causal
- * chain as a plain list, recommended actions) plus an "add to briefing"
- * workaround (see `ScenarioLabStore.addToBriefing`). The full causal-
- * chain/heatmap visualization is T2 issue #20 — out of scope here.
+ * `ScenarioResult` (impact heatmap, evidence grouped by type, interactive
+ * causal-chain flow diagram, recommended actions) plus an "add to
+ * briefing" workaround (see `ScenarioLabStore.addToBriefing`).
  *
  * Unauthenticated: `POST /api/v1/scenarios/generate` has no
  * `require_current_user` dependency on the backend (shared/global research,

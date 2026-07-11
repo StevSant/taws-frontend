@@ -1,0 +1,44 @@
+<div class="impact-heatmap">
+  <span class="impact-heatmap__title">{{ i18n.t('scenarios.result.heatmap.title') }}</span>
+  <p class="impact-heatmap__hint">{{ i18n.t('scenarios.result.heatmap.hint') }}</p>
+
+  <div class="impact-heatmap__grid" role="list">
+    @for (cell of cells; track cell.assetClass) {
+      <div
+        class="impact-heatmap__cell"
+        [class.impact-heatmap__cell--empty]="!cell.impact"
+        role="listitem"
+        [attr.title]="cellTooltip(cell)"
+      >
+        <div
+          class="impact-heatmap__cell-fill"
+          [class.impact-heatmap__cell-fill--positive]="cell.impact?.direction === 'positive'"
+          [class.impact-heatmap__cell-fill--negative]="cell.impact?.direction === 'negative'"
+          [class.impact-heatmap__cell-fill--neutral]="cell.impact?.direction === 'neutral'"
+          [class.impact-heatmap__cell-fill--uncertain]="cell.impact?.direction === 'uncertain'"
+          [style.opacity]="tintOpacity(cell)"
+        ></div>
+
+        <div class="impact-heatmap__cell-content">
+          <span class="impact-heatmap__asset-class">{{ assetClassLabel(cell.assetClass) }}</span>
+
+          @if (cell.impact; as impact) {
+            <span class="impact-heatmap__direction">
+              <span class="impact-heatmap__direction-symbol" aria-hidden="true">{{
+                directionSymbol(impact.direction)
+              }}</span>
+              {{ directionLabel(impact.direction) }}
+            </span>
+            <span class="impact-heatmap__confidence">{{
+              impact.confidence | percent: '1.0-0'
+            }}</span>
+          } @else {
+            <span class="impact-heatmap__direction impact-heatmap__direction--empty">
+              {{ i18n.t('scenarios.result.heatmap.notAssessed') }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
