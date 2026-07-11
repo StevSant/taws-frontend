@@ -1,8 +1,11 @@
 <article class="briefing-card">
   <header class="briefing-card__header">
-    <span class="briefing-card__created">
-      {{ i18n.t('briefings.card.createdAt') }} {{ briefing.createdAt | date: 'short' }}
-    </span>
+    <div class="briefing-card__identity">
+      <span class="briefing-card__ticker">#{{ briefing.id.slice(0, 8) }}</span>
+      <span class="briefing-card__created">
+        {{ i18n.t('briefings.card.createdAt') }} {{ briefing.createdAt | date: 'short' }}
+      </span>
+    </div>
 
     <div
       class="briefing-card__status"
@@ -12,7 +15,10 @@
       [class.briefing-card__status--pending]="status === 'pending'"
     >
       <span class="briefing-card__status-label">{{ i18n.t('briefings.card.status.label') }}</span>
-      <span class="briefing-card__status-value">{{ statusLabel(status) }}</span>
+      <span class="briefing-card__status-value">
+        <span class="briefing-card__status-dot" aria-hidden="true"></span>
+        {{ statusLabel(status) }}
+      </span>
     </div>
   </header>
 

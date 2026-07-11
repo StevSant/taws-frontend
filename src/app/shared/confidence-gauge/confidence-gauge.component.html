@@ -1,0 +1,45 @@
+<svg
+  class="confidence-gauge"
+  [attr.width]="size()"
+  [attr.height]="size()"
+  viewBox="0 0 40 40"
+  role="img"
+  [attr.aria-label]="roundedValue() + '%'"
+>
+  <defs>
+    <linearGradient [attr.id]="uid + '-grad'" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" [attr.stop-color]="'var(--color-gold)'" />
+      <stop offset="100%" [attr.stop-color]="'var(--color-gold-bright)'" />
+    </linearGradient>
+    <filter [attr.id]="uid + '-glow'" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.2" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <circle class="confidence-gauge__track" cx="20" cy="20" [attr.r]="radius" />
+
+  <circle
+    class="confidence-gauge__value"
+    cx="20"
+    cy="20"
+    [attr.r]="radius"
+    [attr.stroke]="'url(#' + uid + '-grad)'"
+    [attr.filter]="'url(#' + uid + '-glow)'"
+    [attr.stroke-dasharray]="circumference"
+    [attr.stroke-dashoffset]="dashOffset()"
+  />
+
+  <text
+    class="confidence-gauge__label"
+    x="20"
+    y="20"
+    text-anchor="middle"
+    dominant-baseline="central"
+  >
+    {{ roundedValue() }}
+  </text>
+</svg>

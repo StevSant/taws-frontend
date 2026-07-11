@@ -1,20 +1,22 @@
 .routing-trace {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
 
   &__title {
-    font-size: 0.7rem;
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     color: var(--color-text-muted);
   }
 
   &__hops {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
+    flex-direction: column;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -22,30 +24,51 @@
   }
 
   &__hop {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: var(--space-1);
+    gap: var(--space-2);
     padding: var(--space-1) var(--space-2);
-    border-radius: var(--radius-full);
-    background: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-family: var(--font-family-mono);
     font-size: 0.75rem;
     color: var(--color-text-secondary);
-
-    &:not(:last-child)::after {
-      content: '→';
-      margin-left: var(--space-2);
-      color: var(--color-text-muted);
-    }
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
 
     &--active {
-      border-color: var(--color-primary);
-      animation: routing-trace-pulse 1.4s ease-in-out infinite;
+      background: var(--color-gold-dim-bg);
+      border-color: var(--color-gold-border);
+
+      .routing-trace__dot {
+        background: var(--color-gold);
+      }
+
+      .routing-trace__status {
+        color: var(--color-gold);
+      }
     }
 
     &--done {
-      opacity: 0.85;
+      opacity: 0.75;
+
+      .routing-trace__dot {
+        background: var(--color-gain);
+      }
+
+      .routing-trace__status {
+        color: var(--color-gain);
+      }
     }
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-text-muted);
   }
 
   &__agent {
@@ -54,17 +77,10 @@
   }
 
   &__status {
+    margin-left: auto;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.65rem;
     color: var(--color-text-muted);
-  }
-}
-
-@keyframes routing-trace-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.55;
   }
 }

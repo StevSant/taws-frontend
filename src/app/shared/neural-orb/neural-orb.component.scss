@@ -1,0 +1,43 @@
+:host {
+  display: inline-flex;
+  line-height: 0;
+}
+
+.neural-orb {
+  overflow: visible;
+
+  &__ring {
+    fill: none;
+    stroke: var(--color-gold-border-hi);
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: ringRotate 12s linear infinite;
+  }
+
+  &__mesh {
+    line {
+      stroke: var(--color-gold-border);
+      stroke-width: 0.5;
+    }
+  }
+
+  &__node {
+    fill: var(--color-gold-bright);
+    opacity: 0.85;
+  }
+
+  &__core {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: orbPulse 2.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neural-orb__ring,
+  .neural-orb__core {
+    animation: none;
+  }
+}

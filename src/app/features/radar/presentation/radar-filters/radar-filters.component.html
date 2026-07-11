@@ -1,18 +1,31 @@
 <form class="radar-filters">
-  <label class="radar-filters__field">
+  <div class="radar-filters__group">
     <span class="radar-filters__label">{{ i18n.t('radar.filters.type.label') }}</span>
-    <select
-      class="radar-filters__select"
-      name="assetClass"
-      [ngModel]="filters.assetClass"
-      (ngModelChange)="assetClassChange.emit($event)"
+    <div
+      class="radar-filters__pills"
+      role="group"
+      [attr.aria-label]="i18n.t('radar.filters.type.label')"
     >
-      <option [ngValue]="null">{{ i18n.t('radar.filters.type.all') }}</option>
+      <button
+        type="button"
+        class="radar-filters__pill"
+        [class.radar-filters__pill--active]="filters.assetClass === null"
+        (click)="selectAssetClass(null)"
+      >
+        {{ i18n.t('radar.filters.type.all') }}
+      </button>
       @for (assetClass of assetClasses; track assetClass) {
-        <option [ngValue]="assetClass">{{ assetClassLabel(assetClass) }}</option>
+        <button
+          type="button"
+          class="radar-filters__pill"
+          [class.radar-filters__pill--active]="filters.assetClass === assetClass"
+          (click)="selectAssetClass(assetClass)"
+        >
+          {{ assetClassLabel(assetClass) }}
+        </button>
       }
-    </select>
-  </label>
+    </div>
+  </div>
 
   <label class="radar-filters__field">
     <span class="radar-filters__label">{{ i18n.t('radar.filters.asset.label') }}</span>
@@ -31,17 +44,23 @@
     </select>
   </label>
 
-  <label class="radar-filters__field">
+  <div class="radar-filters__group">
     <span class="radar-filters__label">{{ i18n.t('radar.filters.recency.label') }}</span>
-    <select
-      class="radar-filters__select"
-      name="sinceHours"
-      [ngModel]="filters.sinceHours"
-      (ngModelChange)="sinceHoursChange.emit($event)"
+    <div
+      class="radar-filters__pills"
+      role="group"
+      [attr.aria-label]="i18n.t('radar.filters.recency.label')"
     >
       @for (hours of recencyOptions; track hours) {
-        <option [ngValue]="hours">{{ recencyLabel(hours) }}</option>
+        <button
+          type="button"
+          class="radar-filters__pill"
+          [class.radar-filters__pill--active]="filters.sinceHours === hours"
+          (click)="selectRecency(hours)"
+        >
+          {{ recencyLabel(hours) }}
+        </button>
       }
-    </select>
-  </label>
+    </div>
+  </div>
 </form>

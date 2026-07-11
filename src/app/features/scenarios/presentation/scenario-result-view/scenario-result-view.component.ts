@@ -1,4 +1,3 @@
-import { PercentPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BriefingActionStatus } from '../../application';
 import {
@@ -9,6 +8,7 @@ import {
   ScenarioResult,
 } from '../../domain';
 import { TranslationKey, TranslationService } from '../../../../core';
+import { ConfidenceGaugeComponent } from '../../../../shared';
 import { CausalChainViewComponent } from '../causal-chain-view/causal-chain-view.component';
 import { EvidencePanelComponent } from '../evidence-panel/evidence-panel.component';
 import { ImpactHeatmapComponent } from '../impact-heatmap/impact-heatmap.component';
@@ -53,7 +53,12 @@ const ASSET_CLASS_LABELS: Record<AssetClass, TranslationKey> = {
 @Component({
   selector: 'app-scenario-result-view',
   standalone: true,
-  imports: [PercentPipe, ImpactHeatmapComponent, EvidencePanelComponent, CausalChainViewComponent],
+  imports: [
+    ImpactHeatmapComponent,
+    EvidencePanelComponent,
+    CausalChainViewComponent,
+    ConfidenceGaugeComponent,
+  ],
   templateUrl: './scenario-result-view.component.html',
   styleUrl: './scenario-result-view.component.scss',
 })

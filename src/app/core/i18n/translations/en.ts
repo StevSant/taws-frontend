@@ -12,6 +12,7 @@ export const EN_TRANSLATIONS = {
   'shell.language.toggleLabel': 'Switch language',
   'shell.auth.login': 'Log in',
   'shell.auth.logout': 'Log out',
+  'shell.status.active': 'System active',
   'auth.login.title': 'Log in',
   'auth.signup.title': 'Create an account',
   'auth.email.label': 'Email',

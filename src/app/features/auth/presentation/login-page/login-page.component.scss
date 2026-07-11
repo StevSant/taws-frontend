@@ -1,4 +1,5 @@
 .login-page {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,23 +7,77 @@
   min-height: 100vh;
   padding: var(--space-5);
   background: var(--color-background);
+  overflow: hidden;
+
+  &__glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 640px;
+    height: 640px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle,
+      var(--color-gold-dim-bg) 0%,
+      rgba(212, 160, 23, 0.03) 45%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
 
   &__card {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
     padding: var(--space-6);
-    border-radius: var(--radius-lg);
-    background: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
-    box-shadow: var(--elevation-2);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-gold-border);
+    box-shadow:
+      var(--elevation-3),
+      0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  &__brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(155deg, var(--color-gold-bright), var(--color-gold) 70%);
+    color: var(--color-text-on-primary);
+    font-family: var(--font-family-mono);
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow:
+      0 0 0 1px var(--color-gold-border-hi),
+      0 4px 14px rgba(212, 160, 23, 0.28);
+  }
+
+  &__brand-name {
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
   }
 
   &__title {
     margin: 0 0 var(--space-2);
-    font-size: 1.25rem;
+    font-size: 1.4rem;
+    font-weight: 700;
     color: var(--color-text-primary);
   }
 
@@ -33,7 +88,11 @@
   }
 
   &__label {
-    font-size: 0.8rem;
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-text-secondary);
   }
 
@@ -44,14 +103,25 @@
     font-size: 0.95rem;
     background: var(--color-surface);
     color: var(--color-text-primary);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-border-hi);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-gold-border-hi);
+      background: var(--color-surface-raised);
+    }
   }
 
   &__error {
     padding: var(--space-3);
     border-radius: var(--radius-md);
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid var(--color-danger);
-    color: var(--color-danger);
+    background: var(--color-loss-dim);
+    border: 1px solid var(--color-loss-border);
+    color: var(--color-loss);
     font-size: 0.85rem;
   }
 
@@ -65,13 +135,20 @@
     align-self: center;
     background: none;
     border: none;
-    color: var(--color-primary);
-    font-size: 0.85rem;
+    color: var(--color-gold-bright);
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
     cursor: pointer;
     padding: 0;
+    transition: all 0.2s ease;
 
     &:hover {
-      color: var(--color-primary-hover);
+      opacity: 0.8;
+    }
+
+    &:active {
+      transform: scale(0.95);
     }
   }
 }

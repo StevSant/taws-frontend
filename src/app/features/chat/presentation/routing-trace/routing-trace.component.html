@@ -1,5 +1,5 @@
 @if (hops.length > 0) {
-  <div class="routing-trace" role="status">
+  <div class="routing-trace glass" role="status">
     <span class="routing-trace__title">{{ i18n.t('chat.trace.title') }}</span>
     <ol class="routing-trace__hops">
       @for (hop of hops; track hop.agent) {
@@ -9,6 +9,7 @@
           [class.routing-trace__hop--done]="hop.status === 'done'"
           [attr.title]="hop.detail || null"
         >
+          <span class="routing-trace__dot" [class.blink]="hop.status === 'active'"></span>
           <span class="routing-trace__agent">{{ agentLabel(hop.agent) }}</span>
           <span class="routing-trace__status">{{ statusLabel(hop.status) }}</span>
         </li>

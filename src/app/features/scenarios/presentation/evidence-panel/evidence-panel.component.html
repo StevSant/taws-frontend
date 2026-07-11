@@ -18,7 +18,10 @@
       </span>
       <ul class="evidence-panel__list">
         @for (item of group.items; track $index) {
-          <li class="evidence-panel__item">{{ item.detail }}</li>
+          <li class="evidence-panel__item">
+            <span class="evidence-panel__chevron" aria-hidden="true">›</span>
+            <span class="evidence-panel__item-text">{{ item.detail }}</span>
+          </li>
         }
       </ul>
     </div>

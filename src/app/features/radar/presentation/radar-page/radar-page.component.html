@@ -18,14 +18,14 @@
   }
 
   @if (store.error(); as error) {
-    <div class="radar-page__error" role="alert">
+    <div class="radar-page__error glass" role="alert">
       <span>{{ i18n.t('radar.error.banner') }}{{ error }}</span>
       <app-button [label]="i18n.t('radar.error.retry')" (pressed)="onRetry()" />
     </div>
   }
 
   @if (store.isEmpty()) {
-    <div class="radar-page__empty">
+    <div class="radar-page__empty glass">
       <p class="radar-page__empty-title">{{ i18n.t('radar.empty.title') }}</p>
       <p class="radar-page__empty-description">{{ i18n.t('radar.empty.description') }}</p>
     </div>

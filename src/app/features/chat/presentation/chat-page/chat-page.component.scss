@@ -8,12 +8,53 @@
   padding: var(--space-5);
   gap: var(--space-4);
 
+  &__hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6) 0 var(--space-4);
+    transition: padding 0.3s ease;
+
+    &--compact {
+      padding: var(--space-2) 0;
+    }
+  }
+
+  &__corona {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  &__corona-glow {
+    position: absolute;
+    width: 14rem;
+    height: 14rem;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle, var(--color-gold-dim-bg) 0%, transparent 70%);
+    animation: coronaPulse 4s ease-in-out infinite;
+  }
+
+  &__corona-ring {
+    position: absolute;
+    width: 10rem;
+    height: 10rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-gold-border);
+    animation: ringExpand 4s ease-in-out infinite;
+  }
+
   &__error {
     padding: var(--space-3);
     border-radius: var(--radius-md);
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid var(--color-danger);
-    color: var(--color-danger);
+    background: var(--color-loss-dim);
+    border: 1px solid var(--color-loss-border);
+    color: var(--color-loss);
+    font-family: var(--font-family-mono);
     font-size: 0.85rem;
   }
 
@@ -29,45 +70,116 @@
   }
 
   &__message {
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    background: var(--color-surface-raised);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
     align-self: flex-start;
     max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+
+    &--assistant {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--color-gold-border);
+
+      .chat-page__role {
+        color: var(--color-gold);
+      }
+    }
 
     &--user {
       align-self: flex-end;
-      background: var(--color-primary);
-      color: var(--color-text-on-primary);
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border-hi);
+      color: var(--color-text-primary);
     }
   }
 
   &__role {
-    display: block;
-    font-size: 0.7rem;
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     color: var(--color-text-muted);
-    margin-bottom: 0.15rem;
   }
 
   &__content {
     margin: 0;
     white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  &__typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: var(--space-1);
+  }
+
+  &__typing-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: var(--radius-full);
+    background: var(--color-gold);
+    animation: typingDot 1.2s ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.3s;
+    }
   }
 
   &__composer {
     display: flex;
     gap: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    transition: border-color 0.2s ease;
+
+    &:focus-within {
+      border-color: var(--color-gold-border-hi);
+    }
   }
 
   &__input {
     flex: 1;
     padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    border: none;
+    border-radius: var(--radius-lg);
     font-size: 0.95rem;
-    background: var(--color-surface);
+    font-family: var(--font-family-base);
+    background: transparent;
     color: var(--color-text-primary);
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  // Scoped CSS-variable override — CSS custom properties cascade through
+  // Angular's emulated encapsulation (it only scopes selectors, not
+  // inheritance), so this re-themes the shared app-button's gold fill into a
+  // gradient for the send action without touching ButtonComponent itself.
+  &__send {
+    --color-primary: linear-gradient(135deg, var(--color-gold), var(--color-gold-bright));
+    --color-primary-hover: linear-gradient(135deg, var(--color-gold-bright), var(--color-gold));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-page__corona-glow,
+  .chat-page__corona-ring,
+  .chat-page__typing-dot {
+    animation: none;
   }
 }

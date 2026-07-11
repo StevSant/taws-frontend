@@ -1,7 +1,7 @@
 <article class="signal-card">
   <header class="signal-card__header">
     <div class="signal-card__instrument">
-      <span class="signal-card__symbol">{{ signal.symbol }}</span>
+      <span class="signal-card__ticker">{{ signal.symbol }}</span>
       @if (signal.instrument) {
         <span class="signal-card__name">{{ signal.instrument.name }}</span>
         <span class="signal-card__asset-class">{{ signal.instrument.assetClass }}</span>
@@ -26,20 +26,21 @@
     </div>
   </header>
 
-  <dl class="signal-card__metrics">
-    <div class="signal-card__metric">
-      <dt class="signal-card__metric-label">{{ i18n.t('radar.card.confidence.label') }}</dt>
-      <dd class="signal-card__metric-value">
-        {{
-          signal.confidence !== undefined
-            ? (signal.confidence | percent: '1.0-0')
-            : i18n.t('radar.card.confidence.unavailable')
-        }}
-      </dd>
+  <div class="signal-card__metrics">
+    <div class="signal-card__metric signal-card__metric--confidence">
+      <span class="signal-card__metric-label">{{ i18n.t('radar.card.confidence.label') }}</span>
+      @if (signal.confidence !== undefined) {
+        <app-confidence-gauge [value]="confidencePercent(signal.confidence)" [size]="52" />
+      } @else {
+        <span class="signal-card__metric-value signal-card__metric-value--muted">
+          {{ i18n.t('radar.card.confidence.unavailable') }}
+        </span>
+      }
     </div>
+
     <div class="signal-card__metric">
-      <dt class="signal-card__metric-label">{{ i18n.t('radar.card.priceDelta.label') }}</dt>
-      <dd
+      <span class="signal-card__metric-label">{{ i18n.t('radar.card.priceDelta.label') }}</span>
+      <span
         class="signal-card__metric-value"
         [class.signal-card__metric-value--positive]="(signal.priceDelta ?? 0) > 0"
         [class.signal-card__metric-value--negative]="(signal.priceDelta ?? 0) < 0"
@@ -49,25 +50,28 @@
             ? formatPriceDelta(signal.priceDelta)
             : i18n.t('radar.card.priceDelta.unavailable')
         }}
-      </dd>
+      </span>
     </div>
-  </dl>
+  </div>
 
   <div class="signal-card__evidence">
     <span class="signal-card__evidence-title">{{ i18n.t('radar.card.evidence.title') }}</span>
     <ul class="signal-card__evidence-list">
       @for (item of signal.news; track item.id) {
         <li class="signal-card__evidence-item">
-          <a
-            class="signal-card__evidence-headline"
-            [href]="item.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{ item.title }}</a
-          >
-          <div class="signal-card__evidence-meta">
-            <span class="signal-card__evidence-source">{{ item.source }}</span>
-            <span class="signal-card__evidence-date">{{ item.publishedAt | date: 'short' }}</span>
+          <span class="signal-card__evidence-chevron" aria-hidden="true">›</span>
+          <div class="signal-card__evidence-body">
+            <a
+              class="signal-card__evidence-headline"
+              [href]="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ item.title }}</a
+            >
+            <div class="signal-card__evidence-meta">
+              <span class="signal-card__evidence-source">{{ item.source }}</span>
+              <span class="signal-card__evidence-date">{{ item.publishedAt | date: 'short' }}</span>
+            </div>
           </div>
         </li>
       }

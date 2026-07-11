@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { RoutingHop, RoutingHopStatus } from '../../domain';
 
@@ -32,11 +32,12 @@ const STATUS_LABEL_KEYS: Record<RoutingHopStatus, TranslationKey> = {
   standalone: true,
   templateUrl: './routing-trace.component.html',
   styleUrl: './routing-trace.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RoutingTraceComponent {
   @Input() hops: RoutingHop[] = [];
 
-  constructor(readonly i18n: TranslationService) {}
+  readonly i18n = inject(TranslationService);
 
   agentLabel(agent: string): string {
     const key = AGENT_LABEL_KEYS[agent];

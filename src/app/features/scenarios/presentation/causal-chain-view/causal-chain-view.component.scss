@@ -18,7 +18,8 @@
   }
 
   &__overview-arrow {
-    color: var(--color-text-muted);
+    color: var(--color-gold-border-hi);
+    font-family: var(--font-family-mono);
   }
 
   &__node,
@@ -28,24 +29,27 @@
     border: 1px solid var(--color-border);
     background: var(--color-surface-raised);
     color: var(--color-text-primary);
-    font-family: inherit;
-    font-size: 0.8rem;
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
     font-weight: 600;
     cursor: pointer;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease;
+    transition: all 0.2s ease;
 
     &:hover {
-      border-color: var(--color-primary);
+      border-color: var(--color-gold-border-hi);
+      opacity: 0.85;
+    }
+
+    &:active {
+      transform: scale(0.95);
     }
   }
 
   &__node--selected,
   &__edge-node--selected {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    color: var(--color-primary-contrast);
+    border-color: var(--color-gold-border-hi);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold-bright);
   }
 
   &__empty {
@@ -72,12 +76,12 @@
     padding: var(--space-2);
     border-radius: var(--radius-md);
     transition:
-      opacity 0.15s ease,
-      background 0.15s ease;
+      opacity 0.2s ease,
+      background 0.2s ease;
   }
 
   &__edge--highlighted {
-    background: var(--color-surface-raised);
+    background: var(--color-gold-dim-bg);
   }
 
   &__edge--dimmed {
@@ -103,9 +107,15 @@
     font-family: inherit;
     text-align: left;
     cursor: pointer;
+    transition: all 0.2s ease;
 
     &:hover {
-      border-color: var(--color-primary);
+      border-color: var(--color-gold-border-hi);
+      opacity: 0.9;
+    }
+
+    &:active {
+      transform: scale(0.98);
     }
 
     // Confidence "size-coded" as border weight — a non-color cue, on top
@@ -118,13 +128,16 @@
     }
     &--high {
       border-width: 2px;
-      border-color: var(--color-primary);
+      border-color: var(--color-gold-border-hi);
+      background: var(--color-gold-dim-bg);
     }
   }
 
   &__mechanism-arrow {
     flex-shrink: 0;
-    color: var(--color-text-muted);
+    color: var(--color-gold);
+    font-family: var(--font-family-mono);
+    font-weight: 700;
   }
 
   &__mechanism-text {
@@ -146,8 +159,9 @@
     flex-shrink: 0;
     padding: 0.1rem var(--space-2);
     border-radius: var(--radius-full);
-    background: var(--color-surface-raised);
-    color: var(--color-text-primary);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold-bright);
+    font-family: var(--font-family-mono);
     font-size: 0.7rem;
     font-weight: 700;
   }

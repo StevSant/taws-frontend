@@ -1,5 +1,12 @@
 <div class="login-page">
-  <form class="login-page__card" (ngSubmit)="onSubmit()">
+  <div class="login-page__glow" aria-hidden="true"></div>
+
+  <form class="login-page__card glass" (ngSubmit)="onSubmit()">
+    <div class="login-page__brand">
+      <span class="login-page__brand-mark" aria-hidden="true">T</span>
+      <span class="login-page__brand-name">{{ i18n.t('shell.title') }}</span>
+    </div>
+
     <h1 class="login-page__title">{{ titleLabel() }}</h1>
 
     @if (confirmationRequired()) {

@@ -15,15 +15,24 @@
     font: inherit;
     text-align: left;
     cursor: pointer;
-    transition: border-color 0.15s ease;
+    box-shadow: var(--elevation-1);
+    transition: all 0.2s ease;
 
     &:hover {
-      border-color: var(--color-primary);
+      border-color: var(--color-gold-border-hi);
+      box-shadow: var(--elevation-2);
+    }
+
+    &:active {
+      transform: scale(0.98);
     }
 
     &--selected {
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 1px var(--color-primary);
+      border-color: var(--color-gold-border-hi);
+      background: var(--color-gold-dim-bg);
+      box-shadow:
+        0 0 0 1px var(--color-gold-border-hi),
+        var(--elevation-2);
     }
   }
 
@@ -35,6 +44,7 @@
   &__description {
     color: var(--color-text-secondary);
     font-size: 0.85rem;
+    line-height: 1.45;
   }
 
   &__meta {
@@ -45,10 +55,12 @@
   &__badge {
     padding: 0.1rem var(--space-2);
     border-radius: var(--radius-full);
-    background: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-muted);
+    background: var(--color-gold-dim-bg);
+    border: 1px solid var(--color-gold-border);
+    color: var(--color-gold-bright);
+    font-family: var(--font-family-mono);
     font-size: 0.65rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }

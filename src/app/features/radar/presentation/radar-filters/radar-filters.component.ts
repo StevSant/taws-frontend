@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  inject,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationKey, TranslationService } from '../../../../core';
 import {
@@ -36,6 +43,7 @@ const RECENCY_LABELS: Record<number, TranslationKey> = {
   imports: [FormsModule],
   templateUrl: './radar-filters.component.html',
   styleUrl: './radar-filters.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RadarFiltersComponent {
   @Input({ required: true }) filters!: RadarFilters;
@@ -48,7 +56,7 @@ export class RadarFiltersComponent {
   readonly assetClasses = ASSET_CLASSES;
   readonly recencyOptions = RECENCY_OPTIONS_HOURS;
 
-  constructor(readonly i18n: TranslationService) {}
+  readonly i18n = inject(TranslationService);
 
   assetClassLabel(assetClass: AssetClass): string {
     return this.i18n.t(ASSET_CLASS_LABELS[assetClass]);
@@ -57,5 +65,13 @@ export class RadarFiltersComponent {
   recencyLabel(hours: number): string {
     const key = RECENCY_LABELS[hours];
     return key ? this.i18n.t(key) : `${hours}h`;
+  }
+
+  selectAssetClass(assetClass: AssetClass | null): void {
+    this.assetClassChange.emit(assetClass);
+  }
+
+  selectRecency(hours: number): void {
+    this.sinceHoursChange.emit(hours);
   }
 }

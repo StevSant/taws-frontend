@@ -32,10 +32,12 @@
               impactDirectionLabel(impact.direction)
             }}</span>
           </header>
-          <p class="scenario-result__impact-confidence">
-            {{ i18n.t('scenarios.result.impact.confidence.label') }}:
-            {{ impact.confidence | percent: '1.0-0' }}
-          </p>
+          <div class="scenario-result__impact-confidence">
+            <span class="scenario-result__impact-confidence-label">{{
+              i18n.t('scenarios.result.impact.confidence.label')
+            }}</span>
+            <app-confidence-gauge [value]="impact.confidence * 100" [size]="44" />
+          </div>
 
           <app-evidence-panel [evidence]="impact.evidence" />
         </div>
@@ -52,7 +54,10 @@
     <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.actions.title') }}</h3>
     <ul class="scenario-result__actions">
       @for (action of result.recommendedActions; track $index) {
-        <li>{{ action }}</li>
+        <li class="scenario-result__action">
+          <span class="scenario-result__action-chevron" aria-hidden="true">›</span>
+          <span>{{ action }}</span>
+        </li>
       }
     </ul>
   </section>

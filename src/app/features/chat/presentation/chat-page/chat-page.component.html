@@ -1,15 +1,35 @@
 <div class="chat-page">
+  <div class="chat-page__hero" [class.chat-page__hero--compact]="hasMessages()">
+    <div class="chat-page__corona" aria-hidden="true">
+      <span class="chat-page__corona-glow"></span>
+      <span class="chat-page__corona-ring"></span>
+    </div>
+    <app-golden-polyhedron [size]="heroSize()" />
+  </div>
+
   <app-routing-trace [hops]="store.routingHops()" />
 
-  <ul class="chat-page__messages">
+  <ul class="chat-page__messages scroll-hide">
     @for (message of store.messages(); track message.id) {
-      <li class="chat-page__message" [class.chat-page__message--user]="message.role === 'user'">
+      <li
+        class="chat-page__message"
+        [class.chat-page__message--user]="message.role === 'user'"
+        [class.chat-page__message--assistant]="message.role === 'assistant'"
+      >
         <span class="chat-page__role">
           {{ message.role === 'user' ? i18n.t('chat.role.user') : i18n.t('chat.role.assistant') }}
         </span>
         <p class="chat-page__content">{{ message.content }}</p>
         @if (message.pending) {
-          <app-spinner [label]="i18n.t('chat.streaming')" />
+          <span
+            class="chat-page__typing"
+            role="status"
+            [attr.aria-label]="i18n.t('chat.streaming')"
+          >
+            <span class="chat-page__typing-dot"></span>
+            <span class="chat-page__typing-dot"></span>
+            <span class="chat-page__typing-dot"></span>
+          </span>
         }
       </li>
     }
@@ -21,7 +41,7 @@
     </div>
   }
 
-  <form class="chat-page__composer" (ngSubmit)="onSend()">
+  <form class="chat-page__composer glass" (ngSubmit)="onSend()">
     <input
       class="chat-page__input"
       type="text"
@@ -31,10 +51,12 @@
       (ngModelChange)="draft.set($event)"
       [disabled]="store.isStreaming()"
     />
-    <app-button
-      [label]="i18n.t('chat.send')"
-      [disabled]="!store.canSend() || !draft().trim()"
-      (pressed)="onSend()"
-    />
+    <div class="chat-page__send">
+      <app-button
+        [label]="i18n.t('chat.send')"
+        [disabled]="!store.canSend() || !draft().trim()"
+        (pressed)="onSend()"
+      />
+    </div>
   </form>
 </div>

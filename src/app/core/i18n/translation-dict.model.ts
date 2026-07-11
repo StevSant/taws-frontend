@@ -15,6 +15,7 @@ export interface TranslationDict {
   'shell.language.toggleLabel': string;
   'shell.auth.login': string;
   'shell.auth.logout': string;
+  'shell.status.active': string;
   'auth.login.title': string;
   'auth.signup.title': string;
   'auth.email.label': string;
