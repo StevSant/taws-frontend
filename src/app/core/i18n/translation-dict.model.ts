@@ -61,6 +61,38 @@ export interface TranslationDict {
   'scenarios.description': string;
   'briefings.title': string;
   'briefings.description': string;
+  'briefings.disclaimer.static': string;
+  'briefings.watchlist.label': string;
+  'briefings.watchlist.placeholder': string;
+  'briefings.watchlist.empty': string;
+  'briefings.generate': string;
+  'briefings.generating': string;
+  'briefings.loading': string;
+  'briefings.error.banner': string;
+  'briefings.error.retry': string;
+  'briefings.selectPrompt': string;
+  'briefings.empty.title': string;
+  'briefings.empty.description': string;
+  'briefings.card.createdAt': string;
+  'briefings.card.status.label': string;
+  'briefings.card.status.pending': string;
+  'briefings.card.linkedSignals.title': string;
+  'briefings.card.linkedSignals.empty': string;
+  'briefings.card.disclaimer.label': string;
+  'briefings.review.decision.reviewed': string;
+  'briefings.review.decision.escalated': string;
+  'briefings.review.decision.discarded': string;
+  'briefings.review.justification.label': string;
+  'briefings.review.justification.placeholder': string;
+  'briefings.review.action.reviewed': string;
+  'briefings.review.action.escalated': string;
+  'briefings.review.action.discarded': string;
+  'briefings.review.closed': string;
+  'briefings.review.error.banner': string;
+  'briefings.review.submitting': string;
+  'briefings.history.title': string;
+  'briefings.history.empty': string;
+  'briefings.history.reviewer': string;
   'placeholder.badge': string;
 }
 
