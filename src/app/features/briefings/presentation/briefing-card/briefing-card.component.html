@@ -39,6 +39,23 @@
     <strong>{{ i18n.t('briefings.card.disclaimer.label') }}:</strong> {{ briefing.disclaimer }}
   </p>
 
+  <div class="briefing-card__export">
+    <app-button
+      [label]="
+        isExporting
+          ? i18n.t('briefings.card.export.exporting')
+          : i18n.t('briefings.card.export.action')
+      "
+      [disabled]="isExporting"
+      (pressed)="exportPdf.emit()"
+    />
+    @if (exportError) {
+      <p class="briefing-card__export-error" role="alert">
+        {{ i18n.t('briefings.card.export.error.banner') }}{{ exportError }}
+      </p>
+    }
+  </div>
+
   <app-review-panel
     [history]="history"
     [isSubmitting]="isSubmitting"

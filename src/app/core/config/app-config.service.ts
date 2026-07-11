@@ -12,4 +12,6 @@ export class AppConfigService {
   readonly production: boolean = environment.production;
   readonly supabaseUrl: string = environment.supabaseUrl;
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
+  /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */
+  readonly radarPollIntervalMs: number = environment.radarPollIntervalMs;
 }

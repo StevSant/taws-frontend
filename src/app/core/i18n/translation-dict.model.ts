@@ -157,6 +157,16 @@ export interface TranslationDict {
   'briefings.history.title': string;
   'briefings.history.empty': string;
   'briefings.history.reviewer': string;
+  'briefings.card.export.action': string;
+  'briefings.card.export.exporting': string;
+  'briefings.card.export.error.banner': string;
+  'notifications.bell.label': string;
+  'notifications.panel.title': string;
+  'notifications.empty': string;
+  'notifications.clearAll': string;
+  'notifications.dismiss': string;
+  'notifications.radar.newSignals': string;
+  'notifications.briefing.generated': string;
   'placeholder.badge': string;
 }
 

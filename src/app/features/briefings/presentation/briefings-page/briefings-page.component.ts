@@ -61,4 +61,8 @@ export class BriefingsPageComponent implements OnInit {
   onSubmitReview(briefingId: string, event: ReviewDecisionSubmitted): void {
     void this.store.submitReview(briefingId, event.decision, event.justification);
   }
+
+  onExportPdf(briefingId: string): void {
+    void this.store.exportBriefing(briefingId);
+  }
 }

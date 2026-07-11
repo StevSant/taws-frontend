@@ -29,6 +29,12 @@
       >
     </nav>
 
+    <app-notification-bell
+      [notifications]="notifications.notifications()"
+      (dismiss)="notifications.dismiss($event)"
+      (clearAll)="notifications.clearAll()"
+    />
+
     <div
       class="app-shell__language"
       role="group"

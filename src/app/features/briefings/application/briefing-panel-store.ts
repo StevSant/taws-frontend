@@ -1,4 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { NotificationsStore } from '../../../core';
+import { downloadBlob } from '../../../shared';
 import {
   Briefing,
   BriefingRepository,
@@ -28,6 +30,8 @@ export class BriefingPanelStore {
   private readonly errorSignal = signal<string | null>(null);
   private readonly reviewErrorsSignal = signal<Record<string, string | null>>({});
   private readonly submittingBriefingIdSignal = signal<string | null>(null);
+  private readonly exportingBriefingIdSignal = signal<string | null>(null);
+  private readonly exportErrorsSignal = signal<Record<string, string | null>>({});
 
   readonly watchlists = this.watchlistsSignal.asReadonly();
   readonly selectedWatchlistId = this.selectedWatchlistIdSignal.asReadonly();
@@ -58,6 +62,7 @@ export class BriefingPanelStore {
     private readonly watchlistRepository: WatchlistRepository,
     private readonly briefingRepository: BriefingRepository,
     private readonly reviewRepository: ReviewRepository,
+    private readonly notifications: NotificationsStore,
   ) {}
 
   /** Loads the user's watchlists and auto-selects the first one, if any. */
@@ -101,6 +106,7 @@ export class BriefingPanelStore {
       const briefing = await this.briefingRepository.generateBriefing(watchlistId);
       this.briefingsSignal.update((briefings) => [briefing, ...briefings]);
       await this.loadReviewHistory(briefing.id);
+      this.notifications.notify('briefing', 'notifications.briefing.generated');
     } catch (error: unknown) {
       this.errorSignal.set(this.toErrorMessage(error));
     } finally {
@@ -118,6 +124,38 @@ export class BriefingPanelStore {
 
   reviewErrorFor(briefingId: string): string | null {
     return this.reviewErrorsSignal()[briefingId] ?? null;
+  }
+
+  isExportingFor(briefingId: string): boolean {
+    return this.exportingBriefingIdSignal() === briefingId;
+  }
+
+  exportErrorFor(briefingId: string): string | null {
+    return this.exportErrorsSignal()[briefingId] ?? null;
+  }
+
+  /**
+   * Exports a briefing as PDF and triggers a browser download (issue #22).
+   * The backend endpoint (`GET /api/v1/briefings/{id}/export.pdf`) is being
+   * built in parallel — `BriefingRepository.exportBriefingPdf` already maps
+   * a 404/network failure to a clear `Error` message, surfaced here via
+   * `exportErrorFor(briefingId)` instead of crashing or failing silently.
+   */
+  async exportBriefing(briefingId: string): Promise<void> {
+    if (this.exportingBriefingIdSignal() !== null) {
+      return;
+    }
+
+    this.exportingBriefingIdSignal.set(briefingId);
+    this.setExportError(briefingId, null);
+    try {
+      const blob = await this.briefingRepository.exportBriefingPdf(briefingId);
+      downloadBlob(blob, `briefing-${briefingId}.pdf`);
+    } catch (error: unknown) {
+      this.setExportError(briefingId, this.toErrorMessage(error));
+    } finally {
+      this.exportingBriefingIdSignal.set(null);
+    }
   }
 
   /** Submits a review decision (reviewed/escalated/discarded) with its required justification. */
@@ -194,6 +232,10 @@ export class BriefingPanelStore {
 
   private setReviewError(briefingId: string, message: string | null): void {
     this.reviewErrorsSignal.update((errors) => ({ ...errors, [briefingId]: message }));
+  }
+
+  private setExportError(briefingId: string, message: string | null): void {
+    this.exportErrorsSignal.update((errors) => ({ ...errors, [briefingId]: message }));
   }
 
   private toErrorMessage(error: unknown): string {
