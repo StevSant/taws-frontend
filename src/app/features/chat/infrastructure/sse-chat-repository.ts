@@ -32,11 +32,11 @@ export class SseChatRepository extends ChatRepository {
   private readonly config = inject(AppConfigService);
   private readonly authToken = inject(AuthTokenService);
 
-  async *streamReply(input: string): AsyncIterable<ChatStreamEvent> {
+  async *streamReply(input: string, threadId: string): AsyncIterable<ChatStreamEvent> {
     const response = await fetch(`${this.config.apiBaseUrl}${CHAT_STREAM_PATH}`, {
       method: 'POST',
       headers: this.buildHeaders(),
-      body: JSON.stringify({ message: input }),
+      body: JSON.stringify({ message: input, thread_id: threadId }),
     });
 
     if (!response.ok || !response.body) {

@@ -145,18 +145,23 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
     }
 
     if (theme === 'light') {
-      this.material.color.setHex(0xf0c040);
-      this.material.shininess = 68;
-      this.ambientLight.color.setHex(0xfff8e7);
-      this.ambientLight.intensity = 0.95;
-      this.keyLight.color.setHex(0xffe08a);
-      this.keyLight.intensity = 1.65;
-      this.fillLight.color.setHex(0xe6b422);
-      this.fillLight.intensity = 0.55;
+      this.material.color.setHex(0xc8920e);
+      this.material.shininess = 82;
+      this.material.emissive.setHex(0xe6b422);
+      this.material.emissiveIntensity = 0.12;
+      this.ambientLight.color.setHex(0xfff3d4);
+      this.ambientLight.intensity = 0.55;
+      this.keyLight.color.setHex(0xffd966);
+      this.keyLight.intensity = 2.1;
+      this.fillLight.color.setHex(0xb8860b);
+      this.fillLight.intensity = 0.75;
       this.rimLight.color.setHex(0xffffff);
-      this.rimLight.intensity = 0.45;
+      this.rimLight.intensity = 0.65;
       return;
     }
+
+    this.material.emissive.setHex(0x000000);
+    this.material.emissiveIntensity = 0;
 
     this.material.color.setHex(0xc8920e);
     this.material.shininess = 45;
@@ -207,7 +212,7 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
         this.rotationY += delta * profile.rotationSpeed;
         this.mesh.rotation.y = this.rotationY;
         this.mesh.rotation.x = Math.sin(elapsed * profile.pulseHz) * profile.wobble;
-        const scale = 1 + Math.sin(elapsed * profile.pulseHz * 1.6) * profile.pulseAmp;
+        const scale = 1 + Math.sin(elapsed * profile.pulseHz) * profile.pulseAmp;
         this.mesh.scale.setScalar(scale);
         this.material.emissive.setHex(profile.emissive);
         this.material.emissiveIntensity = profile.emissiveIntensity;

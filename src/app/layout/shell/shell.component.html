@@ -1,11 +1,8 @@
 <div class="app-shell">
   <header class="app-shell__header">
     <a class="app-shell__brand" routerLink="/radar">
-      <app-midas-logo class="app-shell__brand-mark" [size]="32" />
-      <span class="app-shell__brand-text">
-        <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
-        <span class="app-shell__brand-tag">{{ i18n.t('shell.tagline') }}</span>
-      </span>
+      <app-midas-logo class="app-shell__brand-mark" [size]="26" />
+      <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
     </a>
 
     <nav class="app-shell__nav" [attr.aria-label]="i18n.t('shell.nav.label')">

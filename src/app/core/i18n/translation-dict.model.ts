@@ -83,6 +83,13 @@ export interface TranslationDict {
   'chat.oracle.status.listening': string;
   'chat.oracle.status.composing': string;
   'chat.oracle.status.streaming': string;
+  'chat.sessions.title': string;
+  'chat.sessions.new': string;
+  'chat.sessions.newChat': string;
+  'chat.sessions.messages': string;
+  'chat.sessions.delete': string;
+  'chat.sessions.toggle': string;
+  'chat.sessions.hide': string;
   'radar.title': string;
   'radar.description': string;
   'radar.filters.type.label': string;

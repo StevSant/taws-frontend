@@ -81,7 +81,7 @@ html:not([data-theme]) {
 
   --glass-bg: rgba(14, 14, 14, 0.75);
   --glass-blur: 20px;
-  --shell-header-height: 4rem;
+  --shell-header-height: calc(3rem + (2 * var(--space-2)));
   --shell-header-bg: color-mix(in srgb, var(--color-background) 98%, transparent);
   --card-outline-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
@@ -141,7 +141,7 @@ html[data-theme='light'] {
 
   --glass-bg: rgba(255, 253, 248, 0.86);
   --glass-blur: 18px;
-  --shell-header-height: 4rem;
+  --shell-header-height: calc(3rem + (2 * var(--space-2)));
   --shell-header-bg: color-mix(in srgb, var(--color-surface) 94%, transparent);
   --card-outline-shadow: 0 0 0 1px rgba(28, 25, 23, 0.06);
 }

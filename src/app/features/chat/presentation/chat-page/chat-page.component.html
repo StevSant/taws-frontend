@@ -1,31 +1,67 @@
 <div
   class="chat-page"
   [class.chat-page--idle]="oracleActivity() === 'idle'"
-  [class.chat-page--composing]="oracleActivity() === 'composing'"
   [class.chat-page--listening]="oracleActivity() === 'listening'"
   [class.chat-page--streaming]="oracleActivity() === 'streaming'"
   [class.chat-page--conversation]="hasMessages()"
+  [class.chat-page--sessions]="auth.isAuthenticated()"
+  [class.chat-page--sessions-open]="auth.isAuthenticated() && sessionsOpen()"
 >
   <div class="chat-page__stage" aria-hidden="true">
     <div class="chat-page__mesh"></div>
-    <div class="chat-page__hex-field"></div>
+    @if (!hasMessages()) {
+      <div class="chat-page__hex-field"></div>
+    }
     <span class="chat-page__energy-pulse"></span>
     <span class="chat-page__orb chat-page__orb--left"></span>
     <span class="chat-page__orb chat-page__orb--right"></span>
-    <span class="chat-page__scanline"></span>
   </div>
 
   <div class="chat-page__viewport">
-    <div class="chat-page__frame">
+    @if (auth.isAuthenticated()) {
+      <app-chat-sessions-panel
+        [mobileOpen]="sessionsOpen()"
+        (closePanel)="closeSessionsPanel()"
+      />
+    }
+
+    @if (auth.isAuthenticated() && sessionsOpen()) {
+      <button
+        type="button"
+        class="chat-page__sessions-backdrop"
+        [attr.aria-label]="i18n.t('chat.sessions.hide')"
+        (click)="closeSessionsPanel()"
+      ></button>
+    }
+
+    <div class="chat-page__workspace">
+      @if (auth.isAuthenticated() && !sessionsOpen()) {
+        <button
+          type="button"
+          class="chat-page__sessions-toggle"
+          [attr.aria-expanded]="sessionsOpen()"
+          [attr.aria-label]="i18n.t('chat.sessions.toggle')"
+          [attr.title]="i18n.t('chat.sessions.toggle')"
+          (click)="openSessionsPanel()"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h10" />
+          </svg>
+        </button>
+      }
+
+      <div class="chat-page__frame">
       @if (!hasMessages()) {
         <header class="chat-page__oracle">
-          <div
+          <button
+            type="button"
             class="chat-page__hero"
             [class.chat-page__hero--idle]="oracleActivity() === 'idle'"
             [class.chat-page__hero--listening]="oracleActivity() === 'listening'"
-            [class.chat-page__hero--composing]="oracleActivity() === 'composing'"
             [class.chat-page__hero--streaming]="oracleActivity() === 'streaming'"
             [style.--hero-diameter.px]="heroSize()"
+            [attr.aria-label]="oracleStatusLabel()"
+            (click)="focusComposer()"
           >
             <div class="chat-page__corona" aria-hidden="true">
               <span class="chat-page__corona-glow"></span>
@@ -34,18 +70,13 @@
               </span>
             </div>
             <app-golden-polyhedron [size]="heroSize()" [activity]="oracleActivity()" />
-          </div>
+          </button>
 
           <p class="chat-page__oracle-status" role="status">
             <span class="chat-page__oracle-status-dot" aria-hidden="true"></span>
             {{ oracleStatusLabel() }}
           </p>
         </header>
-      } @else {
-        <div class="chat-page__session-bar" role="status">
-          <span class="chat-page__oracle-status-dot" aria-hidden="true"></span>
-          <span class="chat-page__session-label">{{ oracleStatusLabel() }}</span>
-        </div>
       }
 
       <section class="chat-page__main">
@@ -86,19 +117,15 @@
                       "
                     >
                       @if (message.pending && isLatestAssistant(message.id)) {
-                        <app-golden-polyhedron
-                          [size]="avatarSize"
-                          [activity]="oracleActivity()"
-                        />
-                      } @else {
-                        <img
-                          class="chat-page__avatar-mark"
-                          src="/midas-mark.svg"
-                          alt=""
-                          width="48"
-                          height="48"
-                        />
+                        <div class="chat-page__avatar-corona" aria-hidden="true">
+                          <span class="chat-page__avatar-corona-glow"></span>
+                          <span class="chat-page__avatar-corona-ring"></span>
+                        </div>
                       }
+                      <app-golden-polyhedron
+                        [size]="avatarSize"
+                        [activity]="avatarActivity(message.id, !!message.pending)"
+                      />
                     </div>
 
                     <article
@@ -171,7 +198,7 @@
           </div>
         }
       </section>
-    </div>
+      </div>
 
     <footer class="chat-page__footer">
       <div class="chat-page__footer-inner">
@@ -213,6 +240,7 @@
           </button>
 
           <input
+            #composerInput
             class="chat-page__input"
             type="text"
             name="draft"
@@ -234,5 +262,6 @@
         </form>
       </div>
     </footer>
+    </div>
   </div>
 </div>
