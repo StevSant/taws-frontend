@@ -10,4 +10,6 @@ import { environment } from '../../../environments/environment';
 export class AppConfigService {
   readonly apiBaseUrl: string = environment.apiBaseUrl;
   readonly production: boolean = environment.production;
+  readonly supabaseUrl: string = environment.supabaseUrl;
+  readonly supabaseAnonKey: string = environment.supabaseAnonKey;
 }

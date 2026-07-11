@@ -13,6 +13,18 @@ export interface TranslationDict {
   'shell.language.es': string;
   'shell.language.en': string;
   'shell.language.toggleLabel': string;
+  'shell.auth.login': string;
+  'shell.auth.logout': string;
+  'auth.login.title': string;
+  'auth.signup.title': string;
+  'auth.email.label': string;
+  'auth.password.label': string;
+  'auth.submit.login': string;
+  'auth.submit.signup': string;
+  'auth.submitting': string;
+  'auth.toggle.toSignup': string;
+  'auth.toggle.toLogin': string;
+  'auth.confirmation.required': string;
   'chat.placeholder': string;
   'chat.send': string;
   'chat.streaming': string;

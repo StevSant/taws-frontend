@@ -1,0 +1,52 @@
+<div class="login-page">
+  <form class="login-page__card" (ngSubmit)="onSubmit()">
+    <h1 class="login-page__title">{{ titleLabel() }}</h1>
+
+    @if (confirmationRequired()) {
+      <p class="login-page__confirmation" role="status">
+        {{ i18n.t('auth.confirmation.required') }}
+      </p>
+    } @else {
+      <label class="login-page__field">
+        <span class="login-page__label">{{ i18n.t('auth.email.label') }}</span>
+        <input
+          class="login-page__input"
+          type="email"
+          name="email"
+          autocomplete="email"
+          required
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+      </label>
+
+      <label class="login-page__field">
+        <span class="login-page__label">{{ i18n.t('auth.password.label') }}</span>
+        <input
+          class="login-page__input"
+          type="password"
+          name="password"
+          autocomplete="current-password"
+          required
+          minlength="6"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+        />
+      </label>
+
+      @if (store.error()) {
+        <div class="login-page__error" role="alert">{{ store.error() }}</div>
+      }
+
+      <app-button [label]="submitLabel()" [disabled]="!canSubmit()" (pressed)="onSubmit()" />
+
+      @if (isSubmitting()) {
+        <app-spinner [label]="i18n.t('auth.submitting')" />
+      }
+
+      <button type="button" class="login-page__toggle" (click)="toggleMode()">
+        {{ toggleLabel() }}
+      </button>
+    }
+  </form>
+</div>
