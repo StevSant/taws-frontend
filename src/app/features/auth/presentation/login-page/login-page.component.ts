@@ -1,9 +1,10 @@
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslationKey, TranslationService } from '../../../../core';
-import { ButtonComponent, SpinnerComponent } from '../../../../shared';
+import { AppConfigService, TranslationKey, TranslationService } from '../../../../core';
+import { ButtonComponent, MidasLogoComponent, SpinnerComponent } from '../../../../shared';
 import { AuthErrorCode, AuthStore } from '../../application';
+import { DemoAuthPerspective } from '../../domain/models/demo-auth-perspective.model';
 
 type AuthMode = 'login' | 'signup';
 
@@ -13,7 +14,7 @@ const SUBMIT_LABELS: Record<AuthMode, TranslationKey> = {
 };
 
 const TITLE_LABELS: Record<AuthMode, TranslationKey> = {
-  login: 'auth.login.title',
+  login: 'auth.login.welcome',
   signup: 'auth.signup.title',
 };
 
@@ -22,11 +23,6 @@ const TOGGLE_LABELS: Record<AuthMode, TranslationKey> = {
   signup: 'auth.toggle.toLogin',
 };
 
-/**
- * Maps every `AuthErrorCode` to a translation key. `store.error()` is never
- * raw text (see `AuthStore.toErrorCode`), so this lookup is exhaustive and
- * the template never renders unmapped/untranslated content.
- */
 const ERROR_LABELS: Record<AuthErrorCode, TranslationKey> = {
   configMissing: 'auth.error.configMissing',
   noSession: 'auth.error.noSession',
@@ -35,17 +31,10 @@ const ERROR_LABELS: Record<AuthErrorCode, TranslationKey> = {
 
 const DEFAULT_REDIRECT_PATH = '/radar';
 
-/**
- * Combined login/signup form (email+password) for Supabase Auth. Redirects
- * to `?returnUrl=` (set by `authGuard`) — or `/radar` — as soon as
- * AuthStore reports an authenticated session, which covers both a fresh
- * login/signup and the case where an already-logged-in user lands here
- * directly.
- */
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, SpinnerComponent],
+  imports: [FormsModule, ButtonComponent, MidasLogoComponent, SpinnerComponent],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })
@@ -53,6 +42,18 @@ export class LoginPageComponent {
   readonly mode = signal<AuthMode>('login');
   readonly email = signal('');
   readonly password = signal('');
+  readonly activePerspectiveId = signal<DemoAuthPerspective['id'] | null>(null);
+
+  readonly store = inject(AuthStore);
+  readonly i18n = inject(TranslationService);
+  private readonly config = inject(AppConfigService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  readonly demoPerspectives = this.config.demoAuthPerspectives;
+  readonly showDemoPerspectives = computed(
+    () => !this.config.production && this.demoPerspectives.length > 0 && this.mode() === 'login',
+  );
 
   readonly isSubmitting = computed(() => this.store.status() === 'submitting');
   readonly confirmationRequired = computed(() => this.store.status() === 'confirmationRequired');
@@ -60,12 +61,7 @@ export class LoginPageComponent {
     () => !this.isSubmitting() && this.email().trim().length > 0 && this.password().length > 0,
   );
 
-  constructor(
-    readonly store: AuthStore,
-    readonly i18n: TranslationService,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
-  ) {
+  constructor() {
     effect(() => {
       if (this.store.isAuthenticated()) {
         void this.router.navigateByUrl(this.resolveReturnUrl());
@@ -85,14 +81,18 @@ export class LoginPageComponent {
     return this.i18n.t(TOGGLE_LABELS[this.mode()]);
   }
 
-  /** Translated message for the current auth error code, or `null` when there is none. */
   errorMessage(): string | null {
     const code = this.store.error();
     return code ? this.i18n.t(ERROR_LABELS[code]) : null;
   }
 
+  isPerspectiveBusy(id: DemoAuthPerspective['id']): boolean {
+    return this.isSubmitting() && this.activePerspectiveId() === id;
+  }
+
   toggleMode(): void {
     this.mode.set(this.mode() === 'login' ? 'signup' : 'login');
+    this.activePerspectiveId.set(null);
   }
 
   onSubmit(): void {
@@ -102,11 +102,27 @@ export class LoginPageComponent {
       return;
     }
 
+    this.activePerspectiveId.set(null);
     if (this.mode() === 'login') {
       void this.store.login(email, password);
     } else {
       void this.store.signUp(email, password);
     }
+  }
+
+  loginAsPerspective(perspective: DemoAuthPerspective): void {
+    if (this.isSubmitting()) {
+      return;
+    }
+
+    this.email.set(perspective.email);
+    this.password.set(perspective.password);
+    this.activePerspectiveId.set(perspective.id);
+    void this.store.login(perspective.email, perspective.password).finally(() => {
+      if (this.activePerspectiveId() === perspective.id) {
+        this.activePerspectiveId.set(null);
+      }
+    });
   }
 
   private resolveReturnUrl(): string {

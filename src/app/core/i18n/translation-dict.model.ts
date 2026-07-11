@@ -17,6 +17,9 @@ export interface TranslationDict {
   'shell.auth.logout': string;
   'shell.status.active': string;
   'auth.login.title': string;
+  'auth.login.eyebrow': string;
+  'auth.login.welcome': string;
+  'auth.login.subtitle': string;
   'auth.signup.title': string;
   'auth.email.label': string;
   'auth.password.label': string;
@@ -30,6 +33,15 @@ export interface TranslationDict {
   'auth.error.configMissing': string;
   'auth.error.noSession': string;
   'auth.error.unknown': string;
+  'auth.demo.divider': string;
+  'auth.demo.footer': string;
+  'auth.demo.hint': string;
+  'auth.demo.role.analyst': string;
+  'auth.demo.role.portfolio': string;
+  'auth.demo.role.compliance': string;
+  'auth.demo.persona.analyst': string;
+  'auth.demo.persona.portfolio': string;
+  'auth.demo.persona.compliance': string;
   'chat.placeholder': string;
   'chat.send': string;
   'chat.streaming': string;

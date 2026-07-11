@@ -28,21 +28,7 @@
   }
 
   &__brand-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
     flex-shrink: 0;
-    border-radius: var(--radius-sm);
-    background: linear-gradient(155deg, var(--color-gold-bright), var(--color-gold) 70%);
-    color: var(--color-text-on-primary);
-    font-family: var(--font-family-mono);
-    font-weight: 700;
-    font-size: 0.95rem;
-    box-shadow:
-      0 0 0 1px var(--color-gold-border-hi),
-      0 4px 14px rgba(212, 160, 23, 0.28);
   }
 
   &__title {

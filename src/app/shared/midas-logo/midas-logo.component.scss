@@ -1,0 +1,14 @@
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.midas-logo {
+  display: block;
+  transition: opacity 0.2s ease;
+}
+
+:host(:hover) .midas-logo {
+  opacity: 0.92;
+}

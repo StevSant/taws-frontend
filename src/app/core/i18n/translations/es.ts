@@ -2,7 +2,7 @@ import { TranslationDict } from '../translation-dict.model';
 
 /** Spanish dictionary — default locale. Keep this the natural, primary copy. */
 export const ES_TRANSLATIONS = {
-  'shell.title': 'TAWS · Radar de Mercado',
+  'shell.title': 'Midas · Radar de Mercado',
   'shell.nav.radar': 'Radar',
   'shell.nav.chat': 'Chat',
   'shell.nav.scenarios': 'Laboratorio de Escenarios',
@@ -14,6 +14,10 @@ export const ES_TRANSLATIONS = {
   'shell.auth.logout': 'Cerrar sesión',
   'shell.status.active': 'Sistema activo',
   'auth.login.title': 'Iniciar sesión',
+  'auth.login.eyebrow': 'Iniciar sesión',
+  'auth.login.welcome': 'Bienvenido de vuelta',
+  'auth.login.subtitle':
+    'Entrá con tu correo o elegí una perspectiva demo para explorar Midas.',
   'auth.signup.title': 'Crear una cuenta',
   'auth.email.label': 'Correo electrónico',
   'auth.password.label': 'Contraseña',
@@ -29,6 +33,15 @@ export const ES_TRANSLATIONS = {
     'La autenticación aún no está configurada del todo. Contactá a soporte.',
   'auth.error.noSession': 'No pudimos iniciar tu sesión. Intentá iniciar sesión nuevamente.',
   'auth.error.unknown': 'Revisá tus datos e intentá de nuevo.',
+  'auth.demo.divider': 'Demo · Perspectiva',
+  'auth.demo.footer': 'Podés cambiar de perspectiva cerrando sesión y volviendo a entrar.',
+  'auth.demo.hint': 'Midas — Supabase Auth. Creá los usuarios demo en el dashboard antes de usar estos accesos.',
+  'auth.demo.role.analyst': 'Analista',
+  'auth.demo.role.portfolio': 'Gestor',
+  'auth.demo.role.compliance': 'Cumplimiento',
+  'auth.demo.persona.analyst': 'Sofía Reyes · radar & señales',
+  'auth.demo.persona.portfolio': 'Marco Vega · briefings',
+  'auth.demo.persona.compliance': 'Elena Ruiz · revisión HITL',
   'chat.placeholder': 'Escribe un mensaje…',
   'chat.send': 'Enviar',
   'chat.streaming': 'Generando respuesta…',

@@ -14,4 +14,6 @@ export class AppConfigService {
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */
   readonly radarPollIntervalMs: number = environment.radarPollIntervalMs;
+  /** Dev-only demo personas for role-based one-click login. */
+  readonly demoAuthPerspectives = environment.demoAuthPerspectives;
 }

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Midas">
+  <defs>
+    <linearGradient id="gold" x1="4" y1="4" x2="60" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f5c842" />
+      <stop offset="50%" stop-color="#d4a017" />
+      <stop offset="100%" stop-color="#9a7209" />
+    </linearGradient>
+  </defs>
+  <g stroke="url(#gold)" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="miter">
+    <path d="M 4 32 L 60 32" />
+    <path d="M 32 6 L 20 32" />
+    <path d="M 32 6 L 44 32" />
+    <path d="M 20 32 L 32 56" />
+    <path d="M 44 32 L 32 56" />
+    <path d="M 9 15 L 6 32" />
+    <path d="M 9 15 L 20 32" />
+    <path d="M 55 13 L 59 32" />
+    <path d="M 55 13 L 44 32" />
+    <path d="M 60 32 L 62 42" />
+  </g>
+</svg>

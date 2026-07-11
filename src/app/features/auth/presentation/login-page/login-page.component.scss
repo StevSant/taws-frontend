@@ -31,7 +31,7 @@
     flex-direction: column;
     gap: var(--space-3);
     width: 100%;
-    max-width: 380px;
+    max-width: 440px;
     padding: var(--space-6);
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-gold-border);
@@ -48,21 +48,8 @@
   }
 
   &__brand-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
     flex-shrink: 0;
-    border-radius: var(--radius-sm);
-    background: linear-gradient(155deg, var(--color-gold-bright), var(--color-gold) 70%);
-    color: var(--color-text-on-primary);
-    font-family: var(--font-family-mono);
-    font-weight: 700;
-    font-size: 1.05rem;
-    box-shadow:
-      0 0 0 1px var(--color-gold-border-hi),
-      0 4px 14px rgba(212, 160, 23, 0.28);
+    filter: drop-shadow(0 4px 14px rgba(212, 160, 23, 0.28));
   }
 
   &__brand-name {
@@ -75,10 +62,28 @@
   }
 
   &__title {
-    margin: 0 0 var(--space-2);
-    font-size: 1.4rem;
+    margin: 0;
+    font-size: 1.55rem;
     font-weight: 700;
     color: var(--color-text-primary);
+    line-height: 1.15;
+  }
+
+  &__eyebrow {
+    margin: 0;
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gold-bright);
+  }
+
+  &__subtitle {
+    margin: 0 0 var(--space-2);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
   }
 
   &__field {
@@ -150,5 +155,140 @@
     &:active {
       transform: scale(0.95);
     }
+  }
+
+  &__demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__demo-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
+    span {
+      font-family: var(--font-family-mono);
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+  }
+
+  &__demo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+
+    @media (max-width: 520px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__demo-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    min-height: 5.5rem;
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-gold-border-hi);
+      background: var(--color-gold-dim-bg);
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    &:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    &--busy {
+      border-color: var(--color-gold-border-hi);
+      box-shadow: 0 0 0 1px var(--color-gold-border);
+    }
+  }
+
+  &__demo-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-full);
+    background: var(--color-gold-dim-bg);
+    border: 1px solid var(--color-gold-border);
+    color: var(--color-gold-bright);
+
+    svg {
+      width: 1.05rem;
+      height: 1.05rem;
+    }
+  }
+
+  &__demo-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__demo-role {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__demo-persona {
+    font-family: var(--font-family-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.02em;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  &__demo-footer {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+
+  &__demo-hint {
+    margin: 0;
+    font-family: var(--font-family-mono);
+    font-size: 0.6rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    text-align: center;
   }
 }

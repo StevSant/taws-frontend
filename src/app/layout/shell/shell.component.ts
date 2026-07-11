@@ -14,7 +14,7 @@ import {
   TranslationService,
 } from '../../core';
 import { AuthStore } from '../../features/auth/application';
-import { NeuralOrbComponent } from '../../shared';
+import { NeuralOrbComponent, MidasLogoComponent } from '../../shared';
 
 const CLOCK_TICK_MS = 1000;
 
@@ -32,6 +32,7 @@ const CLOCK_TICK_MS = 1000;
     RouterLinkActive,
     NotificationBellComponent,
     NeuralOrbComponent,
+    MidasLogoComponent,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',

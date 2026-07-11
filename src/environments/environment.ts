@@ -1,3 +1,5 @@
+import { DEMO_AUTH_PERSPECTIVES } from './demo-auth-perspectives';
+
 /**
  * Development environment configuration.
  * Overridden by environment.prod.ts in production builds (see angular.json fileReplacements).
@@ -15,4 +17,6 @@ export const environment = {
   supabaseAnonKey: '',
   /** How often the radar page re-polls `/api/v1/news` for new signals, in ms. */
   radarPollIntervalMs: 60_000,
+  /** One-click demo logins — empty in production builds. */
+  demoAuthPerspectives: DEMO_AUTH_PERSPECTIVES,
 };

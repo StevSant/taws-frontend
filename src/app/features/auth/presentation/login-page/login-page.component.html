@@ -3,11 +3,19 @@
 
   <form class="login-page__card glass" (ngSubmit)="onSubmit()">
     <div class="login-page__brand">
-      <span class="login-page__brand-mark" aria-hidden="true">T</span>
+      <app-midas-logo class="login-page__brand-mark" [size]="40" />
       <span class="login-page__brand-name">{{ i18n.t('shell.title') }}</span>
     </div>
 
+    @if (mode() === 'login') {
+      <p class="login-page__eyebrow">{{ i18n.t('auth.login.eyebrow') }}</p>
+    }
+
     <h1 class="login-page__title">{{ titleLabel() }}</h1>
+
+    @if (mode() === 'login') {
+      <p class="login-page__subtitle">{{ i18n.t('auth.login.subtitle') }}</p>
+    }
 
     @if (confirmationRequired()) {
       <p class="login-page__confirmation" role="status">
@@ -49,13 +57,65 @@
 
       <app-button [label]="submitLabel()" [disabled]="!canSubmit()" (pressed)="onSubmit()" />
 
-      @if (isSubmitting()) {
+      @if (isSubmitting() && !activePerspectiveId()) {
         <app-spinner [label]="i18n.t('auth.submitting')" />
       }
 
       <button type="button" class="login-page__toggle" (click)="toggleMode()">
         {{ toggleLabel() }}
       </button>
+
+      @if (showDemoPerspectives()) {
+        <div class="login-page__demo">
+          <div class="login-page__demo-divider" aria-hidden="true">
+            <span>{{ i18n.t('auth.demo.divider') }}</span>
+          </div>
+
+          <div class="login-page__demo-grid" role="group" [attr.aria-label]="i18n.t('auth.demo.divider')">
+            @for (perspective of demoPerspectives; track perspective.id) {
+              <button
+                type="button"
+                class="login-page__demo-btn"
+                [class.login-page__demo-btn--busy]="isPerspectiveBusy(perspective.id)"
+                [disabled]="isSubmitting()"
+                (click)="loginAsPerspective(perspective)"
+              >
+                <span class="login-page__demo-icon" [attr.data-icon]="perspective.icon" aria-hidden="true">
+                  @switch (perspective.icon) {
+                    @case ('analyst') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M4 19V5" />
+                        <path d="M4 19h16" />
+                        <path d="M8 15l3-4 3 2 4-6" />
+                      </svg>
+                    }
+                    @case ('portfolio') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="7" width="18" height="13" rx="2" />
+                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        <path d="M3 12h18" />
+                      </svg>
+                    }
+                    @case ('compliance') {
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 3l8 4v6c0 4.4-3.2 7.4-8 8-4.8-.6-8-3.6-8-8V7l8-4z" />
+                        <path d="M9 12l2 2 4-4" />
+                      </svg>
+                    }
+                  }
+                </span>
+                <span class="login-page__demo-copy">
+                  <span class="login-page__demo-role">{{ i18n.t(perspective.roleKey) }}</span>
+                  <span class="login-page__demo-persona">{{ i18n.t(perspective.personaKey) }}</span>
+                </span>
+              </button>
+            }
+          </div>
+
+          <p class="login-page__demo-footer">{{ i18n.t('auth.demo.footer') }}</p>
+          <p class="login-page__demo-hint">{{ i18n.t('auth.demo.hint') }}</p>
+        </div>
+      }
     }
   </form>
 </div>

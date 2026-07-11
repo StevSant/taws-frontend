@@ -13,4 +13,5 @@ export const environment = {
   supabaseAnonKey: '',
   /** How often the radar page re-polls `/api/v1/news` for new signals, in ms. */
   radarPollIntervalMs: 60_000,
+  demoAuthPerspectives: [] as const,
 };

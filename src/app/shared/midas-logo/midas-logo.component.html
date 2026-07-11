@@ -1,0 +1,51 @@
+<svg
+  class="midas-logo"
+  [attr.width]="size()"
+  [attr.height]="size()"
+  [attr.viewBox]="viewBox"
+  role="img"
+  aria-label="Midas"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient [attr.id]="uid + '-gold'" x1="4" y1="4" x2="60" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--color-gold-bright, #f5c842)" />
+      <stop offset="50%" stop-color="var(--color-gold, #d4a017)" />
+      <stop offset="100%" stop-color="#9a7209" />
+    </linearGradient>
+    <filter [attr.id]="uid + '-glow'" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="0.9" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g
+    class="midas-logo__mark"
+    [attr.stroke]="'url(#' + uid + '-gold)'"
+    [attr.filter]="'url(#' + uid + '-glow)'"
+    fill="none"
+    [attr.stroke-width]="strokeWidth()"
+    stroke-linecap="round"
+    stroke-linejoin="miter"
+  >
+    <!-- Horizontal axis -->
+    <path d="M 4 32 L 60 32" />
+    <!-- Central upward triangle -->
+    <path d="M 32 6 L 20 32" />
+    <path d="M 32 6 L 44 32" />
+    <!-- Central downward triangle -->
+    <path d="M 20 32 L 32 56" />
+    <path d="M 44 32 L 32 56" />
+    <!-- Left upper wing -->
+    <path d="M 9 15 L 6 32" />
+    <path d="M 9 15 L 20 32" />
+    <!-- Right upper wing -->
+    <path d="M 55 13 L 59 32" />
+    <path d="M 55 13 L 44 32" />
+    <!-- Right lower hook -->
+    <path d="M 60 32 L 62 42" />
+  </g>
+</svg>
