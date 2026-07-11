@@ -14,7 +14,7 @@ export type BriefingActionStatus = 'idle' | 'copied' | 'error';
  * `setMode`/`selectPreset`/`setFreeText`/`generate`/`addToBriefing` intents;
  * they never touch `ScenarioRepository` directly.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ScenarioLabStore {
   private readonly presetsSignal = signal<ScenarioPreset[]>([]);
   private readonly isLoadingPresetsSignal = signal(false);
@@ -33,6 +33,9 @@ export class ScenarioLabStore {
   private readonly monitorSignal = signal<ScenarioMonitor | null>(null);
   private readonly isArmingMonitorSignal = signal(false);
   private readonly monitorErrorSignal = signal<string | null>(null);
+  private readonly recentScenariosSignal = signal<ScenarioResult[]>([]);
+  private readonly isLoadingRecentSignal = signal(false);
+  private sessionReady = false;
 
   readonly presets = this.presetsSignal.asReadonly();
   readonly isLoadingPresets = this.isLoadingPresetsSignal.asReadonly();
@@ -52,6 +55,9 @@ export class ScenarioLabStore {
   readonly isArmingMonitor = this.isArmingMonitorSignal.asReadonly();
   readonly monitorError = this.monitorErrorSignal.asReadonly();
 
+  readonly recentScenarios = this.recentScenariosSignal.asReadonly();
+  readonly isLoadingRecent = this.isLoadingRecentSignal.asReadonly();
+
   readonly selectedPreset = computed<ScenarioPreset | null>(
     () =>
       this.presetsSignal().find((preset) => preset.id === this.selectedPresetIdSignal()) ?? null,
@@ -70,7 +76,14 @@ export class ScenarioLabStore {
 
   /** Loads the curated preset list (once, on page entry). */
   async init(): Promise<void> {
-    await this.loadPresets();
+    if (this.sessionReady && this.presetsSignal().length > 0) {
+      void this.loadPresets({ background: true });
+      void this.loadRecentScenarios({ background: true });
+      return;
+    }
+
+    await Promise.all([this.loadPresets(), this.loadRecentScenarios()]);
+    this.sessionReady = true;
   }
 
   async retryPresets(): Promise<void> {
@@ -110,6 +123,7 @@ export class ScenarioLabStore {
           : { freeText: this.freeTextSignal().trim() },
       );
       this.resultSignal.set(result);
+      await this.loadRecentScenarios();
     } catch (error: unknown) {
       this.generateErrorSignal.set(this.toErrorMessage(error));
       this.resultSignal.set(null);
@@ -182,8 +196,38 @@ export class ScenarioLabStore {
     }
   }
 
-  private async loadPresets(): Promise<void> {
-    this.isLoadingPresetsSignal.set(true);
+  async loadScenarioById(scenarioId: string): Promise<void> {
+    this.generateErrorSignal.set(null);
+    try {
+      const result = await this.scenarioRepository.getScenario(scenarioId);
+      this.resultSignal.set(result);
+      this.monitorSignal.set(null);
+      this.monitorErrorSignal.set(null);
+    } catch (error: unknown) {
+      this.generateErrorSignal.set(this.toErrorMessage(error));
+    }
+  }
+
+  private async loadRecentScenarios(options?: { background?: boolean }): Promise<void> {
+    const background = options?.background ?? false;
+    if (!background && this.recentScenariosSignal().length === 0) {
+      this.isLoadingRecentSignal.set(true);
+    }
+    try {
+      const scenarios = await this.scenarioRepository.listRecentScenarios();
+      this.recentScenariosSignal.set(scenarios);
+    } catch {
+      this.recentScenariosSignal.set([]);
+    } finally {
+      this.isLoadingRecentSignal.set(false);
+    }
+  }
+
+  private async loadPresets(options?: { background?: boolean }): Promise<void> {
+    const background = options?.background ?? false;
+    if (!background && this.presetsSignal().length === 0) {
+      this.isLoadingPresetsSignal.set(true);
+    }
     this.presetsErrorSignal.set(null);
     try {
       const presets = await this.scenarioRepository.fetchPresets();

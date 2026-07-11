@@ -14,5 +14,5 @@ export abstract class ChatRepository {
    * (assistant tokens, agent routing traces, or a stream-level error) as
    * they arrive over SSE-v2.
    */
-  abstract streamReply(input: string): AsyncIterable<ChatStreamEvent>;
+  abstract streamReply(input: string, threadId: string): AsyncIterable<ChatStreamEvent>;
 }

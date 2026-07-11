@@ -1,62 +1,267 @@
-<div class="chat-page">
-  <div class="chat-page__hero" [class.chat-page__hero--compact]="hasMessages()">
-    <div class="chat-page__corona" aria-hidden="true">
-      <span class="chat-page__corona-glow"></span>
-      <span class="chat-page__corona-ring"></span>
-    </div>
-    <app-golden-polyhedron [size]="heroSize()" />
+<div
+  class="chat-page"
+  [class.chat-page--idle]="oracleActivity() === 'idle'"
+  [class.chat-page--listening]="oracleActivity() === 'listening'"
+  [class.chat-page--streaming]="oracleActivity() === 'streaming'"
+  [class.chat-page--conversation]="hasMessages()"
+  [class.chat-page--sessions]="auth.isAuthenticated()"
+  [class.chat-page--sessions-open]="auth.isAuthenticated() && sessionsOpen()"
+>
+  <div class="chat-page__stage" aria-hidden="true">
+    <div class="chat-page__mesh"></div>
+    @if (!hasMessages()) {
+      <div class="chat-page__hex-field"></div>
+    }
+    <span class="chat-page__energy-pulse"></span>
+    <span class="chat-page__orb chat-page__orb--left"></span>
+    <span class="chat-page__orb chat-page__orb--right"></span>
   </div>
 
-  <app-routing-trace [hops]="store.routingHops()" />
-
-  <ul class="chat-page__messages scroll-hide">
-    @for (message of store.messages(); track message.id) {
-      <li
-        class="chat-page__message"
-        [class.chat-page__message--user]="message.role === 'user'"
-        [class.chat-page__message--assistant]="message.role === 'assistant'"
-      >
-        <span class="chat-page__role">
-          {{ message.role === 'user' ? i18n.t('chat.role.user') : i18n.t('chat.role.assistant') }}
-        </span>
-        <p class="chat-page__content">{{ message.content }}</p>
-        @if (message.pending) {
-          <span
-            class="chat-page__typing"
-            role="status"
-            [attr.aria-label]="i18n.t('chat.streaming')"
-          >
-            <span class="chat-page__typing-dot"></span>
-            <span class="chat-page__typing-dot"></span>
-            <span class="chat-page__typing-dot"></span>
-          </span>
-        }
-      </li>
-    }
-  </ul>
-
-  @if (store.error()) {
-    <div class="chat-page__error" role="alert">
-      {{ i18n.t('chat.error.banner') }}{{ store.error() }}
-    </div>
-  }
-
-  <form class="chat-page__composer glass" (ngSubmit)="onSend()">
-    <input
-      class="chat-page__input"
-      type="text"
-      name="draft"
-      [placeholder]="i18n.t('chat.placeholder')"
-      [ngModel]="draft()"
-      (ngModelChange)="draft.set($event)"
-      [disabled]="store.isStreaming()"
-    />
-    <div class="chat-page__send">
-      <app-button
-        [label]="i18n.t('chat.send')"
-        [disabled]="!store.canSend() || !draft().trim()"
-        (pressed)="onSend()"
+  <div class="chat-page__viewport">
+    @if (auth.isAuthenticated()) {
+      <app-chat-sessions-panel
+        [mobileOpen]="sessionsOpen()"
+        (closePanel)="closeSessionsPanel()"
       />
+    }
+
+    @if (auth.isAuthenticated() && sessionsOpen()) {
+      <button
+        type="button"
+        class="chat-page__sessions-backdrop"
+        [attr.aria-label]="i18n.t('chat.sessions.hide')"
+        (click)="closeSessionsPanel()"
+      ></button>
+    }
+
+    <div class="chat-page__workspace">
+      @if (auth.isAuthenticated() && !sessionsOpen()) {
+        <button
+          type="button"
+          class="chat-page__sessions-toggle"
+          [attr.aria-expanded]="sessionsOpen()"
+          [attr.aria-label]="i18n.t('chat.sessions.toggle')"
+          [attr.title]="i18n.t('chat.sessions.toggle')"
+          (click)="openSessionsPanel()"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h10" />
+          </svg>
+        </button>
+      }
+
+      <div class="chat-page__frame">
+      @if (!hasMessages()) {
+        <header class="chat-page__oracle">
+          <button
+            type="button"
+            class="chat-page__hero"
+            [class.chat-page__hero--idle]="oracleActivity() === 'idle'"
+            [class.chat-page__hero--listening]="oracleActivity() === 'listening'"
+            [class.chat-page__hero--streaming]="oracleActivity() === 'streaming'"
+            [style.--hero-diameter.px]="heroSize()"
+            [attr.aria-label]="oracleStatusLabel()"
+            (click)="focusComposer()"
+          >
+            <div class="chat-page__corona" aria-hidden="true">
+              <span class="chat-page__corona-glow"></span>
+              <span class="chat-page__corona-ring">
+                <span class="chat-page__corona-ring-track"></span>
+              </span>
+            </div>
+            <app-golden-polyhedron [size]="heroSize()" [activity]="oracleActivity()" />
+          </button>
+
+          <p class="chat-page__oracle-status" role="status">
+            <span class="chat-page__oracle-status-dot" aria-hidden="true"></span>
+            {{ oracleStatusLabel() }}
+          </p>
+        </header>
+      }
+
+      <section class="chat-page__main">
+        @if (!hasMessages()) {
+          <div class="chat-page__welcome">
+            <h1 class="chat-page__welcome-title">{{ i18n.t('chat.welcome.title') }}</h1>
+            <p class="chat-page__welcome-subtitle">{{ i18n.t('chat.welcome.subtitle') }}</p>
+
+            @if (auth.isAuthenticated()) {
+              <div
+                class="chat-page__suggestions"
+                role="group"
+                [attr.aria-label]="i18n.t('chat.welcome.title')"
+              >
+                @for (key of suggestionKeys; track key) {
+                  <button
+                    type="button"
+                    class="chat-page__suggestion"
+                    [disabled]="store.isStreaming() || isListening()"
+                    (click)="useSuggestion(key)"
+                  >
+                    {{ i18n.t(key) }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="chat-page__conversation">
+            <ul class="chat-page__messages">
+              @for (message of store.messages(); track message.id) {
+                @if (message.role === 'assistant') {
+                  <li class="chat-page__message-row chat-page__message-row--assistant">
+                    <div
+                      class="chat-page__avatar"
+                      [class.chat-page__avatar--live]="
+                        message.pending && isLatestAssistant(message.id)
+                      "
+                    >
+                      @if (message.pending && isLatestAssistant(message.id)) {
+                        <div class="chat-page__avatar-corona" aria-hidden="true">
+                          <span class="chat-page__avatar-corona-glow"></span>
+                          <span class="chat-page__avatar-corona-ring"></span>
+                        </div>
+                      }
+                      <app-golden-polyhedron
+                        [size]="avatarSize"
+                        [activity]="avatarActivity(message.id, !!message.pending)"
+                      />
+                    </div>
+
+                    <article
+                      class="chat-page__bubble chat-page__bubble--assistant"
+                      [class.chat-page__bubble--streaming]="message.pending"
+                    >
+                      <header class="chat-page__bubble-header">
+                        <span class="chat-page__agent-name">
+                          {{
+                            message.pending && isLatestAssistant(message.id)
+                              ? respondingAgentLabel()
+                              : i18n.t('chat.role.assistant')
+                          }}
+                        </span>
+                        @if (message.pending && isLatestAssistant(message.id) && store.routingHops().length > 0) {
+                          <div class="chat-page__route-pills" aria-label="{{ i18n.t('chat.trace.title') }}">
+                            @for (hop of store.routingHops(); track hop.agent) {
+                              <span
+                                class="chat-page__route-pill"
+                                [class.chat-page__route-pill--active]="hop.status === 'active'"
+                                [class.chat-page__route-pill--done]="hop.status === 'done'"
+                              >
+                                {{ agentLabel(hop.agent) }}
+                              </span>
+                            }
+                          </div>
+                        }
+                      </header>
+
+                      @if (message.content) {
+                        <p
+                          class="chat-page__content"
+                          [class.chat-page__content--streaming]="message.pending"
+                        >
+                          {{ message.content }}
+                        </p>
+                      }
+
+                      @if (message.pending && !message.content) {
+                        <span
+                          class="chat-page__typing"
+                          role="status"
+                          [attr.aria-label]="i18n.t('chat.streaming')"
+                        >
+                          <span class="chat-page__typing-dot"></span>
+                          <span class="chat-page__typing-dot"></span>
+                          <span class="chat-page__typing-dot"></span>
+                        </span>
+                      }
+                    </article>
+                  </li>
+                } @else {
+                  <li class="chat-page__message-row chat-page__message-row--user">
+                    <article class="chat-page__bubble chat-page__bubble--user">
+                      <p class="chat-page__content">{{ message.content }}</p>
+                    </article>
+                    <div class="chat-page__avatar chat-page__avatar--user" aria-hidden="true">
+                      <span>{{ userInitial() }}</span>
+                    </div>
+                  </li>
+                }
+              }
+            </ul>
+          </div>
+        }
+
+        @if (store.error(); as error) {
+          <div class="chat-page__error" role="alert">
+            {{ i18n.t('chat.error.banner') }}{{ error }}
+          </div>
+        }
+      </section>
+      </div>
+
+    <footer class="chat-page__footer">
+      <div class="chat-page__footer-inner">
+        @if (!auth.isAuthenticated()) {
+          <p class="chat-page__auth-prompt">
+            {{ i18n.t('chat.auth.signInPrompt') }}
+            <a routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
+          </p>
+        } @else {
+          <p class="chat-page__voice-hint">{{ i18n.t('chat.voice.hint') }}</p>
+        }
+
+        <form class="chat-page__composer glass" (ngSubmit)="onSend()">
+          <button
+            type="button"
+            class="chat-page__voice-btn"
+            [class.chat-page__voice-btn--active]="isListening()"
+            [attr.aria-label]="
+              isListening() ? i18n.t('chat.voice.stop') : i18n.t('chat.voice.listen')
+            "
+            [attr.aria-pressed]="isListening()"
+            [disabled]="!canCompose()"
+            (click)="toggleVoiceDummy()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              @if (isListening()) {
+                <rect x="7" y="7" width="10" height="10" rx="1.5" />
+              } @else {
+                <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z" />
+                <path d="M19 11a7 7 0 0 1-14 0M12 18v3" />
+              }
+            </svg>
+          </button>
+
+          <input
+            #composerInput
+            class="chat-page__input"
+            type="text"
+            name="draft"
+            [placeholder]="
+              isListening() ? i18n.t('chat.voice.listening') : i18n.t('chat.placeholder')
+            "
+            [ngModel]="draft()"
+            (ngModelChange)="draft.set($event)"
+            [disabled]="!canCompose() || isListening()"
+          />
+
+          <div class="chat-page__send">
+            <app-button
+              [label]="i18n.t('chat.send')"
+              [disabled]="!canCompose() || isListening() || !draft().trim()"
+              (pressed)="onSend()"
+            />
+          </div>
+        </form>
+      </div>
+    </footer>
     </div>
-  </form>
+  </div>
 </div>

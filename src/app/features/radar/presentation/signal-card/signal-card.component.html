@@ -54,6 +54,20 @@
     </div>
   </div>
 
+  @if (!signal.impactClass) {
+    <div class="signal-card__actions">
+      <app-button
+        [label]="
+          store.isGeneratingFor(signal.symbol)
+            ? i18n.t('radar.generate.generating')
+            : i18n.t('radar.generate.action')
+        "
+        [disabled]="store.isGeneratingFor(signal.symbol)"
+        (pressed)="onGenerate()"
+      />
+    </div>
+  }
+
   <div class="signal-card__evidence">
     <span class="signal-card__evidence-title">{{ i18n.t('radar.card.evidence.title') }}</span>
     <ul class="signal-card__evidence-list">
@@ -77,6 +91,18 @@
       }
     </ul>
   </div>
+
+  @if (signal.signalId && auth.isAuthenticated()) {
+    <section class="signal-card__review">
+      <span class="signal-card__review-title">{{ i18n.t('radar.review.title') }}</span>
+      <app-review-panel
+        [history]="store.reviewHistoryFor(signal.signalId)"
+        [isSubmitting]="store.isSubmittingReviewFor(signal.signalId)"
+        [submitError]="store.reviewErrorFor(signal.signalId)"
+        (decide)="onSubmitReview($event)"
+      />
+    </section>
+  }
 
   <p class="signal-card__disclaimer">{{ i18n.t('radar.card.disclaimer') }}</p>
 </article>

@@ -1,0 +1,50 @@
+<aside
+  class="chat-sessions"
+  [class.chat-sessions--open]="mobileOpen()"
+  [attr.aria-label]="i18n.t('chat.sessions.title')"
+>
+  <div class="chat-sessions__header">
+    <div class="chat-sessions__header-row">
+      <h2 class="chat-sessions__title">{{ i18n.t('chat.sessions.title') }}</h2>
+      <button
+        type="button"
+        class="chat-sessions__close"
+        [attr.aria-label]="i18n.t('chat.sessions.hide')"
+        (click)="onClose()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
+    </div>
+    <button type="button" class="chat-sessions__new" (click)="onCreate()">
+      {{ i18n.t('chat.sessions.newChat') }}
+    </button>
+  </div>
+
+  <ul class="chat-sessions__list">
+    @for (session of sessionsStore.sessions(); track session.id) {
+      <li>
+        <button
+          type="button"
+          class="chat-sessions__item"
+          [class.chat-sessions__item--active]="sessionsStore.activeSessionId() === session.id"
+          (click)="onSelect(session.id)"
+        >
+          <span class="chat-sessions__item-title">{{ sessionTitle(session.title) }}</span>
+          <span class="chat-sessions__item-meta">
+            {{ session.messages.length }} {{ i18n.t('chat.sessions.messages') }}
+          </span>
+        </button>
+        <button
+          type="button"
+          class="chat-sessions__delete"
+          [attr.aria-label]="i18n.t('chat.sessions.delete')"
+          (click)="onDelete($event, session.id)"
+        >
+          ×
+        </button>
+      </li>
+    }
+  </ul>
+</aside>

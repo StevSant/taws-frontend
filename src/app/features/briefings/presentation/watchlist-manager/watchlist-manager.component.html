@@ -1,0 +1,73 @@
+<section class="watchlist-manager feature-panel">
+  <h2 class="watchlist-manager__title">{{ i18n.t('watchlist.manager.title') }}</h2>
+
+  <form class="watchlist-manager__create" (ngSubmit)="onCreateWatchlist()">
+    <input
+      class="feature-input"
+      type="text"
+      name="watchlistName"
+      [placeholder]="i18n.t('watchlist.manager.namePlaceholder')"
+      [ngModel]="newWatchlistName()"
+      (ngModelChange)="newWatchlistName.set($event)"
+    />
+    <app-button
+      [label]="i18n.t('watchlist.manager.create')"
+      [disabled]="!newWatchlistName().trim() || store.isManagingWatchlist()"
+      (pressed)="onCreateWatchlist()"
+    />
+  </form>
+
+  @if (store.selectedWatchlist(); as watchlist) {
+    <div class="watchlist-manager__selected">
+      <div class="watchlist-manager__selected-header">
+        <span class="watchlist-manager__selected-name">{{ watchlist.name }}</span>
+        <button
+          type="button"
+          class="watchlist-manager__delete"
+          [disabled]="store.isManagingWatchlist()"
+          (click)="onDeleteWatchlist()"
+        >
+          {{ i18n.t('watchlist.manager.delete') }}
+        </button>
+      </div>
+
+      <form class="watchlist-manager__add" (ngSubmit)="onAddSymbol()">
+        <input
+          class="feature-input"
+          type="text"
+          name="symbol"
+          [placeholder]="i18n.t('watchlist.manager.symbolPlaceholder')"
+          [ngModel]="newSymbol()"
+          (ngModelChange)="newSymbol.set($event)"
+        />
+        <app-button
+          [label]="i18n.t('watchlist.manager.addSymbol')"
+          [disabled]="!newSymbol().trim() || store.isManagingWatchlist()"
+          (pressed)="onAddSymbol()"
+        />
+      </form>
+
+      @if (store.isLoadingItems()) {
+        <p class="watchlist-manager__hint">…</p>
+      } @else if (store.watchlistItems().length === 0) {
+        <p class="watchlist-manager__hint">{{ i18n.t('watchlist.manager.emptyItems') }}</p>
+      } @else {
+        <ul class="watchlist-manager__items">
+          @for (item of store.watchlistItems(); track item.id) {
+            <li>
+              <span class="watchlist-manager__symbol">{{ item.symbol }}</span>
+              <button
+                type="button"
+                class="watchlist-manager__remove"
+                [disabled]="store.isManagingWatchlist()"
+                (click)="onRemoveItem(item.id)"
+              >
+                ×
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</section>

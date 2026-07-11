@@ -1,17 +1,22 @@
 <div class="language-toggle" [class.language-toggle--open]="isOpen()">
-  <div class="language-toggle__group" role="menu">
-    <button
-      type="button"
-      class="language-toggle__trigger"
-      [attr.aria-label]="i18n.t('shell.language.toggleLabel')"
-      [attr.aria-expanded]="isOpen()"
-      [attr.aria-haspopup]="true"
-      (click)="toggle()"
-    >
-      {{ currentLabel() }}
-    </button>
+  <button
+    type="button"
+    class="language-toggle__trigger"
+    [attr.aria-label]="i18n.t('shell.language.toggleLabel')"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-haspopup]="true"
+    (click)="toggle()"
+  >
+    {{ currentLabel() }}
+  </button>
 
-    @if (isOpen()) {
+  @if (isOpen()) {
+    <div
+      class="language-toggle__menu"
+      role="menu"
+      [style.top.px]="menuAnchor().top"
+      [style.left.px]="menuAnchor().left"
+    >
       <button
         type="button"
         class="language-toggle__option"
@@ -21,6 +26,6 @@
       >
         {{ alternateLabel() }}
       </button>
-    }
-  </div>
+    </div>
+  }
 </div>

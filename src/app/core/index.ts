@@ -6,5 +6,13 @@ export { ThemeService } from './theme';
 export type { Theme } from './theme';
 export { TranslationService, TranslatePipe } from './i18n';
 export type { Locale, TranslationDict, TranslationKey } from './i18n';
+export { RequestCacheService, cachedFetch } from './cache';
 export { NotificationsStore, NotificationBellComponent } from './notifications';
 export type { Notification, NotificationSource } from './notifications';
+export {
+  TelegramRepository,
+  HttpTelegramRepository,
+  TelegramSettingsStore,
+  TelegramLinkPanelComponent,
+} from './telegram';
+export type { TelegramLinkStatus, TelegramLinkToken } from './telegram';

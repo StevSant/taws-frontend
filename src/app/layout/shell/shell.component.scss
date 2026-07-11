@@ -1,18 +1,20 @@
 .app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--color-background);
   color: var(--color-text-primary);
   font-family: var(--font-family-base);
 
   &__header {
+    position: sticky;
+    top: 0;
+    z-index: 500;
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-4);
-    min-height: 4rem;
-    padding: var(--space-3) var(--space-5);
+    gap: var(--space-4);
+    min-height: var(--shell-header-height);
+    padding: 0 var(--space-4);
     border-bottom: 1px solid var(--color-border);
     background: var(--shell-header-bg);
     backdrop-filter: blur(var(--glass-blur));
@@ -22,11 +24,8 @@
   &__brand {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    flex: 0 0 auto;
-    order: 1;
-    min-width: 0;
-    max-width: 14rem;
+    gap: var(--space-2);
+    flex-shrink: 0;
     text-decoration: none;
     color: inherit;
 
@@ -39,83 +38,57 @@
     flex-shrink: 0;
   }
 
-  &__brand-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    min-width: 0;
-  }
-
   &__brand-name {
-    font-weight: 700;
-    font-size: 1.05rem;
-    line-height: 1.1;
+    font-weight: 600;
+    font-size: 0.9rem;
     letter-spacing: -0.01em;
     white-space: nowrap;
-    transition: color 0.2s ease;
-  }
-
-  &__brand-tag {
-    font-size: 0.72rem;
-    color: var(--color-text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    @media (max-width: 640px) {
-      display: none;
-    }
+    transition: color 0.15s ease;
   }
 
   &__nav {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: var(--space-1);
     flex: 1 1 auto;
     min-width: 0;
-    order: 2;
     overflow-x: auto;
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
       display: none;
     }
-
-    @media (max-width: 900px) {
-      order: 3;
-      flex: 1 1 100%;
-      justify-content: flex-start;
-    }
   }
 
   &__nav-link {
-    display: inline-flex;
-    align-items: center;
+    position: relative;
     flex-shrink: 0;
     color: var(--color-text-secondary);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     font-weight: 500;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    border: 1px solid transparent;
+    padding: 0.55rem 0.65rem;
     white-space: nowrap;
-    transition:
-      color 0.2s ease,
-      background 0.2s ease,
-      border-color 0.2s ease;
+    transition: color 0.15s ease;
 
     &:hover {
       color: var(--color-text-primary);
-      background: var(--color-surface-raised);
     }
 
     &--active {
-      color: var(--color-gold);
+      color: var(--color-text-primary);
       font-weight: 600;
-      background: var(--color-gold-dim-bg);
-      border-color: var(--color-gold-border);
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0.65rem;
+        right: 0.65rem;
+        bottom: 0.35rem;
+        height: 2px;
+        border-radius: 1px;
+        background: var(--color-gold);
+      }
     }
   }
 
@@ -123,39 +96,63 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    flex: 0 0 auto;
+    flex-shrink: 0;
     margin-left: auto;
-    order: 3;
-
-    @media (max-width: 900px) {
-      order: 2;
-    }
   }
 
   &__auth-btn {
     flex-shrink: 0;
-    border: 1px solid var(--color-gold-border);
+    border: none;
     background: transparent;
-    color: var(--color-text-primary);
-    font-size: 0.85rem;
-    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
     text-decoration: none;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
+    padding: 0.4rem 0.5rem;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s ease;
+    transition: color 0.15s ease;
 
     &:hover {
-      background: var(--color-gold-dim-bg);
-      border-color: var(--color-gold-border-hi);
       color: var(--color-gold);
     }
   }
 
   &__content {
+    position: relative;
+    z-index: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
+    overflow: auto;
+    background:
+      radial-gradient(
+        ellipse 80% 45% at 50% 0%,
+        color-mix(in srgb, var(--color-gold) 8%, transparent) 0%,
+        transparent 65%
+      ),
+      var(--color-background);
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell__header {
+    gap: var(--space-2);
+    padding: 0 var(--space-3);
+  }
+
+  .app-shell__brand-name {
+    display: none;
+  }
+
+  .app-shell__nav-link {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.5rem;
+  }
+
+  .app-shell__auth-btn {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.4rem;
   }
 }

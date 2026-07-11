@@ -1,6 +1,7 @@
 export { NewsRepository } from './news-repository';
 export { InstrumentRepository } from './instrument-repository';
 export { SignalRepository } from './signal-repository';
+export { SignalReviewRepository } from './signal-review-repository';
 export type { AssetClass } from './models/asset-class.model';
 export { ASSET_CLASSES } from './models/asset-class.model';
 export type { Instrument } from './models/instrument.model';

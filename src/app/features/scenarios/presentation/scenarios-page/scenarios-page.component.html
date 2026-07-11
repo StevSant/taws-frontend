@@ -1,93 +1,134 @@
-<div class="scenarios-page">
-  <header class="scenarios-page__header">
-    <h1 class="scenarios-page__title">{{ i18n.t('scenarios.title') }}</h1>
-    <p class="scenarios-page__description">{{ i18n.t('scenarios.description') }}</p>
-  </header>
+<div class="feature-page feature-page--narrow scenarios-page">
+  <app-feature-page-header
+    [title]="i18n.t('scenarios.title')"
+    [description]="i18n.t('scenarios.description')"
+  />
 
-  <p class="scenarios-page__disclaimer" role="note">
+  <p class="feature-disclaimer" role="note">
     {{ i18n.t('scenarios.disclaimer.static') }}
   </p>
 
-  <div class="scenarios-page__mode-toggle" role="tablist">
-    <button
-      type="button"
-      role="tab"
-      class="scenarios-page__mode-tab"
-      [class.scenarios-page__mode-tab--active]="store.mode() === 'preset'"
-      [attr.aria-selected]="store.mode() === 'preset'"
-      (click)="onModeChange('preset')"
-    >
-      {{ i18n.t('scenarios.mode.preset') }}
-    </button>
-    <button
-      type="button"
-      role="tab"
-      class="scenarios-page__mode-tab"
-      [class.scenarios-page__mode-tab--active]="store.mode() === 'freeform'"
-      [attr.aria-selected]="store.mode() === 'freeform'"
-      (click)="onModeChange('freeform')"
-    >
-      {{ i18n.t('scenarios.mode.freeform') }}
-    </button>
+  <section class="scenarios-page__history feature-panel">
+    <h2 class="scenarios-page__history-title">{{ i18n.t('scenarios.history.title') }}</h2>
+    @if (store.isLoadingRecent()) {
+      <div class="scenarios-page__skeletons" aria-busy="true">
+        @for (item of [1, 2]; track item) {
+          <app-skeleton-card [lines]="1" />
+        }
+      </div>
+    } @else if (store.recentScenarios().length === 0) {
+      <p class="scenarios-page__history-empty">{{ i18n.t('scenarios.history.empty') }}</p>
+    } @else {
+      <ul class="scenarios-page__history-list">
+        @for (scenario of store.recentScenarios(); track scenario.id) {
+          <li>
+            <button
+              type="button"
+              class="scenarios-page__history-item"
+              [class.scenarios-page__history-item--active]="store.result()?.id === scenario.id"
+              (click)="onLoadScenario(scenario.id)"
+            >
+              <span class="scenarios-page__history-item-title">{{ scenario.title }}</span>
+              <span class="scenarios-page__history-item-date">{{ scenario.createdAt | date: 'short' }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <div class="scenarios-page__composer feature-panel">
+    <div class="scenarios-page__mode-toggle" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="scenarios-page__mode-tab"
+        [class.scenarios-page__mode-tab--active]="store.mode() === 'preset'"
+        [attr.aria-selected]="store.mode() === 'preset'"
+        (click)="onModeChange('preset')"
+      >
+        {{ i18n.t('scenarios.mode.preset') }}
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="scenarios-page__mode-tab"
+        [class.scenarios-page__mode-tab--active]="store.mode() === 'freeform'"
+        [attr.aria-selected]="store.mode() === 'freeform'"
+        (click)="onModeChange('freeform')"
+      >
+        {{ i18n.t('scenarios.mode.freeform') }}
+      </button>
+    </div>
+
+    @if (store.mode() === 'preset') {
+      @if (store.isLoadingPresets()) {
+        <div class="scenarios-page__skeletons" aria-busy="true">
+          @for (item of [1, 2, 3]; track item) {
+            <app-skeleton-card [lines]="2" />
+          }
+        </div>
+      }
+
+      @if (store.presetsError(); as error) {
+        <div class="feature-error" role="alert">
+          <span>{{ i18n.t('scenarios.presets.error.banner') }}{{ error }}</span>
+          <app-button
+            [label]="i18n.t('scenarios.presets.error.retry')"
+            (pressed)="onRetryPresets()"
+          />
+        </div>
+      }
+
+      @if (!store.isLoadingPresets() && !store.presetsError() && store.presets().length === 0) {
+        <app-empty-state [title]="i18n.t('scenarios.presets.empty')" />
+      }
+
+      @if (!store.isLoadingPresets() && store.presets().length > 0) {
+        <app-preset-picker
+          [presets]="store.presets()"
+          [selectedId]="store.selectedPresetId()"
+          (select)="onSelectPreset($event)"
+        />
+      }
+    } @else {
+      <label class="feature-field">
+        <span class="feature-label">{{ i18n.t('scenarios.freeform.label') }}</span>
+        <textarea
+          class="feature-textarea"
+          rows="3"
+          [maxlength]="freeTextMaxLength"
+          [ngModel]="store.freeText()"
+          (ngModelChange)="onFreeTextChange($event)"
+          [placeholder]="i18n.t('scenarios.freeform.placeholder')"
+        ></textarea>
+        <span class="scenarios-page__hint">{{ i18n.t('scenarios.freeform.maxLengthHint') }}</span>
+      </label>
+    }
+
+    <div class="scenarios-page__actions">
+      <app-button
+        [label]="store.isGenerating() ? i18n.t('scenarios.generating') : i18n.t('scenarios.generate')"
+        [disabled]="!store.canGenerate()"
+        (pressed)="onGenerate()"
+      />
+      @if (store.isGenerating()) {
+        <span class="scenarios-page__generating" role="status">
+          {{ i18n.t('scenarios.generating') }}
+        </span>
+      }
+    </div>
   </div>
 
-  @if (store.mode() === 'preset') {
-    @if (store.isLoadingPresets()) {
-      <app-spinner class="scenarios-page__loading" [label]="i18n.t('scenarios.presets.loading')" />
-    }
-
-    @if (store.presetsError(); as error) {
-      <div class="scenarios-page__error" role="alert">
-        <span>{{ i18n.t('scenarios.presets.error.banner') }}{{ error }}</span>
-        <app-button
-          [label]="i18n.t('scenarios.presets.error.retry')"
-          (pressed)="onRetryPresets()"
-        />
-      </div>
-    }
-
-    @if (!store.isLoadingPresets() && !store.presetsError() && store.presets().length === 0) {
-      <p class="scenarios-page__empty">{{ i18n.t('scenarios.presets.empty') }}</p>
-    }
-
-    <app-preset-picker
-      [presets]="store.presets()"
-      [selectedId]="store.selectedPresetId()"
-      (select)="onSelectPreset($event)"
-    />
-  } @else {
-    <label class="scenarios-page__field">
-      <span class="scenarios-page__label">{{ i18n.t('scenarios.freeform.label') }}</span>
-      <textarea
-        class="scenarios-page__textarea"
-        rows="3"
-        [maxlength]="freeTextMaxLength"
-        [ngModel]="store.freeText()"
-        (ngModelChange)="onFreeTextChange($event)"
-        [placeholder]="i18n.t('scenarios.freeform.placeholder')"
-      ></textarea>
-      <span class="scenarios-page__hint">{{ i18n.t('scenarios.freeform.maxLengthHint') }}</span>
-    </label>
-  }
-
-  <app-button
-    [label]="store.isGenerating() ? i18n.t('scenarios.generating') : i18n.t('scenarios.generate')"
-    [disabled]="!store.canGenerate()"
-    (pressed)="onGenerate()"
-  />
-
-  @if (store.isGenerating()) {
-    <app-spinner class="scenarios-page__loading" [label]="i18n.t('scenarios.generating')" />
-  }
-
   @if (store.generateError(); as error) {
-    <div class="scenarios-page__error" role="alert">
+    <div class="feature-error" role="alert">
       <span>{{ i18n.t('scenarios.error.banner') }}{{ error }}</span>
     </div>
   }
 
   @if (store.result(); as result) {
     <app-scenario-result-view
+      class="feature-stagger"
       [result]="result"
       [briefingActionStatus]="store.briefingActionStatus()"
       [isAuthenticated]="auth.isAuthenticated()"

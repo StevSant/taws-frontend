@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService } from '../../../core';
+import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
 import { NewsItem, NewsRepository, RadarFilters } from '../domain';
 import { mapNewsItemDto } from './map-news-item-dto';
 import { NewsItemDto } from './news-item-dto';
@@ -18,6 +18,8 @@ const NEWS_PATH = '/api/v1/news';
  */
 @Injectable()
 export class HttpNewsRepository extends NewsRepository {
+  private readonly cache = inject(RequestCacheService);
+
   constructor(
     private readonly http: HttpClient,
     private readonly config: AppConfigService,
@@ -26,17 +28,26 @@ export class HttpNewsRepository extends NewsRepository {
   }
 
   async fetchNews(filters: RadarFilters): Promise<NewsItem[]> {
-    let params = new HttpParams().set('since_hours', filters.sinceHours);
-    if (filters.symbol) {
-      params = params.set('symbol', filters.symbol);
-    }
-    if (filters.assetClass) {
-      params = params.set('asset_class', filters.assetClass);
-    }
+    const cacheKey = JSON.stringify(filters);
+    return cachedFetch(
+      this.cache,
+      'news',
+      cacheKey,
+      this.config.newsCacheTtlMs,
+      async () => {
+        let params = new HttpParams().set('since_hours', filters.sinceHours);
+        if (filters.symbol) {
+          params = params.set('symbol', filters.symbol);
+        }
+        if (filters.assetClass) {
+          params = params.set('asset_class', filters.assetClass);
+        }
 
-    const dtos = await firstValueFrom(
-      this.http.get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params }),
+        const dtos = await firstValueFrom(
+          this.http.get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params }),
+        );
+        return dtos.map(mapNewsItemDto);
+      },
     );
-    return dtos.map(mapNewsItemDto);
   }
 }

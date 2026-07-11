@@ -1,6 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { NotificationBellComponent, NotificationsStore, TranslationService } from '../../core';
+import {
+  HttpTelegramRepository,
+  NotificationBellComponent,
+  NotificationsStore,
+  TelegramLinkPanelComponent,
+  TelegramRepository,
+  TelegramSettingsStore,
+  TranslationService,
+} from '../../core';
 import { AuthStore } from '../../features/auth/application';
 import { LanguageToggleComponent, MidasLogoComponent, ThemeToggleComponent } from '../../shared';
 
@@ -15,9 +23,14 @@ import { LanguageToggleComponent, MidasLogoComponent, ThemeToggleComponent } fro
     RouterLink,
     RouterLinkActive,
     NotificationBellComponent,
+    TelegramLinkPanelComponent,
     MidasLogoComponent,
     ThemeToggleComponent,
     LanguageToggleComponent,
+  ],
+  providers: [
+    TelegramSettingsStore,
+    { provide: TelegramRepository, useClass: HttpTelegramRepository },
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',

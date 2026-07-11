@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   AgentTrace,
   ChatMessage,
@@ -7,6 +7,7 @@ import {
   ChatStreamEvent,
   buildRoutingHops,
 } from '../domain';
+import { ChatSessionsStore } from './chat-sessions-store';
 
 const ASSISTANT_ROLE = 'assistant';
 const USER_ROLE = 'user';
@@ -18,23 +19,16 @@ const USER_ROLE = 'user';
  */
 @Injectable()
 export class ChatStore {
-  private readonly messagesSignal = signal<ChatMessage[]>([]);
+  private readonly sessionsStore = inject(ChatSessionsStore);
+
   private readonly streamingSignal = signal(false);
   private readonly tracesSignal = signal<AgentTrace[]>([]);
   private readonly errorSignal = signal<string | null>(null);
 
-  readonly messages = this.messagesSignal.asReadonly();
+  readonly messages = this.sessionsStore.activeMessages;
   readonly isStreaming = this.streamingSignal.asReadonly();
-  /** Agent routing trace for the *current* turn — cleared on every new send. */
   readonly traces = this.tracesSignal.asReadonly();
-  /**
-   * `traces` collapsed into one display hop per distinct agent (e.g.
-   * "Supervisor -> Quant"), updated live as trace events arrive. This is
-   * what the routing-trace UI renders — see `buildRoutingHops` for why it
-   * doesn't clutter simple, single-specialist turns.
-   */
   readonly routingHops = computed(() => buildRoutingHops(this.tracesSignal()));
-  /** Stream-level error message for the current turn, if any. */
   readonly error = this.errorSignal.asReadonly();
   readonly canSend = computed(() => !this.streamingSignal());
 
@@ -46,7 +40,9 @@ export class ChatStore {
       return;
     }
 
-    this.appendMessage({ id: this.nextId(), role: USER_ROLE, content: trimmed });
+    const threadId = this.sessionsStore.ensureActiveSession();
+    const userMessage: ChatMessage = { id: this.nextId(), role: USER_ROLE, content: trimmed };
+    this.appendMessage(userMessage);
 
     const assistantId = this.nextId();
     this.appendMessage({ id: assistantId, role: ASSISTANT_ROLE, content: '', pending: true });
@@ -55,7 +51,7 @@ export class ChatStore {
     this.streamingSignal.set(true);
 
     try {
-      for await (const event of this.chatRepository.streamReply(trimmed)) {
+      for await (const event of this.chatRepository.streamReply(trimmed, threadId)) {
         this.applyStreamEvent(assistantId, event);
       }
     } catch (error: unknown) {
@@ -63,6 +59,7 @@ export class ChatStore {
     } finally {
       this.markSettled(assistantId);
       this.streamingSignal.set(false);
+      this.sessionsStore.replaceActiveMessages(this.messages());
     }
   }
 
@@ -81,20 +78,20 @@ export class ChatStore {
   }
 
   private appendMessage(message: ChatMessage): void {
-    this.messagesSignal.update((messages) => [...messages, message]);
+    this.sessionsStore.syncActiveMessages([...this.messages(), message]);
   }
 
   private appendToken(messageId: string, token: string): void {
-    this.messagesSignal.update((messages) =>
-      messages.map((message) =>
+    this.sessionsStore.syncActiveMessages(
+      this.messages().map((message) =>
         message.id === messageId ? { ...message, content: message.content + token } : message,
       ),
     );
   }
 
   private markSettled(messageId: string): void {
-    this.messagesSignal.update((messages) =>
-      messages.map((message) =>
+    this.sessionsStore.syncActiveMessages(
+      this.messages().map((message) =>
         message.id === messageId ? { ...message, pending: false } : message,
       ),
     );

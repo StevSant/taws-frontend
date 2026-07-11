@@ -1,30 +1,85 @@
+:host {
+  display: block;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
 .login-page {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  min-height: 100vh;
-  padding: var(--space-5);
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  padding:
+    clamp(3.25rem, 9vh, 3.75rem) clamp(0.75rem, 3vw, 1.25rem)
+    clamp(0.75rem, 2vh, 1.25rem);
   background: var(--color-background);
   overflow: hidden;
 
   &__topbar {
-    position: absolute;
-    top: var(--space-5);
-    right: var(--space-5);
-    z-index: 2;
+    position: fixed;
+    top: clamp(0.75rem, 2vh, 1.25rem);
+    left: clamp(0.75rem, 3vw, 1.25rem);
+    right: clamp(0.75rem, 3vw, 1.25rem);
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  &__topbar-actions {
     display: flex;
     align-items: flex-start;
     gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    color: var(--color-text-secondary);
+    font-size: clamp(0.72rem, 1.4vh, 0.8rem);
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.45rem 0.75rem;
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease;
+
+    svg {
+      width: 0.9rem;
+      height: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold-border);
+      background: var(--color-gold-dim-bg);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
   }
 
   &__glow {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 640px;
-    height: 640px;
+    width: min(92vw, 640px);
+    height: min(92vw, 640px);
     transform: translate(-50%, -50%);
     background: radial-gradient(
       circle,
@@ -37,30 +92,39 @@
 
   &__card {
     position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    width: 100%;
-    max-width: 440px;
-    padding: var(--space-6);
+    gap: clamp(0.35rem, 1.1vh, 0.7rem);
+    width: min(100%, 440px);
+    max-height: 100%;
+    padding: clamp(0.9rem, 2.4vh, 1.5rem);
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-gold-border);
     box-shadow:
       var(--elevation-3),
       var(--card-outline-shadow);
+    overflow: hidden;
+    flex-shrink: 1;
+    min-height: 0;
+
+    &--demo {
+      width: min(100%, 560px);
+    }
   }
 
   &__brand {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-2);
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    flex-shrink: 0;
   }
 
   &__brand-text {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.05rem;
+    min-width: 0;
   }
 
   &__brand-mark {
@@ -69,51 +133,59 @@
   }
 
   &__brand-name {
-    font-size: 1rem;
+    font-size: clamp(0.9rem, 1.8vh, 1rem);
     font-weight: 700;
     letter-spacing: -0.01em;
     color: var(--color-text-primary);
   }
 
   &__brand-tag {
-    font-size: 0.72rem;
+    font-size: clamp(0.64rem, 1.2vh, 0.72rem);
     color: var(--color-text-muted);
   }
 
   &__title {
     margin: 0;
-    font-size: 1.55rem;
+    font-size: clamp(1.15rem, 2.8vh, 1.55rem);
     font-weight: 700;
     color: var(--color-text-primary);
-    line-height: 1.15;
+    line-height: 1.12;
+    flex-shrink: 0;
   }
 
   &__eyebrow {
     margin: 0;
     font-family: var(--font-family-mono);
-    font-size: 0.65rem;
+    font-size: clamp(0.58rem, 1.1vh, 0.65rem);
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-gold-bright);
+    flex-shrink: 0;
   }
 
   &__subtitle {
-    margin: 0 0 var(--space-2);
-    font-size: 0.9rem;
-    line-height: 1.45;
+    margin: 0;
+    font-size: clamp(0.78rem, 1.7vh, 0.9rem);
+    line-height: 1.4;
     color: var(--color-text-secondary);
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   &__field {
     display: flex;
     flex-direction: column;
-    gap: var(--space-1);
+    gap: 0.2rem;
+    flex-shrink: 0;
   }
 
   &__label {
     font-family: var(--font-family-mono);
-    font-size: 0.7rem;
+    font-size: clamp(0.62rem, 1.2vh, 0.7rem);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -121,10 +193,10 @@
   }
 
   &__input {
-    padding: var(--space-2) var(--space-3);
+    padding: clamp(0.35rem, 1vh, 0.5rem) clamp(0.55rem, 1.5vw, 0.75rem);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    font-size: 0.95rem;
+    font-size: clamp(0.82rem, 1.8vh, 0.95rem);
     background: var(--color-surface);
     color: var(--color-text-primary);
     transition: all 0.2s ease;
@@ -141,18 +213,20 @@
   }
 
   &__error {
-    padding: var(--space-3);
+    padding: clamp(0.45rem, 1.2vh, 0.65rem);
     border-radius: var(--radius-md);
     background: var(--color-loss-dim);
     border: 1px solid var(--color-loss-border);
     color: var(--color-loss);
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 1.6vh, 0.85rem);
+    flex-shrink: 0;
   }
 
   &__confirmation {
     margin: 0;
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    font-size: clamp(0.78rem, 1.7vh, 0.9rem);
+    flex-shrink: 0;
   }
 
   &__toggle {
@@ -161,10 +235,11 @@
     border: none;
     color: var(--color-gold-bright);
     font-family: var(--font-family-mono);
-    font-size: 0.75rem;
+    font-size: clamp(0.68rem, 1.4vh, 0.75rem);
     letter-spacing: 0.02em;
     cursor: pointer;
     padding: 0;
+    flex-shrink: 0;
     transition: all 0.2s ease;
 
     &:hover {
@@ -179,16 +254,20 @@
   &__demo {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
-    padding-top: var(--space-4);
+    gap: clamp(0.3rem, 0.9vh, 0.55rem);
+    margin-top: clamp(0.15rem, 0.5vh, 0.35rem);
+    padding-top: clamp(0.45rem, 1.2vh, 0.75rem);
     border-top: 1px solid var(--color-border);
+    flex-shrink: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
   &__demo-divider {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
+    flex-shrink: 0;
 
     &::before,
     &::after {
@@ -200,7 +279,7 @@
 
     span {
       font-family: var(--font-family-mono);
-      font-size: 0.62rem;
+      font-size: clamp(0.56rem, 1.1vh, 0.62rem);
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -212,26 +291,28 @@
   &__demo-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-2);
-
-    @media (max-width: 520px) {
-      grid-template-columns: 1fr;
-    }
+    gap: clamp(0.25rem, 0.8vw, 0.45rem);
+    width: 100%;
+    min-height: 0;
+    flex-shrink: 1;
   }
 
   &__demo-btn {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2);
-    min-height: 5.5rem;
-    padding: var(--space-3);
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(0.3rem, 0.9vw, 0.45rem);
+    width: 100%;
+    min-width: 0;
+    padding: clamp(0.35rem, 1vh, 0.5rem);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
     color: var(--color-text-primary);
     text-align: left;
     cursor: pointer;
+    overflow: hidden;
+    box-sizing: border-box;
     transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
@@ -258,56 +339,132 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    flex-shrink: 0;
+    width: clamp(1.55rem, 3.5vh, 1.85rem);
+    height: clamp(1.55rem, 3.5vh, 1.85rem);
     border-radius: var(--radius-full);
     background: var(--color-gold-dim-bg);
     border: 1px solid var(--color-gold-border);
     color: var(--color-gold-bright);
 
     svg {
-      width: 1.05rem;
-      height: 1.05rem;
+      width: clamp(0.85rem, 2vh, 1rem);
+      height: clamp(0.85rem, 2vh, 1rem);
     }
   }
 
   &__demo-copy {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.05rem;
+    width: 100%;
     min-width: 0;
   }
 
   &__demo-role {
-    font-size: 0.82rem;
+    font-size: clamp(0.68rem, 1.4vh, 0.78rem);
     font-weight: 700;
+    line-height: 1.2;
     color: var(--color-text-primary);
+    overflow-wrap: anywhere;
   }
 
-  &__demo-persona {
+  &__demo-name {
+    font-size: clamp(0.64rem, 1.3vh, 0.72rem);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+  }
+
+  &__demo-focus {
     font-family: var(--font-family-mono);
-    font-size: 0.62rem;
+    font-size: clamp(0.56rem, 1.1vh, 0.62rem);
+    line-height: 1.25;
     letter-spacing: 0.02em;
     color: var(--color-text-secondary);
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
   }
 
   &__demo-footer {
     margin: 0;
-    font-size: 0.75rem;
+    font-size: clamp(0.66rem, 1.3vh, 0.75rem);
+    line-height: 1.35;
     color: var(--color-text-secondary);
     text-align: center;
+    overflow-wrap: anywhere;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 
   &__demo-hint {
     margin: 0;
     font-family: var(--font-family-mono);
-    font-size: 0.6rem;
-    line-height: 1.4;
+    font-size: clamp(0.54rem, 1vh, 0.6rem);
+    line-height: 1.35;
     color: var(--color-text-muted);
     text-align: center;
+    overflow-wrap: anywhere;
+    flex-shrink: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+}
+
+@media (max-height: 720px) {
+  .login-page__subtitle {
+    display: none;
+  }
+
+  .login-page__demo-hint {
+    display: none;
+  }
+}
+
+@media (max-height: 640px) {
+  .login-page__demo-footer {
+    -webkit-line-clamp: 1;
+  }
+
+  .login-page__brand-tag {
+    display: none;
+  }
+}
+
+@media (max-height: 560px) {
+  .login-page__demo-footer {
+    display: none;
+  }
+
+  .login-page--demo .login-page__card--demo {
+    transform: scale(0.94);
+    transform-origin: center center;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-page__back span {
+    display: none;
+  }
+
+  .login-page__back {
+    padding: 0.45rem;
+  }
+
+  .login-page__demo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .login-page__demo-btn {
+    min-height: 0;
   }
 }

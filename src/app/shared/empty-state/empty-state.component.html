@@ -1,0 +1,8 @@
+<div class="empty-state glass">
+  <app-midas-logo class="empty-state__mark" [size]="36" />
+  <p class="empty-state__title">{{ title() }}</p>
+  @if (description()) {
+    <p class="empty-state__description">{{ description() }}</p>
+  }
+  <ng-content />
+</div>

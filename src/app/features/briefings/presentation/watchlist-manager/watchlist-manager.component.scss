@@ -1,0 +1,111 @@
+.watchlist-manager {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  &__title {
+    margin: 0;
+    font-size: 0.72rem;
+    font-family: var(--font-family-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  &__create,
+  &__add {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  &__create .feature-input,
+  &__add .feature-input {
+    flex: 1 1 10rem;
+    min-width: 0;
+  }
+
+  &__selected {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__selected-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  &__selected-name {
+    font-weight: 600;
+    color: var(--color-gold);
+  }
+
+  &__delete,
+  &__remove {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    padding: 0.3rem 0.55rem;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      color: var(--color-loss);
+      border-color: var(--color-loss-border);
+      background: var(--color-loss-dim);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__remove {
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border-radius: var(--radius-full);
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  &__hint {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  &__items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  &__items > li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.35rem 0.25rem 0.65rem;
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-full);
+    background: var(--color-gold-dim-bg);
+  }
+
+  &__symbol {
+    font-family: var(--font-family-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-gold);
+  }
+}

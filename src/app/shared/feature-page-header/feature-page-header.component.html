@@ -1,0 +1,19 @@
+<header class="feature-page-header">
+  <div class="feature-page-header__copy">
+    <h1 class="feature-page-header__title">{{ title() }}</h1>
+    @if (description()) {
+      <p class="feature-page-header__description">{{ description() }}</p>
+    }
+  </div>
+
+  @if (stats().length > 0) {
+    <div class="feature-page-header__stats">
+      @for (stat of stats(); track stat.label) {
+        <div class="feature-page-header__stat">
+          <span class="feature-page-header__stat-value">{{ stat.value }}</span>
+          <span class="feature-page-header__stat-label">{{ stat.label }}</span>
+        </div>
+      }
+    </div>
+  }
+</header>

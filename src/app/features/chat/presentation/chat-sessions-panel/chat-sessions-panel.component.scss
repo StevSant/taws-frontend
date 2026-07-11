@@ -1,0 +1,198 @@
+:host {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.chat-sessions {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  padding: var(--space-4) var(--space-3);
+  border-right: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-background-deep) 78%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: none;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: 0 var(--space-1) var(--space-3);
+  }
+
+  &__header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    padding: 0;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background 0.15s ease;
+
+    svg {
+      width: 0.95rem;
+      height: 0.95rem;
+    }
+
+    &:hover {
+      color: var(--color-text-primary);
+      border-color: var(--color-gold-border);
+      background: var(--color-gold-dim-bg);
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.72rem;
+    font-family: var(--font-family-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  &__new {
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-full);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: var(--space-2) var(--space-3);
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-gold-border-hi);
+      background: color-mix(in srgb, var(--color-gold) 18%, var(--color-surface));
+    }
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1;
+  }
+
+  &__list > li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25rem;
+    align-items: stretch;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+
+    &:hover {
+      border-color: var(--color-gold-border);
+      background: color-mix(in srgb, var(--color-gold) 8%, var(--color-surface));
+    }
+
+    &--active {
+      border-color: var(--color-gold-border-hi);
+      background: var(--color-gold-dim-bg);
+    }
+  }
+
+  &__item-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  &__item-meta {
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-family-mono);
+  }
+
+  &__delete {
+    align-self: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-loss);
+      background: var(--color-loss-dim);
+    }
+  }
+}
+
+html[data-theme='light'] .chat-sessions {
+  background: var(--color-background);
+  border-right-color: var(--color-gold-border);
+}
+
+@media (max-width: 900px) {
+  .chat-sessions {
+    position: fixed;
+    top: var(--shell-header-height);
+    left: 0;
+    bottom: 0;
+    z-index: 400;
+    width: min(86vw, 280px);
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+    box-shadow: var(--elevation-2);
+
+    &--open {
+      transform: translateX(0);
+    }
+  }
+}

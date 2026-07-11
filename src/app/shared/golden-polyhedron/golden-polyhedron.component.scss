@@ -2,6 +2,10 @@
   display: inline-block;
 }
 
+:host-context(html[data-theme='light']) .golden-polyhedron {
+  filter: drop-shadow(0 2px 5px rgba(120, 80, 0, 0.4));
+}
+
 .golden-polyhedron {
   display: block;
   line-height: 0;

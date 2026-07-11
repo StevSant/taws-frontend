@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService, TranslationService } from '../../../core';
+import { AppConfigService, cachedFetch, RequestCacheService, TranslationService } from '../../../core';
 import {
   ScenarioIntake,
   ScenarioMonitor,
@@ -29,6 +29,8 @@ const SCENARIOS_PATH = '/api/v1/scenarios';
  */
 @Injectable()
 export class HttpScenarioRepository extends ScenarioRepository {
+  private readonly cache = inject(RequestCacheService);
+
   constructor(
     private readonly http: HttpClient,
     private readonly config: AppConfigService,
@@ -38,10 +40,20 @@ export class HttpScenarioRepository extends ScenarioRepository {
   }
 
   async fetchPresets(): Promise<ScenarioPreset[]> {
-    const dtos = await firstValueFrom(
-      this.http.get<ScenarioPresetDto[]>(`${this.config.apiBaseUrl}${SCENARIOS_PATH}/presets`),
+    return cachedFetch(
+      this.cache,
+      'scenario-presets',
+      'all',
+      this.config.scenarioPresetsCacheTtlMs,
+      async () => {
+        const dtos = await firstValueFrom(
+          this.http.get<ScenarioPresetDto[]>(
+            `${this.config.apiBaseUrl}${SCENARIOS_PATH}/presets`,
+          ),
+        );
+        return dtos.map(mapScenarioPresetDto);
+      },
     );
-    return dtos.map(mapScenarioPresetDto);
   }
 
   async generateScenario(intake: ScenarioIntake): Promise<ScenarioResult> {
@@ -73,6 +85,25 @@ export class HttpScenarioRepository extends ScenarioRepository {
     await firstValueFrom(
       this.http.delete<void>(`${this.config.apiBaseUrl}${this.armPath(scenarioId)}`),
     );
+  }
+
+  async listRecentScenarios(limit = 12): Promise<ScenarioResult[]> {
+    const params = new HttpParams().set('limit', String(limit));
+    const dtos = await firstValueFrom(
+      this.http.get<ScenarioResultDto[]>(`${this.config.apiBaseUrl}${SCENARIOS_PATH}`, {
+        params,
+      }),
+    );
+    return dtos.map(mapScenarioResultDto);
+  }
+
+  async getScenario(scenarioId: string): Promise<ScenarioResult> {
+    const dto = await firstValueFrom(
+      this.http.get<ScenarioResultDto>(
+        `${this.config.apiBaseUrl}${SCENARIOS_PATH}/${scenarioId}`,
+      ),
+    );
+    return mapScenarioResultDto(dto);
   }
 
   private armPath(scenarioId: string): string {

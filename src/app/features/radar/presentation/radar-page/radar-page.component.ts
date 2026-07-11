@@ -1,40 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed } from '@angular/core';
 import { TranslationService } from '../../../../core';
-import { ButtonComponent, SpinnerComponent } from '../../../../shared';
-import { RadarStore } from '../../application';
-import { InstrumentRepository, NewsRepository, SignalRepository } from '../../domain';
 import {
-  HttpInstrumentRepository,
-  HttpNewsRepository,
-  HttpSignalRepository,
-} from '../../infrastructure';
+  ButtonComponent,
+  EmptyStateComponent,
+  FeaturePageHeaderComponent,
+  FeaturePageStat,
+  SkeletonCardComponent,
+} from '../../../../shared';
+import { RadarStore } from '../../application';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { SignalCardComponent } from '../signal-card/signal-card.component';
 
-/**
- * Radar page: news & signals radar wired to the real `/api/v1/news` and
- * `/api/v1/instruments` endpoints. Groups news by linked instrument into
- * signal cards, with filters (instrument type / asset / recency) backed by
- * real query params, plus loading/error/empty states.
- *
- * `RadarStore`/`NewsRepository`/`InstrumentRepository` are provided here so
- * each navigation to this page gets a fresh instance (feature-scoped DI),
- * same pattern as `ChatPageComponent`.
- */
 @Component({
   selector: 'app-radar-page',
   standalone: true,
-  imports: [RadarFiltersComponent, SignalCardComponent, SpinnerComponent, ButtonComponent],
-  providers: [
-    RadarStore,
-    { provide: NewsRepository, useClass: HttpNewsRepository },
-    { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
-    { provide: SignalRepository, useClass: HttpSignalRepository },
+  imports: [
+    RadarFiltersComponent,
+    SignalCardComponent,
+    ButtonComponent,
+    FeaturePageHeaderComponent,
+    SkeletonCardComponent,
+    EmptyStateComponent,
   ],
   templateUrl: './radar-page.component.html',
   styleUrl: './radar-page.component.scss',
 })
-export class RadarPageComponent implements OnInit {
+export class RadarPageComponent implements OnInit, OnDestroy {
+  readonly headerStats = computed<FeaturePageStat[]>(() => {
+    if (this.store.isLoading()) {
+      return [];
+    }
+
+    return [
+      {
+        label: this.i18n.t('radar.stats.signals'),
+        value: String(this.store.signals().length),
+      },
+      {
+        label: this.i18n.t('radar.stats.unlinked'),
+        value: String(this.store.unlinkedNewsCount()),
+      },
+    ];
+  });
+
   constructor(
     readonly store: RadarStore,
     readonly i18n: TranslationService,
@@ -42,6 +50,10 @@ export class RadarPageComponent implements OnInit {
 
   ngOnInit(): void {
     void this.store.init();
+  }
+
+  ngOnDestroy(): void {
+    this.store.pausePolling();
   }
 
   onRetry(): void {

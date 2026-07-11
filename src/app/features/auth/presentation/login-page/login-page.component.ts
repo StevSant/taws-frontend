@@ -1,4 +1,5 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfigService, TranslationKey, TranslationService } from '../../../../core';
@@ -51,7 +52,7 @@ const DEFAULT_REDIRECT_PATH = '/radar';
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })
-export class LoginPageComponent {
+export class LoginPageComponent implements OnInit, OnDestroy {
   readonly mode = signal<AuthMode>('login');
   readonly email = signal('');
   readonly password = signal('');
@@ -62,6 +63,7 @@ export class LoginPageComponent {
   private readonly config = inject(AppConfigService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
 
   readonly demoPerspectives = this.config.demoAuthPerspectives;
   readonly showDemoPerspectives = computed(
@@ -80,6 +82,14 @@ export class LoginPageComponent {
         void this.router.navigateByUrl(this.resolveReturnUrl());
       }
     });
+  }
+
+  ngOnInit(): void {
+    document.body.classList.add('route-login');
+  }
+
+  ngOnDestroy(): void {
+    document.body.classList.remove('route-login');
   }
 
   titleLabel(): string {
@@ -106,6 +116,21 @@ export class LoginPageComponent {
   toggleMode(): void {
     this.mode.set(this.mode() === 'login' ? 'signup' : 'login');
     this.activePerspectiveId.set(null);
+  }
+
+  goBack(): void {
+    const returnUrl = this.safeInternalPath(this.route.snapshot.queryParamMap.get('returnUrl'));
+    if (returnUrl) {
+      void this.router.navigateByUrl(returnUrl);
+      return;
+    }
+
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    void this.router.navigateByUrl(DEFAULT_REDIRECT_PATH);
   }
 
   onSubmit(): void {
@@ -138,7 +163,23 @@ export class LoginPageComponent {
     });
   }
 
+  demoPersonaParts(personaKey: TranslationKey): { name: string; focus: string } {
+    const text = this.i18n.t(personaKey);
+    const segments = text.split('·').map((segment) => segment.trim());
+    return {
+      name: segments[0] ?? text,
+      focus: segments[1] ?? '',
+    };
+  }
+
   private resolveReturnUrl(): string {
-    return this.route.snapshot.queryParamMap.get('returnUrl') ?? DEFAULT_REDIRECT_PATH;
+    return this.safeInternalPath(this.route.snapshot.queryParamMap.get('returnUrl')) ?? DEFAULT_REDIRECT_PATH;
+  }
+
+  private safeInternalPath(url: string | null): string | null {
+    if (!url || !url.startsWith('/') || url.startsWith('//')) {
+      return null;
+    }
+    return url;
   }
 }

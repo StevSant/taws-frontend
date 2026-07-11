@@ -1,6 +1,6 @@
-<form class="radar-filters">
-  <div class="radar-filters__group">
-    <span class="radar-filters__label">{{ i18n.t('radar.filters.type.label') }}</span>
+<form class="radar-filters feature-panel">
+  <div class="radar-filters__group feature-field">
+    <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.type.label') }}</span>
     <div
       class="radar-filters__pills"
       role="group"
@@ -27,10 +27,10 @@
     </div>
   </div>
 
-  <label class="radar-filters__field">
-    <span class="radar-filters__label">{{ i18n.t('radar.filters.asset.label') }}</span>
+  <label class="radar-filters__field feature-field">
+    <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.asset.label') }}</span>
     <select
-      class="radar-filters__select"
+      class="radar-filters__select feature-select"
       name="symbol"
       [ngModel]="filters.symbol"
       (ngModelChange)="symbolChange.emit($event)"
@@ -44,8 +44,8 @@
     </select>
   </label>
 
-  <div class="radar-filters__group">
-    <span class="radar-filters__label">{{ i18n.t('radar.filters.recency.label') }}</span>
+  <div class="radar-filters__group feature-field">
+    <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.recency.label') }}</span>
     <div
       class="radar-filters__pills"
       role="group"
