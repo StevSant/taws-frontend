@@ -24,6 +24,10 @@ export const ES_TRANSLATIONS = {
   'auth.confirmation.required':
     'Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.',
   'auth.error.banner': 'Ocurrió un error: ',
+  'auth.error.configMissing':
+    'La autenticación aún no está configurada del todo. Contactá a soporte.',
+  'auth.error.noSession': 'No pudimos iniciar tu sesión. Intentá iniciar sesión nuevamente.',
+  'auth.error.unknown': 'Revisá tus datos e intentá de nuevo.',
   'chat.placeholder': 'Escribe un mensaje…',
   'chat.send': 'Enviar',
   'chat.streaming': 'Generando respuesta…',

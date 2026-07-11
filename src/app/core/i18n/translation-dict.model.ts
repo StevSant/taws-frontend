@@ -26,6 +26,9 @@ export interface TranslationDict {
   'auth.toggle.toLogin': string;
   'auth.confirmation.required': string;
   'auth.error.banner': string;
+  'auth.error.configMissing': string;
+  'auth.error.noSession': string;
+  'auth.error.unknown': string;
   'chat.placeholder': string;
   'chat.send': string;
   'chat.streaming': string;

@@ -1,6 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { AuthTokenService } from '../../../core';
-import { AuthRepository, AuthSession, AuthUser } from '../domain';
+import {
+  AuthConfigMissingError,
+  AuthNoSessionError,
+  AuthRepository,
+  AuthSession,
+  AuthUser,
+} from '../domain';
 
 /**
  * `submitting` covers both login and signup while their promise is in
@@ -9,6 +15,17 @@ import { AuthRepository, AuthSession, AuthUser } from '../domain';
  * session yet — the user must click the confirmation link before logging in.
  */
 export type AuthStatus = 'idle' | 'submitting' | 'confirmationRequired';
+
+/**
+ * Classifies an auth failure for presentation. `configMissing` and
+ * `noSession` are the small set of errors this app itself throws
+ * deliberately (see `AuthConfigMissingError`/`AuthNoSessionError`) and can
+ * map to a precise, translated message. Everything else — including any
+ * `error.message` text the Supabase SDK itself produces — is unbounded and
+ * provider-controlled, so it collapses to `unknown` and the presentation
+ * layer renders a generic, translated fallback instead of raw text.
+ */
+export type AuthErrorCode = 'configMissing' | 'noSession' | 'unknown';
 
 /**
  * Signal-based state + facade for the auth feature. Presentation components
@@ -24,7 +41,7 @@ export type AuthStatus = 'idle' | 'submitting' | 'confirmationRequired';
 export class AuthStore {
   private readonly userSignal = signal<AuthUser | null>(null);
   private readonly statusSignal = signal<AuthStatus>('idle');
-  private readonly errorSignal = signal<string | null>(null);
+  private readonly errorSignal = signal<AuthErrorCode | null>(null);
   private readonly readySignal = signal(false);
 
   readonly user = this.userSignal.asReadonly();
@@ -70,7 +87,7 @@ export class AuthStore {
       this.applySession(session);
       this.statusSignal.set('idle');
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      this.errorSignal.set(this.toErrorCode(error));
       this.statusSignal.set('idle');
     }
   }
@@ -87,7 +104,7 @@ export class AuthStore {
       this.applySession(session);
       this.statusSignal.set('idle');
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      this.errorSignal.set(this.toErrorCode(error));
       this.statusSignal.set('idle');
     }
   }
@@ -109,7 +126,20 @@ export class AuthStore {
     }
   }
 
-  private toErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : 'Unknown authentication error';
+  /**
+   * Never exposes `error.message` as-is: only this app's own, deliberately
+   * thrown errors are mapped to a specific code. Anything else — including
+   * raw messages the Supabase SDK generates — is logged for debugging but
+   * classified as `unknown` so the UI always renders translated copy.
+   */
+  private toErrorCode(error: unknown): AuthErrorCode {
+    if (error instanceof AuthConfigMissingError) {
+      return 'configMissing';
+    }
+    if (error instanceof AuthNoSessionError) {
+      return 'noSession';
+    }
+    console.error('[auth] Authentication error:', error instanceof Error ? error.message : error);
+    return 'unknown';
   }
 }

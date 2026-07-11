@@ -34,9 +34,9 @@
         />
       </label>
 
-      @if (store.error(); as error) {
+      @if (errorMessage(); as message) {
         <div class="login-page__error" role="alert">
-          {{ i18n.t('auth.error.banner') }}{{ error }}
+          {{ i18n.t('auth.error.banner') }}{{ message }}
         </div>
       }
 

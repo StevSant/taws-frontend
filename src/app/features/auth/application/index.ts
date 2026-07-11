@@ -1,2 +1,2 @@
 export { AuthStore } from './auth-store';
-export type { AuthStatus } from './auth-store';
+export type { AuthErrorCode, AuthStatus } from './auth-store';
