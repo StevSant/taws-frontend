@@ -1,0 +1,26 @@
+<div class="evidence-panel">
+  <span class="evidence-panel__title">{{ i18n.t('scenarios.result.evidence.title') }}</span>
+
+  @if (groups.length === 0) {
+    <p class="evidence-panel__empty">{{ i18n.t('scenarios.result.evidence.empty') }}</p>
+  }
+
+  @for (group of groups; track group.evidenceType) {
+    <div class="evidence-panel__group">
+      <span
+        class="evidence-panel__group-title"
+        [class.evidence-panel__group-title--actual]="group.evidenceType === 'actual_data'"
+        [class.evidence-panel__group-title--analog]="group.evidenceType === 'historical_analog'"
+        [class.evidence-panel__group-title--reasoning]="group.evidenceType === 'reasoning'"
+      >
+        {{ evidenceTypeLabel(group.evidenceType) }}
+        <span class="evidence-panel__group-count">{{ group.items.length }}</span>
+      </span>
+      <ul class="evidence-panel__list">
+        @for (item of group.items; track $index) {
+          <li class="evidence-panel__item">{{ item.detail }}</li>
+        }
+      </ul>
+    </div>
+  }
+</div>

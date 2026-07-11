@@ -76,7 +76,7 @@ export const EN_TRANSLATIONS = {
     'Informational only — not personalized financial advice. We never execute trades.',
   'scenarios.title': 'Scenario Lab',
   'scenarios.description':
-    '"What happens if X occurs?" Pick a curated preset or describe your own scenario, and get a causal chain, quantified per-asset-class impact, and evidence-backed recommendations. The full causal-chain/heatmap visualization is coming in a later update — this is the basic result view.',
+    '"What happens if X occurs?" Pick a curated preset or describe your own scenario, and get an interactive causal chain, a per-asset-class impact heatmap, and evidence-backed recommendations.',
   'scenarios.disclaimer.static':
     'Informational only — not personalized financial advice. We never execute trades.',
   'scenarios.mode.preset': 'Curated presets',
@@ -112,14 +112,20 @@ export const EN_TRANSLATIONS = {
   'scenarios.result.impact.direction.uncertain': 'Uncertain',
   'scenarios.result.impact.confidence.label': 'Confidence',
   'scenarios.result.evidence.title': 'Evidence',
+  'scenarios.result.evidence.empty': 'No evidence cited for this impact.',
   'scenarios.result.evidence.type.actual_data': 'Actual data',
   'scenarios.result.evidence.type.historical_analog': 'Historical analog',
   'scenarios.result.evidence.type.reasoning': 'Reasoning',
-  'scenarios.result.chain.title': 'Causal chain (basic view)',
+  'scenarios.result.heatmap.title': 'Impact heatmap',
+  'scenarios.result.heatmap.hint':
+    'Every asset class in the curated universe is shown — dimmed cells are classes this scenario does not directly affect.',
+  'scenarios.result.heatmap.notAssessed': 'Not assessed',
+  'scenarios.result.chain.title': 'Causal chain',
   'scenarios.result.chain.nodes.title': 'Steps',
   'scenarios.result.chain.edges.title': 'Links',
-  'scenarios.result.chain.placeholderNote':
-    'Shown here as a plain list — the full visual causal-chain graph and impact heatmap are coming in a later update.',
+  'scenarios.result.chain.interactionHint':
+    'Click a step to highlight its links; click a link to expand the full explanation.',
+  'scenarios.result.chain.empty': 'No causal links were generated for this scenario.',
   'scenarios.result.actions.title': 'Recommended actions',
   'scenarios.result.disclaimer.label': 'Disclaimer',
   'scenarios.result.addToBriefing.action': 'Add to briefing',
