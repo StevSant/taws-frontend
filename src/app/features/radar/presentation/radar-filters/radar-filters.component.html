@@ -1,0 +1,47 @@
+<form class="radar-filters">
+  <label class="radar-filters__field">
+    <span class="radar-filters__label">{{ i18n.t('radar.filters.type.label') }}</span>
+    <select
+      class="radar-filters__select"
+      name="assetClass"
+      [ngModel]="filters.assetClass"
+      (ngModelChange)="assetClassChange.emit($event)"
+    >
+      <option [ngValue]="null">{{ i18n.t('radar.filters.type.all') }}</option>
+      @for (assetClass of assetClasses; track assetClass) {
+        <option [ngValue]="assetClass">{{ assetClassLabel(assetClass) }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="radar-filters__field">
+    <span class="radar-filters__label">{{ i18n.t('radar.filters.asset.label') }}</span>
+    <select
+      class="radar-filters__select"
+      name="symbol"
+      [ngModel]="filters.symbol"
+      (ngModelChange)="symbolChange.emit($event)"
+    >
+      <option [ngValue]="null">{{ i18n.t('radar.filters.asset.all') }}</option>
+      @for (instrument of instrumentOptions; track instrument.symbol) {
+        <option [ngValue]="instrument.symbol">
+          {{ instrument.symbol }} — {{ instrument.name }}
+        </option>
+      }
+    </select>
+  </label>
+
+  <label class="radar-filters__field">
+    <span class="radar-filters__label">{{ i18n.t('radar.filters.recency.label') }}</span>
+    <select
+      class="radar-filters__select"
+      name="sinceHours"
+      [ngModel]="filters.sinceHours"
+      (ngModelChange)="sinceHoursChange.emit($event)"
+    >
+      @for (hours of recencyOptions; track hours) {
+        <option [ngValue]="hours">{{ recencyLabel(hours) }}</option>
+      }
+    </select>
+  </label>
+</form>
