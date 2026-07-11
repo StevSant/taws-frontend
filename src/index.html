@@ -12,6 +12,16 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        var key = 'midas.theme';
+        var theme = localStorage.getItem(key);
+        document.documentElement.setAttribute(
+          'data-theme',
+          theme === 'light' || theme === 'dark' ? theme : 'dark',
+        );
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

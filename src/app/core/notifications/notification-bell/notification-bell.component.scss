@@ -19,8 +19,13 @@
   }
 
   &__icon {
-    font-size: 1rem;
-    line-height: 1;
+    display: block;
+    color: var(--color-text-secondary);
+    transition: color 0.2s ease;
+
+    .notification-bell__toggle:hover & {
+      color: var(--color-gold);
+    }
   }
 
   &__badge {
@@ -130,16 +135,22 @@
 
   &__dismiss {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
     border: none;
     background: transparent;
     color: var(--color-text-muted);
     cursor: pointer;
-    font-size: 0.8rem;
-    line-height: 1;
-    padding: 0.1rem;
+    border-radius: var(--radius-sm);
+    padding: 0;
+    transition: color 0.2s ease, background 0.2s ease;
 
     &:hover {
       color: var(--color-danger);
+      background: var(--color-loss-dim);
     }
   }
 }

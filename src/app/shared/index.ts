@@ -1,4 +1,6 @@
 export { MidasLogoComponent } from './midas-logo/midas-logo.component';
+export { ThemeToggleComponent } from './theme-toggle/theme-toggle.component';
+export { LanguageToggleComponent } from './language-toggle/language-toggle.component';
 export { ButtonComponent } from './button/button.component';
 export { SpinnerComponent } from './spinner/spinner.component';
 export { PlaceholderPageComponent } from './placeholder-page/placeholder-page.component';

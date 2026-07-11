@@ -6,7 +6,7 @@
     [attr.aria-expanded]="isOpen()"
     (click)="toggle()"
   >
-    <span class="notification-bell__icon" aria-hidden="true">🔔</span>
+    <svg lucideBell class="notification-bell__icon" [size]="18" aria-hidden="true"></svg>
     @if (notifications.length > 0) {
       <span class="notification-bell__badge">{{ notifications.length }}</span>
     }
@@ -48,7 +48,7 @@
                 [attr.aria-label]="i18n.t('notifications.dismiss')"
                 (click)="onDismiss(notification.id, $event)"
               >
-                ✕
+                <svg lucideX [size]="14" aria-hidden="true"></svg>
               </button>
             </li>
           }

@@ -1,10 +1,18 @@
 <div class="login-page">
+  <div class="login-page__topbar">
+    <app-theme-toggle />
+    <app-language-toggle />
+  </div>
+
   <div class="login-page__glow" aria-hidden="true"></div>
 
   <form class="login-page__card glass" (ngSubmit)="onSubmit()">
     <div class="login-page__brand">
-      <app-midas-logo class="login-page__brand-mark" [size]="40" />
-      <span class="login-page__brand-name">{{ i18n.t('shell.title') }}</span>
+      <app-midas-logo class="login-page__brand-mark" [size]="48" />
+      <div class="login-page__brand-text">
+        <span class="login-page__brand-name">{{ i18n.t('shell.brand') }}</span>
+        <span class="login-page__brand-tag">{{ i18n.t('shell.tagline') }}</span>
+      </div>
     </div>
 
     @if (mode() === 'login') {

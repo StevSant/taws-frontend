@@ -8,6 +8,7 @@ import {
   Output,
   signal,
 } from '@angular/core';
+import { LucideBell, LucideX } from '@lucide/angular';
 import { TranslationService } from '../../i18n';
 import { Notification } from '../notification.model';
 
@@ -22,7 +23,7 @@ import { Notification } from '../notification.model';
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, LucideBell, LucideX],
   templateUrl: './notification-bell.component.html',
   styleUrl: './notification-bell.component.scss',
 })

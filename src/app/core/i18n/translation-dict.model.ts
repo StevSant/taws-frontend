@@ -6,13 +6,23 @@
  */
 export interface TranslationDict {
   'shell.title': string;
+  'shell.brand': string;
+  'shell.tagline': string;
+  'shell.nav.label': string;
   'shell.nav.radar': string;
   'shell.nav.chat': string;
   'shell.nav.scenarios': string;
   'shell.nav.briefings': string;
   'shell.language.es': string;
   'shell.language.en': string;
+  'shell.language.esFull': string;
+  'shell.language.enFull': string;
   'shell.language.toggleLabel': string;
+  'shell.theme.dark': string;
+  'shell.theme.light': string;
+  'shell.theme.darkShort': string;
+  'shell.theme.lightShort': string;
+  'shell.theme.toggleLabel': string;
   'shell.auth.login': string;
   'shell.auth.logout': string;
   'shell.status.active': string;

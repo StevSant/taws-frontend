@@ -2,7 +2,13 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfigService, TranslationKey, TranslationService } from '../../../../core';
-import { ButtonComponent, MidasLogoComponent, SpinnerComponent } from '../../../../shared';
+import {
+  ButtonComponent,
+  LanguageToggleComponent,
+  MidasLogoComponent,
+  SpinnerComponent,
+  ThemeToggleComponent,
+} from '../../../../shared';
 import { AuthErrorCode, AuthStore } from '../../application';
 import { DemoAuthPerspective } from '../../domain/models/demo-auth-perspective.model';
 
@@ -34,7 +40,14 @@ const DEFAULT_REDIRECT_PATH = '/radar';
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, MidasLogoComponent, SpinnerComponent],
+  imports: [
+    FormsModule,
+    ButtonComponent,
+    LanguageToggleComponent,
+    MidasLogoComponent,
+    SpinnerComponent,
+    ThemeToggleComponent,
+  ],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })

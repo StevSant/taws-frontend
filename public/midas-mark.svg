@@ -1,21 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Midas">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" role="img" aria-label="Midas">
   <defs>
-    <linearGradient id="gold" x1="4" y1="4" x2="60" y2="58" gradientUnits="userSpaceOnUse">
+    <radialGradient id="core" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="#f5c842" />
-      <stop offset="50%" stop-color="#d4a017" />
-      <stop offset="100%" stop-color="#9a7209" />
-    </linearGradient>
+      <stop offset="100%" stop-color="#d4a017" />
+    </radialGradient>
   </defs>
-  <g stroke="url(#gold)" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="miter">
-    <path d="M 4 32 L 60 32" />
-    <path d="M 32 6 L 20 32" />
-    <path d="M 32 6 L 44 32" />
-    <path d="M 20 32 L 32 56" />
-    <path d="M 44 32 L 32 56" />
-    <path d="M 9 15 L 6 32" />
-    <path d="M 9 15 L 20 32" />
-    <path d="M 55 13 L 59 32" />
-    <path d="M 55 13 L 44 32" />
-    <path d="M 60 32 L 62 42" />
+  <circle cx="20" cy="20" r="17" stroke="#d4a017" stroke-opacity="0.32" stroke-width="1" stroke-dasharray="4 3" />
+  <g stroke="#d4a017" stroke-opacity="0.16" stroke-width="0.5">
+    <line x1="20" y1="6" x2="33.31" y2="15.67" />
+    <line x1="33.31" y1="15.67" x2="28.23" y2="31.33" />
+    <line x1="28.23" y1="31.33" x2="11.77" y2="31.33" />
+    <line x1="11.77" y1="31.33" x2="6.69" y2="15.67" />
+    <line x1="6.69" y1="15.67" x2="20" y2="6" />
+    <line x1="20" y1="20" x2="20" y2="6" />
+    <line x1="20" y1="20" x2="33.31" y2="15.67" />
+    <line x1="20" y1="20" x2="28.23" y2="31.33" />
+    <line x1="20" y1="20" x2="11.77" y2="31.33" />
+    <line x1="20" y1="20" x2="6.69" y2="15.67" />
   </g>
+  <circle cx="20" cy="6" r="1.6" fill="#f5c842" />
+  <circle cx="33.31" cy="15.67" r="1.6" fill="#f5c842" />
+  <circle cx="28.23" cy="31.33" r="1.6" fill="#f5c842" />
+  <circle cx="11.77" cy="31.33" r="1.6" fill="#f5c842" />
+  <circle cx="6.69" cy="15.67" r="1.6" fill="#f5c842" />
+  <circle cx="20" cy="20" r="5" fill="url(#core)" />
 </svg>

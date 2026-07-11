@@ -1,0 +1,26 @@
+<div class="language-toggle" [class.language-toggle--open]="isOpen()">
+  <div class="language-toggle__group" role="menu">
+    <button
+      type="button"
+      class="language-toggle__trigger"
+      [attr.aria-label]="i18n.t('shell.language.toggleLabel')"
+      [attr.aria-expanded]="isOpen()"
+      [attr.aria-haspopup]="true"
+      (click)="toggle()"
+    >
+      {{ currentLabel() }}
+    </button>
+
+    @if (isOpen()) {
+      <button
+        type="button"
+        class="language-toggle__option"
+        role="menuitem"
+        [attr.aria-label]="alternateLabel()"
+        (click)="selectLocale(alternateLocale())"
+      >
+        {{ alternateLabel() }}
+      </button>
+    }
+  </div>
+</div>

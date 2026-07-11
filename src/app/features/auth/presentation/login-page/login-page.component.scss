@@ -9,6 +9,16 @@
   background: var(--color-background);
   overflow: hidden;
 
+  &__topbar {
+    position: absolute;
+    top: var(--space-5);
+    right: var(--space-5);
+    z-index: 2;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
   &__glow {
     position: absolute;
     top: 50%;
@@ -37,7 +47,7 @@
     border: 1px solid var(--color-gold-border);
     box-shadow:
       var(--elevation-3),
-      0 0 0 1px rgba(0, 0, 0, 0.2);
+      var(--card-outline-shadow);
   }
 
   &__brand {
@@ -47,18 +57,27 @@
     margin-bottom: var(--space-2);
   }
 
+  &__brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
   &__brand-mark {
     flex-shrink: 0;
     filter: drop-shadow(0 4px 14px rgba(212, 160, 23, 0.28));
   }
 
   &__brand-name {
-    font-family: var(--font-family-mono);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+
+  &__brand-tag {
     font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-secondary);
+    color: var(--color-text-muted);
   }
 
   &__title {

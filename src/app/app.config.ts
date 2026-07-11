@@ -6,9 +6,10 @@ import {
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import { provideLucideConfig } from '@lucide/angular';
 
 import { routes } from './app.routes';
-import { authInterceptor } from './core';
+import { authInterceptor, ThemeService } from './core';
 import { AuthStore } from './features/auth/application';
 import { AuthRepository } from './features/auth/domain';
 import { SupabaseAuthRepository } from './features/auth/infrastructure';
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
+    provideLucideConfig({ strokeWidth: 1.75 }),
     provideHttpClient(withInterceptors([authInterceptor])),
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
     // Restores any persisted Supabase session before the router's initial
@@ -24,5 +26,9 @@ export const appConfig: ApplicationConfig = {
     // refresh (provideRouter blocks initial navigation on app initializers
     // by default).
     provideAppInitializer(() => inject(AuthStore).initialize()),
+    provideAppInitializer(() => {
+      const theme = inject(ThemeService);
+      theme.setTheme(theme.theme());
+    }),
   ],
 };

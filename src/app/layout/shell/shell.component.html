@@ -1,11 +1,14 @@
 <div class="app-shell">
   <header class="app-shell__header">
-    <div class="app-shell__brand">
+    <a class="app-shell__brand" routerLink="/radar">
       <app-midas-logo class="app-shell__brand-mark" [size]="32" />
-      <span class="app-shell__title">{{ i18n.t('shell.title') }}</span>
-    </div>
+      <span class="app-shell__brand-text">
+        <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
+        <span class="app-shell__brand-tag">{{ i18n.t('shell.tagline') }}</span>
+      </span>
+    </a>
 
-    <nav class="app-shell__nav">
+    <nav class="app-shell__nav" [attr.aria-label]="i18n.t('shell.nav.label')">
       <a
         class="app-shell__nav-link"
         routerLink="/radar"
@@ -32,51 +35,15 @@
       >
     </nav>
 
-    <div class="app-shell__status">
-      <app-neural-orb [size]="34" />
-      <span class="app-shell__status-line">
-        <span class="app-shell__status-dot blink" aria-hidden="true"></span>
-        {{ i18n.t('shell.status.active') }}
-      </span>
-    </div>
-
     <div class="app-shell__cluster">
-      <span class="app-shell__clock">{{ clockLabel() }}</span>
-
-      <span class="app-shell__divider" aria-hidden="true"></span>
-
       <app-notification-bell
         [notifications]="notifications.notifications()"
         (dismiss)="notifications.dismiss($event)"
         (clearAll)="notifications.clearAll()"
       />
 
-      <span class="app-shell__divider" aria-hidden="true"></span>
-
-      <div
-        class="app-shell__language"
-        role="group"
-        [attr.aria-label]="i18n.t('shell.language.toggleLabel')"
-      >
-        <button
-          type="button"
-          class="app-shell__language-btn"
-          [class.app-shell__language-btn--active]="i18n.locale() === 'es'"
-          (click)="setLocale('es')"
-        >
-          {{ i18n.t('shell.language.es') }}
-        </button>
-        <button
-          type="button"
-          class="app-shell__language-btn"
-          [class.app-shell__language-btn--active]="i18n.locale() === 'en'"
-          (click)="setLocale('en')"
-        >
-          {{ i18n.t('shell.language.en') }}
-        </button>
-      </div>
-
-      <span class="app-shell__divider" aria-hidden="true"></span>
+      <app-theme-toggle />
+      <app-language-toggle />
 
       @if (auth.isAuthenticated()) {
         <button type="button" class="app-shell__auth-btn" (click)="logout()">
