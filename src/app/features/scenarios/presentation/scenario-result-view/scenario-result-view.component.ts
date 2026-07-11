@@ -1,11 +1,14 @@
 import { PercentPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { BriefingActionStatus } from '../../application';
 import {
   AssetClass,
   ImpactDirection,
   ScenarioHorizon,
   ScenarioMagnitude,
+  ScenarioMonitor,
+  ScenarioMonitorStatus,
   ScenarioResult,
 } from '../../domain';
 import { TranslationKey, TranslationService } from '../../../../core';
@@ -41,26 +44,46 @@ const ASSET_CLASS_LABELS: Record<AssetClass, TranslationKey> = {
   forex: 'scenarios.assetClass.forex',
 };
 
+const MONITOR_STATUS_LABELS: Record<ScenarioMonitorStatus, TranslationKey> = {
+  armed: 'scenarios.result.monitor.status.armed',
+  matched: 'scenarios.result.monitor.status.matched',
+  expired: 'scenarios.result.monitor.status.expired',
+};
+
 /**
  * Full `ScenarioResult` view (issue #20, upgrading #13's basic scope):
  * title/narrative, a per-asset-class impact heatmap (`app-impact-heatmap`),
  * per-impact evidence grouped by type (`app-evidence-panel`), the embedded
  * consequence chain as an interactive flow diagram (`app-causal-chain-view`
  * — replaces #13's plain node/edge list), recommended actions, disclaimer,
- * and the "add to briefing" action. Purely presentational; the three new
- * subcomponents own their own rendering/interaction logic.
+ * "add to briefing", and "arm monitor" (issue #18/#34) actions. Purely
+ * presentational; the three new subcomponents own their own
+ * rendering/interaction logic, and auth/monitor state is passed in via
+ * inputs rather than read from a store directly.
  */
 @Component({
   selector: 'app-scenario-result-view',
   standalone: true,
-  imports: [PercentPipe, ImpactHeatmapComponent, EvidencePanelComponent, CausalChainViewComponent],
+  imports: [
+    PercentPipe,
+    RouterLink,
+    ImpactHeatmapComponent,
+    EvidencePanelComponent,
+    CausalChainViewComponent,
+  ],
   templateUrl: './scenario-result-view.component.html',
   styleUrl: './scenario-result-view.component.scss',
 })
 export class ScenarioResultViewComponent {
   @Input({ required: true }) result!: ScenarioResult;
   @Input() briefingActionStatus: BriefingActionStatus = 'idle';
+  @Input() isAuthenticated = false;
+  @Input() monitor: ScenarioMonitor | null = null;
+  @Input() isArmingMonitor = false;
+  @Input() monitorError: string | null = null;
   @Output() addToBriefing = new EventEmitter<void>();
+  @Output() armMonitor = new EventEmitter<void>();
+  @Output() disarmMonitor = new EventEmitter<void>();
 
   constructor(readonly i18n: TranslationService) {}
 
@@ -80,7 +103,19 @@ export class ScenarioResultViewComponent {
     return this.i18n.t(ASSET_CLASS_LABELS[assetClass]);
   }
 
+  monitorStatusLabel(status: ScenarioMonitorStatus): string {
+    return this.i18n.t(MONITOR_STATUS_LABELS[status]);
+  }
+
   onAddToBriefing(): void {
     this.addToBriefing.emit();
+  }
+
+  onArmMonitor(): void {
+    this.armMonitor.emit();
+  }
+
+  onDisarmMonitor(): void {
+    this.disarmMonitor.emit();
   }
 }
