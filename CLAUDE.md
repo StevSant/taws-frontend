@@ -24,6 +24,13 @@ Presentation never imports infrastructure directly. Domain has zero framework/ve
 imports — it only defines the port (`ChatRepository`, as an abstract class so it can also
 be used as a DI token).
 
+## Code conventions
+
+- **One class/component/function per file (SRP).** Never group multiple components,
+  services, stores, or models in one file. Don't let files grow large with code that
+  mixes responsibilities: each file has one focused purpose — if it's accumulating
+  several definitions or concerns, split it.
+
 ## Adding a new feature
 
 Mirror the chat feature's 4-layer structure under `features/<name>/`:

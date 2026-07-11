@@ -5,13 +5,21 @@ import { ChatRepository } from '../domain';
 const CHAT_STREAM_PATH = '/api/v1/chat/stream';
 const SSE_DATA_PREFIX = 'data:';
 
+/** Shape of a decoded SSE frame's JSON payload — see backend `chat.py`'s `_to_sse`. */
+interface ChatStreamFrame {
+  t?: string;
+  done?: boolean;
+}
+
 /**
  * Infrastructure adapter for ChatRepository. Calls the backend SSE endpoint
  * with `fetch` and reads the `ReadableStream` body directly (no EventSource,
  * since EventSource can't send a POST body/JSON payload).
  *
- * Parses `data: <token>` lines per the SSE wire format and yields the token
- * payloads. Bound to ChatRepository in app.config.ts.
+ * Parses `data: <json>` lines per the SSE wire format — each payload is a JSON
+ * object (`{"t": "<token>"}` or `{"done": true}`), not a raw token, so tokens
+ * containing newlines can't corrupt the frame. Yields `.t` and stops once
+ * `.done` arrives. Bound to ChatRepository in app.config.ts.
  */
 @Injectable()
 export class SseChatRepository extends ChatRepository {
@@ -46,9 +54,15 @@ export class SseChatRepository extends ChatRepository {
         buffer = lines.pop() ?? '';
 
         for (const line of lines) {
-          const token = this.parseDataLine(line);
-          if (token !== null) {
-            yield token;
+          const frame = this.parseDataLine(line);
+          if (frame === null) {
+            continue;
+          }
+          if (frame.done) {
+            return;
+          }
+          if (frame.t !== undefined) {
+            yield frame.t;
           }
         }
       }
@@ -57,11 +71,21 @@ export class SseChatRepository extends ChatRepository {
     }
   }
 
-  private parseDataLine(line: string): string | null {
+  private parseDataLine(line: string): ChatStreamFrame | null {
     const trimmed = line.trim();
     if (!trimmed.startsWith(SSE_DATA_PREFIX)) {
       return null;
     }
-    return trimmed.slice(SSE_DATA_PREFIX.length).trim();
+
+    const payload = trimmed.slice(SSE_DATA_PREFIX.length).trim();
+    if (!payload) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(payload) as ChatStreamFrame;
+    } catch {
+      return null;
+    }
   }
 }
