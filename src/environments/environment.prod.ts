@@ -1,5 +1,4 @@
 import { DemoAuthPerspective } from '../app/features/auth/domain/models/demo-auth-perspective.model';
-
 /**
  * Production environment configuration.
  * Swapped in for environment.ts during production builds (see angular.json fileReplacements).

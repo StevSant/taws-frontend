@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { Locale, TranslationService } from '../../core';
+import { DropdownAnchor, syncDropdownAnchor } from '../sync-dropdown-anchor';
 
 @Component({
   selector: 'app-language-toggle',
@@ -14,15 +15,23 @@ import { Locale, TranslationService } from '../../core';
   templateUrl: './language-toggle.component.html',
   styleUrl: './language-toggle.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[class.pref-control-host--open]': 'isOpen()',
+  },
 })
 export class LanguageToggleComponent {
   readonly i18n = inject(TranslationService);
   readonly isOpen = signal(false);
+  readonly menuAnchor = signal<DropdownAnchor>({ top: 0, left: 0 });
 
   constructor(private readonly host: ElementRef<HTMLElement>) {}
 
   toggle(): void {
-    this.isOpen.update((open) => !open);
+    const opening = !this.isOpen();
+    if (opening) {
+      this.syncMenuAnchor();
+    }
+    this.isOpen.set(opening);
   }
 
   selectLocale(locale: Locale): void {
@@ -46,12 +55,21 @@ export class LanguageToggleComponent {
       : this.i18n.t('shell.language.en');
   }
 
+  @HostListener('window:resize')
+  @HostListener('window:scroll')
+  onViewportChange(): void {
+    if (this.isOpen()) {
+      this.syncMenuAnchor();
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.isOpen()) {
       return;
     }
-    if (!this.host.nativeElement.contains(event.target as Node)) {
+    const target = event.target as Node;
+    if (!this.host.nativeElement.contains(target)) {
       this.isOpen.set(false);
     }
   }
@@ -59,5 +77,9 @@ export class LanguageToggleComponent {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.isOpen.set(false);
+  }
+
+  private syncMenuAnchor(): void {
+    this.menuAnchor.set(syncDropdownAnchor(this.host.nativeElement));
   }
 }

@@ -5,6 +5,7 @@
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
+  background: var(--glass-bg);
 
   &__title {
     font-family: var(--font-family-mono);
@@ -83,4 +84,9 @@
     font-size: 0.65rem;
     color: var(--color-text-muted);
   }
+}
+
+html[data-theme='light'] .routing-trace {
+  background: var(--color-surface);
+  border-color: var(--color-gold-border);
 }

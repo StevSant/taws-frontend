@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { DemoAuthPerspective } from '../../features/auth/domain/models/demo-auth-perspective.model';
 
 /**
  * Central read-only access point for environment-driven configuration.
@@ -15,5 +16,5 @@ export class AppConfigService {
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */
   readonly radarPollIntervalMs: number = environment.radarPollIntervalMs;
   /** Dev-only demo personas for role-based one-click login. */
-  readonly demoAuthPerspectives = environment.demoAuthPerspectives;
+  readonly demoAuthPerspectives: DemoAuthPerspective[] = environment.demoAuthPerspectives;
 }

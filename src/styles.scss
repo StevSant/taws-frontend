@@ -53,12 +53,12 @@
 @keyframes coronaPulse {
   0%,
   100% {
-    opacity: 0.6;
-    transform: scale(1);
+    opacity: 0.75;
+    transform: scale(0.98);
   }
   50% {
     opacity: 1;
-    transform: scale(1.06);
+    transform: scale(1.03);
   }
 }
 
@@ -80,6 +80,43 @@
 
 .scroll-hide {
   scrollbar-width: none;
+}
+
+html.route-chat,
+body.route-chat {
+  overflow: hidden;
+  height: 100dvh;
+  max-height: 100dvh;
+  background: var(--color-background-deep);
+}
+
+body.route-chat .app-shell {
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+body.route-login {
+  overflow: hidden;
+}
+
+body.route-login app-root {
+  display: block;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+body.route-chat .app-shell__content {
+  overflow: hidden;
+  background: transparent;
+}
+
+body.route-chat .app-shell__header {
+  background: color-mix(in srgb, var(--color-background-deep) 72%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--color-gold-border) 35%, transparent);
 }
 
 .glass {

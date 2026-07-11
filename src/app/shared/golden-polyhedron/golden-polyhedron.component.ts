@@ -5,11 +5,15 @@ import {
   ElementRef,
   NgZone,
   OnDestroy,
+  effect,
   inject,
   input,
   viewChild,
 } from '@angular/core';
 import type * as THREE from 'three';
+import { Theme, ThemeService } from '../../core';
+import { POLYHEDRON_ACTIVITY_PROFILES } from './polyhedron-activity-profile';
+import { PolyhedronActivity } from './polyhedron-activity.model';
 
 /**
  * Three.js gold icosahedron centerpiece. No precedent for a Three.js
@@ -27,9 +31,12 @@ import type * as THREE from 'three';
 export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
   /** Rendered width/height in px (canvas is square). */
   readonly size = input(300);
+  /** Drives motion/glow — listening, composing, streaming, or idle. */
+  readonly activity = input<PolyhedronActivity>('idle');
 
   private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('container');
   private readonly ngZone = inject(NgZone);
+  private readonly themes = inject(ThemeService);
 
   private renderer?: THREE.WebGLRenderer;
   private scene?: THREE.Scene;
@@ -37,9 +44,29 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
   private mesh?: THREE.Mesh;
   private geometry?: THREE.IcosahedronGeometry;
   private material?: THREE.MeshPhongMaterial;
+  private ambientLight?: THREE.AmbientLight;
+  private keyLight?: THREE.DirectionalLight;
+  private fillLight?: THREE.DirectionalLight;
+  private rimLight?: THREE.DirectionalLight;
   private resizeObserver?: ResizeObserver;
   private frameId?: number;
   private reducedMotion = false;
+  private sceneReady = false;
+  private activityState: PolyhedronActivity = 'idle';
+  private rotationY = 0;
+
+  constructor() {
+    effect(() => {
+      const theme = this.themes.theme();
+      if (this.sceneReady) {
+        this.applyThemePalette(theme);
+      }
+    });
+
+    effect(() => {
+      this.activityState = this.activity();
+    });
+  }
 
   async ngAfterViewInit(): Promise<void> {
     const three = await import('three');
@@ -79,11 +106,15 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
       color: 0xc8920e,
       flatShading: true,
       shininess: 45,
+      emissive: 0x000000,
+      emissiveIntensity: 0,
     });
     this.mesh = new three.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh);
 
     this.addLightRig(three);
+    this.sceneReady = true;
+    this.applyThemePalette(this.themes.theme());
 
     if (this.reducedMotion) {
       this.renderer.render(this.scene, this.camera);
@@ -94,18 +125,49 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
   private addLightRig(three: typeof THREE): void {
     if (!this.scene) return;
 
-    const ambient = new three.AmbientLight(0x2a1f0a, 0.6);
+    this.ambientLight = new three.AmbientLight(0x2a1f0a, 0.6);
 
-    const key = new three.DirectionalLight(0xf5c842, 1.4);
-    key.position.set(3, 4, 5);
+    this.keyLight = new three.DirectionalLight(0xf5c842, 1.4);
+    this.keyLight.position.set(3, 4, 5);
 
-    const fill = new three.DirectionalLight(0x8a6a2a, 0.4);
-    fill.position.set(-4, -1, 2);
+    this.fillLight = new three.DirectionalLight(0x8a6a2a, 0.4);
+    this.fillLight.position.set(-4, -1, 2);
 
-    const rim = new three.DirectionalLight(0xffffff, 0.25);
-    rim.position.set(-2, 3, -4);
+    this.rimLight = new three.DirectionalLight(0xffffff, 0.25);
+    this.rimLight.position.set(-2, 3, -4);
 
-    this.scene.add(ambient, key, fill, rim);
+    this.scene.add(this.ambientLight, this.keyLight, this.fillLight, this.rimLight);
+  }
+
+  private applyThemePalette(theme: Theme): void {
+    if (!this.material || !this.ambientLight || !this.keyLight || !this.fillLight || !this.rimLight) {
+      return;
+    }
+
+    if (theme === 'light') {
+      this.material.color.setHex(0xf0c040);
+      this.material.shininess = 68;
+      this.ambientLight.color.setHex(0xfff8e7);
+      this.ambientLight.intensity = 0.95;
+      this.keyLight.color.setHex(0xffe08a);
+      this.keyLight.intensity = 1.65;
+      this.fillLight.color.setHex(0xe6b422);
+      this.fillLight.intensity = 0.55;
+      this.rimLight.color.setHex(0xffffff);
+      this.rimLight.intensity = 0.45;
+      return;
+    }
+
+    this.material.color.setHex(0xc8920e);
+    this.material.shininess = 45;
+    this.ambientLight.color.setHex(0x2a1f0a);
+    this.ambientLight.intensity = 0.6;
+    this.keyLight.color.setHex(0xf5c842);
+    this.keyLight.intensity = 1.4;
+    this.fillLight.color.setHex(0x8a6a2a);
+    this.fillLight.intensity = 0.4;
+    this.rimLight.color.setHex(0xffffff);
+    this.rimLight.intensity = 0.25;
   }
 
   private observeResize(): void {
@@ -133,12 +195,24 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
+    let lastTime = performance.now();
+
     const tick = (time: number) => {
+      const delta = Math.min((time - lastTime) / 1000, 0.05);
+      lastTime = time;
       const elapsed = time / 1000;
-      if (this.mesh) {
-        this.mesh.rotation.y = elapsed * 0.35;
-        this.mesh.rotation.x = Math.sin(elapsed * 0.6) * 0.15;
+      const profile = POLYHEDRON_ACTIVITY_PROFILES[this.activityState];
+
+      if (this.mesh && this.material) {
+        this.rotationY += delta * profile.rotationSpeed;
+        this.mesh.rotation.y = this.rotationY;
+        this.mesh.rotation.x = Math.sin(elapsed * profile.pulseHz) * profile.wobble;
+        const scale = 1 + Math.sin(elapsed * profile.pulseHz * 1.6) * profile.pulseAmp;
+        this.mesh.scale.setScalar(scale);
+        this.material.emissive.setHex(profile.emissive);
+        this.material.emissiveIntensity = profile.emissiveIntensity;
       }
+
       if (this.renderer && this.scene && this.camera) {
         this.renderer.render(this.scene, this.camera);
       }

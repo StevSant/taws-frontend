@@ -81,6 +81,7 @@ html:not([data-theme]) {
 
   --glass-bg: rgba(14, 14, 14, 0.75);
   --glass-blur: 20px;
+  --shell-header-height: 4rem;
   --shell-header-bg: color-mix(in srgb, var(--color-background) 98%, transparent);
   --card-outline-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
@@ -89,15 +90,15 @@ html:not([data-theme]) {
 html[data-theme='light'] {
   color-scheme: light;
 
-  --color-primary: #9a7209;
-  --color-primary-hover: #b8860b;
+  --color-primary: #c8920e;
+  --color-primary-hover: #e6b422;
   --color-primary-contrast: #fffdf8;
 
-  --color-gold: #9a7209;
-  --color-gold-bright: #b8860b;
-  --color-gold-dim-bg: rgba(154, 114, 9, 0.1);
-  --color-gold-border: rgba(154, 114, 9, 0.22);
-  --color-gold-border-hi: rgba(154, 114, 9, 0.38);
+  --color-gold: #c8920e;
+  --color-gold-bright: #e6b422;
+  --color-gold-dim-bg: rgba(200, 146, 14, 0.14);
+  --color-gold-border: rgba(200, 146, 14, 0.3);
+  --color-gold-border-hi: rgba(200, 146, 14, 0.48);
 
   --color-background: #f5f1e8;
   --color-background-deep: #ebe4d6;
@@ -140,6 +141,7 @@ html[data-theme='light'] {
 
   --glass-bg: rgba(255, 253, 248, 0.86);
   --glass-blur: 18px;
+  --shell-header-height: 4rem;
   --shell-header-bg: color-mix(in srgb, var(--color-surface) 94%, transparent);
   --card-outline-shadow: 0 0 0 1px rgba(28, 25, 23, 0.06);
 }

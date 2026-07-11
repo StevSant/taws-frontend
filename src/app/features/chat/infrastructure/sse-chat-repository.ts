@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { AppConfigService } from '../../../core';
+import { Injectable, inject } from '@angular/core';
+import { AppConfigService, AuthTokenService } from '../../../core';
 import { AgentTrace, ChatRepository, ChatStreamEvent } from '../domain';
 
 const CHAT_STREAM_PATH = '/api/v1/chat/stream';
@@ -29,14 +29,13 @@ interface ChatStreamFrame {
  */
 @Injectable()
 export class SseChatRepository extends ChatRepository {
-  constructor(private readonly config: AppConfigService) {
-    super();
-  }
+  private readonly config = inject(AppConfigService);
+  private readonly authToken = inject(AuthTokenService);
 
   async *streamReply(input: string): AsyncIterable<ChatStreamEvent> {
     const response = await fetch(`${this.config.apiBaseUrl}${CHAT_STREAM_PATH}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.buildHeaders(),
       body: JSON.stringify({ message: input }),
     });
 
@@ -84,6 +83,15 @@ export class SseChatRepository extends ChatRepository {
     } finally {
       reader.releaseLock();
     }
+  }
+
+  private buildHeaders(): Record<string, string> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    const token = this.authToken.currentToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
   }
 
   private parseDataLine(line: string): ChatStreamFrame | null {
