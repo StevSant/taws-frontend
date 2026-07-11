@@ -1,0 +1,19 @@
+.app-spinner {
+  display: inline-block;
+
+  &__dot {
+    display: inline-block;
+    width: 0.85rem;
+    height: 0.85rem;
+    border: 2px solid #d1d5db;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: app-spinner-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes app-spinner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

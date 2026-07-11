@@ -1,0 +1,30 @@
+<div class="chat-page">
+  <ul class="chat-page__messages">
+    @for (message of store.messages(); track message.id) {
+      <li class="chat-page__message" [class.chat-page__message--user]="message.role === 'user'">
+        <span class="chat-page__role">{{ message.role }}</span>
+        <p class="chat-page__content">{{ message.content }}</p>
+        @if (message.pending) {
+          <app-spinner label="Streaming reply" />
+        }
+      </li>
+    }
+  </ul>
+
+  <form class="chat-page__composer" (ngSubmit)="onSend()">
+    <input
+      class="chat-page__input"
+      type="text"
+      name="draft"
+      placeholder="Type a message…"
+      [ngModel]="draft()"
+      (ngModelChange)="draft.set($event)"
+      [disabled]="store.isStreaming()"
+    />
+    <app-button
+      label="Send"
+      [disabled]="!store.canSend() || !draft().trim()"
+      (pressed)="onSend()"
+    />
+  </form>
+</div>
