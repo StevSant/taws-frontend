@@ -1,5 +1,5 @@
 import { PercentPipe } from '@angular/common';
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, signal } from '@angular/core';
 import { ConsequenceChain, ConsequenceEdge } from '../../domain';
 import { TranslationService } from '../../../../core';
 
@@ -48,13 +48,37 @@ function confidenceTier(confidence: number): ConfidenceTier {
   templateUrl: './causal-chain-view.component.html',
   styleUrl: './causal-chain-view.component.scss',
 })
-export class CausalChainViewComponent {
+export class CausalChainViewComponent implements OnChanges {
   @Input({ required: true }) chain!: ConsequenceChain;
 
   readonly selectedNodeId = signal<string | null>(null);
   readonly expandedEdgeIndex = signal<number | null>(null);
 
   constructor(readonly i18n: TranslationService) {}
+
+  /**
+   * `ScenariosPageComponent`'s `@if (store.result(); as result)` stays
+   * truthy across a second "generate" click (a result already exists), so
+   * Angular reuses this same component instance across regenerations —
+   * only the `chain` input is rebound to a new `ConsequenceChain`. Without
+   * this hook, `selectedNodeId`/`expandedEdgeIndex` would keep pointing at
+   * node/edge identifiers from the *previous* chain, and since the backend
+   * assigns fresh `n0, n1, n2...` ids per chain, a stale id can
+   * "coincidentally" collide with a real node/edge in the new chain and
+   * render it as selected/expanded — misleading state the user never
+   * chose. `ngOnChanges` only fires when the bound `chain` reference
+   * actually changes (Angular's default input diffing), and
+   * `ScenarioLabStore.generate()` always assigns a brand-new
+   * `ScenarioResult` object rather than mutating one in place, so this
+   * reset fires exactly once per genuine regeneration — never on
+   * unrelated re-renders (e.g. the "add to briefing" status changing).
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['chain']) {
+      this.selectedNodeId.set(null);
+      this.expandedEdgeIndex.set(null);
+    }
+  }
 
   nodeLabel(nodeId: string): string {
     return this.chain.nodes.find((node) => node.id === nodeId)?.label ?? nodeId;
