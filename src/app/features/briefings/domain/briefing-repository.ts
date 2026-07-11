@@ -15,4 +15,14 @@ export abstract class BriefingRepository {
    * scheduled/recurring generation is a separate T1 concern on the backend.
    */
   abstract generateBriefing(watchlistId: string): Promise<Briefing>;
+
+  /**
+   * Fetches a single briefing rendered as a PDF (`GET
+   * /api/v1/briefings/{id}/export.pdf` — agreed contract with the backend
+   * team, issue #22). Returns the raw `Blob` so the caller can trigger a
+   * browser download; throws a descriptive `Error` on a non-2xx response
+   * (including a 404 while the endpoint is still being built in parallel)
+   * instead of letting the raw HTTP error leak to the UI layer.
+   */
+  abstract exportBriefingPdf(briefingId: string): Promise<Blob>;
 }

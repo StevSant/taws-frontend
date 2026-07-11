@@ -68,7 +68,10 @@
         [history]="store.reviewHistoryFor(briefing.id)"
         [isSubmitting]="store.isSubmittingReviewFor(briefing.id)"
         [submitError]="store.reviewErrorFor(briefing.id)"
+        [isExporting]="store.isExportingFor(briefing.id)"
+        [exportError]="store.exportErrorFor(briefing.id)"
         (submitReview)="onSubmitReview(briefing.id, $event)"
+        (exportPdf)="onExportPdf(briefing.id)"
       />
     }
   </div>

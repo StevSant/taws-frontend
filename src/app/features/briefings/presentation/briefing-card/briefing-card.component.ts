@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslationKey, TranslationService } from '../../../../core';
+import { ButtonComponent } from '../../../../shared';
 import { Briefing, ReviewDecision, ReviewState } from '../../domain';
 import {
   ReviewDecisionSubmitted,
@@ -23,7 +24,7 @@ const DECISION_LABELS: Record<ReviewDecision, TranslationKey> = {
 @Component({
   selector: 'app-briefing-card',
   standalone: true,
-  imports: [DatePipe, ReviewPanelComponent, ReviewHistoryComponent],
+  imports: [DatePipe, ReviewPanelComponent, ReviewHistoryComponent, ButtonComponent],
   templateUrl: './briefing-card.component.html',
   styleUrl: './briefing-card.component.scss',
 })
@@ -32,7 +33,10 @@ export class BriefingCardComponent {
   @Input() history: ReviewState[] = [];
   @Input() isSubmitting = false;
   @Input() submitError: string | null = null;
+  @Input() isExporting = false;
+  @Input() exportError: string | null = null;
   @Output() submitReview = new EventEmitter<ReviewDecisionSubmitted>();
+  @Output() exportPdf = new EventEmitter<void>();
 
   constructor(readonly i18n: TranslationService) {}
 

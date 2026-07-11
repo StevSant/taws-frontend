@@ -1,0 +1,59 @@
+<div class="notification-bell">
+  <button
+    type="button"
+    class="notification-bell__toggle"
+    [attr.aria-label]="i18n.t('notifications.bell.label')"
+    [attr.aria-expanded]="isOpen()"
+    (click)="toggle()"
+  >
+    <span class="notification-bell__icon" aria-hidden="true">🔔</span>
+    @if (notifications.length > 0) {
+      <span class="notification-bell__badge">{{ notifications.length }}</span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="notification-bell__panel" role="menu">
+      <header class="notification-bell__panel-header">
+        <span class="notification-bell__panel-title">{{
+          i18n.t('notifications.panel.title')
+        }}</span>
+        @if (notifications.length > 0) {
+          <button type="button" class="notification-bell__clear" (click)="onClearAll()">
+            {{ i18n.t('notifications.clearAll') }}
+          </button>
+        }
+      </header>
+
+      @if (notifications.length === 0) {
+        <p class="notification-bell__empty">{{ i18n.t('notifications.empty') }}</p>
+      } @else {
+        <ul class="notification-bell__list">
+          @for (notification of notifications; track notification.id) {
+            <li class="notification-bell__item">
+              <div class="notification-bell__item-body">
+                <span class="notification-bell__item-message">
+                  {{ i18n.t(notification.messageKey) }}
+                  @if (notification.count > 1) {
+                    ({{ notification.count }})
+                  }
+                </span>
+                <span class="notification-bell__item-time">
+                  {{ notification.createdAt | date: 'short' }}
+                </span>
+              </div>
+              <button
+                type="button"
+                class="notification-bell__dismiss"
+                [attr.aria-label]="i18n.t('notifications.dismiss')"
+                (click)="onDismiss(notification.id, $event)"
+              >
+                ✕
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</div>

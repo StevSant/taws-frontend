@@ -11,4 +11,6 @@ export const environment = {
   apiBaseUrl: 'http://localhost:8000',
   supabaseUrl: 'https://jtvaogvsjjpspypmnwgm.supabase.co',
   supabaseAnonKey: '',
+  /** How often the radar page re-polls `/api/v1/news` for new signals, in ms. */
+  radarPollIntervalMs: 60_000,
 };

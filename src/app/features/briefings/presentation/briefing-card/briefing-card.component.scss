@@ -118,4 +118,17 @@
     font-size: 0.75rem;
     font-style: italic;
   }
+
+  &__export {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: flex-start;
+  }
+
+  &__export-error {
+    margin: 0;
+    color: var(--color-danger);
+    font-size: 0.8rem;
+  }
 }
