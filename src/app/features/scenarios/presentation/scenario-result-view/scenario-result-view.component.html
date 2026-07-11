@@ -1,0 +1,137 @@
+<article class="scenario-result">
+  <header class="scenario-result__header">
+    <h2 class="scenario-result__title">{{ result.title }}</h2>
+    <div class="scenario-result__meta">
+      <span class="scenario-result__badge">{{ magnitudeLabel(result.spec.magnitude) }}</span>
+      <span class="scenario-result__badge">{{ horizonLabel(result.spec.horizon) }}</span>
+    </div>
+  </header>
+
+  <p class="scenario-result__narrative">{{ result.narrative }}</p>
+
+  <section class="scenario-result__section">
+    <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.impact.title') }}</h3>
+    <div class="scenario-result__impact-grid">
+      @for (impact of result.impactMap; track impact.assetClass) {
+        <div
+          class="scenario-result__impact-card"
+          [class.scenario-result__impact-card--positive]="impact.direction === 'positive'"
+          [class.scenario-result__impact-card--negative]="impact.direction === 'negative'"
+          [class.scenario-result__impact-card--neutral]="impact.direction === 'neutral'"
+          [class.scenario-result__impact-card--uncertain]="impact.direction === 'uncertain'"
+        >
+          <header class="scenario-result__impact-header">
+            <span class="scenario-result__impact-asset">{{
+              assetClassLabel(impact.assetClass)
+            }}</span>
+            <span class="scenario-result__impact-direction">{{
+              impactDirectionLabel(impact.direction)
+            }}</span>
+          </header>
+          <p class="scenario-result__impact-confidence">
+            {{ i18n.t('scenarios.result.impact.confidence.label') }}:
+            {{ impact.confidence | percent: '1.0-0' }}
+          </p>
+
+          <div class="scenario-result__evidence">
+            <span class="scenario-result__evidence-title">{{
+              i18n.t('scenarios.result.evidence.title')
+            }}</span>
+            <ul class="scenario-result__evidence-list">
+              @for (evidence of impact.evidence; track $index) {
+                <li class="scenario-result__evidence-item">
+                  <span
+                    class="scenario-result__evidence-tag"
+                    [class.scenario-result__evidence-tag--actual]="
+                      evidence.evidenceType === 'actual_data'
+                    "
+                    [class.scenario-result__evidence-tag--analog]="
+                      evidence.evidenceType === 'historical_analog'
+                    "
+                    [class.scenario-result__evidence-tag--reasoning]="
+                      evidence.evidenceType === 'reasoning'
+                    "
+                  >
+                    {{ evidenceTypeLabel(evidence.evidenceType) }}
+                  </span>
+                  <span class="scenario-result__evidence-detail">{{ evidence.detail }}</span>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="scenario-result__section">
+    <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.chain.title') }}</h3>
+    <p class="scenario-result__chain-note">
+      {{ i18n.t('scenarios.result.chain.placeholderNote') }}
+    </p>
+
+    <div class="scenario-result__chain">
+      <div class="scenario-result__chain-column">
+        <span class="scenario-result__chain-subtitle">{{
+          i18n.t('scenarios.result.chain.nodes.title')
+        }}</span>
+        <ol class="scenario-result__chain-nodes">
+          @for (node of result.consequenceChain.nodes; track node.id) {
+            <li>{{ node.label }}</li>
+          }
+        </ol>
+      </div>
+
+      <div class="scenario-result__chain-column">
+        <span class="scenario-result__chain-subtitle">{{
+          i18n.t('scenarios.result.chain.edges.title')
+        }}</span>
+        <ul class="scenario-result__chain-edges">
+          @for (edge of result.consequenceChain.edges; track $index) {
+            <li>
+              <strong>{{ nodeLabel(edge.sourceNodeId) }}</strong>
+              →
+              <strong>{{ nodeLabel(edge.targetNodeId) }}</strong>
+              : {{ edge.mechanism }} ({{ edge.confidence | percent: '1.0-0' }})
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="scenario-result__section">
+    <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.actions.title') }}</h3>
+    <ul class="scenario-result__actions">
+      @for (action of result.recommendedActions; track $index) {
+        <li>{{ action }}</li>
+      }
+    </ul>
+  </section>
+
+  <p class="scenario-result__disclaimer">
+    <strong>{{ i18n.t('scenarios.result.disclaimer.label') }}:</strong> {{ result.disclaimer }}
+  </p>
+
+  <section class="scenario-result__briefing">
+    <p class="scenario-result__briefing-explain">
+      {{ i18n.t('scenarios.result.addToBriefing.explain') }}
+    </p>
+    <button type="button" class="scenario-result__briefing-action" (click)="onAddToBriefing()">
+      {{ i18n.t('scenarios.result.addToBriefing.action') }}
+    </button>
+    @if (briefingActionStatus === 'copied') {
+      <p class="scenario-result__briefing-status" role="status">
+        {{ i18n.t('scenarios.result.addToBriefing.copied') }}
+      </p>
+    }
+    @if (briefingActionStatus === 'error') {
+      <p
+        class="scenario-result__briefing-status scenario-result__briefing-status--error"
+        role="alert"
+      >
+        {{ i18n.t('scenarios.result.addToBriefing.error') }}
+      </p>
+    }
+  </section>
+</article>

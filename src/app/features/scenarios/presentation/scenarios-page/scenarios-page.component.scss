@@ -2,3 +2,113 @@
   display: flex;
   flex: 1;
 }
+
+.scenarios-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  gap: var(--space-4);
+
+  &__title {
+    font-size: 1.5rem;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2);
+  }
+
+  &__description {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+
+  &__disclaimer {
+    margin: 0;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+
+  &__mode-toggle {
+    display: flex;
+    gap: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__mode-tab {
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+
+    &--active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+  }
+
+  &__loading {
+    align-self: center;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+    font-size: 0.85rem;
+  }
+
+  &__empty {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__label {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  &__textarea {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    font: inherit;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+  }
+
+  &__hint {
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+}

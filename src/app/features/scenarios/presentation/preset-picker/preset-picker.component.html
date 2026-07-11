@@ -1,0 +1,20 @@
+<div class="preset-picker" role="radiogroup">
+  @for (preset of presets; track preset.id) {
+    <button
+      type="button"
+      class="preset-picker__card"
+      role="radio"
+      [attr.aria-checked]="preset.id === selectedId"
+      [class.preset-picker__card--selected]="preset.id === selectedId"
+      (click)="onSelect(preset)"
+    >
+      <span class="preset-picker__title">{{ title(preset) }}</span>
+      <span class="preset-picker__description">{{ description(preset) }}</span>
+      <span class="preset-picker__meta">
+        <span class="preset-picker__badge">{{ preset.magnitude }}</span>
+        <span class="preset-picker__badge">{{ preset.horizon }}</span>
+      </span>
+      <span class="preset-picker__symbols">{{ preset.affectedSymbols.join(', ') }}</span>
+    </button>
+  }
+</div>
