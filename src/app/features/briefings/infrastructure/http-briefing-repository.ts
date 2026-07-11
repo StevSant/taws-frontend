@@ -1,9 +1,10 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService } from '../../../core';
+import { AppConfigService, TranslationService } from '../../../core';
 import { Briefing, BriefingRepository } from '../domain';
 import { BriefingDto } from './briefing-dto';
+import { GenerateBriefingRequestDto } from './generate-briefing-request-dto';
 import { mapBriefingDto } from './map-briefing-dto';
 
 /**
@@ -18,6 +19,7 @@ export class HttpBriefingRepository extends BriefingRepository {
   constructor(
     private readonly http: HttpClient,
     private readonly config: AppConfigService,
+    private readonly translation: TranslationService,
   ) {
     super();
   }
@@ -30,10 +32,11 @@ export class HttpBriefingRepository extends BriefingRepository {
   }
 
   async generateBriefing(watchlistId: string): Promise<Briefing> {
+    const body: GenerateBriefingRequestDto = { locale: this.translation.locale() };
     const dto = await firstValueFrom(
       this.http.post<BriefingDto>(
         `${this.config.apiBaseUrl}${this.briefingsPath(watchlistId)}`,
-        {},
+        body,
       ),
     );
     return mapBriefingDto(dto);
