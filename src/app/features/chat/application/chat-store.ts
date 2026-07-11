@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import {
   AgentTrace,
@@ -100,6 +101,9 @@ export class ChatStore {
   }
 
   private toErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      return error.error?.detail ?? error.message ?? 'Unknown streaming error';
+    }
     return error instanceof Error ? error.message : 'Unknown streaming error';
   }
 

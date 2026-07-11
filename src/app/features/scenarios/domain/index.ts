@@ -15,3 +15,5 @@ export type { ConsequenceEdge } from './models/consequence-edge.model';
 export type { ConsequenceChain } from './models/consequence-chain.model';
 export type { ScenarioResult } from './models/scenario-result.model';
 export type { ScenarioIntake } from './models/scenario-intake.model';
+export type { ScenarioMonitor } from './models/scenario-monitor.model';
+export type { ScenarioMonitorStatus } from './models/scenario-monitor-status.model';

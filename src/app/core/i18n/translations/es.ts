@@ -25,6 +25,10 @@ export const ES_TRANSLATIONS = {
   'auth.confirmation.required':
     'Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.',
   'auth.error.banner': 'Ocurrió un error: ',
+  'auth.error.configMissing':
+    'La autenticación aún no está configurada del todo. Contactá a soporte.',
+  'auth.error.noSession': 'No pudimos iniciar tu sesión. Intentá iniciar sesión nuevamente.',
+  'auth.error.unknown': 'Revisá tus datos e intentá de nuevo.',
   'chat.placeholder': 'Escribe un mensaje…',
   'chat.send': 'Enviar',
   'chat.streaming': 'Generando respuesta…',
@@ -135,6 +139,19 @@ export const ES_TRANSLATIONS = {
     'Los briefings todavía no son conscientes de escenarios — solo se generan a partir de las señales de una watchlist. Esto copia el resumen del escenario a tu portapapeles para que puedas referenciarlo manualmente en tu próxima revisión de briefing.',
   'scenarios.result.addToBriefing.copied': 'Resumen del escenario copiado al portapapeles.',
   'scenarios.result.addToBriefing.error': 'No se pudo copiar al portapapeles.',
+  'scenarios.result.monitor.explain':
+    'Activa un monitor para recibir un aviso por Telegram si este escenario empieza a materializarse.',
+  'scenarios.result.monitor.arm.action': 'Activar monitor',
+  'scenarios.result.monitor.disarm.action': 'Desactivar monitor',
+  'scenarios.result.monitor.arming': 'Activando…',
+  'scenarios.result.monitor.disarming': 'Desactivando…',
+  'scenarios.result.monitor.status.armed': 'Activo',
+  'scenarios.result.monitor.status.matched': 'Coincidencia detectada',
+  'scenarios.result.monitor.status.expired': 'Expirado',
+  'scenarios.result.monitor.matchReason.label': 'Por qué coincidió',
+  'scenarios.result.monitor.error.banner': 'Falló la acción del monitor: ',
+  'scenarios.result.monitor.signInPrompt':
+    'Inicia sesión para activar un monitor de este escenario.',
   'briefings.title': 'Briefings',
   'briefings.description':
     'Resúmenes por watchlist que puedes marcar como revisado, escalado o descartado, siempre con fuentes, evidencia y el recordatorio de que esto no es asesoría personalizada. Nunca ejecutamos operaciones.',

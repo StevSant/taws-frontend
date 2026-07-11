@@ -2,4 +2,5 @@
 export interface GenerateScenarioRequestDto {
   preset_id?: string;
   free_text?: string;
+  locale: string;
 }

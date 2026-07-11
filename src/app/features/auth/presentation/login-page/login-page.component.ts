@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { ButtonComponent, SpinnerComponent } from '../../../../shared';
-import { AuthStore } from '../../application';
+import { AuthErrorCode, AuthStore } from '../../application';
 
 type AuthMode = 'login' | 'signup';
 
@@ -20,6 +20,17 @@ const TITLE_LABELS: Record<AuthMode, TranslationKey> = {
 const TOGGLE_LABELS: Record<AuthMode, TranslationKey> = {
   login: 'auth.toggle.toSignup',
   signup: 'auth.toggle.toLogin',
+};
+
+/**
+ * Maps every `AuthErrorCode` to a translation key. `store.error()` is never
+ * raw text (see `AuthStore.toErrorCode`), so this lookup is exhaustive and
+ * the template never renders unmapped/untranslated content.
+ */
+const ERROR_LABELS: Record<AuthErrorCode, TranslationKey> = {
+  configMissing: 'auth.error.configMissing',
+  noSession: 'auth.error.noSession',
+  unknown: 'auth.error.unknown',
 };
 
 const DEFAULT_REDIRECT_PATH = '/radar';
@@ -72,6 +83,12 @@ export class LoginPageComponent {
 
   toggleLabel(): string {
     return this.i18n.t(TOGGLE_LABELS[this.mode()]);
+  }
+
+  /** Translated message for the current auth error code, or `null` when there is none. */
+  errorMessage(): string | null {
+    const code = this.store.error();
+    return code ? this.i18n.t(ERROR_LABELS[code]) : null;
   }
 
   toggleMode(): void {

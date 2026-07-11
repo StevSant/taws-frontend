@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js';
 import { AppConfigService } from '../../../core';
 import { AuthRepository } from '../domain/auth-repository';
+import { AuthConfigMissingError, AuthNoSessionError } from '../domain/errors';
 import { AuthSession } from '../domain/models/auth-session.model';
 
 const CONFIG_MISSING_MESSAGE =
@@ -53,7 +54,7 @@ export class SupabaseAuthRepository extends AuthRepository {
 
     const session = this.toAuthSession(data.session);
     if (!session) {
-      throw new Error('Supabase did not return a session for this login.');
+      throw new AuthNoSessionError('Supabase did not return a session for this login.');
     }
     return session;
   }
@@ -101,7 +102,7 @@ export class SupabaseAuthRepository extends AuthRepository {
 
   private requireClient(): SupabaseClient {
     if (!this.client) {
-      throw new Error(CONFIG_MISSING_MESSAGE);
+      throw new AuthConfigMissingError(CONFIG_MISSING_MESSAGE);
     }
     return this.client;
   }

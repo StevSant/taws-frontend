@@ -27,6 +27,9 @@ export interface TranslationDict {
   'auth.toggle.toLogin': string;
   'auth.confirmation.required': string;
   'auth.error.banner': string;
+  'auth.error.configMissing': string;
+  'auth.error.noSession': string;
+  'auth.error.unknown': string;
   'chat.placeholder': string;
   'chat.send': string;
   'chat.streaming': string;
@@ -129,6 +132,17 @@ export interface TranslationDict {
   'scenarios.result.addToBriefing.explain': string;
   'scenarios.result.addToBriefing.copied': string;
   'scenarios.result.addToBriefing.error': string;
+  'scenarios.result.monitor.explain': string;
+  'scenarios.result.monitor.arm.action': string;
+  'scenarios.result.monitor.disarm.action': string;
+  'scenarios.result.monitor.arming': string;
+  'scenarios.result.monitor.disarming': string;
+  'scenarios.result.monitor.status.armed': string;
+  'scenarios.result.monitor.status.matched': string;
+  'scenarios.result.monitor.status.expired': string;
+  'scenarios.result.monitor.matchReason.label': string;
+  'scenarios.result.monitor.error.banner': string;
+  'scenarios.result.monitor.signInPrompt': string;
   'briefings.title': string;
   'briefings.description': string;
   'briefings.disclaimer.static': string;
