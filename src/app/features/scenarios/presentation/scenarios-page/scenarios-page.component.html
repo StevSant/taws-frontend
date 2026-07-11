@@ -1,5 +1,96 @@
-<app-placeholder-page
-  [title]="i18n.t('scenarios.title')"
-  [description]="i18n.t('scenarios.description')"
-  [badge]="i18n.t('placeholder.badge')"
-/>
+<div class="scenarios-page">
+  <header class="scenarios-page__header">
+    <h1 class="scenarios-page__title">{{ i18n.t('scenarios.title') }}</h1>
+    <p class="scenarios-page__description">{{ i18n.t('scenarios.description') }}</p>
+  </header>
+
+  <p class="scenarios-page__disclaimer" role="note">
+    {{ i18n.t('scenarios.disclaimer.static') }}
+  </p>
+
+  <div class="scenarios-page__mode-toggle" role="tablist">
+    <button
+      type="button"
+      role="tab"
+      class="scenarios-page__mode-tab"
+      [class.scenarios-page__mode-tab--active]="store.mode() === 'preset'"
+      [attr.aria-selected]="store.mode() === 'preset'"
+      (click)="onModeChange('preset')"
+    >
+      {{ i18n.t('scenarios.mode.preset') }}
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="scenarios-page__mode-tab"
+      [class.scenarios-page__mode-tab--active]="store.mode() === 'freeform'"
+      [attr.aria-selected]="store.mode() === 'freeform'"
+      (click)="onModeChange('freeform')"
+    >
+      {{ i18n.t('scenarios.mode.freeform') }}
+    </button>
+  </div>
+
+  @if (store.mode() === 'preset') {
+    @if (store.isLoadingPresets()) {
+      <app-spinner class="scenarios-page__loading" [label]="i18n.t('scenarios.presets.loading')" />
+    }
+
+    @if (store.presetsError(); as error) {
+      <div class="scenarios-page__error" role="alert">
+        <span>{{ i18n.t('scenarios.presets.error.banner') }}{{ error }}</span>
+        <app-button
+          [label]="i18n.t('scenarios.presets.error.retry')"
+          (pressed)="onRetryPresets()"
+        />
+      </div>
+    }
+
+    @if (!store.isLoadingPresets() && !store.presetsError() && store.presets().length === 0) {
+      <p class="scenarios-page__empty">{{ i18n.t('scenarios.presets.empty') }}</p>
+    }
+
+    <app-preset-picker
+      [presets]="store.presets()"
+      [selectedId]="store.selectedPresetId()"
+      (select)="onSelectPreset($event)"
+    />
+  } @else {
+    <label class="scenarios-page__field">
+      <span class="scenarios-page__label">{{ i18n.t('scenarios.freeform.label') }}</span>
+      <textarea
+        class="scenarios-page__textarea"
+        rows="3"
+        [maxlength]="freeTextMaxLength"
+        [ngModel]="store.freeText()"
+        (ngModelChange)="onFreeTextChange($event)"
+        [placeholder]="i18n.t('scenarios.freeform.placeholder')"
+      ></textarea>
+      <span class="scenarios-page__hint">{{ i18n.t('scenarios.freeform.maxLengthHint') }}</span>
+    </label>
+  }
+
+  <app-button
+    [label]="store.isGenerating() ? i18n.t('scenarios.generating') : i18n.t('scenarios.generate')"
+    [disabled]="!store.canGenerate()"
+    (pressed)="onGenerate()"
+  />
+
+  @if (store.isGenerating()) {
+    <app-spinner class="scenarios-page__loading" />
+  }
+
+  @if (store.generateError(); as error) {
+    <div class="scenarios-page__error" role="alert">
+      <span>{{ i18n.t('scenarios.error.banner') }}{{ error }}</span>
+    </div>
+  }
+
+  @if (store.result(); as result) {
+    <app-scenario-result-view
+      [result]="result"
+      [briefingActionStatus]="store.briefingActionStatus()"
+      (addToBriefing)="onAddToBriefing()"
+    />
+  }
+</div>
