@@ -9,12 +9,6 @@ import {
   SkeletonCardComponent,
 } from '../../../../shared';
 import { BriefingPanelStore } from '../../application';
-import { BriefingRepository, ReviewRepository, WatchlistRepository } from '../../domain';
-import {
-  HttpBriefingRepository,
-  HttpReviewRepository,
-  HttpWatchlistRepository,
-} from '../../infrastructure';
 import { ReviewDecisionSubmitted } from '../review-panel/review-panel.component';
 import { BriefingCardComponent } from '../briefing-card/briefing-card.component';
 import { WatchlistManagerComponent } from '../watchlist-manager/watchlist-manager.component';
@@ -30,12 +24,6 @@ import { WatchlistManagerComponent } from '../watchlist-manager/watchlist-manage
     EmptyStateComponent,
     BriefingCardComponent,
     WatchlistManagerComponent,
-  ],
-  providers: [
-    BriefingPanelStore,
-    { provide: WatchlistRepository, useClass: HttpWatchlistRepository },
-    { provide: BriefingRepository, useClass: HttpBriefingRepository },
-    { provide: ReviewRepository, useClass: HttpReviewRepository },
   ],
   templateUrl: './briefings-page.component.html',
   styleUrl: './briefings-page.component.scss',

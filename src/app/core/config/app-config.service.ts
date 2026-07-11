@@ -15,6 +15,12 @@ export class AppConfigService {
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */
   readonly radarPollIntervalMs: number = environment.radarPollIntervalMs;
+  readonly instrumentsCacheTtlMs: number = environment.instrumentsCacheTtlMs;
+  readonly newsCacheTtlMs: number = environment.newsCacheTtlMs;
+  readonly signalsCacheTtlMs: number = environment.signalsCacheTtlMs;
+  readonly watchlistsCacheTtlMs: number = environment.watchlistsCacheTtlMs;
+  readonly scenarioPresetsCacheTtlMs: number = environment.scenarioPresetsCacheTtlMs;
+  readonly radarSignalFetchBatchSize: number = environment.radarSignalFetchBatchSize;
   /** Dev-only demo personas for role-based one-click login. */
   readonly demoAuthPerspectives: DemoAuthPerspective[] = environment.demoAuthPerspectives;
 }

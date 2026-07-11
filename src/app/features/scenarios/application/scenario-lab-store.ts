@@ -14,7 +14,7 @@ export type BriefingActionStatus = 'idle' | 'copied' | 'error';
  * `setMode`/`selectPreset`/`setFreeText`/`generate`/`addToBriefing` intents;
  * they never touch `ScenarioRepository` directly.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ScenarioLabStore {
   private readonly presetsSignal = signal<ScenarioPreset[]>([]);
   private readonly isLoadingPresetsSignal = signal(false);
@@ -35,6 +35,7 @@ export class ScenarioLabStore {
   private readonly monitorErrorSignal = signal<string | null>(null);
   private readonly recentScenariosSignal = signal<ScenarioResult[]>([]);
   private readonly isLoadingRecentSignal = signal(false);
+  private sessionReady = false;
 
   readonly presets = this.presetsSignal.asReadonly();
   readonly isLoadingPresets = this.isLoadingPresetsSignal.asReadonly();
@@ -75,7 +76,14 @@ export class ScenarioLabStore {
 
   /** Loads the curated preset list (once, on page entry). */
   async init(): Promise<void> {
+    if (this.sessionReady && this.presetsSignal().length > 0) {
+      void this.loadPresets({ background: true });
+      void this.loadRecentScenarios({ background: true });
+      return;
+    }
+
     await Promise.all([this.loadPresets(), this.loadRecentScenarios()]);
+    this.sessionReady = true;
   }
 
   async retryPresets(): Promise<void> {
@@ -200,8 +208,11 @@ export class ScenarioLabStore {
     }
   }
 
-  private async loadRecentScenarios(): Promise<void> {
-    this.isLoadingRecentSignal.set(true);
+  private async loadRecentScenarios(options?: { background?: boolean }): Promise<void> {
+    const background = options?.background ?? false;
+    if (!background && this.recentScenariosSignal().length === 0) {
+      this.isLoadingRecentSignal.set(true);
+    }
     try {
       const scenarios = await this.scenarioRepository.listRecentScenarios();
       this.recentScenariosSignal.set(scenarios);
@@ -212,8 +223,11 @@ export class ScenarioLabStore {
     }
   }
 
-  private async loadPresets(): Promise<void> {
-    this.isLoadingPresetsSignal.set(true);
+  private async loadPresets(options?: { background?: boolean }): Promise<void> {
+    const background = options?.background ?? false;
+    if (!background && this.presetsSignal().length === 0) {
+      this.isLoadingPresetsSignal.set(true);
+    }
     this.presetsErrorSignal.set(null);
     try {
       const presets = await this.scenarioRepository.fetchPresets();

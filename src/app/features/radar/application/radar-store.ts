@@ -1,6 +1,5 @@
-import { DestroyRef, Injectable, computed, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { interval } from 'rxjs';
+import { Injectable, computed, signal } from '@angular/core';
+import { Subscription, interval } from 'rxjs';
 import { AppConfigService, NotificationsStore } from '../../../core';
 import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
@@ -17,6 +16,7 @@ import {
 } from '../domain';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
+import { mapInBatches } from './map-in-batches';
 
 /**
  * Signal-based state + facade for the radar feature. Presentation components
@@ -34,13 +34,12 @@ import { latestSignalBySymbol } from './latest-signal-by-symbol';
  * pushing exactly one `NotificationsStore.notify(...)` call per tick that
  * has new items — never one per tick regardless of change.
  *
- * `RadarStore` is provided per-navigation in `RadarPageComponent`'s
- * `providers` (feature-scoped DI), so its injector — and therefore the
- * `DestroyRef` the poll subscription is tied to via `takeUntilDestroyed` —
- * is destroyed when the component is destroyed (e.g. navigating away).
- * That's what stops the interval; there's no separate manual teardown.
+ * `RadarStore` is app-scoped (`providedIn: 'root'`) so revisiting Radar shows
+ * the last loaded feed instantly and refreshes in the background. The poll loop
+ * is started by `init()` and stopped by `pausePolling()` when the user leaves
+ * the page — see `RadarPageComponent`.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class RadarStore {
   private readonly filtersSignal = signal<RadarFilters>(DEFAULT_RADAR_FILTERS);
   private readonly newsSignal = signal<NewsItem[]>([]);
@@ -57,7 +56,8 @@ export class RadarStore {
    * first fetch resolves, so the very first poll tick after `init()` never
    * fires a "new items" notification for the whole initial page load. */
   private lastSeenNewsIds: Set<string> | null = null;
-  private pollingStarted = false;
+  private pollSubscription: Subscription | null = null;
+  private sessionReady = false;
 
   readonly filters = this.filtersSignal.asReadonly();
   readonly isLoading = this.loadingSignal.asReadonly();
@@ -107,17 +107,29 @@ export class RadarStore {
     private readonly signalReviewRepository: SignalReviewRepository,
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
-    private readonly destroyRef: DestroyRef,
   ) {}
 
-  /** Loads the instrument universe (once), the initial news window, and starts auto-refresh. */
+  /** Loads instruments + news on first visit; revisits show cached state and refresh silently. */
   async init(): Promise<void> {
-    await Promise.all([this.loadInstruments(), this.loadNews()]);
     this.startAutoRefresh();
+
+    if (this.sessionReady) {
+      void this.loadNews({ background: true });
+      return;
+    }
+
+    await Promise.all([this.loadInstruments(), this.loadNews()]);
+    this.sessionReady = true;
+  }
+
+  /** Stops background polling when navigating away from Radar. */
+  pausePolling(): void {
+    this.pollSubscription?.unsubscribe();
+    this.pollSubscription = null;
   }
 
   async retry(): Promise<void> {
-    await this.init();
+    await Promise.all([this.loadInstruments(), this.loadNews()]);
   }
 
   async setAssetClass(assetClass: AssetClass | null): Promise<void> {
@@ -126,7 +138,7 @@ export class RadarStore {
     }
     // Changing instrument type invalidates a more specific asset selection.
     this.filtersSignal.update((filters) => ({ ...filters, assetClass, symbol: null }));
-    await this.loadNews();
+    await this.loadNews({ forceLoading: true });
   }
 
   async setSymbol(symbol: string | null): Promise<void> {
@@ -134,7 +146,7 @@ export class RadarStore {
       return;
     }
     this.filtersSignal.update((filters) => ({ ...filters, symbol }));
-    await this.loadNews();
+    await this.loadNews({ forceLoading: true });
   }
 
   async setSinceHours(sinceHours: number): Promise<void> {
@@ -142,7 +154,7 @@ export class RadarStore {
       return;
     }
     this.filtersSignal.update((filters) => ({ ...filters, sinceHours }));
-    await this.loadNews();
+    await this.loadNews({ forceLoading: true });
   }
 
   isGeneratingFor(symbol: string): boolean {
@@ -240,8 +252,12 @@ export class RadarStore {
     }
   }
 
-  private async loadNews(): Promise<void> {
-    this.loadingSignal.set(true);
+  private async loadNews(options?: { background?: boolean; forceLoading?: boolean }): Promise<void> {
+    const background = options?.background ?? false;
+    const forceLoading = options?.forceLoading ?? false;
+    if (forceLoading || (!background && this.newsSignal().length === 0)) {
+      this.loadingSignal.set(true);
+    }
     this.errorSignal.set(null);
     try {
       const news = await this.newsRepository.fetchNews(this.filtersSignal());
@@ -269,29 +285,26 @@ export class RadarStore {
    * page itself (same posture as `loadInstruments`).
    */
   private async loadSignals(news: NewsItem[]): Promise<void> {
-    const symbols = new Set(news.flatMap((item) => item.relatedSymbols));
-    const fetched = await Promise.all(
-      Array.from(symbols).map(async (symbol) => {
-        try {
-          return await this.signalRepository.fetchSignals(symbol);
-        } catch {
-          return [];
-        }
-      }),
-    );
+    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
+    const fetched = await mapInBatches(symbols, this.config.radarSignalFetchBatchSize, async (symbol) => {
+      try {
+        return await this.signalRepository.fetchSignals(symbol);
+      } catch {
+        return [];
+      }
+    });
     this.signalsBySymbolSignal.set(latestSignalBySymbol(fetched.flat()));
   }
 
-  /** Starts the auto-refresh poll loop (once per `RadarStore` instance). */
+  /** Starts the auto-refresh poll loop while the Radar page is active. */
   private startAutoRefresh(): void {
-    if (this.pollingStarted) {
+    if (this.pollSubscription) {
       return;
     }
-    this.pollingStarted = true;
 
-    interval(this.config.radarPollIntervalMs)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => void this.pollNews());
+    this.pollSubscription = interval(this.config.radarPollIntervalMs).subscribe(() =>
+      void this.pollNews(),
+    );
   }
 
   /**

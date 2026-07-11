@@ -1,4 +1,4 @@
-import { Component, OnInit, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed } from '@angular/core';
 import { TranslationService } from '../../../../core';
 import {
   ButtonComponent,
@@ -8,13 +8,6 @@ import {
   SkeletonCardComponent,
 } from '../../../../shared';
 import { RadarStore } from '../../application';
-import { InstrumentRepository, NewsRepository, SignalRepository, SignalReviewRepository } from '../../domain';
-import {
-  HttpInstrumentRepository,
-  HttpNewsRepository,
-  HttpSignalRepository,
-  HttpSignalReviewRepository,
-} from '../../infrastructure';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { SignalCardComponent } from '../signal-card/signal-card.component';
 
@@ -29,17 +22,10 @@ import { SignalCardComponent } from '../signal-card/signal-card.component';
     SkeletonCardComponent,
     EmptyStateComponent,
   ],
-  providers: [
-    RadarStore,
-    { provide: NewsRepository, useClass: HttpNewsRepository },
-    { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
-    { provide: SignalRepository, useClass: HttpSignalRepository },
-    { provide: SignalReviewRepository, useClass: HttpSignalReviewRepository },
-  ],
   templateUrl: './radar-page.component.html',
   styleUrl: './radar-page.component.scss',
 })
-export class RadarPageComponent implements OnInit {
+export class RadarPageComponent implements OnInit, OnDestroy {
   readonly headerStats = computed<FeaturePageStat[]>(() => {
     if (this.store.isLoading()) {
       return [];
@@ -64,6 +50,10 @@ export class RadarPageComponent implements OnInit {
 
   ngOnInit(): void {
     void this.store.init();
+  }
+
+  ngOnDestroy(): void {
+    this.store.pausePolling();
   }
 
   onRetry(): void {

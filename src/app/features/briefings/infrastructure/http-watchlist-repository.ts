@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService } from '../../../core';
+import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
 import { Watchlist, WatchlistItem, WatchlistRepository } from '../domain';
 import { mapWatchlistDto } from './map-watchlist-dto';
 import { mapWatchlistItemDto } from './map-watchlist-item-dto';
@@ -17,6 +17,8 @@ const WATCHLISTS_PATH = '/api/v1/watchlists';
 
 @Injectable()
 export class HttpWatchlistRepository extends WatchlistRepository {
+  private readonly cache = inject(RequestCacheService);
+
   constructor(
     private readonly http: HttpClient,
     private readonly config: AppConfigService,
@@ -25,10 +27,18 @@ export class HttpWatchlistRepository extends WatchlistRepository {
   }
 
   async fetchWatchlists(): Promise<Watchlist[]> {
-    const dtos = await firstValueFrom(
-      this.http.get<WatchlistDto[]>(`${this.config.apiBaseUrl}${WATCHLISTS_PATH}`),
+    return cachedFetch(
+      this.cache,
+      'watchlists',
+      'all',
+      this.config.watchlistsCacheTtlMs,
+      async () => {
+        const dtos = await firstValueFrom(
+          this.http.get<WatchlistDto[]>(`${this.config.apiBaseUrl}${WATCHLISTS_PATH}`),
+        );
+        return dtos.map(mapWatchlistDto);
+      },
     );
-    return dtos.map(mapWatchlistDto);
   }
 
   async createWatchlist(name: string): Promise<Watchlist> {
@@ -36,6 +46,7 @@ export class HttpWatchlistRepository extends WatchlistRepository {
     const dto = await firstValueFrom(
       this.http.post<WatchlistDto>(`${this.config.apiBaseUrl}${WATCHLISTS_PATH}`, body),
     );
+    this.cache.clearNamespace('watchlists');
     return mapWatchlistDto(dto);
   }
 
@@ -51,6 +62,7 @@ export class HttpWatchlistRepository extends WatchlistRepository {
     await firstValueFrom(
       this.http.delete<void>(`${this.config.apiBaseUrl}${WATCHLISTS_PATH}/${id}`),
     );
+    this.cache.clearNamespace('watchlists');
   }
 
   async listItems(watchlistId: string): Promise<WatchlistItem[]> {

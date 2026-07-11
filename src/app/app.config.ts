@@ -13,6 +13,26 @@ import { authInterceptor, ThemeService } from './core';
 import { AuthStore } from './features/auth/application';
 import { AuthRepository } from './features/auth/domain';
 import { SupabaseAuthRepository } from './features/auth/infrastructure';
+import { BriefingRepository, ReviewRepository, WatchlistRepository } from './features/briefings/domain';
+import {
+  HttpBriefingRepository,
+  HttpReviewRepository,
+  HttpWatchlistRepository,
+} from './features/briefings/infrastructure';
+import {
+  InstrumentRepository,
+  NewsRepository,
+  SignalRepository,
+  SignalReviewRepository,
+} from './features/radar/domain';
+import {
+  HttpInstrumentRepository,
+  HttpNewsRepository,
+  HttpSignalRepository,
+  HttpSignalReviewRepository,
+} from './features/radar/infrastructure';
+import { ScenarioRepository } from './features/scenarios/domain';
+import { HttpScenarioRepository } from './features/scenarios/infrastructure';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +41,14 @@ export const appConfig: ApplicationConfig = {
     provideLucideConfig({ strokeWidth: 1.75 }),
     provideHttpClient(withInterceptors([authInterceptor])),
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
+    { provide: NewsRepository, useClass: HttpNewsRepository },
+    { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
+    { provide: SignalRepository, useClass: HttpSignalRepository },
+    { provide: SignalReviewRepository, useClass: HttpSignalReviewRepository },
+    { provide: WatchlistRepository, useClass: HttpWatchlistRepository },
+    { provide: BriefingRepository, useClass: HttpBriefingRepository },
+    { provide: ReviewRepository, useClass: HttpReviewRepository },
+    { provide: ScenarioRepository, useClass: HttpScenarioRepository },
     // Restores any persisted Supabase session before the router's initial
     // navigation runs, so authGuard never sees a false "logged out" on
     // refresh (provideRouter blocks initial navigation on app initializers

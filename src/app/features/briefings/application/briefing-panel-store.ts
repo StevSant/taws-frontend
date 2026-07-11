@@ -20,7 +20,7 @@ import {
  * never touch `WatchlistRepository`/`BriefingRepository`/`ReviewRepository`
  * directly.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class BriefingPanelStore {
   private readonly watchlistsSignal = signal<Watchlist[]>([]);
   private readonly selectedWatchlistIdSignal = signal<string | null>(null);
@@ -37,6 +37,7 @@ export class BriefingPanelStore {
   private readonly watchlistItemsSignal = signal<WatchlistItem[]>([]);
   private readonly isLoadingItemsSignal = signal(false);
   private readonly isManagingWatchlistSignal = signal(false);
+  private sessionReady = false;
 
   readonly watchlists = this.watchlistsSignal.asReadonly();
   readonly watchlistItems = this.watchlistItemsSignal.asReadonly();
@@ -75,11 +76,17 @@ export class BriefingPanelStore {
 
   /** Loads the user's watchlists and auto-selects the first one, if any. */
   async init(): Promise<void> {
+    if (this.sessionReady && this.watchlistsSignal().length > 0) {
+      void this.loadWatchlists({ background: true });
+      return;
+    }
+
     await this.loadWatchlists();
     const first = this.watchlistsSignal()[0];
     if (first) {
       await this.selectWatchlist(first.id);
     }
+    this.sessionReady = true;
   }
 
   async retry(): Promise<void> {
@@ -282,8 +289,11 @@ export class BriefingPanelStore {
     }
   }
 
-  private async loadWatchlists(): Promise<void> {
-    this.isLoadingWatchlistsSignal.set(true);
+  private async loadWatchlists(options?: { background?: boolean }): Promise<void> {
+    const background = options?.background ?? false;
+    if (!background && this.watchlistsSignal().length === 0) {
+      this.isLoadingWatchlistsSignal.set(true);
+    }
     this.errorSignal.set(null);
     try {
       const watchlists = await this.watchlistRepository.fetchWatchlists();

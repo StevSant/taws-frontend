@@ -10,8 +10,6 @@ import {
 } from '../../../../shared';
 import { AuthStore } from '../../../auth/application';
 import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
-import { ScenarioRepository } from '../../domain';
-import { HttpScenarioRepository } from '../../infrastructure';
 import { PresetPickerComponent } from '../preset-picker/preset-picker.component';
 import { ScenarioResultViewComponent } from '../scenario-result-view/scenario-result-view.component';
 
@@ -38,9 +36,7 @@ const FREE_TEXT_MAX_LENGTH = 1000;
  * shows a sign-in prompt instead of the action when there's no session —
  * same show/hide-by-auth pattern as the shell header's login/logout switch.
  *
- * `ScenarioLabStore`/`ScenarioRepository` are provided here so each
- * navigation to this page gets a fresh instance — same feature-scoped DI
- * pattern as `ChatPageComponent`/`RadarPageComponent`/`BriefingsPageComponent`.
+ * `ScenarioLabStore` is app-scoped and reuses cached presets/history on revisit.
  */
 @Component({
   selector: 'app-scenarios-page',
@@ -55,7 +51,6 @@ const FREE_TEXT_MAX_LENGTH = 1000;
     PresetPickerComponent,
     ScenarioResultViewComponent,
   ],
-  providers: [ScenarioLabStore, { provide: ScenarioRepository, useClass: HttpScenarioRepository }],
   templateUrl: './scenarios-page.component.html',
   styleUrl: './scenarios-page.component.scss',
 })
