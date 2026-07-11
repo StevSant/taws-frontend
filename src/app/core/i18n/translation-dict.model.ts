@@ -34,6 +34,11 @@ export interface TranslationDict {
   'chat.trace.routing': string;
   'chat.trace.start': string;
   'chat.trace.done': string;
+  'chat.agent.supervisor': string;
+  'chat.agent.analyst': string;
+  'chat.agent.quant': string;
+  'chat.agent.advisor': string;
+  'chat.agent.consequence': string;
   'chat.error.banner': string;
   'radar.title': string;
   'radar.description': string;

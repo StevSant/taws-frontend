@@ -1,20 +1,5 @@
 <div class="chat-page">
-  @if (store.traces().length > 0) {
-    <div class="chat-page__trace-panel">
-      <span class="chat-page__trace-title">{{ i18n.t('chat.trace.title') }}</span>
-      <ul class="chat-page__traces">
-        @for (trace of store.traces(); track $index) {
-          <li class="chat-page__trace-chip">
-            <span class="chat-page__trace-agent">{{ trace.agent }}</span>
-            <span class="chat-page__trace-event">{{ traceEventLabel(trace.event) }}</span>
-            @if (trace.detail) {
-              <span class="chat-page__trace-detail">{{ trace.detail }}</span>
-            }
-          </li>
-        }
-      </ul>
-    </div>
-  }
+  <app-routing-trace [hops]="store.routingHops()" />
 
   <ul class="chat-page__messages">
     @for (message of store.messages(); track message.id) {
