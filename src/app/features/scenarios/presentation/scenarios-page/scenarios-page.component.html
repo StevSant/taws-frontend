@@ -77,7 +77,7 @@
   />
 
   @if (store.isGenerating()) {
-    <app-spinner class="scenarios-page__loading" />
+    <app-spinner class="scenarios-page__loading" [label]="i18n.t('scenarios.generating')" />
   }
 
   @if (store.generateError(); as error) {

@@ -25,6 +25,7 @@ export interface TranslationDict {
   'auth.toggle.toSignup': string;
   'auth.toggle.toLogin': string;
   'auth.confirmation.required': string;
+  'auth.error.banner': string;
   'chat.placeholder': string;
   'chat.send': string;
   'chat.streaming': string;
