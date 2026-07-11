@@ -1,5 +1,6 @@
 import { ImpactClass } from './impact-class.model';
 import { Instrument } from './instrument.model';
+import { MarketStats } from './market-stats.model';
 import { NewsItem } from './news-item.model';
 
 /**
@@ -27,4 +28,6 @@ export interface RadarSignal {
   priceDelta?: number;
   /** Latest persisted Analyst signal id, when one exists for this instrument. */
   signalId?: string;
+  /** Quant stats for sparkline / live price context (independent of Analyst signal). */
+  marketStats?: MarketStats;
 }

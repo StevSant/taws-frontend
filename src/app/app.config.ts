@@ -21,13 +21,17 @@ import {
 } from './features/briefings/infrastructure';
 import {
   InstrumentRepository,
+  MacroRepository,
   NewsRepository,
+  QuantRepository,
   SignalRepository,
   SignalReviewRepository,
 } from './features/radar/domain';
 import {
   HttpInstrumentRepository,
+  HttpMacroRepository,
   HttpNewsRepository,
+  HttpQuantRepository,
   HttpSignalRepository,
   HttpSignalReviewRepository,
 } from './features/radar/infrastructure';
@@ -45,6 +49,8 @@ export const appConfig: ApplicationConfig = {
     { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
     { provide: SignalRepository, useClass: HttpSignalRepository },
     { provide: SignalReviewRepository, useClass: HttpSignalReviewRepository },
+    { provide: QuantRepository, useClass: HttpQuantRepository },
+    { provide: MacroRepository, useClass: HttpMacroRepository },
     { provide: WatchlistRepository, useClass: HttpWatchlistRepository },
     { provide: BriefingRepository, useClass: HttpBriefingRepository },
     { provide: ReviewRepository, useClass: HttpReviewRepository },

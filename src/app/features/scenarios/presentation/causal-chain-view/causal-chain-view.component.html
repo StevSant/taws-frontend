@@ -1,82 +1,51 @@
 <div class="causal-chain">
   <p class="causal-chain__hint">{{ i18n.t('scenarios.result.chain.interactionHint') }}</p>
 
-  <div
-    class="causal-chain__overview"
-    role="list"
-    [attr.aria-label]="i18n.t('scenarios.result.chain.nodes.title')"
-  >
-    @for (node of chain.nodes; track node.id; let last = $last) {
-      <button
-        type="button"
-        class="causal-chain__node"
-        role="listitem"
-        [class.causal-chain__node--selected]="selectedNodeId() === node.id"
-        [attr.aria-pressed]="selectedNodeId() === node.id"
-        (click)="onToggleNode(node.id)"
-      >
-        {{ node.label }}
-      </button>
-      @if (!last) {
-        <span class="causal-chain__overview-arrow" aria-hidden="true">→</span>
-      }
-    }
-  </div>
-
   @if (chain.edges.length === 0) {
     <p class="causal-chain__empty">{{ i18n.t('scenarios.result.chain.empty') }}</p>
   } @else {
-    <ol
-      class="causal-chain__edges"
-      [attr.aria-label]="i18n.t('scenarios.result.chain.edges.title')"
-    >
+    <ol class="causal-chain__timeline">
       @for (edge of chain.edges; track $index; let i = $index) {
         <li
-          class="causal-chain__edge"
-          [class.causal-chain__edge--highlighted]="
+          class="causal-chain__step"
+          [class.causal-chain__step--highlighted]="
             selectedNodeId() !== null && edgeInvolves(edge, selectedNodeId()!)
           "
-          [class.causal-chain__edge--dimmed]="
+          [class.causal-chain__step--dimmed]="
             selectedNodeId() !== null && !edgeInvolves(edge, selectedNodeId()!)
           "
         >
-          <button
-            type="button"
-            class="causal-chain__edge-node"
-            [class.causal-chain__edge-node--selected]="selectedNodeId() === edge.sourceNodeId"
-            [attr.aria-pressed]="selectedNodeId() === edge.sourceNodeId"
-            (click)="onToggleNode(edge.sourceNodeId)"
-          >
-            {{ nodeLabel(edge.sourceNodeId) }}
-          </button>
-
-          <button
-            type="button"
-            class="causal-chain__mechanism"
-            [class.causal-chain__mechanism--low]="confidenceTier(edge.confidence) === 'low'"
-            [class.causal-chain__mechanism--medium]="confidenceTier(edge.confidence) === 'medium'"
-            [class.causal-chain__mechanism--high]="confidenceTier(edge.confidence) === 'high'"
-            [class.causal-chain__mechanism--expanded]="expandedEdgeIndex() === i"
-            [attr.title]="edge.mechanism"
-            [attr.aria-expanded]="expandedEdgeIndex() === i"
-            (click)="onToggleEdge(i)"
-          >
-            <span class="causal-chain__mechanism-arrow" aria-hidden="true">→</span>
-            <span class="causal-chain__mechanism-text">{{ edge.mechanism }}</span>
-            <span class="causal-chain__mechanism-confidence">{{
-              edge.confidence | percent: '1.0-0'
-            }}</span>
-          </button>
-
-          <button
-            type="button"
-            class="causal-chain__edge-node"
-            [class.causal-chain__edge-node--selected]="selectedNodeId() === edge.targetNodeId"
-            [attr.aria-pressed]="selectedNodeId() === edge.targetNodeId"
-            (click)="onToggleNode(edge.targetNodeId)"
-          >
-            {{ nodeLabel(edge.targetNodeId) }}
-          </button>
+          <span class="causal-chain__step-num">{{ i + 1 }}</span>
+          <div class="causal-chain__step-body">
+            <div class="causal-chain__nodes">
+              <button
+                type="button"
+                class="causal-chain__node"
+                [class.causal-chain__node--selected]="selectedNodeId() === edge.sourceNodeId"
+                (click)="onToggleNode(edge.sourceNodeId)"
+              >
+                {{ nodeLabel(edge.sourceNodeId) }}
+              </button>
+              <span class="causal-chain__arrow" aria-hidden="true">→</span>
+              <button
+                type="button"
+                class="causal-chain__node"
+                [class.causal-chain__node--selected]="selectedNodeId() === edge.targetNodeId"
+                (click)="onToggleNode(edge.targetNodeId)"
+              >
+                {{ nodeLabel(edge.targetNodeId) }}
+              </button>
+            </div>
+            <button
+              type="button"
+              class="causal-chain__mechanism"
+              [class.causal-chain__mechanism--expanded]="expandedEdgeIndex() === i"
+              (click)="onToggleEdge(i)"
+            >
+              <span class="causal-chain__mechanism-text">{{ edge.mechanism }}</span>
+              <span class="causal-chain__mechanism-confidence">{{ edge.confidence | percent: '1.0-0' }}</span>
+            </button>
+          </div>
         </li>
       }
     </ol>

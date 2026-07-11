@@ -1,0 +1,28 @@
+<svg
+  class="return-sparkline"
+  [attr.width]="width()"
+  [attr.height]="height()"
+  viewBox="0 0 220 56"
+  role="img"
+  [attr.aria-label]="'Price moves'"
+>
+  <line x1="10" y1="28" x2="210" y2="28" class="return-sparkline__baseline" />
+  @if (bars().length === 0) {
+    <text x="110" y="32" class="return-sparkline__empty" text-anchor="middle">—</text>
+  } @else {
+    @for (bar of bars(); track bar.index) {
+      <rect
+        class="return-sparkline__bar"
+        [class.return-sparkline__bar--positive]="bar.positive"
+        [class.return-sparkline__bar--negative]="!bar.positive"
+        [attr.x]="bar.x"
+        [attr.y]="bar.positive ? 28 - bar.barHeight : 28"
+        [attr.width]="bar.barWidth"
+        [attr.height]="bar.barHeight"
+        rx="2"
+      >
+        <title>{{ formatTooltip(bar.move) }}</title>
+      </rect>
+    }
+  }
+</svg>

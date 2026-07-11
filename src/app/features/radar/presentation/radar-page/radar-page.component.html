@@ -5,6 +5,24 @@
     [stats]="headerStats()"
   />
 
+  <section class="radar-page__guide" [attr.aria-label]="i18n.t('radar.guide.title')">
+    <h2 class="radar-page__guide-title">{{ i18n.t('radar.guide.title') }}</h2>
+    <ol class="radar-page__guide-steps">
+      <li class="radar-page__guide-step">
+        <span class="radar-page__guide-num">1</span>
+        <span>{{ i18n.t('radar.guide.step1') }}</span>
+      </li>
+      <li class="radar-page__guide-step">
+        <span class="radar-page__guide-num">2</span>
+        <span>{{ i18n.t('radar.guide.step2') }}</span>
+      </li>
+      <li class="radar-page__guide-step">
+        <span class="radar-page__guide-num">3</span>
+        <span>{{ i18n.t('radar.guide.step3') }}</span>
+      </li>
+    </ol>
+  </section>
+
   <app-radar-filters
     class="radar-page__filters"
     [filters]="store.filters()"
@@ -13,6 +31,19 @@
     (symbolChange)="store.setSymbol($event)"
     (sinceHoursChange)="store.setSinceHours($event)"
   />
+
+  @if (!store.isLoading() && store.signals().length > 0) {
+    <app-radar-landscape
+      [landscape]="store.landscape()"
+      [macro]="store.macroState()"
+      [activeAssetClass]="store.filters().assetClass"
+      (assetClassFilter)="onLandscapeAssetClass($event)"
+    />
+  }
+
+  @if (store.isEnriching() && !store.isLoading()) {
+    <p class="radar-page__enriching" aria-live="polite">{{ i18n.t('radar.landscape.enriching') }}</p>
+  }
 
   @if (store.isLoading()) {
     <div class="feature-grid radar-page__skeletons" aria-busy="true">
@@ -43,6 +74,24 @@
   }
 
   @if (!store.isLoading() && store.signals().length > 0) {
+    <header class="radar-page__cards-header">
+      <div>
+        <h2 class="radar-page__cards-title">{{ i18n.t('radar.cards.title') }}</h2>
+        <p class="radar-page__cards-subtitle">{{ i18n.t('radar.cards.subtitle') }}</p>
+      </div>
+      @if (store.unclassifiedCount() > 0) {
+        <app-button
+          [label]="
+            store.isGeneratingAny()
+              ? i18n.t('radar.generate.allRunning')
+              : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
+          "
+          [disabled]="store.isGeneratingAny()"
+          (pressed)="onAnalyzeAll()"
+        />
+      }
+    </header>
+
     <div class="feature-grid feature-stagger radar-page__grid">
       @for (signal of store.signals(); track signal.symbol) {
         <app-signal-card [signal]="signal" />

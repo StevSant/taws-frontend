@@ -1,0 +1,29 @@
+.return-sparkline {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+
+  &__baseline {
+    stroke: var(--color-border);
+    stroke-width: 1;
+  }
+
+  &__empty {
+    fill: var(--color-text-muted);
+    font-size: 10px;
+    font-family: var(--font-family-mono);
+  }
+
+  &__bar {
+    &--positive {
+      fill: var(--color-gain);
+      opacity: 0.9;
+    }
+
+    &--negative {
+      fill: var(--color-loss);
+      opacity: 0.9;
+    }
+  }
+}

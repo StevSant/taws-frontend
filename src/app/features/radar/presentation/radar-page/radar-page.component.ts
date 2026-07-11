@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, computed } from '@angular/core';
+import { AssetClass } from '../../domain';
 import { TranslationService } from '../../../../core';
 import {
   ButtonComponent,
@@ -8,6 +9,7 @@ import {
   SkeletonCardComponent,
 } from '../../../../shared';
 import { RadarStore } from '../../application';
+import { RadarLandscapeComponent } from '../radar-landscape/radar-landscape.component';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { SignalCardComponent } from '../signal-card/signal-card.component';
 
@@ -16,6 +18,7 @@ import { SignalCardComponent } from '../signal-card/signal-card.component';
   standalone: true,
   imports: [
     RadarFiltersComponent,
+    RadarLandscapeComponent,
     SignalCardComponent,
     ButtonComponent,
     FeaturePageHeaderComponent,
@@ -58,5 +61,14 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   onRetry(): void {
     void this.store.retry();
+  }
+
+  onLandscapeAssetClass(assetClass: AssetClass): void {
+    const current = this.store.filters().assetClass;
+    void this.store.setAssetClass(current === assetClass ? null : assetClass);
+  }
+
+  onAnalyzeAll(): void {
+    void this.store.generateAllUnclassified();
   }
 }

@@ -11,3 +11,8 @@ export type { RadarFilters } from './models/radar-filters.model';
 export { DEFAULT_RADAR_FILTERS, RECENCY_OPTIONS_HOURS } from './models/radar-filters.model';
 export type { RadarSignal } from './models/radar-signal.model';
 export type { Signal } from './models/signal.model';
+export type { MarketStats } from './models/market-stats.model';
+export type { MacroState } from './models/macro-state.model';
+export type { UnusualMove } from './models/unusual-move.model';
+export { QuantRepository } from './quant-repository';
+export { MacroRepository } from './macro-repository';

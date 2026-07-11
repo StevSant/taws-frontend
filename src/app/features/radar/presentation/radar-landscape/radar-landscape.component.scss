@@ -1,0 +1,161 @@
+.radar-landscape {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+    max-width: 36rem;
+    line-height: 1.5;
+  }
+
+  &__totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  &__total {
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-gold-border);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold-bright);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  &__panel-title {
+    margin: 0;
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  &__panel-hint {
+    margin: 0;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+  }
+
+  &__asset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  &__asset-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-raised);
+    min-height: 4.25rem;
+    cursor: pointer;
+    text-align: left;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.15s ease;
+
+    &:hover {
+      border-color: var(--color-gold-border);
+      box-shadow: var(--elevation-1);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &--positive {
+      border-color: var(--color-gain-border);
+      background: var(--color-gain-dim);
+    }
+
+    &--negative {
+      border-color: var(--color-loss-border);
+      background: var(--color-loss-dim);
+    }
+
+    &--uncertain {
+      border-color: var(--color-warn-border);
+      background: var(--color-warn-dim);
+    }
+
+    &--unclassified {
+      border-color: var(--color-gold-border);
+      background: var(--color-gold-dim-bg);
+    }
+
+    &--empty {
+      opacity: 0.55;
+    }
+
+    &--active {
+      outline: 2px solid var(--color-gold);
+      outline-offset: 1px;
+    }
+  }
+
+  &__asset-label {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__asset-count {
+    font-family: var(--font-family-mono);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1;
+  }
+
+  &__asset-impact {
+    font-family: var(--font-family-mono);
+    font-size: 0.62rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+@media (max-width: 1100px) {
+  .radar-landscape__grid {
+    grid-template-columns: 1fr;
+  }
+}

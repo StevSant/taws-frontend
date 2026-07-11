@@ -1,4 +1,4 @@
-<div class="preset-picker" role="radiogroup">
+<div class="preset-picker" role="radiogroup" [attr.aria-label]="i18n.t('scenarios.mode.preset')">
   @for (preset of presets; track preset.id) {
     <button
       type="button"
@@ -8,13 +8,24 @@
       [class.preset-picker__card--selected]="preset.id === selectedId"
       (click)="onSelect(preset)"
     >
+      @if (preset.id === selectedId) {
+        <span class="preset-picker__check" aria-hidden="true">✓</span>
+      }
       <span class="preset-picker__title">{{ title(preset) }}</span>
       <span class="preset-picker__description">{{ description(preset) }}</span>
       <span class="preset-picker__meta">
-        <span class="preset-picker__badge">{{ preset.magnitude }}</span>
-        <span class="preset-picker__badge">{{ preset.horizon }}</span>
+        <span class="preset-picker__badge preset-picker__badge--magnitude">
+          {{ magnitudeLabel(preset.magnitude) }}
+        </span>
+        <span class="preset-picker__badge preset-picker__badge--horizon">
+          {{ horizonLabel(preset.horizon) }}
+        </span>
       </span>
-      <span class="preset-picker__symbols">{{ preset.affectedSymbols.join(', ') }}</span>
+      <span class="preset-picker__assets">
+        @for (assetClass of preset.affectedAssetClasses; track assetClass) {
+          <span class="preset-picker__asset-chip">{{ assetClassLabel(assetClass) }}</span>
+        }
+      </span>
     </button>
   }
 </div>

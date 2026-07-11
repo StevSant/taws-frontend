@@ -7,6 +7,8 @@ export { PlaceholderPageComponent } from './placeholder-page/placeholder-page.co
 export { NeuralOrbComponent } from './neural-orb/neural-orb.component';
 export { GoldenPolyhedronComponent } from './golden-polyhedron/golden-polyhedron.component';
 export { ConfidenceGaugeComponent } from './confidence-gauge/confidence-gauge.component';
+export { ImpactCompassComponent } from './impact-compass/impact-compass.component';
+export { ReturnSparklineComponent } from './return-sparkline/return-sparkline.component';
 export { FeaturePageHeaderComponent } from './feature-page-header/feature-page-header.component';
 export type { FeaturePageStat } from './feature-page-header/feature-page-header.component';
 export { SkeletonCardComponent } from './skeleton-card/skeleton-card.component';

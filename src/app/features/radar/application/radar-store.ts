@@ -7,13 +7,18 @@ import {
   DEFAULT_RADAR_FILTERS,
   Instrument,
   InstrumentRepository,
+  MacroRepository,
+  MacroState,
+  MarketStats,
   NewsItem,
   NewsRepository,
+  QuantRepository,
   RadarFilters,
   Signal,
   SignalRepository,
   SignalReviewRepository,
 } from '../domain';
+import { computeRadarLandscape } from './compute-radar-landscape';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
@@ -46,7 +51,10 @@ export class RadarStore {
   private readonly instrumentsSignal = signal<Instrument[]>([]);
   /** Latest signal per instrument symbol, populated alongside `newsSignal` (see `loadNews`/`pollNews`). */
   private readonly signalsBySymbolSignal = signal<Map<string, Signal>>(new Map());
+  private readonly marketStatsBySymbolSignal = signal<Map<string, MarketStats>>(new Map());
+  private readonly macroStateSignal = signal<MacroState | null>(null);
   private readonly loadingSignal = signal(false);
+  private readonly isEnrichingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private readonly generatingSymbolSignal = signal<string | null>(null);
   private readonly reviewHistorySignal = signal<Record<string, ReviewState[]>>({});
@@ -61,6 +69,8 @@ export class RadarStore {
 
   readonly filters = this.filtersSignal.asReadonly();
   readonly isLoading = this.loadingSignal.asReadonly();
+  readonly isEnriching = this.isEnrichingSignal.asReadonly();
+  readonly macroState = this.macroStateSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
 
   /** Instrument options for the "asset" filter, scoped to the selected instrument type. */
@@ -81,30 +91,38 @@ export class RadarStore {
    * enriched with the latest Analyst signal for that instrument when one exists. */
   readonly signals = computed(() => {
     const signalsBySymbol = this.signalsBySymbolSignal();
+    const marketStatsBySymbol = this.marketStatsBySymbolSignal();
     return this.grouped().signals.map((radarSignal) => {
       const signal = signalsBySymbol.get(radarSignal.symbol);
-      return signal
-        ? {
-            ...radarSignal,
-            impactClass: signal.impactClass,
-            confidence: signal.confidence,
-            priceDelta: signal.priceDelta,
-            signalId: signal.id,
-          }
-        : radarSignal;
+      const marketStats = marketStatsBySymbol.get(radarSignal.symbol);
+      return {
+        ...radarSignal,
+        impactClass: signal?.impactClass,
+        confidence: signal?.confidence,
+        priceDelta: signal?.priceDelta ?? marketStats?.priceDeltaPct ?? undefined,
+        signalId: signal?.id,
+        marketStats,
+      };
     });
   });
+  readonly landscape = computed(() => computeRadarLandscape(this.signals()));
   /** News items fetched but not linked to any instrument — surfaced, not dropped silently. */
   readonly unlinkedNewsCount = computed(() => this.grouped().unlinkedCount);
   readonly isEmpty = computed(
     () => !this.loadingSignal() && !this.errorSignal() && this.signals().length === 0,
   );
+  readonly unclassifiedCount = computed(
+    () => this.signals().filter((signal) => !signal.impactClass).length,
+  );
+  readonly isGeneratingAny = computed(() => this.generatingSymbolSignal() !== null);
 
   constructor(
     private readonly newsRepository: NewsRepository,
     private readonly instrumentRepository: InstrumentRepository,
     private readonly signalRepository: SignalRepository,
     private readonly signalReviewRepository: SignalReviewRepository,
+    private readonly quantRepository: QuantRepository,
+    private readonly macroRepository: MacroRepository,
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
   ) {}
@@ -118,7 +136,7 @@ export class RadarStore {
       return;
     }
 
-    await Promise.all([this.loadInstruments(), this.loadNews()]);
+    await Promise.all([this.loadInstruments(), this.loadMacroState(), this.loadNews()]);
     this.sessionReady = true;
   }
 
@@ -206,6 +224,15 @@ export class RadarStore {
     }
   }
 
+  async generateAllUnclassified(): Promise<void> {
+    const symbols = this.signals()
+      .filter((signal) => !signal.impactClass)
+      .map((signal) => signal.symbol);
+    for (const symbol of symbols) {
+      await this.generateSignal(symbol);
+    }
+  }
+
   async submitSignalReview(
     signalId: string,
     decision: ReviewDecision,
@@ -268,13 +295,54 @@ export class RadarStore {
       // so switching filters never spams a "new signals" notification for
       // items that were simply outside the old filter.
       this.lastSeenNewsIds = new Set(news.map((item) => item.id));
-      await this.loadSignals(news);
+      if (!background) {
+        this.loadingSignal.set(false);
+      }
+      await this.enrichFeed(news);
     } catch (error: unknown) {
       this.errorSignal.set(this.toErrorMessage(error));
       this.newsSignal.set([]);
     } finally {
       this.loadingSignal.set(false);
     }
+  }
+
+  private async enrichFeed(news: NewsItem[]): Promise<void> {
+    this.isEnrichingSignal.set(true);
+    try {
+      await Promise.all([this.loadSignals(news), this.loadMarketStats(news)]);
+    } finally {
+      this.isEnrichingSignal.set(false);
+    }
+  }
+
+  private async loadMacroState(): Promise<void> {
+    try {
+      const macro = await this.macroRepository.fetchMacroState();
+      this.macroStateSignal.set(macro);
+    } catch {
+      this.macroStateSignal.set(null);
+    }
+  }
+
+  private async loadMarketStats(news: NewsItem[]): Promise<void> {
+    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
+    const fetched = await mapInBatches(symbols, this.config.radarSignalFetchBatchSize, async (symbol) => {
+      try {
+        const stats = await this.quantRepository.fetchMarketStats(symbol);
+        return [symbol, stats] as const;
+      } catch {
+        return null;
+      }
+    });
+
+    const next = new Map(this.marketStatsBySymbolSignal());
+    for (const entry of fetched) {
+      if (entry) {
+        next.set(entry[0], entry[1]);
+      }
+    }
+    this.marketStatsBySymbolSignal.set(next);
   }
 
   /**
@@ -332,7 +400,7 @@ export class RadarStore {
 
       this.lastSeenNewsIds = currentIds;
       this.newsSignal.set(news);
-      await this.loadSignals(news);
+      await this.enrichFeed(news);
     } catch {
       // Silent by design (see class doc) — a background poll failure
       // shouldn't surface a page-level error banner over otherwise-good data.
