@@ -89,3 +89,17 @@ npm run format:check # Prettier --check
 None during the hackathon by design (see root architecture doc, decision ledger). The
 `test` script and Vitest devDependency are present so a spec can be added in minutes if a
 bug needs a regression test — don't add test suites proactively.
+
+## Team & ownership
+
+Shared engineering rules live in the root repo's `CLAUDE.md` — everyone follows the same
+conventions (Conventional Commits in English, no hardcoded values, direct-to-main in pairs, keep CI
+green). Frontend is led by Luis, with Kevin on branding/UI-UX and Marco supporting; see `CODEOWNERS`.
+
+| Dev | Primary area | GitHub |
+|-----|--------------|--------|
+| Bryan | AI agent dev & project coordination | `@StevSant` |
+| Miquel | Backend | `@lesquel` |
+| Luis Figueroa | Frontend | `@DweskZ` |
+| Kevin Alonso | Branding & UI/UX | `@Tokioh` |
+| Marco Zambrano | Backend / Frontend / Data support | `@marco-zambrano` |

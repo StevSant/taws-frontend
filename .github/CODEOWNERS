@@ -1,0 +1,8 @@
+# taws-frontend code owners.
+#   Luis  @DweskZ          — frontend lead
+#   Kevin @Tokioh          — branding & UI/UX
+#   Marco @marco-zambrano  — frontend support
+
+*                       @DweskZ
+/src/app/shared/        @Tokioh
+/src/styles.scss        @Tokioh
