@@ -1,7 +1,13 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationService } from '../../../../core';
-import { ButtonComponent, SpinnerComponent } from '../../../../shared';
+import {
+  ButtonComponent,
+  EmptyStateComponent,
+  FeaturePageHeaderComponent,
+  SkeletonCardComponent,
+} from '../../../../shared';
 import { AuthStore } from '../../../auth/application';
 import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
 import { ScenarioRepository } from '../../domain';
@@ -40,9 +46,12 @@ const FREE_TEXT_MAX_LENGTH = 1000;
   selector: 'app-scenarios-page',
   standalone: true,
   imports: [
+    DatePipe,
     FormsModule,
     ButtonComponent,
-    SpinnerComponent,
+    FeaturePageHeaderComponent,
+    SkeletonCardComponent,
+    EmptyStateComponent,
     PresetPickerComponent,
     ScenarioResultViewComponent,
   ],
@@ -93,5 +102,9 @@ export class ScenariosPageComponent implements OnInit {
 
   onDisarmMonitor(): void {
     void this.store.disarmMonitor();
+  }
+
+  onLoadScenario(scenarioId: string): void {
+    void this.store.loadScenarioById(scenarioId);
   }
 }

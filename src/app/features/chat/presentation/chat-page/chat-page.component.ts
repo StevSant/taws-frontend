@@ -77,7 +77,9 @@ const SUGGESTION_KEYS = [
 
 const SESSIONS_PANEL_STORAGE_KEY = 'taws-chat-sessions-open';
 
-const ORACLE_STATUS_KEYS: Record<PolyhedronActivity, TranslationKey> = {
+type OracleActivity = Exclude<PolyhedronActivity, 'frozen'>;
+
+const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
 
   idle: 'chat.oracle.status.idle',
 
@@ -160,7 +162,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
 
 
-  readonly oracleActivity = computed<PolyhedronActivity>(() => {
+  readonly oracleActivity = computed<OracleActivity>(() => {
 
     if (this.isListening()) {
 
@@ -267,7 +269,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     }
 
-    return 'idle';
+    return 'frozen';
 
   }
 

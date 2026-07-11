@@ -9,4 +9,7 @@ import { Signal } from './models/signal.model';
 export abstract class SignalRepository {
   /** Returns every signal recorded for one instrument symbol. */
   abstract fetchSignals(symbol: string): Promise<Signal[]>;
+
+  /** Runs the Analyst pipeline for one instrument and persists a new signal. */
+  abstract generateSignal(symbol: string): Promise<Signal>;
 }

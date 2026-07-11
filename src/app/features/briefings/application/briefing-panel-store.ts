@@ -9,6 +9,7 @@ import {
   ReviewRepository,
   ReviewState,
   Watchlist,
+  WatchlistItem,
   WatchlistRepository,
 } from '../domain';
 
@@ -33,8 +34,14 @@ export class BriefingPanelStore {
   private readonly submittingBriefingIdsSignal = signal<ReadonlySet<string>>(new Set());
   private readonly exportingBriefingIdSignal = signal<string | null>(null);
   private readonly exportErrorsSignal = signal<Record<string, string | null>>({});
+  private readonly watchlistItemsSignal = signal<WatchlistItem[]>([]);
+  private readonly isLoadingItemsSignal = signal(false);
+  private readonly isManagingWatchlistSignal = signal(false);
 
   readonly watchlists = this.watchlistsSignal.asReadonly();
+  readonly watchlistItems = this.watchlistItemsSignal.asReadonly();
+  readonly isLoadingItems = this.isLoadingItemsSignal.asReadonly();
+  readonly isManagingWatchlist = this.isManagingWatchlistSignal.asReadonly();
   readonly selectedWatchlistId = this.selectedWatchlistIdSignal.asReadonly();
   readonly briefings = this.briefingsSignal.asReadonly();
   readonly isLoadingWatchlists = this.isLoadingWatchlistsSignal.asReadonly();
@@ -87,11 +94,85 @@ export class BriefingPanelStore {
     this.selectedWatchlistIdSignal.set(watchlistId);
     this.briefingsSignal.set([]);
     this.reviewHistorySignal.set({});
+    this.watchlistItemsSignal.set([]);
     this.errorSignal.set(null);
     if (!watchlistId) {
       return;
     }
-    await this.loadBriefings(watchlistId);
+    await Promise.all([this.loadBriefings(watchlistId), this.loadWatchlistItems(watchlistId)]);
+  }
+
+  async createWatchlist(name: string): Promise<void> {
+    const trimmed = name.trim();
+    if (!trimmed || this.isManagingWatchlistSignal()) {
+      return;
+    }
+    this.isManagingWatchlistSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      const watchlist = await this.watchlistRepository.createWatchlist(trimmed);
+      this.watchlistsSignal.update((lists) => [...lists, watchlist]);
+      await this.selectWatchlist(watchlist.id);
+    } catch (error: unknown) {
+      this.errorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isManagingWatchlistSignal.set(false);
+    }
+  }
+
+  async deleteWatchlist(watchlistId: string): Promise<void> {
+    if (this.isManagingWatchlistSignal()) {
+      return;
+    }
+    this.isManagingWatchlistSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      await this.watchlistRepository.deleteWatchlist(watchlistId);
+      this.watchlistsSignal.update((lists) => lists.filter((w) => w.id !== watchlistId));
+      if (this.selectedWatchlistIdSignal() === watchlistId) {
+        const next = this.watchlistsSignal()[0]?.id ?? null;
+        await this.selectWatchlist(next);
+      }
+    } catch (error: unknown) {
+      this.errorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isManagingWatchlistSignal.set(false);
+    }
+  }
+
+  async addWatchlistItem(symbol: string): Promise<void> {
+    const watchlistId = this.selectedWatchlistIdSignal();
+    const trimmed = symbol.trim().toUpperCase();
+    if (!watchlistId || !trimmed || this.isManagingWatchlistSignal()) {
+      return;
+    }
+    this.isManagingWatchlistSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      const item = await this.watchlistRepository.addItem(watchlistId, trimmed);
+      this.watchlistItemsSignal.update((items) => [...items, item]);
+    } catch (error: unknown) {
+      this.errorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isManagingWatchlistSignal.set(false);
+    }
+  }
+
+  async removeWatchlistItem(itemId: string): Promise<void> {
+    const watchlistId = this.selectedWatchlistIdSignal();
+    if (!watchlistId || this.isManagingWatchlistSignal()) {
+      return;
+    }
+    this.isManagingWatchlistSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      await this.watchlistRepository.removeItem(watchlistId, itemId);
+      this.watchlistItemsSignal.update((items) => items.filter((item) => item.id !== itemId));
+    } catch (error: unknown) {
+      this.errorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isManagingWatchlistSignal.set(false);
+    }
   }
 
   /** Triggers on-demand briefing generation for the selected watchlist (HU3). */
@@ -186,6 +267,18 @@ export class BriefingPanelStore {
       this.setReviewError(briefingId, this.toErrorMessage(error));
     } finally {
       this.removeSubmittingBriefingId(briefingId);
+    }
+  }
+
+  private async loadWatchlistItems(watchlistId: string): Promise<void> {
+    this.isLoadingItemsSignal.set(true);
+    try {
+      const items = await this.watchlistRepository.listItems(watchlistId);
+      this.watchlistItemsSignal.set(items);
+    } catch {
+      this.watchlistItemsSignal.set([]);
+    } finally {
+      this.isLoadingItemsSignal.set(false);
     }
   }
 

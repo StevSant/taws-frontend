@@ -209,11 +209,14 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
       const profile = POLYHEDRON_ACTIVITY_PROFILES[this.activityState];
 
       if (this.mesh && this.material) {
-        this.rotationY += delta * profile.rotationSpeed;
-        this.mesh.rotation.y = this.rotationY;
-        this.mesh.rotation.x = Math.sin(elapsed * profile.pulseHz) * profile.wobble;
-        const scale = 1 + Math.sin(elapsed * profile.pulseHz) * profile.pulseAmp;
-        this.mesh.scale.setScalar(scale);
+        if (profile.rotationSpeed > 0 || profile.pulseHz > 0) {
+          this.rotationY += delta * profile.rotationSpeed;
+          this.mesh.rotation.y = this.rotationY;
+          this.mesh.rotation.x = Math.sin(elapsed * profile.pulseHz) * profile.wobble;
+          const scale = 1 + Math.sin(elapsed * profile.pulseHz) * profile.pulseAmp;
+          this.mesh.scale.setScalar(scale);
+        }
+
         this.material.emissive.setHex(profile.emissive);
         this.material.emissiveIntensity = profile.emissiveIntensity;
       }

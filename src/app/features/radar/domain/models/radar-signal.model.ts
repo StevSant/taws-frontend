@@ -25,4 +25,6 @@ export interface RadarSignal {
   impactClass?: ImpactClass;
   confidence?: number;
   priceDelta?: number;
+  /** Latest persisted Analyst signal id, when one exists for this instrument. */
+  signalId?: string;
 }

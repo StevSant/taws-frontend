@@ -1,0 +1,84 @@
+<div class="telegram-link">
+  <button
+    type="button"
+    class="telegram-link__toggle"
+    [class.telegram-link__toggle--linked]="store.status()?.linked"
+    [attr.aria-label]="i18n.t('telegram.title')"
+    [attr.aria-expanded]="isOpen()"
+    (click)="toggle()"
+  >
+    <svg lucideSend class="telegram-link__icon" [size]="18" aria-hidden="true"></svg>
+    @if (store.status()?.linked) {
+      <span class="telegram-link__dot" aria-hidden="true"></span>
+    }
+  </button>
+
+  @if (isOpen()) {
+    <div class="telegram-link__panel" role="dialog" [attr.aria-label]="i18n.t('telegram.title')">
+      <header class="telegram-link__panel-header">
+        <span class="telegram-link__panel-title">{{ i18n.t('telegram.title') }}</span>
+        @if (store.status()?.linked) {
+          <span class="telegram-link__badge telegram-link__badge--linked">
+            {{ i18n.t('telegram.linked') }}
+          </span>
+        } @else {
+          <span class="telegram-link__badge">{{ i18n.t('telegram.notLinked') }}</span>
+        }
+      </header>
+
+      @if (!isAuthenticated) {
+        <p class="telegram-link__hint">{{ i18n.t('telegram.loginRequired') }}</p>
+      } @else if (store.isLoading()) {
+        <p class="telegram-link__hint" aria-busy="true">…</p>
+      } @else {
+        @if (store.error()) {
+          <p class="telegram-link__error" role="alert">{{ store.error() }}</p>
+        }
+
+        @if (store.status()?.linked) {
+          <p class="telegram-link__hint">
+            @if (store.status()?.linkedAt) {
+              {{ store.status()?.linkedAt | date: 'medium' }}
+            }
+          </p>
+          <button
+            type="button"
+            class="telegram-link__action telegram-link__action--danger"
+            [disabled]="store.isActionPending()"
+            (click)="onUnlink()"
+          >
+            {{ i18n.t('telegram.unlink') }}
+          </button>
+        } @else {
+          <p class="telegram-link__hint">{{ i18n.t('telegram.connect') }}</p>
+          <button
+            type="button"
+            class="telegram-link__action"
+            [disabled]="store.isActionPending()"
+            (click)="onConnect()"
+          >
+            {{ i18n.t('telegram.connect') }}
+          </button>
+
+          @if (store.pendingToken(); as token) {
+            <div class="telegram-link__token">
+              @if (token.deepLinkUrl) {
+                <a
+                  class="telegram-link__deeplink"
+                  [href]="token.deepLinkUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ token.deepLinkUrl }}
+                </a>
+              }
+              <p class="telegram-link__expires">
+                {{ i18n.t('telegram.expires') }}: {{ token.expiresAt | date: 'short' }}
+              </p>
+            </div>
+          }
+        }
+      }
+    </div>
+  }
+</div>

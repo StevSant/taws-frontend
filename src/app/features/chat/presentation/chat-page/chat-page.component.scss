@@ -127,11 +127,6 @@
 
   &--sessions-open &__viewport {
     grid-template-columns: 248px minmax(0, 1fr);
-    background: var(--color-surface);
-  }
-
-  &--sessions-open &__workspace {
-    background: transparent;
   }
 
   &__workspace {
@@ -156,7 +151,9 @@
     padding: 0;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    background: var(--color-surface);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: var(--color-text-secondary);
     cursor: pointer;
     transition:

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AppConfigService, TranslationService } from '../../../core';
@@ -73,6 +73,25 @@ export class HttpScenarioRepository extends ScenarioRepository {
     await firstValueFrom(
       this.http.delete<void>(`${this.config.apiBaseUrl}${this.armPath(scenarioId)}`),
     );
+  }
+
+  async listRecentScenarios(limit = 12): Promise<ScenarioResult[]> {
+    const params = new HttpParams().set('limit', String(limit));
+    const dtos = await firstValueFrom(
+      this.http.get<ScenarioResultDto[]>(`${this.config.apiBaseUrl}${SCENARIOS_PATH}`, {
+        params,
+      }),
+    );
+    return dtos.map(mapScenarioResultDto);
+  }
+
+  async getScenario(scenarioId: string): Promise<ScenarioResult> {
+    const dto = await firstValueFrom(
+      this.http.get<ScenarioResultDto>(
+        `${this.config.apiBaseUrl}${SCENARIOS_PATH}/${scenarioId}`,
+      ),
+    );
+    return mapScenarioResultDto(dto);
   }
 
   private armPath(scenarioId: string): string {

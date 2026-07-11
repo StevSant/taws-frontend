@@ -33,6 +33,8 @@ export class ScenarioLabStore {
   private readonly monitorSignal = signal<ScenarioMonitor | null>(null);
   private readonly isArmingMonitorSignal = signal(false);
   private readonly monitorErrorSignal = signal<string | null>(null);
+  private readonly recentScenariosSignal = signal<ScenarioResult[]>([]);
+  private readonly isLoadingRecentSignal = signal(false);
 
   readonly presets = this.presetsSignal.asReadonly();
   readonly isLoadingPresets = this.isLoadingPresetsSignal.asReadonly();
@@ -52,6 +54,9 @@ export class ScenarioLabStore {
   readonly isArmingMonitor = this.isArmingMonitorSignal.asReadonly();
   readonly monitorError = this.monitorErrorSignal.asReadonly();
 
+  readonly recentScenarios = this.recentScenariosSignal.asReadonly();
+  readonly isLoadingRecent = this.isLoadingRecentSignal.asReadonly();
+
   readonly selectedPreset = computed<ScenarioPreset | null>(
     () =>
       this.presetsSignal().find((preset) => preset.id === this.selectedPresetIdSignal()) ?? null,
@@ -70,7 +75,7 @@ export class ScenarioLabStore {
 
   /** Loads the curated preset list (once, on page entry). */
   async init(): Promise<void> {
-    await this.loadPresets();
+    await Promise.all([this.loadPresets(), this.loadRecentScenarios()]);
   }
 
   async retryPresets(): Promise<void> {
@@ -110,6 +115,7 @@ export class ScenarioLabStore {
           : { freeText: this.freeTextSignal().trim() },
       );
       this.resultSignal.set(result);
+      await this.loadRecentScenarios();
     } catch (error: unknown) {
       this.generateErrorSignal.set(this.toErrorMessage(error));
       this.resultSignal.set(null);
@@ -179,6 +185,30 @@ export class ScenarioLabStore {
       this.monitorErrorSignal.set(this.toErrorMessage(error));
     } finally {
       this.isArmingMonitorSignal.set(false);
+    }
+  }
+
+  async loadScenarioById(scenarioId: string): Promise<void> {
+    this.generateErrorSignal.set(null);
+    try {
+      const result = await this.scenarioRepository.getScenario(scenarioId);
+      this.resultSignal.set(result);
+      this.monitorSignal.set(null);
+      this.monitorErrorSignal.set(null);
+    } catch (error: unknown) {
+      this.generateErrorSignal.set(this.toErrorMessage(error));
+    }
+  }
+
+  private async loadRecentScenarios(): Promise<void> {
+    this.isLoadingRecentSignal.set(true);
+    try {
+      const scenarios = await this.scenarioRepository.listRecentScenarios();
+      this.recentScenariosSignal.set(scenarios);
+    } catch {
+      this.recentScenariosSignal.set([]);
+    } finally {
+      this.isLoadingRecentSignal.set(false);
     }
   }
 

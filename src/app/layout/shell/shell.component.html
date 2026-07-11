@@ -39,6 +39,8 @@
         (clearAll)="notifications.clearAll()"
       />
 
+      <app-telegram-link-panel [isAuthenticated]="auth.isAuthenticated()" />
+
       <app-theme-toggle />
       <app-language-toggle />
 

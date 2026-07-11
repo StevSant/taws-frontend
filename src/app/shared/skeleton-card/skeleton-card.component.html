@@ -1,0 +1,10 @@
+<article class="skeleton-card" aria-hidden="true">
+  <div class="skeleton-card__row">
+    <span class="skeleton-card__block skeleton-card__block--sm"></span>
+    <span class="skeleton-card__block skeleton-card__block--badge"></span>
+  </div>
+  <span class="skeleton-card__block skeleton-card__block--title"></span>
+  @for (index of lineIndexes(); track index) {
+    <span class="skeleton-card__block skeleton-card__block--line"></span>
+  }
+</article>

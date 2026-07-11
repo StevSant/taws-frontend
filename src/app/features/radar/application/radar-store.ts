@@ -2,6 +2,7 @@ import { DestroyRef, Injectable, computed, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { interval } from 'rxjs';
 import { AppConfigService, NotificationsStore } from '../../../core';
+import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
   AssetClass,
   DEFAULT_RADAR_FILTERS,
@@ -12,6 +13,7 @@ import {
   RadarFilters,
   Signal,
   SignalRepository,
+  SignalReviewRepository,
 } from '../domain';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
@@ -47,6 +49,10 @@ export class RadarStore {
   private readonly signalsBySymbolSignal = signal<Map<string, Signal>>(new Map());
   private readonly loadingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
+  private readonly generatingSymbolSignal = signal<string | null>(null);
+  private readonly reviewHistorySignal = signal<Record<string, ReviewState[]>>({});
+  private readonly reviewErrorsSignal = signal<Record<string, string | null>>({});
+  private readonly submittingSignalIdsSignal = signal<ReadonlySet<string>>(new Set());
   /** IDs from the last successful fetch (initial or poll). `null` until the
    * first fetch resolves, so the very first poll tick after `init()` never
    * fires a "new items" notification for the whole initial page load. */
@@ -83,6 +89,7 @@ export class RadarStore {
             impactClass: signal.impactClass,
             confidence: signal.confidence,
             priceDelta: signal.priceDelta,
+            signalId: signal.id,
           }
         : radarSignal;
     });
@@ -97,6 +104,7 @@ export class RadarStore {
     private readonly newsRepository: NewsRepository,
     private readonly instrumentRepository: InstrumentRepository,
     private readonly signalRepository: SignalRepository,
+    private readonly signalReviewRepository: SignalReviewRepository,
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
     private readonly destroyRef: DestroyRef,
@@ -135,6 +143,89 @@ export class RadarStore {
     }
     this.filtersSignal.update((filters) => ({ ...filters, sinceHours }));
     await this.loadNews();
+  }
+
+  isGeneratingFor(symbol: string): boolean {
+    return this.generatingSymbolSignal() === symbol;
+  }
+
+  reviewHistoryFor(signalId: string): ReviewState[] {
+    return this.reviewHistorySignal()[signalId] ?? [];
+  }
+
+  isSubmittingReviewFor(signalId: string): boolean {
+    return this.submittingSignalIdsSignal().has(signalId);
+  }
+
+  reviewErrorFor(signalId: string): string | null {
+    return this.reviewErrorsSignal()[signalId] ?? null;
+  }
+
+  async ensureSignalReviews(signalId: string): Promise<void> {
+    if (this.reviewHistorySignal()[signalId]) {
+      return;
+    }
+    try {
+      const history = await this.signalReviewRepository.listSignalReviews(signalId);
+      this.reviewHistorySignal.update((current) => ({ ...current, [signalId]: history }));
+    } catch {
+      this.reviewHistorySignal.update((current) => ({ ...current, [signalId]: [] }));
+    }
+  }
+
+  async generateSignal(symbol: string): Promise<void> {
+    if (this.generatingSymbolSignal()) {
+      return;
+    }
+    this.generatingSymbolSignal.set(symbol);
+    try {
+      const signal = await this.signalRepository.generateSignal(symbol);
+      this.signalsBySymbolSignal.update((current) => {
+        const next = new Map(current);
+        next.set(symbol, signal);
+        return next;
+      });
+      this.notifications.notify('radar', 'notifications.radar.signalGenerated');
+      await this.ensureSignalReviews(signal.id);
+    } catch (error: unknown) {
+      this.errorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.generatingSymbolSignal.set(null);
+    }
+  }
+
+  async submitSignalReview(
+    signalId: string,
+    decision: ReviewDecision,
+    justification: string,
+  ): Promise<void> {
+    if (this.submittingSignalIdsSignal().has(signalId)) {
+      return;
+    }
+    this.submittingSignalIdsSignal.update((ids) => new Set([...ids, signalId]));
+    this.reviewErrorsSignal.update((errors) => ({ ...errors, [signalId]: null }));
+    try {
+      const review = await this.signalReviewRepository.submitSignalReview(
+        signalId,
+        decision,
+        justification,
+      );
+      this.reviewHistorySignal.update((current) => ({
+        ...current,
+        [signalId]: [...(current[signalId] ?? []), review],
+      }));
+    } catch (error: unknown) {
+      this.reviewErrorsSignal.update((errors) => ({
+        ...errors,
+        [signalId]: this.toErrorMessage(error),
+      }));
+    } finally {
+      this.submittingSignalIdsSignal.update((ids) => {
+        const next = new Set(ids);
+        next.delete(signalId);
+        return next;
+      });
+    }
   }
 
   private async loadInstruments(): Promise<void> {

@@ -43,4 +43,12 @@ export const POLYHEDRON_ACTIVITY_PROFILES: Record<PolyhedronActivity, Polyhedron
     emissive: 0xf0c040,
     emissiveIntensity: 0.3,
   },
+  frozen: {
+    rotationSpeed: 0,
+    wobble: 0,
+    pulseHz: 0,
+    pulseAmp: 0,
+    emissive: 0x000000,
+    emissiveIntensity: 0,
+  },
 };

@@ -112,6 +112,8 @@ export interface TranslationDict {
   'radar.empty.title': string;
   'radar.empty.description': string;
   'radar.unlinked.note': string;
+  'radar.stats.signals': string;
+  'radar.stats.unlinked': string;
   'radar.card.impact.label': string;
   'radar.card.impact.positive': string;
   'radar.card.impact.negative': string;
@@ -124,7 +126,27 @@ export interface TranslationDict {
   'radar.card.priceDelta.unavailable': string;
   'radar.card.evidence.title': string;
   'radar.card.disclaimer': string;
+  'radar.generate.action': string;
+  'radar.generate.generating': string;
+  'radar.review.title': string;
   'scenarios.title': string;
+  'scenarios.history.title': string;
+  'scenarios.history.empty': string;
+  'scenarios.history.load': string;
+  'watchlist.manager.title': string;
+  'watchlist.manager.create': string;
+  'watchlist.manager.namePlaceholder': string;
+  'watchlist.manager.addSymbol': string;
+  'watchlist.manager.symbolPlaceholder': string;
+  'watchlist.manager.delete': string;
+  'watchlist.manager.emptyItems': string;
+  'telegram.title': string;
+  'telegram.linked': string;
+  'telegram.notLinked': string;
+  'telegram.connect': string;
+  'telegram.unlink': string;
+  'telegram.expires': string;
+  'telegram.loginRequired': string;
   'scenarios.description': string;
   'scenarios.disclaimer.static': string;
   'scenarios.mode.preset': string;
@@ -194,6 +216,8 @@ export interface TranslationDict {
   'briefings.watchlist.label': string;
   'briefings.watchlist.placeholder': string;
   'briefings.watchlist.empty': string;
+  'briefings.stats.watchlists': string;
+  'briefings.stats.briefings': string;
   'briefings.generate': string;
   'briefings.generating': string;
   'briefings.loading': string;
@@ -231,6 +255,7 @@ export interface TranslationDict {
   'notifications.clearAll': string;
   'notifications.dismiss': string;
   'notifications.radar.newSignals': string;
+  'notifications.radar.signalGenerated': string;
   'notifications.briefing.generated': string;
   'placeholder.badge': string;
 }

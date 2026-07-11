@@ -36,4 +36,10 @@ export abstract class ScenarioRepository {
    * Idempotent — a no-op if the user never armed it or already disarmed it.
    */
   abstract disarmMonitor(scenarioId: string): Promise<void>;
+
+  /** Lists recently persisted scenario results (newest first). */
+  abstract listRecentScenarios(limit?: number): Promise<ScenarioResult[]>;
+
+  /** Loads one persisted scenario by id. */
+  abstract getScenario(scenarioId: string): Promise<ScenarioResult>;
 }

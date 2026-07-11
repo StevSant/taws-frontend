@@ -126,6 +126,13 @@
     flex-direction: column;
     min-height: 0;
     overflow: auto;
+    background:
+      radial-gradient(
+        ellipse 80% 45% at 50% 0%,
+        color-mix(in srgb, var(--color-gold) 8%, transparent) 0%,
+        transparent 65%
+      ),
+      var(--color-background);
   }
 }
 
@@ -145,6 +152,7 @@
   }
 
   .app-shell__auth-btn {
-    display: none;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.4rem;
   }
 }
