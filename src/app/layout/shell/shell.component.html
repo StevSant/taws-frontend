@@ -51,6 +51,14 @@
         {{ i18n.t('shell.language.en') }}
       </button>
     </div>
+
+    @if (auth.isAuthenticated()) {
+      <button type="button" class="app-shell__auth-btn" (click)="logout()">
+        {{ i18n.t('shell.auth.logout') }}
+      </button>
+    } @else {
+      <a class="app-shell__auth-btn" routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
+    }
   </header>
 
   <main class="app-shell__content">
