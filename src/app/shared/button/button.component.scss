@@ -1,18 +1,19 @@
 .app-button {
-  padding: 0.5rem 1.25rem;
+  padding: var(--space-2) var(--space-5);
   border: none;
-  border-radius: 6px;
-  background: #2563eb;
-  color: #fff;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-text-on-primary);
+  font-family: var(--font-family-base);
   font-size: 0.95rem;
   cursor: pointer;
 
   &:disabled {
-    background: #9ca3af;
+    background: var(--color-text-muted);
     cursor: not-allowed;
   }
 
   &:not(:disabled):hover {
-    background: #1d4ed8;
+    background: var(--color-primary-hover);
   }
 }

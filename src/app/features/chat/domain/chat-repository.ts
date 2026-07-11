@@ -1,3 +1,5 @@
+import { ChatStreamEvent } from './models/chat-stream-event.model';
+
 /**
  * Domain port for streaming chat replies. An abstract class (not an
  * interface) so it can double as an Angular DI token — bind the concrete
@@ -8,8 +10,9 @@
  */
 export abstract class ChatRepository {
   /**
-   * Sends `input` to the backend and yields assistant reply tokens as they
-   * arrive over the stream.
+   * Sends `input` to the backend and yields discriminated stream events
+   * (assistant tokens, agent routing traces, or a stream-level error) as
+   * they arrive over SSE-v2.
    */
-  abstract streamReply(input: string): AsyncIterable<string>;
+  abstract streamReply(input: string): AsyncIterable<ChatStreamEvent>;
 }

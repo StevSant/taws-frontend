@@ -5,9 +5,9 @@
     display: inline-block;
     width: 0.85rem;
     height: 0.85rem;
-    border: 2px solid #d1d5db;
-    border-top-color: #2563eb;
-    border-radius: 50%;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: var(--radius-full);
     animation: app-spinner-spin 0.7s linear infinite;
   }
 }

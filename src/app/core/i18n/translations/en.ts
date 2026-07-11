@@ -1,0 +1,33 @@
+import { TranslationDict } from '../translation-dict.model';
+
+/** English dictionary — completed in T1, reachable via the header toggle. */
+export const EN_TRANSLATIONS = {
+  'shell.title': 'TAWS · Market Radar',
+  'shell.nav.radar': 'Radar',
+  'shell.nav.chat': 'Chat',
+  'shell.nav.scenarios': 'Scenario Lab',
+  'shell.nav.briefings': 'Briefings',
+  'shell.language.es': 'ES',
+  'shell.language.en': 'EN',
+  'shell.language.toggleLabel': 'Switch language',
+  'chat.placeholder': 'Type a message…',
+  'chat.send': 'Send',
+  'chat.streaming': 'Streaming reply…',
+  'chat.role.user': 'You',
+  'chat.role.assistant': 'Assistant',
+  'chat.trace.title': 'Agent routing',
+  'chat.trace.routing': 'routing',
+  'chat.trace.start': 'started',
+  'chat.trace.done': 'done',
+  'chat.error.banner': 'Something went wrong: ',
+  'radar.title': 'News & Signals Radar',
+  'radar.description':
+    'A live feed of financial news linked to instruments across asset classes, with impact classification (positive/negative/neutral/uncertain), confidence, and price-movement evidence. Coming soon: filters by instrument type, asset, and recency.',
+  'scenarios.title': 'Scenario Lab',
+  'scenarios.description':
+    '"What happens if X occurs?" Simulate market events — rate moves, earnings misses, macro shocks — and get causal chains, quantified per-asset-class impact, and evidence-backed recommendations. Coming soon: curated presets, free-form input, and an impact heatmap.',
+  'briefings.title': 'Briefings',
+  'briefings.description':
+    'Per-watchlist summaries you can mark reviewed, escalated, or discarded — always with sources, evidence, and a reminder that this is not personalized advice. We never execute trades. Coming soon: on-demand and scheduled briefings with review history.',
+  'placeholder.badge': 'Coming soon',
+} satisfies TranslationDict;

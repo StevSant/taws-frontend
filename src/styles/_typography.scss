@@ -1,0 +1,29 @@
+// Typography — minimal defaults; Kevin/Marco own the final scale.
+html,
+body {
+  font-family: var(--font-family-base);
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+p {
+  line-height: 1.5;
+  margin: 0;
+}
+
+code,
+pre {
+  font-family: var(--font-family-mono);
+}

@@ -1,6 +1,56 @@
 <div class="app-shell">
   <header class="app-shell__header">
-    <span class="app-shell__title">TAWS</span>
+    <span class="app-shell__title">{{ i18n.t('shell.title') }}</span>
+
+    <nav class="app-shell__nav">
+      <a
+        class="app-shell__nav-link"
+        routerLink="/radar"
+        routerLinkActive="app-shell__nav-link--active"
+        >{{ i18n.t('shell.nav.radar') }}</a
+      >
+      <a
+        class="app-shell__nav-link"
+        routerLink="/chat"
+        routerLinkActive="app-shell__nav-link--active"
+        >{{ i18n.t('shell.nav.chat') }}</a
+      >
+      <a
+        class="app-shell__nav-link"
+        routerLink="/scenarios"
+        routerLinkActive="app-shell__nav-link--active"
+        >{{ i18n.t('shell.nav.scenarios') }}</a
+      >
+      <a
+        class="app-shell__nav-link"
+        routerLink="/briefings"
+        routerLinkActive="app-shell__nav-link--active"
+        >{{ i18n.t('shell.nav.briefings') }}</a
+      >
+    </nav>
+
+    <div
+      class="app-shell__language"
+      role="group"
+      [attr.aria-label]="i18n.t('shell.language.toggleLabel')"
+    >
+      <button
+        type="button"
+        class="app-shell__language-btn"
+        [class.app-shell__language-btn--active]="i18n.locale() === 'es'"
+        (click)="setLocale('es')"
+      >
+        {{ i18n.t('shell.language.es') }}
+      </button>
+      <button
+        type="button"
+        class="app-shell__language-btn"
+        [class.app-shell__language-btn--active]="i18n.locale() === 'en'"
+        (click)="setLocale('en')"
+      >
+        {{ i18n.t('shell.language.en') }}
+      </button>
+    </div>
   </header>
 
   <main class="app-shell__content">

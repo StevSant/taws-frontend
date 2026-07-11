@@ -1,28 +1,53 @@
 <div class="chat-page">
+  @if (store.traces().length > 0) {
+    <div class="chat-page__trace-panel">
+      <span class="chat-page__trace-title">{{ i18n.t('chat.trace.title') }}</span>
+      <ul class="chat-page__traces">
+        @for (trace of store.traces(); track $index) {
+          <li class="chat-page__trace-chip">
+            <span class="chat-page__trace-agent">{{ trace.agent }}</span>
+            <span class="chat-page__trace-event">{{ traceEventLabel(trace.event) }}</span>
+            @if (trace.detail) {
+              <span class="chat-page__trace-detail">{{ trace.detail }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
   <ul class="chat-page__messages">
     @for (message of store.messages(); track message.id) {
       <li class="chat-page__message" [class.chat-page__message--user]="message.role === 'user'">
-        <span class="chat-page__role">{{ message.role }}</span>
+        <span class="chat-page__role">
+          {{ message.role === 'user' ? i18n.t('chat.role.user') : i18n.t('chat.role.assistant') }}
+        </span>
         <p class="chat-page__content">{{ message.content }}</p>
         @if (message.pending) {
-          <app-spinner label="Streaming reply" />
+          <app-spinner [label]="i18n.t('chat.streaming')" />
         }
       </li>
     }
   </ul>
+
+  @if (store.error()) {
+    <div class="chat-page__error" role="alert">
+      {{ i18n.t('chat.error.banner') }}{{ store.error() }}
+    </div>
+  }
 
   <form class="chat-page__composer" (ngSubmit)="onSend()">
     <input
       class="chat-page__input"
       type="text"
       name="draft"
-      placeholder="Type a message…"
+      [placeholder]="i18n.t('chat.placeholder')"
       [ngModel]="draft()"
       (ngModelChange)="draft.set($event)"
       [disabled]="store.isStreaming()"
     />
     <app-button
-      label="Send"
+      [label]="i18n.t('chat.send')"
       [disabled]="!store.canSend() || !draft().trim()"
       (pressed)="onSend()"
     />
