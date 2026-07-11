@@ -1,19 +1,45 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TranslationService } from '../../../../core';
-import { PlaceholderPageComponent } from '../../../../shared';
+import { ButtonComponent, SpinnerComponent } from '../../../../shared';
+import { RadarStore } from '../../application';
+import { InstrumentRepository, NewsRepository } from '../../domain';
+import { HttpInstrumentRepository, HttpNewsRepository } from '../../infrastructure';
+import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
+import { SignalCardComponent } from '../signal-card/signal-card.component';
 
 /**
- * Radar page (T0 placeholder): news & signals radar — instrument-linked
- * news feed with impact classification, confidence, and price-movement
- * evidence. Filters by instrument type/asset/recency land here next.
+ * Radar page: news & signals radar wired to the real `/api/v1/news` and
+ * `/api/v1/instruments` endpoints. Groups news by linked instrument into
+ * signal cards, with filters (instrument type / asset / recency) backed by
+ * real query params, plus loading/error/empty states.
+ *
+ * `RadarStore`/`NewsRepository`/`InstrumentRepository` are provided here so
+ * each navigation to this page gets a fresh instance (feature-scoped DI),
+ * same pattern as `ChatPageComponent`.
  */
 @Component({
   selector: 'app-radar-page',
   standalone: true,
-  imports: [PlaceholderPageComponent],
+  imports: [RadarFiltersComponent, SignalCardComponent, SpinnerComponent, ButtonComponent],
+  providers: [
+    RadarStore,
+    { provide: NewsRepository, useClass: HttpNewsRepository },
+    { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
+  ],
   templateUrl: './radar-page.component.html',
   styleUrl: './radar-page.component.scss',
 })
-export class RadarPageComponent {
-  constructor(readonly i18n: TranslationService) {}
+export class RadarPageComponent implements OnInit {
+  constructor(
+    readonly store: RadarStore,
+    readonly i18n: TranslationService,
+  ) {}
+
+  ngOnInit(): void {
+    void this.store.init();
+  }
+
+  onRetry(): void {
+    void this.store.retry();
+  }
 }

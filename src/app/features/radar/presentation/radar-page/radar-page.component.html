@@ -1,5 +1,45 @@
-<app-placeholder-page
-  [title]="i18n.t('radar.title')"
-  [description]="i18n.t('radar.description')"
-  [badge]="i18n.t('placeholder.badge')"
-/>
+<div class="radar-page">
+  <header class="radar-page__header">
+    <h1 class="radar-page__title">{{ i18n.t('radar.title') }}</h1>
+    <p class="radar-page__description">{{ i18n.t('radar.description') }}</p>
+  </header>
+
+  <app-radar-filters
+    class="radar-page__filters"
+    [filters]="store.filters()"
+    [instrumentOptions]="store.instrumentOptions()"
+    (assetClassChange)="store.setAssetClass($event)"
+    (symbolChange)="store.setSymbol($event)"
+    (sinceHoursChange)="store.setSinceHours($event)"
+  />
+
+  @if (store.isLoading()) {
+    <app-spinner class="radar-page__loading" [label]="i18n.t('radar.loading')" />
+  }
+
+  @if (store.error(); as error) {
+    <div class="radar-page__error" role="alert">
+      <span>{{ i18n.t('radar.error.banner') }}{{ error }}</span>
+      <app-button [label]="i18n.t('radar.error.retry')" (pressed)="onRetry()" />
+    </div>
+  }
+
+  @if (store.isEmpty()) {
+    <div class="radar-page__empty">
+      <p class="radar-page__empty-title">{{ i18n.t('radar.empty.title') }}</p>
+      <p class="radar-page__empty-description">{{ i18n.t('radar.empty.description') }}</p>
+    </div>
+  }
+
+  @if (store.unlinkedNewsCount() > 0) {
+    <p class="radar-page__unlinked-note">
+      {{ i18n.t('radar.unlinked.note') }} {{ store.unlinkedNewsCount() }}
+    </p>
+  }
+
+  <div class="radar-page__grid">
+    @for (signal of store.signals(); track signal.symbol) {
+      <app-signal-card [signal]="signal" />
+    }
+  </div>
+</div>
