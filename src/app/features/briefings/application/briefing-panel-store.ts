@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { NotificationsStore } from '../../../core';
 import { downloadBlob } from '../../../shared';
@@ -29,7 +30,7 @@ export class BriefingPanelStore {
   private readonly isGeneratingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private readonly reviewErrorsSignal = signal<Record<string, string | null>>({});
-  private readonly submittingBriefingIdSignal = signal<string | null>(null);
+  private readonly submittingBriefingIdsSignal = signal<ReadonlySet<string>>(new Set());
   private readonly exportingBriefingIdSignal = signal<string | null>(null);
   private readonly exportErrorsSignal = signal<Record<string, string | null>>({});
 
@@ -119,7 +120,7 @@ export class BriefingPanelStore {
   }
 
   isSubmittingReviewFor(briefingId: string): boolean {
-    return this.submittingBriefingIdSignal() === briefingId;
+    return this.submittingBriefingIdsSignal().has(briefingId);
   }
 
   reviewErrorFor(briefingId: string): string | null {
@@ -165,11 +166,11 @@ export class BriefingPanelStore {
     justification: string,
   ): Promise<void> {
     const trimmed = justification.trim();
-    if (!trimmed || this.submittingBriefingIdSignal() !== null) {
+    if (!trimmed || this.submittingBriefingIdsSignal().has(briefingId)) {
       return;
     }
 
-    this.submittingBriefingIdSignal.set(briefingId);
+    this.addSubmittingBriefingId(briefingId);
     this.setReviewError(briefingId, null);
     try {
       const reviewState = await this.reviewRepository.submitBriefingReview(
@@ -184,7 +185,7 @@ export class BriefingPanelStore {
     } catch (error: unknown) {
       this.setReviewError(briefingId, this.toErrorMessage(error));
     } finally {
-      this.submittingBriefingIdSignal.set(null);
+      this.removeSubmittingBriefingId(briefingId);
     }
   }
 
@@ -238,7 +239,22 @@ export class BriefingPanelStore {
     this.exportErrorsSignal.update((errors) => ({ ...errors, [briefingId]: message }));
   }
 
+  private addSubmittingBriefingId(briefingId: string): void {
+    this.submittingBriefingIdsSignal.update((ids) => new Set(ids).add(briefingId));
+  }
+
+  private removeSubmittingBriefingId(briefingId: string): void {
+    this.submittingBriefingIdsSignal.update((ids) => {
+      const next = new Set(ids);
+      next.delete(briefingId);
+      return next;
+    });
+  }
+
   private toErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      return error.error?.detail ?? error.message ?? 'Unknown error while loading briefings';
+    }
     return error instanceof Error ? error.message : 'Unknown error while loading briefings';
   }
 }
