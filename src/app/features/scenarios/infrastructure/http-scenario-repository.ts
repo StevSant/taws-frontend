@@ -2,10 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AppConfigService } from '../../../core';
-import { ScenarioIntake, ScenarioPreset, ScenarioRepository, ScenarioResult } from '../domain';
+import {
+  ScenarioIntake,
+  ScenarioMonitor,
+  ScenarioPreset,
+  ScenarioRepository,
+  ScenarioResult,
+} from '../domain';
 import { GenerateScenarioRequestDto } from './generate-scenario-request-dto';
+import { mapScenarioMonitorDto } from './map-scenario-monitor-dto';
 import { mapScenarioPresetDto } from './map-scenario-preset-dto';
 import { mapScenarioResultDto } from './map-scenario-result-dto';
+import { ScenarioMonitorDto } from './scenario-monitor-dto';
 import { ScenarioPresetDto } from './scenario-preset-dto';
 import { ScenarioResultDto } from './scenario-result-dto';
 
@@ -14,9 +22,10 @@ const SCENARIOS_PATH = '/api/v1/scenarios';
 /**
  * Infrastructure adapter for `ScenarioRepository`. Calls the real
  * `GET /api/v1/scenarios/presets` and `POST /api/v1/scenarios/generate`
- * endpoints via `HttpClient`. Neither endpoint requires auth on the backend
- * (`scenarios.py` has no `require_current_user` dependency) — a scenario
- * run is shared/global research, not per-user data.
+ * endpoints (unauthenticated — a scenario run is shared/global research)
+ * plus `POST`/`DELETE /api/v1/scenarios/{id}/arm` (authenticated — the
+ * app-wide `authInterceptor` attaches the bearer token when a session
+ * exists) via `HttpClient`.
  */
 @Injectable()
 export class HttpScenarioRepository extends ScenarioRepository {
@@ -46,5 +55,25 @@ export class HttpScenarioRepository extends ScenarioRepository {
       ),
     );
     return mapScenarioResultDto(dto);
+  }
+
+  async armMonitor(scenarioId: string): Promise<ScenarioMonitor> {
+    const dto = await firstValueFrom(
+      this.http.post<ScenarioMonitorDto>(
+        `${this.config.apiBaseUrl}${this.armPath(scenarioId)}`,
+        {},
+      ),
+    );
+    return mapScenarioMonitorDto(dto);
+  }
+
+  async disarmMonitor(scenarioId: string): Promise<void> {
+    await firstValueFrom(
+      this.http.delete<void>(`${this.config.apiBaseUrl}${this.armPath(scenarioId)}`),
+    );
+  }
+
+  private armPath(scenarioId: string): string {
+    return `${SCENARIOS_PATH}/${scenarioId}/arm`;
   }
 }

@@ -133,6 +133,18 @@ export const EN_TRANSLATIONS = {
     "Briefings aren't scenario-aware yet — they're only generated from a watchlist's signals. This copies the scenario summary to your clipboard so you can reference it manually in your next briefing review.",
   'scenarios.result.addToBriefing.copied': 'Scenario summary copied to clipboard.',
   'scenarios.result.addToBriefing.error': 'Could not copy to clipboard.',
+  'scenarios.result.monitor.explain':
+    'Arm a monitor to get pinged over Telegram if this scenario starts materializing.',
+  'scenarios.result.monitor.arm.action': 'Arm monitor',
+  'scenarios.result.monitor.disarm.action': 'Disarm monitor',
+  'scenarios.result.monitor.arming': 'Arming…',
+  'scenarios.result.monitor.disarming': 'Disarming…',
+  'scenarios.result.monitor.status.armed': 'Armed',
+  'scenarios.result.monitor.status.matched': 'Matched',
+  'scenarios.result.monitor.status.expired': 'Expired',
+  'scenarios.result.monitor.matchReason.label': 'Why it matched',
+  'scenarios.result.monitor.error.banner': 'Monitor action failed: ',
+  'scenarios.result.monitor.signInPrompt': 'Sign in to arm a monitor for this scenario.',
   'briefings.title': 'Briefings',
   'briefings.description':
     'Per-watchlist summaries you can mark reviewed, escalated, or discarded — always with sources, evidence, and a reminder that this is not personalized advice. We never execute trades.',

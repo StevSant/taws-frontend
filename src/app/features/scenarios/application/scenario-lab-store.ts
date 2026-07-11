@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { ScenarioPreset, ScenarioRepository, ScenarioResult } from '../domain';
+import { ScenarioMonitor, ScenarioPreset, ScenarioRepository, ScenarioResult } from '../domain';
 import { formatScenarioForBriefing } from './format-scenario-for-briefing';
 
 /** Which intake path is active: a curated preset, or free-form text. */
@@ -30,6 +30,10 @@ export class ScenarioLabStore {
 
   private readonly briefingActionStatusSignal = signal<BriefingActionStatus>('idle');
 
+  private readonly monitorSignal = signal<ScenarioMonitor | null>(null);
+  private readonly isArmingMonitorSignal = signal(false);
+  private readonly monitorErrorSignal = signal<string | null>(null);
+
   readonly presets = this.presetsSignal.asReadonly();
   readonly isLoadingPresets = this.isLoadingPresetsSignal.asReadonly();
   readonly presetsError = this.presetsErrorSignal.asReadonly();
@@ -43,6 +47,10 @@ export class ScenarioLabStore {
   readonly generateError = this.generateErrorSignal.asReadonly();
 
   readonly briefingActionStatus = this.briefingActionStatusSignal.asReadonly();
+
+  readonly monitor = this.monitorSignal.asReadonly();
+  readonly isArmingMonitor = this.isArmingMonitorSignal.asReadonly();
+  readonly monitorError = this.monitorErrorSignal.asReadonly();
 
   readonly selectedPreset = computed<ScenarioPreset | null>(
     () =>
@@ -93,6 +101,8 @@ export class ScenarioLabStore {
     this.isGeneratingSignal.set(true);
     this.generateErrorSignal.set(null);
     this.briefingActionStatusSignal.set('idle');
+    this.monitorSignal.set(null);
+    this.monitorErrorSignal.set(null);
     try {
       const result = await this.scenarioRepository.generateScenario(
         this.modeSignal() === 'preset'
@@ -127,6 +137,48 @@ export class ScenarioLabStore {
       this.briefingActionStatusSignal.set('copied');
     } catch {
       this.briefingActionStatusSignal.set('error');
+    }
+  }
+
+  /**
+   * "Arm monitor" action (issue #18/#34): turns the current `ScenarioResult`
+   * into a standing Watchdog rule. Authenticated — the caller (presentation)
+   * is responsible for gating this on `AuthStore.isAuthenticated()`, since
+   * the store itself has no session awareness (same separation as every
+   * other feature store in this app).
+   */
+  async armMonitor(): Promise<void> {
+    const result = this.resultSignal();
+    if (!result || this.isArmingMonitorSignal()) {
+      return;
+    }
+    this.isArmingMonitorSignal.set(true);
+    this.monitorErrorSignal.set(null);
+    try {
+      const monitor = await this.scenarioRepository.armMonitor(result.id);
+      this.monitorSignal.set(monitor);
+    } catch (error: unknown) {
+      this.monitorErrorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isArmingMonitorSignal.set(false);
+    }
+  }
+
+  /** Disarms the monitor for the current `ScenarioResult`, if one is armed. */
+  async disarmMonitor(): Promise<void> {
+    const result = this.resultSignal();
+    if (!result || this.isArmingMonitorSignal()) {
+      return;
+    }
+    this.isArmingMonitorSignal.set(true);
+    this.monitorErrorSignal.set(null);
+    try {
+      await this.scenarioRepository.disarmMonitor(result.id);
+      this.monitorSignal.set(null);
+    } catch (error: unknown) {
+      this.monitorErrorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isArmingMonitorSignal.set(false);
     }
   }
 

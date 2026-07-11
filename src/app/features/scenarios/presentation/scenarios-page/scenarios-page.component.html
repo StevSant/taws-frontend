@@ -90,7 +90,13 @@
     <app-scenario-result-view
       [result]="result"
       [briefingActionStatus]="store.briefingActionStatus()"
+      [isAuthenticated]="auth.isAuthenticated()"
+      [monitor]="store.monitor()"
+      [isArmingMonitor]="store.isArmingMonitor()"
+      [monitorError]="store.monitorError()"
       (addToBriefing)="onAddToBriefing()"
+      (armMonitor)="onArmMonitor()"
+      (disarmMonitor)="onDisarmMonitor()"
     />
   }
 </div>

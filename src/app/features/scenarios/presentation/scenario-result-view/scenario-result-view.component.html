@@ -82,4 +82,74 @@
       </p>
     }
   </section>
+
+  <section class="scenario-result__monitor">
+    <p class="scenario-result__monitor-explain">
+      {{ i18n.t('scenarios.result.monitor.explain') }}
+    </p>
+
+    @if (isAuthenticated) {
+      @if (monitor && monitor.status !== 'expired') {
+        <div class="scenario-result__monitor-status" role="status">
+          <span
+            class="scenario-result__monitor-badge"
+            [class.scenario-result__monitor-badge--matched]="monitor.status === 'matched'"
+          >
+            {{ monitorStatusLabel(monitor.status) }}
+          </span>
+          @if (monitor.status === 'matched' && monitor.matchReason) {
+            <p class="scenario-result__monitor-reason">
+              <strong>{{ i18n.t('scenarios.result.monitor.matchReason.label') }}:</strong>
+              {{ monitor.matchReason }}
+            </p>
+          }
+        </div>
+        <button
+          type="button"
+          class="scenario-result__monitor-action"
+          [disabled]="isArmingMonitor"
+          (click)="onDisarmMonitor()"
+        >
+          {{
+            isArmingMonitor
+              ? i18n.t('scenarios.result.monitor.disarming')
+              : i18n.t('scenarios.result.monitor.disarm.action')
+          }}
+        </button>
+      } @else {
+        @if (monitor?.status === 'expired') {
+          <p class="scenario-result__monitor-status" role="status">
+            <span class="scenario-result__monitor-badge">
+              {{ monitorStatusLabel('expired') }}
+            </span>
+          </p>
+        }
+        <button
+          type="button"
+          class="scenario-result__monitor-action"
+          [disabled]="isArmingMonitor"
+          (click)="onArmMonitor()"
+        >
+          {{
+            isArmingMonitor
+              ? i18n.t('scenarios.result.monitor.arming')
+              : i18n.t('scenarios.result.monitor.arm.action')
+          }}
+        </button>
+      }
+      @if (monitorError) {
+        <p
+          class="scenario-result__monitor-status scenario-result__monitor-status--error"
+          role="alert"
+        >
+          {{ i18n.t('scenarios.result.monitor.error.banner') }}{{ monitorError }}
+        </p>
+      }
+    } @else {
+      <p class="scenario-result__monitor-signin">
+        {{ i18n.t('scenarios.result.monitor.signInPrompt') }}
+        <a routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
+      </p>
+    }
+  </section>
 </article>
