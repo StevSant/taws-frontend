@@ -23,6 +23,7 @@ export const ES_TRANSLATIONS = {
   'auth.toggle.toLogin': '¿Ya tienes cuenta? Inicia sesión',
   'auth.confirmation.required':
     'Revisa tu correo para confirmar tu cuenta antes de iniciar sesión.',
+  'auth.error.banner': 'Ocurrió un error: ',
   'chat.placeholder': 'Escribe un mensaje…',
   'chat.send': 'Enviar',
   'chat.streaming': 'Generando respuesta…',

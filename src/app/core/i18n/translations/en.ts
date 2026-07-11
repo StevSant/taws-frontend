@@ -22,6 +22,7 @@ export const EN_TRANSLATIONS = {
   'auth.toggle.toSignup': "Don't have an account? Sign up",
   'auth.toggle.toLogin': 'Already have an account? Log in',
   'auth.confirmation.required': 'Check your inbox to confirm your email before logging in.',
+  'auth.error.banner': 'Something went wrong: ',
   'chat.placeholder': 'Type a message…',
   'chat.send': 'Send',
   'chat.streaming': 'Streaming reply…',
