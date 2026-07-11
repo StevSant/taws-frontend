@@ -1,5 +1,11 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AgentTrace, ChatMessage, ChatRepository, ChatStreamEvent } from '../domain';
+import {
+  AgentTrace,
+  ChatMessage,
+  ChatRepository,
+  ChatStreamEvent,
+  buildRoutingHops,
+} from '../domain';
 
 const ASSISTANT_ROLE = 'assistant';
 const USER_ROLE = 'user';
@@ -20,6 +26,13 @@ export class ChatStore {
   readonly isStreaming = this.streamingSignal.asReadonly();
   /** Agent routing trace for the *current* turn — cleared on every new send. */
   readonly traces = this.tracesSignal.asReadonly();
+  /**
+   * `traces` collapsed into one display hop per distinct agent (e.g.
+   * "Supervisor -> Quant"), updated live as trace events arrive. This is
+   * what the routing-trace UI renders — see `buildRoutingHops` for why it
+   * doesn't clutter simple, single-specialist turns.
+   */
+  readonly routingHops = computed(() => buildRoutingHops(this.tracesSignal()));
   /** Stream-level error message for the current turn, if any. */
   readonly error = this.errorSignal.asReadonly();
   readonly canSend = computed(() => !this.streamingSignal());
