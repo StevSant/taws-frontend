@@ -1,5 +1,75 @@
-<app-placeholder-page
-  [title]="i18n.t('briefings.title')"
-  [description]="i18n.t('briefings.description')"
-  [badge]="i18n.t('placeholder.badge')"
-/>
+<div class="briefings-page">
+  <header class="briefings-page__header">
+    <h1 class="briefings-page__title">{{ i18n.t('briefings.title') }}</h1>
+    <p class="briefings-page__description">{{ i18n.t('briefings.description') }}</p>
+  </header>
+
+  <p class="briefings-page__disclaimer" role="note">
+    {{ i18n.t('briefings.disclaimer.static') }}
+  </p>
+
+  <form class="briefings-page__controls">
+    <label class="briefings-page__field">
+      <span class="briefings-page__label">{{ i18n.t('briefings.watchlist.label') }}</span>
+      <select
+        class="briefings-page__select"
+        name="watchlist"
+        [ngModel]="store.selectedWatchlistId()"
+        (ngModelChange)="onWatchlistChange($event)"
+      >
+        <option [ngValue]="null" disabled>{{ i18n.t('briefings.watchlist.placeholder') }}</option>
+        @for (watchlist of store.watchlists(); track watchlist.id) {
+          <option [ngValue]="watchlist.id">{{ watchlist.name }}</option>
+        }
+      </select>
+    </label>
+
+    <app-button
+      [label]="store.isGenerating() ? i18n.t('briefings.generating') : i18n.t('briefings.generate')"
+      [disabled]="!store.selectedWatchlistId() || store.isGenerating()"
+      (pressed)="onGenerate()"
+    />
+  </form>
+
+  @if (store.isLoadingWatchlists()) {
+    <app-spinner class="briefings-page__loading" [label]="i18n.t('briefings.loading')" />
+  }
+
+  @if (!store.isLoadingWatchlists() && !store.hasWatchlists()) {
+    <p class="briefings-page__no-watchlists">{{ i18n.t('briefings.watchlist.empty') }}</p>
+  }
+
+  @if (store.error(); as error) {
+    <div class="briefings-page__error" role="alert">
+      <span>{{ i18n.t('briefings.error.banner') }}{{ error }}</span>
+      <app-button [label]="i18n.t('briefings.error.retry')" (pressed)="onRetry()" />
+    </div>
+  }
+
+  @if (!store.selectedWatchlistId() && store.hasWatchlists()) {
+    <p class="briefings-page__prompt">{{ i18n.t('briefings.selectPrompt') }}</p>
+  }
+
+  @if (store.isLoadingBriefings()) {
+    <app-spinner class="briefings-page__loading" [label]="i18n.t('briefings.loading')" />
+  }
+
+  @if (store.isEmpty()) {
+    <div class="briefings-page__empty">
+      <p class="briefings-page__empty-title">{{ i18n.t('briefings.empty.title') }}</p>
+      <p class="briefings-page__empty-description">{{ i18n.t('briefings.empty.description') }}</p>
+    </div>
+  }
+
+  <div class="briefings-page__grid">
+    @for (briefing of store.briefings(); track briefing.id) {
+      <app-briefing-card
+        [briefing]="briefing"
+        [history]="store.reviewHistoryFor(briefing.id)"
+        [isSubmitting]="store.isSubmittingReviewFor(briefing.id)"
+        [submitError]="store.reviewErrorFor(briefing.id)"
+        (submitReview)="onSubmitReview(briefing.id, $event)"
+      />
+    }
+  </div>
+</div>

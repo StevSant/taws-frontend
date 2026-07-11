@@ -1,0 +1,43 @@
+@if (isTerminal) {
+  <p class="review-panel__closed">{{ i18n.t('briefings.review.closed') }}</p>
+} @else {
+  <div class="review-panel">
+    <label class="review-panel__field">
+      <span class="review-panel__label">{{ i18n.t('briefings.review.justification.label') }}</span>
+      <textarea
+        class="review-panel__justification"
+        rows="2"
+        [ngModel]="justification()"
+        (ngModelChange)="justification.set($event)"
+        [disabled]="isSubmitting"
+        [placeholder]="i18n.t('briefings.review.justification.placeholder')"
+      ></textarea>
+    </label>
+
+    <div class="review-panel__actions">
+      @for (decision of decisions; track decision) {
+        <button
+          type="button"
+          class="review-panel__action"
+          [class.review-panel__action--reviewed]="decision === 'reviewed'"
+          [class.review-panel__action--escalated]="decision === 'escalated'"
+          [class.review-panel__action--discarded]="decision === 'discarded'"
+          [disabled]="!canSubmit"
+          (click)="onDecide(decision)"
+        >
+          {{ actionLabel(decision) }}
+        </button>
+      }
+    </div>
+
+    @if (isSubmitting) {
+      <p class="review-panel__status">{{ i18n.t('briefings.review.submitting') }}</p>
+    }
+
+    @if (submitError) {
+      <p class="review-panel__error" role="alert">
+        {{ i18n.t('briefings.review.error.banner') }}{{ submitError }}
+      </p>
+    }
+  </div>
+}

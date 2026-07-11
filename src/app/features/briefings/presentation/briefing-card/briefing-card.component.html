@@ -1,0 +1,50 @@
+<article class="briefing-card">
+  <header class="briefing-card__header">
+    <span class="briefing-card__created">
+      {{ i18n.t('briefings.card.createdAt') }} {{ briefing.createdAt | date: 'short' }}
+    </span>
+
+    <div
+      class="briefing-card__status"
+      [class.briefing-card__status--reviewed]="status === 'reviewed'"
+      [class.briefing-card__status--escalated]="status === 'escalated'"
+      [class.briefing-card__status--discarded]="status === 'discarded'"
+      [class.briefing-card__status--pending]="status === 'pending'"
+    >
+      <span class="briefing-card__status-label">{{ i18n.t('briefings.card.status.label') }}</span>
+      <span class="briefing-card__status-value">{{ statusLabel(status) }}</span>
+    </div>
+  </header>
+
+  <p class="briefing-card__summary">{{ briefing.summary }}</p>
+
+  <div class="briefing-card__linked-signals">
+    <span class="briefing-card__linked-signals-title">
+      {{ i18n.t('briefings.card.linkedSignals.title') }}
+    </span>
+    @if (briefing.linkedSignalIds.length === 0) {
+      <span class="briefing-card__linked-signals-empty">
+        {{ i18n.t('briefings.card.linkedSignals.empty') }}
+      </span>
+    } @else {
+      <ul class="briefing-card__linked-signals-list">
+        @for (signalId of briefing.linkedSignalIds; track signalId) {
+          <li class="briefing-card__linked-signal">{{ signalId }}</li>
+        }
+      </ul>
+    }
+  </div>
+
+  <p class="briefing-card__disclaimer">
+    <strong>{{ i18n.t('briefings.card.disclaimer.label') }}:</strong> {{ briefing.disclaimer }}
+  </p>
+
+  <app-review-panel
+    [history]="history"
+    [isSubmitting]="isSubmitting"
+    [submitError]="submitError"
+    (decide)="submitReview.emit($event)"
+  />
+
+  <app-review-history [history]="history" />
+</article>

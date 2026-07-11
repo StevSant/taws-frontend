@@ -1,0 +1,29 @@
+<div class="review-history">
+  <span class="review-history__title">{{ i18n.t('briefings.history.title') }}</span>
+
+  @if (orderedHistory.length === 0) {
+    <p class="review-history__empty">{{ i18n.t('briefings.history.empty') }}</p>
+  } @else {
+    <ul class="review-history__list">
+      @for (entry of orderedHistory; track entry.id) {
+        <li class="review-history__entry">
+          <div class="review-history__entry-header">
+            <span
+              class="review-history__decision"
+              [class.review-history__decision--reviewed]="entry.decision === 'reviewed'"
+              [class.review-history__decision--escalated]="entry.decision === 'escalated'"
+              [class.review-history__decision--discarded]="entry.decision === 'discarded'"
+            >
+              {{ decisionLabel(entry.decision) }}
+            </span>
+            <span class="review-history__date">{{ entry.createdAt | date: 'short' }}</span>
+          </div>
+          <p class="review-history__justification">{{ entry.justification }}</p>
+          <span class="review-history__reviewer">
+            {{ i18n.t('briefings.history.reviewer') }} {{ entry.userId }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</div>
