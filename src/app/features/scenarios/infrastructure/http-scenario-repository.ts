@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService } from '../../../core';
+import { AppConfigService, TranslationService } from '../../../core';
 import {
   ScenarioIntake,
   ScenarioMonitor,
@@ -32,6 +32,7 @@ export class HttpScenarioRepository extends ScenarioRepository {
   constructor(
     private readonly http: HttpClient,
     private readonly config: AppConfigService,
+    private readonly translation: TranslationService,
   ) {
     super();
   }
@@ -47,6 +48,7 @@ export class HttpScenarioRepository extends ScenarioRepository {
     const body: GenerateScenarioRequestDto = {
       ...(intake.presetId ? { preset_id: intake.presetId } : {}),
       ...(intake.freeText ? { free_text: intake.freeText } : {}),
+      locale: this.translation.locale(),
     };
     const dto = await firstValueFrom(
       this.http.post<ScenarioResultDto>(
