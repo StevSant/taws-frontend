@@ -263,8 +263,8 @@
   &__rail-toggle {
     position: absolute;
     top: var(--space-2);
-    right: calc(var(--chat-context-width) + var(--space-2));
-    z-index: 4;
+    right: var(--space-3);
+    z-index: 3;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -279,7 +279,8 @@
     color: var(--color-text-secondary);
     cursor: pointer;
     transition:
-      right var(--chat-layout-duration) var(--chat-layout-ease),
+      opacity 0.24s ease,
+      transform 0.24s ease,
       color 0.15s ease,
       border-color 0.15s ease,
       background 0.15s ease;
@@ -342,6 +343,10 @@
 
   &--sessions.chat-page--conversation &__workspace {
     padding-inline: var(--chat-thread-gutter);
+  }
+
+  &--sessions:not(.chat-page--rail-open).chat-page--conversation &__workspace {
+    padding-right: calc(var(--chat-thread-gutter, 1rem) + 1.35rem);
   }
 
   &--conversation:not(.chat-page--sessions) &__frame {

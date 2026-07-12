@@ -55,6 +55,27 @@
         </button>
       }
 
+      @if (auth.isAuthenticated() && !railOpen()) {
+        <button
+          type="button"
+          class="chat-page__rail-toggle"
+          [attr.aria-expanded]="railOpen()"
+          [attr.aria-label]="i18n.t('chat.rail.toggle')"
+          [attr.title]="i18n.t('chat.rail.toggle')"
+          (click)="openContextRail()"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+          >
+            <path d="M15 6l-6 6 6 6" />
+          </svg>
+        </button>
+      }
+
       <div class="chat-page__frame">
         @if (!hasMessages()) {
           <header class="chat-page__oracle">
@@ -421,33 +442,10 @@
     </div>
 
     @if (auth.isAuthenticated()) {
-      <button
-        type="button"
-        class="chat-page__rail-toggle"
-        [class.chat-page__rail-toggle--open]="railOpen()"
-        [attr.aria-expanded]="railOpen()"
-        [attr.aria-label]="railOpen() ? i18n.t('chat.rail.hide') : i18n.t('chat.rail.toggle')"
-        [attr.title]="railOpen() ? i18n.t('chat.rail.hide') : i18n.t('chat.rail.toggle')"
-        (click)="railOpen() ? closeContextRail() : openContextRail()"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          aria-hidden="true"
-        >
-          @if (railOpen()) {
-            <path d="M9 6l6 6-6 6" />
-          } @else {
-            <path d="M15 6l-6 6 6 6" />
-          }
-        </svg>
-      </button>
-    }
-
-    @if (auth.isAuthenticated()) {
-      <app-chat-context-rail (askNews)="onNewsQuestion($event)" />
+      <app-chat-context-rail
+        (askNews)="onNewsQuestion($event)"
+        (closePanel)="closeContextRail()"
+      />
     }
   </div>
 </div>

@@ -1,4 +1,27 @@
 <aside class="chat-context-rail" [attr.aria-label]="i18n.t('chat.rail.label')">
+  <header class="chat-context-rail__top">
+    <div class="chat-context-rail__top-row">
+      <h2 class="chat-context-rail__top-title">{{ i18n.t('chat.rail.label') }}</h2>
+      <button
+        type="button"
+        class="chat-context-rail__close"
+        [attr.aria-label]="i18n.t('chat.rail.hide')"
+        [attr.title]="i18n.t('chat.rail.hide')"
+        (click)="onClose()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <path d="M9 6l6 6-6 6" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
   <section class="chat-context-rail__card">
     <header class="chat-context-rail__header">
       <h2 class="chat-context-rail__title">{{ i18n.t('chat.rail.macro.title') }}</h2>
