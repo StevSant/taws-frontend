@@ -126,3 +126,15 @@
     color: var(--color-text-muted);
   }
 }
+
+@media (max-width: 480px) {
+  .review-history__entry-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+  }
+
+  .review-history__date {
+    white-space: normal;
+  }
+}

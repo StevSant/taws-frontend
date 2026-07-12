@@ -137,3 +137,15 @@
     font-style: italic;
   }
 }
+
+@media (max-width: 480px) {
+  .review-panel__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-panel__action {
+    width: 100%;
+    text-align: center;
+  }
+}

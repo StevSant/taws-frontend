@@ -368,3 +368,25 @@
     color: var(--color-text-secondary);
   }
 }
+
+@media (max-width: 768px) {
+  .scenario-result {
+    padding: var(--space-4);
+
+    &__title {
+      font-size: 1.1rem;
+    }
+
+    &__impact-grid,
+    &__footer-actions {
+      grid-template-columns: 1fr;
+    }
+
+    &__briefing-action,
+    &__monitor-action {
+      align-self: stretch;
+      width: 100%;
+      text-align: center;
+    }
+  }
+}

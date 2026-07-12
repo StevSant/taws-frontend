@@ -371,3 +371,40 @@
       'star';
   }
 }
+
+@media (max-width: 768px) {
+  .brand-lab {
+    gap: var(--space-5);
+
+    &__hero {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: var(--space-4);
+    }
+
+    &__finalist {
+      grid-template-columns: 1fr;
+      justify-items: start;
+    }
+
+    &__sizes {
+      flex-wrap: wrap;
+    }
+
+    &__grid,
+    &__grid--agents {
+      grid-template-columns: 1fr;
+    }
+
+    &__section-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-lab__section-desc {
+    margin-top: 0;
+  }
+}

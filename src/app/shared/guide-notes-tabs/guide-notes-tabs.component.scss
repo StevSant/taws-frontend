@@ -82,3 +82,22 @@
     text-align: center;
   }
 }
+
+@media (max-width: 560px) {
+  .guide-notes-tabs__header {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .guide-notes-tabs__tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: var(--space-2);
+  }
+}

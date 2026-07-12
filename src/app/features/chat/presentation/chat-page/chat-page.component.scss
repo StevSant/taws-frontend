@@ -1398,3 +1398,51 @@ html[data-theme='light'] .chat-page {
     opacity: 1;
   }
 }
+
+@media (max-width: 560px) {
+  .chat-page {
+    &:not(&--conversation) &__frame {
+      padding-inline: var(--space-3);
+    }
+
+    &--conversation &__messages {
+      padding-inline: var(--space-2);
+    }
+
+    &__messages {
+      gap: var(--space-3);
+    }
+
+    &__footer-inner {
+      padding-inline: var(--space-3);
+    }
+
+    &__composer {
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-xl);
+    }
+
+    &__input {
+      font-size: 0.88rem;
+      padding: var(--space-2);
+    }
+
+    &__voice-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    &__bubble {
+      max-width: 100%;
+      font-size: 0.88rem;
+    }
+
+    &__welcome-title {
+      font-size: 1.2rem;
+    }
+
+    &__welcome-subtitle {
+      font-size: 0.82rem;
+    }
+  }
+}

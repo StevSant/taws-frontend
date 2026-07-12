@@ -30,3 +30,21 @@
     font-size: 0.9rem;
   }
 }
+
+@media (max-width: 768px) {
+  .briefings-page__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .briefings-page__field {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .briefings-page__content {
+    gap: var(--space-4);
+  }
+}

@@ -164,6 +164,10 @@
   .radar-page__instrument-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .radar-page__skeletons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -172,7 +176,12 @@
   }
 
   .radar-page__hero {
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .radar-page__filters--inline {
+    width: 100%;
   }
 
   .radar-page__instruments-header {
