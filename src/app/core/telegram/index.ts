@@ -4,3 +4,7 @@ export { TelegramSettingsStore } from './telegram-settings-store';
 export { TelegramLinkPanelComponent } from './telegram-link-panel/telegram-link-panel.component';
 export type { TelegramLinkStatus } from './telegram-link-status.model';
 export type { TelegramLinkToken } from './telegram-link-token.model';
+export { BotRegistrationStore } from './bot-registration-store';
+export { BotRegistrationPanelComponent } from './bot-registration-panel/bot-registration-panel.component';
+export type { RegisterBotRequest } from './register-bot-request.model';
+export type { RegisterBotResponse } from './register-bot-response.model';
