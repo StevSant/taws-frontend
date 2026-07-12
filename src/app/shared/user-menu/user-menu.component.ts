@@ -9,6 +9,7 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslationService } from '../../core';
 import { DropdownAnchor, syncDropdownAnchor } from '../sync-dropdown-anchor';
 import { UserProfileChipComponent } from '../user-profile-chip/user-profile-chip.component';
@@ -26,6 +27,7 @@ import { UserProfileChipComponent } from '../user-profile-chip/user-profile-chip
 })
 export class UserMenuComponent {
   readonly i18n = inject(TranslationService);
+  private readonly router = inject(Router);
 
   readonly initial = input.required<string>();
   readonly email = input('');
@@ -51,6 +53,11 @@ export class UserMenuComponent {
   onLogout(): void {
     this.isOpen.set(false);
     this.logout.emit();
+  }
+
+  onOpenProfile(): void {
+    this.isOpen.set(false);
+    void this.router.navigate(['/user']);
   }
 
   @HostListener('window:resize')

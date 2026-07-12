@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { TranslationKey } from '../i18n';
-import { Notification, NotificationSource } from './notification.model';
+import { Notification, NotificationLink, NotificationSource } from './notification.model';
+import { resolveNotificationLink } from './resolve-notification-link';
 
 /** Caps the in-memory list so a long-lived session/tab can't grow it unbounded. */
 const MAX_NOTIFICATIONS = 50;
@@ -24,7 +25,14 @@ export class NotificationsStore {
   readonly count = computed(() => this.notificationsSignal().length);
 
   /** Pushes a new notification onto the top of the list. */
-  notify(source: NotificationSource, messageKey: TranslationKey, count = 1, detail?: string): void {
+  notify(
+    source: NotificationSource,
+    messageKey: TranslationKey,
+    count = 1,
+    detail?: string,
+    link?: NotificationLink,
+  ): void {
+    const resolvedLink = link ?? resolveNotificationLink(messageKey, detail);
     const current = this.notificationsSignal();
 
     if (source === 'radar' && messageKey === 'notifications.radar.newSignals') {
@@ -38,6 +46,7 @@ export class NotificationsStore {
           ...existing,
           count: existing.count + count,
           detail: detail ?? existing.detail,
+          link: resolvedLink ?? existing.link,
           createdAt: new Date().toISOString(),
         };
 
@@ -55,6 +64,7 @@ export class NotificationsStore {
       messageKey,
       count,
       detail,
+      link: resolvedLink,
       createdAt: new Date().toISOString(),
     };
     this.notificationsSignal.update((current) =>

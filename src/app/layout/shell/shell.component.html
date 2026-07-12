@@ -116,6 +116,7 @@
           [notifications]="notifications.notifications()"
           (dismiss)="notifications.dismiss($event)"
           (clearAll)="notifications.clearAll()"
+          (openNotification)="onOpenNotification($event)"
         />
 
         <app-theme-toggle />

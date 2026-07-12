@@ -1,0 +1,124 @@
+.user-page {
+  &__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  &__chip {
+    width: 100%;
+
+    ::ng-deep .user-profile-chip {
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid color-mix(in srgb, var(--color-gold-border) 45%, transparent);
+      border-radius: var(--radius-lg);
+      background: color-mix(in srgb, var(--color-surface) 90%, var(--color-gold) 10%);
+
+      .user-profile-chip__avatar {
+        width: 2.75rem;
+        height: 2.75rem;
+        font-size: 1rem;
+      }
+
+      .user-profile-chip__role {
+        font-size: 1rem;
+      }
+
+      .user-profile-chip__email {
+        font-size: 0.82rem;
+      }
+    }
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  &__status-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: var(--radius-full);
+    background: var(--color-gain);
+    box-shadow: 0 0 0 3px var(--color-gain-dim);
+  }
+
+  &__section-title {
+    margin: 0 0 var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  &__detail {
+    display: grid;
+    gap: var(--space-1);
+
+    dt {
+      margin: 0;
+      font-family: var(--font-family-mono);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    dd {
+      margin: 0;
+      color: var(--color-text-primary);
+      font-size: 0.92rem;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    &--control dd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+  }
+
+  &__mono {
+    font-family: var(--font-family-mono);
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    color: var(--color-text-secondary) !important;
+  }
+
+  &__pref-value {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-page__detail--control dd {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

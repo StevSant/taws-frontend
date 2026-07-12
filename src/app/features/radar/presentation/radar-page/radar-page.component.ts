@@ -1,4 +1,6 @@
-import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
 import { RadarStore } from '../../application';
@@ -34,6 +36,8 @@ import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/ra
   styleUrl: './radar-page.component.scss',
 })
 export class RadarPageComponent implements OnInit, OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+
   /**
    * Client-side dashboard segmentation (issue #41). `null` = the "Todos"
    * composition overview; a class scopes the aggregates and instrument grid to
@@ -81,7 +85,14 @@ export class RadarPageComponent implements OnInit, OnDestroy {
   constructor(
     readonly store: RadarStore,
     readonly i18n: TranslationService,
-  ) {}
+  ) {
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const symbol = params.get('symbol');
+      if (symbol) {
+        void this.applySymbolFilter(symbol);
+      }
+    });
+  }
 
   onSelectClass(assetClass: AssetClass | null): void {
     this.selectedClassSignal.set(assetClass);
@@ -89,6 +100,10 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     void this.store.init();
+    const symbol = this.route.snapshot.queryParamMap.get('symbol');
+    if (symbol) {
+      void this.applySymbolFilter(symbol);
+    }
   }
 
   ngOnDestroy(): void {
@@ -111,5 +126,12 @@ export class RadarPageComponent implements OnInit, OnDestroy {
       720: this.i18n.t('radar.filters.recency.720h'),
     };
     return map[hours] ?? `${hours}h`;
+  }
+
+  private async applySymbolFilter(symbol: string): Promise<void> {
+    if (this.store.filters().assetClass !== null) {
+      await this.store.setAssetClass(null);
+    }
+    await this.store.setSymbol(symbol);
   }
 }

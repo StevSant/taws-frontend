@@ -48,6 +48,17 @@ export interface TranslationDict {
   'shell.auth.login': string;
   'shell.auth.logout': string;
   'shell.user.menuLabel': string;
+  'user.title': string;
+  'user.description': string;
+  'user.menu.profile': string;
+  'user.section.account': string;
+  'user.section.preferences': string;
+  'user.field.displayName': string;
+  'user.field.email': string;
+  'user.field.userId': string;
+  'user.field.theme': string;
+  'user.field.language': string;
+  'user.status.activeSession': string;
   'shell.status.active': string;
   'auth.login.title': string;
   'auth.login.eyebrow': string;
@@ -472,6 +483,7 @@ export interface TranslationDict {
   'notifications.empty': string;
   'notifications.clearAll': string;
   'notifications.dismiss': string;
+  'notifications.open': string;
   'notifications.radar.newSignals': string;
   'notifications.radar.signalGenerated': string;
   'notifications.auth.sessionExpired': string;

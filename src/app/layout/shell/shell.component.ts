@@ -11,8 +11,10 @@ import {
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { LucideSearch } from '@lucide/angular';
-import { NotificationBellComponent, NotificationsStore, TranslationService } from '../../core';
+import { NotificationBellComponent, Notification, NotificationsStore, TranslationService } from '../../core';
+import { resolveNotificationLink } from '../../core/notifications/resolve-notification-link';
 import { AuthStore } from '../../features/auth/application';
+import { RadarStore } from '../../features/radar/application';
 import {
   LanguageToggleComponent,
   MidasLogoComponent,
@@ -50,6 +52,7 @@ export class ShellComponent {
   readonly notifications = inject(NotificationsStore);
   readonly search = inject(ShellSearchService);
   private readonly router = inject(Router);
+  private readonly radarStore = inject(RadarStore);
 
   readonly usesCustomLayout = signal(this.hasFeatureOwnedSidebar(this.router.url));
   readonly routeTransition = signal<ShellRouteTransition>('neutral');
@@ -82,6 +85,26 @@ export class ShellComponent {
 
   logout(): void {
     void this.auth.logout().then(() => this.router.navigateByUrl('/login'));
+  }
+
+  async onOpenNotification(notification: Notification): Promise<void> {
+    const link =
+      notification.link ?? resolveNotificationLink(notification.messageKey, notification.detail);
+    if (!link) {
+      return;
+    }
+
+    await this.router.navigate(link.commands, { queryParams: link.queryParams });
+
+    const symbol = link.queryParams?.['symbol'];
+    if (symbol) {
+      if (this.radarStore.filters().assetClass !== null) {
+        await this.radarStore.setAssetClass(null);
+      }
+      await this.radarStore.setSymbol(symbol);
+    }
+
+    this.notifications.dismiss(notification.id);
   }
 
   onSearchInput(event: Event): void {

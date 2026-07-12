@@ -115,6 +115,34 @@
     &:last-child {
       border-bottom: none;
     }
+
+    &--clickable {
+      padding: 0;
+    }
+  }
+
+  &__item-open {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.15rem;
+    padding: var(--space-3);
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: var(--color-surface-hover, rgba(255, 255, 255, 0.04));
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
   }
 
   &__item-body {
@@ -159,6 +187,7 @@
     justify-content: center;
     width: 1.5rem;
     height: 1.5rem;
+    margin: var(--space-3) var(--space-3) 0 0;
     border: none;
     background: transparent;
     color: var(--color-text-muted);

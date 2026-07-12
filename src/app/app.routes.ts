@@ -40,6 +40,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/brand-lab/brand-lab.routes').then((m) => m.BRAND_LAB_ROUTES),
       },
+      {
+        path: 'user',
+        canActivate: [authGuard],
+        loadChildren: () => import('./features/user/user.routes').then((m) => m.USER_ROUTES),
+      },
     ],
   },
 ];

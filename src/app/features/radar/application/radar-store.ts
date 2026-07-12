@@ -552,11 +552,15 @@ export class RadarStore {
         : news.filter((item) => !this.lastSeenNewsIds!.has(item.id));
 
       if (newItems.length > 0) {
+        const latestNewsId = newItems[0]?.id;
         this.notifications.notify(
           'radar',
           'notifications.radar.newSignals',
           newItems.length,
           formatNewNewsNotificationDetail(newItems),
+          latestNewsId
+            ? { commands: ['/radar/news', latestNewsId] }
+            : { commands: ['/radar'] },
         );
       }
 
