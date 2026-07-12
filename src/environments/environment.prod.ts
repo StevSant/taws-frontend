@@ -22,6 +22,13 @@ export const environment = {
    * instead of POSTing audio to the endpoint just to receive a 503.
    */
   sttEnabled: true,
+  /**
+   * Whether the realtime voice agent (`POST /api/v1/chat/realtime/session`) is
+   * available. When false, the Talk button is hidden so the user never sees a
+   * dead control that only returns a 503. Requires OPENAI_REALTIME_ENABLED=true
+   * on the backend.
+   */
+  realtimeEnabled: true,
   supabaseUrl: 'https://jtvaogvsjjpspypmnwgm.supabase.co',
   supabaseAnonKey:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dmFvZ3Zzampwc3B5cG1ud2dtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDE1NjgsImV4cCI6MjA5OTMxNzU2OH0.NYiyrK0kzxfb5S4YBCCJUVYjOsNLyjCSYYPaP4acS3E',

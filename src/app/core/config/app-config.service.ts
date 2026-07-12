@@ -15,6 +15,12 @@ export class AppConfigService {
   readonly ttsEnabled: boolean = environment.ttsEnabled;
   /** Whether server-side STT is available; gates the primary STT provider. */
   readonly sttEnabled: boolean = environment.sttEnabled;
+  /**
+   * Whether the realtime voice agent (`POST /api/v1/chat/realtime/session`) is
+   * available. When false, the Talk button is hidden — never rendered as a dead
+   * control that only yields a 503.
+   */
+  readonly realtimeEnabled: boolean = environment.realtimeEnabled;
   readonly supabaseUrl: string = environment.supabaseUrl;
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */

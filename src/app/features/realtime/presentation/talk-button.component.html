@@ -1,0 +1,25 @@
+@if (available()) {
+  <div
+    class="talk"
+    [class.talk--live]="isLive()"
+    [class.talk--error]="connectionState() === 'error'"
+  >
+    <button
+      type="button"
+      class="talk__button"
+      [attr.aria-pressed]="isPressed()"
+      [attr.aria-label]="ariaLabel()"
+      [disabled]="isConnecting()"
+      (click)="toggle()"
+    >
+      <span class="talk__orb" aria-hidden="true">
+        <app-golden-polyhedron [size]="orbSize" [activity]="orbActivity()" />
+      </span>
+      <span class="talk__status">{{ statusLabel() }}</span>
+    </button>
+
+    <p class="talk__transcript" aria-live="polite" aria-atomic="false">{{ liveTranscript() }}</p>
+  </div>
+} @else if (unavailable()) {
+  <p class="talk__unavailable" role="note">{{ i18n.t('chat.realtime.unavailable') }}</p>
+}

@@ -120,6 +120,14 @@ export interface TranslationDict {
   'chat.stt.listening': string;
   'chat.stt.error': string;
   'chat.stt.unavailable': string;
+  'chat.realtime.talk': string;
+  'chat.realtime.stop': string;
+  'chat.realtime.connecting': string;
+  'chat.realtime.live': string;
+  'chat.realtime.error': string;
+  'chat.realtime.permissionDenied': string;
+  'chat.realtime.unavailable': string;
+  'chat.realtime.toolRunning': string;
   'chat.oracle.status.idle': string;
   'chat.oracle.status.listening': string;
   'chat.oracle.status.composing': string;

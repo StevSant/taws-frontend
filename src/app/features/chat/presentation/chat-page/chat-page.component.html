@@ -79,6 +79,10 @@
               <span class="chat-page__oracle-status-dot" aria-hidden="true"></span>
               {{ oracleStatusLabel() }}
             </p>
+
+            @if (auth.isAuthenticated()) {
+              <app-talk-button class="chat-page__talk" />
+            }
           </header>
         }
 

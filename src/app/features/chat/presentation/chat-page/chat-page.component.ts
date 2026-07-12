@@ -48,6 +48,8 @@ import {
   WebSpeechTtsProvider,
 } from '../../../audio/infrastructure';
 
+import { TalkButtonComponent } from '../../../realtime';
+
 import { ChartComponent } from '../../../../shared/charts';
 
 import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions-panel.component';
@@ -106,6 +108,8 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ChatQuickActionsComponent,
 
     ChartComponent,
+
+    TalkButtonComponent,
   ],
 
   providers: [
