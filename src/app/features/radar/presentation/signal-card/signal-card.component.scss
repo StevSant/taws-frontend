@@ -198,6 +198,22 @@
     color: var(--color-text-muted);
   }
 
+  // Compact the shared candlestick chart so it fits inside the card. The chart's own
+  // canvas height (320px) is set inside its encapsulated stylesheet, so reach into it
+  // with ::ng-deep scoped to this card to keep the override contained.
+  &__candles {
+    display: block;
+    width: 100%;
+
+    ::ng-deep .taws-chart {
+      margin: 0;
+    }
+
+    ::ng-deep .taws-chart__canvas {
+      height: 132px;
+    }
+  }
+
   &__metrics {
     display: flex;
     align-items: flex-end;

@@ -14,6 +14,14 @@ export function mapMarketStatsDto(dto: MarketStatsDto): MarketStats {
       returnPct: move.return_pct,
       zScore: move.z_score,
     })),
+    candles: (dto.candles ?? []).map((bar) => ({
+      t: bar.t,
+      o: bar.o,
+      h: bar.h,
+      l: bar.l,
+      c: bar.c,
+      v: bar.v ?? null,
+    })),
     asOf: new Date(dto.as_of),
   };
 }
