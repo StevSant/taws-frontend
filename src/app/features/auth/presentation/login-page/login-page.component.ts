@@ -1,5 +1,14 @@
 import { Location } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfigService, TranslationKey, TranslationService } from '../../../../core';
@@ -73,6 +82,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   readonly email = signal('');
   readonly password = signal('');
   readonly activePerspectiveId = signal<DemoAuthPerspective['id'] | null>(null);
+  readonly showcaseMidasSize = signal(112);
+  readonly showcaseAgentSize = signal(42);
 
   readonly store = inject(AuthStore);
   readonly i18n = inject(TranslationService);
@@ -106,10 +117,16 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     document.body.classList.add('route-login');
+    this.updateShowcaseSizes();
   }
 
   ngOnDestroy(): void {
     document.body.classList.remove('route-login');
+  }
+
+  @HostListener('window:resize')
+  onViewportResize(): void {
+    this.updateShowcaseSizes();
   }
 
   glyphFor(agent: AgentProfile) {
@@ -202,6 +219,32 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       this.safeInternalPath(this.route.snapshot.queryParamMap.get('returnUrl')) ??
       DEFAULT_REDIRECT_PATH
     );
+  }
+
+  private updateShowcaseSizes(): void {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    if (width >= 1920 && height >= 1000) {
+      this.showcaseMidasSize.set(162);
+      this.showcaseAgentSize.set(58);
+      return;
+    }
+
+    if (width >= 1440 && height >= 800) {
+      this.showcaseMidasSize.set(134);
+      this.showcaseAgentSize.set(50);
+      return;
+    }
+
+    if (width >= 981 && height <= 720) {
+      this.showcaseMidasSize.set(90);
+      this.showcaseAgentSize.set(34);
+      return;
+    }
+
+    this.showcaseMidasSize.set(112);
+    this.showcaseAgentSize.set(42);
   }
 
   private safeInternalPath(url: string | null): string | null {
