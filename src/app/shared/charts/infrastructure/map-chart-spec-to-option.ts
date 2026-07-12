@@ -33,6 +33,9 @@ export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChart
 
 function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   const series = spec.series[0];
+  if (!series) {
+    return {};
+  }
   const categories = series.bars.map((bar) => bar.t);
   const values = series.bars.map((bar) => [bar.o, bar.c, bar.l, bar.h]);
   return {
