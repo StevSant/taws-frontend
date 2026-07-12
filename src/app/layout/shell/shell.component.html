@@ -10,9 +10,17 @@
         <a
           class="app-shell__tab"
           routerLink="/radar"
+          [routerLinkActiveOptions]="{ exact: true }"
           routerLinkActive="app-shell__tab--active"
           [attr.title]="i18n.t('shell.nav.radar.hint')"
           >{{ i18n.t('shell.nav.radar') }}</a
+        >
+        <a
+          class="app-shell__tab"
+          routerLink="/radar/explore"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.markets.hint')"
+          >{{ i18n.t('shell.nav.markets') }}</a
         >
         <a
           class="app-shell__tab"

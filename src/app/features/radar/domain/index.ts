@@ -21,3 +21,13 @@ export type { UnusualMove } from './models/unusual-move.model';
 export { QuantRepository } from './quant-repository';
 export { MacroRepository } from './macro-repository';
 export { SentimentRepository } from './sentiment-repository';
+export { MarketsRepository } from './markets-repository';
+export type { EnrichedInstrument } from './models/enriched-instrument.model';
+export type {
+  EnrichedInstrumentQuery,
+  InstrumentHighlights,
+  InstrumentPage,
+  InstrumentSortField,
+  SortDirection,
+} from './models/instrument-page.model';
+export type { VolatilityRegimeLevel } from './models/market-stats.model';
