@@ -40,6 +40,14 @@ export const routes: Routes = [
           import('./features/briefings/briefings.routes').then((m) => m.BRIEFINGS_ROUTES),
       },
       {
+        // Guarded: the /watchlists API is authenticated (same as briefings). Dedicated
+        // management page for the user's watchlists (issue #17).
+        path: 'watchlists',
+        canActivate: [authGuard],
+        loadChildren: () =>
+          import('./features/watchlists/watchlists.routes').then((m) => m.WATCHLISTS_ROUTES),
+      },
+      {
         path: 'brand-lab',
         loadChildren: () =>
           import('./features/brand-lab/brand-lab.routes').then((m) => m.BRAND_LAB_ROUTES),

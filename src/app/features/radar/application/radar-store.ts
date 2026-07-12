@@ -170,7 +170,9 @@ export class RadarStore {
     }
     const cards = this.signalCardBySymbol();
     const instrumentsBySymbol = new Map(
-      this.instrumentsSignal().map((instrument) => [instrument.symbol.toUpperCase(), instrument] as const),
+      this.instrumentsSignal().map(
+        (instrument) => [instrument.symbol.toUpperCase(), instrument] as const,
+      ),
     );
     const signalsBySymbol = this.signalsBySymbolSignal();
     const marketStatsBySymbol = this.marketStatsBySymbolSignal();

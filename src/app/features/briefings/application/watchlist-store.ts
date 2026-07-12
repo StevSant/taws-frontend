@@ -214,6 +214,8 @@ export class WatchlistStore {
   }
 
   private setError(error: unknown): void {
-    this.errorSignal.set(`${this.i18n.t('radar.detail.watchlist.error')} ${httpErrorDetail(error, this.i18n)}`);
+    this.errorSignal.set(
+      `${this.i18n.t('radar.detail.watchlist.error')} ${httpErrorDetail(error, this.i18n)}`,
+    );
   }
 }
