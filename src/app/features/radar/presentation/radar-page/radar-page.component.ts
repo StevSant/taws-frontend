@@ -1,12 +1,14 @@
-import { Component, OnDestroy, OnInit, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
 import { RadarStore } from '../../application';
+import { AssetClass } from '../../domain';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { RadarKpiRowComponent } from '../radar-kpi-row/radar-kpi-row.component';
-import { RadarMarketPulseComponent } from '../radar-market-pulse/radar-market-pulse.component';
-import { RadarMarketScoreComponent } from '../radar-market-score/radar-market-score.component';
 import { RadarMacroCardsComponent } from '../radar-macro-cards/radar-macro-cards.component';
+import { RadarAssetClassTabsComponent } from '../radar-asset-class-tabs/radar-asset-class-tabs.component';
+import { RadarCompositionOverviewComponent } from '../radar-composition-overview/radar-composition-overview.component';
+import { RadarAssetClassSectionComponent } from '../radar-asset-class-section/radar-asset-class-section.component';
 import { NewsTimelineComponent } from '../news-timeline/news-timeline.component';
 import { InstrumentCardCompactComponent } from '../instrument-card-compact/instrument-card-compact.component';
 import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/radar-add-instrument-card.component';
@@ -17,9 +19,10 @@ import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/ra
   imports: [
     RadarFiltersComponent,
     RadarKpiRowComponent,
-    RadarMarketPulseComponent,
-    RadarMarketScoreComponent,
     RadarMacroCardsComponent,
+    RadarAssetClassTabsComponent,
+    RadarCompositionOverviewComponent,
+    RadarAssetClassSectionComponent,
     NewsTimelineComponent,
     InstrumentCardCompactComponent,
     RadarAddInstrumentCardComponent,
@@ -31,6 +34,43 @@ import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/ra
   styleUrl: './radar-page.component.scss',
 })
 export class RadarPageComponent implements OnInit, OnDestroy {
+  /**
+   * Client-side dashboard segmentation (issue #41). `null` = the "Todos"
+   * composition overview; a class scopes the aggregates and instrument grid to
+   * that asset class. This is pure view state derived off `RadarStore` signals
+   * — it never refetches.
+   */
+  private readonly selectedClassSignal = signal<AssetClass | null>(null);
+
+  /**
+   * The selected class, reset to `null` when it no longer has any signals
+   * (e.g. after a filter change drops that class), so the view never points at
+   * an empty, tab-less segment.
+   */
+  readonly selectedClass = computed<AssetClass | null>(() => {
+    const selected = this.selectedClassSignal();
+    if (selected === null) {
+      return null;
+    }
+    return this.store.assetClassSegments().some((segment) => segment.assetClass === selected)
+      ? selected
+      : null;
+  });
+
+  readonly activeSegment = computed(() => {
+    const selected = this.selectedClass();
+    if (selected === null) {
+      return null;
+    }
+    return this.store.assetClassSegments().find((segment) => segment.assetClass === selected) ?? null;
+  });
+
+  /** Signals shown in the instrument grid: all, or scoped to the active class. */
+  readonly visibleSignals = computed(() => {
+    const segment = this.activeSegment();
+    return segment ? segment.signals : this.store.signals();
+  });
+
   readonly summaryText = computed(() => {
     const kpis = this.store.kpiSummary();
     const hours = this.store.filters().sinceHours;
@@ -42,6 +82,10 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     readonly store: RadarStore,
     readonly i18n: TranslationService,
   ) {}
+
+  onSelectClass(assetClass: AssetClass | null): void {
+    this.selectedClassSignal.set(assetClass);
+  }
 
   ngOnInit(): void {
     void this.store.init();

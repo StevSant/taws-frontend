@@ -49,12 +49,24 @@
       [sinceHours]="store.filters().sinceHours"
     />
 
+    <app-radar-asset-class-tabs
+      class="radar-page__tabs"
+      [segments]="store.assetClassSegments()"
+      [selected]="selectedClass()"
+      [totalInstruments]="store.signals().length"
+      (selectionChange)="onSelectClass($event)"
+    />
+
     <div class="radar-page__overview">
-      <app-radar-market-pulse
-        [distribution]="store.landscape().distribution"
-        [marketScore]="store.marketScore()"
-      />
-      <app-radar-market-score [marketScore]="store.marketScore()" />
+      @if (activeSegment(); as segment) {
+        <app-radar-asset-class-section class="radar-page__overview-main" [segment]="segment" />
+      } @else {
+        <app-radar-composition-overview
+          class="radar-page__overview-main"
+          [composition]="store.marketComposition()"
+          (selectClass)="onSelectClass($event)"
+        />
+      }
       <app-radar-macro-cards [macro]="store.macroState()" />
     </div>
 
@@ -99,7 +111,7 @@
         </header>
 
         <div class="radar-page__instrument-grid">
-          @for (signal of store.signals(); track signal.symbol) {
+          @for (signal of visibleSignals(); track signal.symbol) {
             <app-instrument-card-compact [signal]="signal" />
           }
           <app-radar-add-instrument-card />

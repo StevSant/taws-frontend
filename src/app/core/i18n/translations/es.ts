@@ -261,6 +261,13 @@ export const ES_TRANSLATIONS = {
   'radar.score.bullish': 'Alcista',
   'radar.score.bearish': 'Bajista',
   'radar.score.neutral': 'Neutral',
+  'radar.segments.all': 'Todos',
+  'radar.segments.tabsLabel': 'Segmentar por clase de activo',
+  'radar.composition.title': 'Composición del mercado',
+  'radar.composition.subtitle':
+    'Contribución de cada clase de activo, con su propia puntuación — no un promedio global que mezcla cripto, acciones y renta fija.',
+  'radar.composition.unclassified': 'sin clasificar por clase de activo',
+  'radar.composition.empty': 'Aún no hay instrumentos clasificados por clase de activo.',
   'radar.macro.title': 'Contexto de mercado',
   'radar.macro.ratesHint': 'Sin cambios recientes',
   'radar.macro.cpiHint': 'Inflación interanual',

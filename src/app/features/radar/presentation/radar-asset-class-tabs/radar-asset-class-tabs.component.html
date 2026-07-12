@@ -1,0 +1,27 @@
+<div class="asset-class-tabs" role="tablist" [attr.aria-label]="i18n.t('radar.segments.tabsLabel')">
+  <button
+    type="button"
+    role="tab"
+    class="asset-class-tabs__tab"
+    [class.asset-class-tabs__tab--active]="selected === null"
+    [attr.aria-selected]="selected === null"
+    (click)="select(null)"
+  >
+    <span class="asset-class-tabs__label">{{ i18n.t('radar.segments.all') }}</span>
+    <span class="asset-class-tabs__count">{{ totalInstruments }}</span>
+  </button>
+
+  @for (segment of segments; track segment.assetClass) {
+    <button
+      type="button"
+      role="tab"
+      class="asset-class-tabs__tab"
+      [class.asset-class-tabs__tab--active]="selected === segment.assetClass"
+      [attr.aria-selected]="selected === segment.assetClass"
+      (click)="select(segment.assetClass)"
+    >
+      <span class="asset-class-tabs__label">{{ labelFor(segment.assetClass) }}</span>
+      <span class="asset-class-tabs__count">{{ segment.signals.length }}</span>
+    </button>
+  }
+</div>

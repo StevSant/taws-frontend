@@ -291,6 +291,13 @@ export const EN_TRANSLATIONS = {
   'radar.score.bullish': 'Bullish',
   'radar.score.bearish': 'Bearish',
   'radar.score.neutral': 'Neutral',
+  'radar.segments.all': 'All',
+  'radar.segments.tabsLabel': 'Segment by asset class',
+  'radar.composition.title': 'Market composition',
+  'radar.composition.subtitle':
+    "Each asset class's contribution, with its own score — not a global average that blends crypto, stocks and fixed income.",
+  'radar.composition.unclassified': 'not classified by asset class',
+  'radar.composition.empty': 'No instruments classified by asset class yet.',
   'radar.macro.title': 'Market context',
   'radar.macro.ratesHint': 'No recent change',
   'radar.macro.cpiHint': 'Year-over-year inflation',

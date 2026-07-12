@@ -248,6 +248,12 @@ export interface TranslationDict {
   'radar.score.bullish': string;
   'radar.score.bearish': string;
   'radar.score.neutral': string;
+  'radar.segments.all': string;
+  'radar.segments.tabsLabel': string;
+  'radar.composition.title': string;
+  'radar.composition.subtitle': string;
+  'radar.composition.unclassified': string;
+  'radar.composition.empty': string;
   'radar.macro.title': string;
   'radar.macro.ratesHint': string;
   'radar.macro.cpiHint': string;

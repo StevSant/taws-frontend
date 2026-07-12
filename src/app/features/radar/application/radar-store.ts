@@ -21,6 +21,8 @@ import {
 } from '../domain';
 import { computeRadarLandscape } from './compute-radar-landscape';
 import { computeMarketScore, MarketScore } from './compute-market-score';
+import { computeAssetClassSegments } from './compute-asset-class-segments';
+import { computeMarketComposition } from './compute-market-composition';
 import { formatNewNewsNotificationDetail } from './format-new-signals-detail';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
@@ -147,6 +149,16 @@ export class RadarStore {
     const landscape = this.landscape();
     return computeMarketScore(landscape.distribution, landscape.totalInstruments);
   });
+  /**
+   * Per-asset-class segments (crypto / stocks / commodities / credit / forex),
+   * each with its own impact distribution and market score. Derived from
+   * `signals()` — no refetch. See issue #41.
+   */
+  readonly assetClassSegments = computed(() => computeAssetClassSegments(this.signals()));
+  /** Global overview as a contribution-per-class breakdown, not a flat blend. */
+  readonly marketComposition = computed(() =>
+    computeMarketComposition(this.assetClassSegments(), this.signals().length),
+  );
   readonly newsTimeline = computed((): NewsTimelineEntry[] => {
     // A multi-symbol article surfaces under every instrument it references,
     // so dedupe by `news.id`: each article appears once, accumulating the
