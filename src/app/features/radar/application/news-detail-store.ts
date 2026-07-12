@@ -10,8 +10,8 @@ import {
 
 /** How many hours back to look for related news on the detail page. */
 const RELATED_NEWS_WINDOW_HOURS = 168;
-/** Cap on related-news cards shown, so a busy instrument doesn't flood the page. */
-const MAX_RELATED_NEWS = 6;
+/** Related-news cards per page in the paginated list. */
+const RELATED_NEWS_PAGE_SIZE = 6;
 /** Cap on affected-instrument price lookups per article (one quant call each). */
 const MAX_AFFECTED_INSTRUMENTS = 8;
 
@@ -32,6 +32,7 @@ export class NewsDetailStore {
   private readonly linkedSignal = signal<Signal | null>(null);
   private readonly affectedInstrumentsSignal = signal<MarketStats[]>([]);
   private readonly relatedNewsSignal = signal<NewsItem[]>([]);
+  private readonly relatedNewsPageSignal = signal(1);
   private readonly loadingSignal = signal(false);
   private readonly notFoundSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
@@ -43,6 +44,17 @@ export class NewsDetailStore {
   readonly affectedInstruments = this.affectedInstrumentsSignal.asReadonly();
   /** Other recent articles touching the same primary instrument (rendered as news cards). */
   readonly relatedNews = this.relatedNewsSignal.asReadonly();
+  /** 1-based current page of the related-news list. */
+  readonly relatedNewsPage = this.relatedNewsPageSignal.asReadonly();
+  /** Total related-news pages (at least 1). */
+  readonly relatedNewsPageCount = computed(() =>
+    Math.max(1, Math.ceil(this.relatedNewsSignal().length / RELATED_NEWS_PAGE_SIZE)),
+  );
+  /** Related-news slice for the current page. */
+  readonly relatedNewsPageItems = computed(() => {
+    const start = (this.relatedNewsPageSignal() - 1) * RELATED_NEWS_PAGE_SIZE;
+    return this.relatedNewsSignal().slice(start, start + RELATED_NEWS_PAGE_SIZE);
+  });
   readonly isLoading = this.loadingSignal.asReadonly();
   readonly isNotFound = this.notFoundSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
@@ -65,6 +77,7 @@ export class NewsDetailStore {
     this.linkedSignal.set(null);
     this.affectedInstrumentsSignal.set([]);
     this.relatedNewsSignal.set([]);
+    this.relatedNewsPageSignal.set(1);
     try {
       const news = await this.newsRepository.getNewsById(id);
       if (news === null) {
@@ -115,12 +128,15 @@ export class NewsDetailStore {
         symbol,
         sinceHours: RELATED_NEWS_WINDOW_HOURS,
       });
-      this.relatedNewsSignal.set(
-        items.filter((item) => item.id !== news.id).slice(0, MAX_RELATED_NEWS),
-      );
+      this.relatedNewsSignal.set(items.filter((item) => item.id !== news.id));
     } catch {
       this.relatedNewsSignal.set([]);
     }
+  }
+
+  /** Move the related-news list to `page` (1-based), clamped to the valid range. */
+  setRelatedNewsPage(page: number): void {
+    this.relatedNewsPageSignal.set(Math.min(Math.max(1, page), this.relatedNewsPageCount()));
   }
 
   /** Runs the Analyst pipeline for the linked instrument and shows the fresh signal. */

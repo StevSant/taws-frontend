@@ -7,6 +7,7 @@ import {
   ButtonComponent,
   EmptyStateComponent,
   InstrumentTickerBadgeComponent,
+  PaginationComponent,
   SpinnerComponent,
 } from '../../../../shared';
 import { NewsDetailStore } from '../../application';
@@ -43,6 +44,7 @@ const LOCALE_TAGS: Record<string, string> = { es: 'es-ES', en: 'en-US' };
     InstrumentTickerBadgeComponent,
     SignalAnalysisComponent,
     NewsCardComponent,
+    PaginationComponent,
   ],
   templateUrl: './news-detail-page.component.html',
   styleUrl: './news-detail-page.component.scss',

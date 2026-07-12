@@ -753,6 +753,10 @@ export interface TranslationDict {
   'brandLab.agents.title': string;
   'brandLab.agents.desc': string;
   'brandLab.note': string;
+  'pagination.previous': string;
+  'pagination.next': string;
+  'pagination.page': string;
+  'pagination.of': string;
 }
 
 /** Union of every valid translation key — used for typed `t()` lookups. */

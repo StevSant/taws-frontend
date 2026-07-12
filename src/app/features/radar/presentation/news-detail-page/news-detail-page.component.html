@@ -156,12 +156,19 @@
         <section class="news-detail__section">
           <h2 class="news-detail__section-title">{{ i18n.t('radar.detail.relatedNews') }}</h2>
           <ul class="news-detail__related-news">
-            @for (item of store.relatedNews(); track item.id) {
+            @for (item of store.relatedNewsPageItems(); track item.id) {
               <li class="news-detail__related-news-item">
                 <app-news-card [news]="item" />
               </li>
             }
           </ul>
+          @if (store.relatedNewsPageCount() > 1) {
+            <app-pagination
+              [page]="store.relatedNewsPage()"
+              [totalPages]="store.relatedNewsPageCount()"
+              (pageChange)="store.setRelatedNewsPage($event)"
+            />
+          }
         </section>
       }
 

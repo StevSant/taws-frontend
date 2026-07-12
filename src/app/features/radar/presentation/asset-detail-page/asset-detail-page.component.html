@@ -151,12 +151,19 @@
       <h2 class="asset-detail__section-title">{{ i18n.t('radar.detail.relatedNews') }}</h2>
       @if (store.relatedNews().length > 0) {
         <ul class="asset-detail__news-list">
-          @for (item of store.relatedNews(); track item.id) {
+          @for (item of store.relatedNewsPageItems(); track item.id) {
             <li class="asset-detail__news-item">
               <app-news-card [news]="item" />
             </li>
           }
         </ul>
+        @if (store.relatedNewsPageCount() > 1) {
+          <app-pagination
+            [page]="store.relatedNewsPage()"
+            [totalPages]="store.relatedNewsPageCount()"
+            (pageChange)="store.setRelatedNewsPage($event)"
+          />
+        }
       } @else {
         <p class="asset-detail__no-news">{{ i18n.t('radar.detail.relatedNews.empty') }}</p>
       }

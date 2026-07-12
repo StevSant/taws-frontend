@@ -1,0 +1,44 @@
+:host {
+  display: block;
+  margin-top: var(--space-3);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-background) 70%, var(--color-surface));
+    color: var(--color-text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-gold-border);
+      color: var(--color-gold);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  &__status {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+}

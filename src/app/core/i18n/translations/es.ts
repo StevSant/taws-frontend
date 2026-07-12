@@ -827,4 +827,8 @@ export const ES_TRANSLATIONS = {
     'Cada especialista del enjambre tiene dos propuestas. Elegí una por rol para routing, avatares y trazas.',
   'brandLab.note':
     'Tip: un logo maestro (marca) + un glifo por agente mantiene coherencia sin repetir el mismo poliedro en todos lados.',
+  'pagination.previous': 'Anterior',
+  'pagination.next': 'Siguiente',
+  'pagination.page': 'Página',
+  'pagination.of': 'de',
 } satisfies TranslationDict;

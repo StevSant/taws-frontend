@@ -7,6 +7,7 @@ import {
   ButtonComponent,
   EmptyStateComponent,
   InstrumentTickerBadgeComponent,
+  PaginationComponent,
   SpinnerComponent,
 } from '../../../../shared';
 import { AssetDetailStore } from '../../application';
@@ -59,6 +60,7 @@ const PERCENT_MULTIPLIER = 100;
     AssetPriceChartComponent,
     SignalAnalysisComponent,
     NewsCardComponent,
+    PaginationComponent,
   ],
   templateUrl: './asset-detail-page.component.html',
   styleUrl: './asset-detail-page.component.scss',

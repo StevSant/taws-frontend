@@ -805,4 +805,8 @@ export const EN_TRANSLATIONS = {
     'Each swarm specialist has two proposals. Pick one per role for routing, avatars, and traces.',
   'brandLab.note':
     'Tip: one master logo (brand) + one glyph per agent keeps cohesion without repeating the same polyhedron everywhere.',
+  'pagination.previous': 'Previous',
+  'pagination.next': 'Next',
+  'pagination.page': 'Page',
+  'pagination.of': 'of',
 } satisfies TranslationDict;

@@ -50,3 +50,4 @@ export {
   formatPriceDelta,
   PriceDeltaChipComponent,
 } from './price';
+export { PaginationComponent } from './pagination/pagination.component';

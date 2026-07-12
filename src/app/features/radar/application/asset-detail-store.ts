@@ -14,6 +14,8 @@ import {
 
 /** Window (hours) of related news shown on an asset detail page — wider than the radar default. */
 const RELATED_NEWS_WINDOW_HOURS = 168;
+/** Related-news cards per page in the paginated list. */
+const RELATED_NEWS_PAGE_SIZE = 6;
 
 /**
  * Signal-based facade for the per-asset detail page (`radar/:symbol`, issue #43). Owns the
@@ -34,6 +36,7 @@ export class AssetDetailStore {
   private readonly marketStatsSignal = signal<MarketStats | null>(null);
   private readonly signalsSignal = signal<Signal[]>([]);
   private readonly relatedNewsSignal = signal<NewsItem[]>([]);
+  private readonly relatedNewsPageSignal = signal(1);
   private readonly loadingSignal = signal(false);
   private readonly notFoundSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
@@ -49,6 +52,17 @@ export class AssetDetailStore {
   readonly marketStats = this.marketStatsSignal.asReadonly();
   readonly signals = this.signalsSignal.asReadonly();
   readonly relatedNews = this.relatedNewsSignal.asReadonly();
+  /** 1-based current page of the related-news list. */
+  readonly relatedNewsPage = this.relatedNewsPageSignal.asReadonly();
+  /** Total related-news pages (at least 1). */
+  readonly relatedNewsPageCount = computed(() =>
+    Math.max(1, Math.ceil(this.relatedNewsSignal().length / RELATED_NEWS_PAGE_SIZE)),
+  );
+  /** Related-news slice for the current page. */
+  readonly relatedNewsPageItems = computed(() => {
+    const start = (this.relatedNewsPageSignal() - 1) * RELATED_NEWS_PAGE_SIZE;
+    return this.relatedNewsSignal().slice(start, start + RELATED_NEWS_PAGE_SIZE);
+  });
   readonly isLoading = this.loadingSignal.asReadonly();
   readonly isNotFound = this.notFoundSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
@@ -103,6 +117,7 @@ export class AssetDetailStore {
     this.marketStatsSignal.set(null);
     this.signalsSignal.set([]);
     this.relatedNewsSignal.set([]);
+    this.relatedNewsPageSignal.set(1);
     this.watchlistItemsSignal.set([]);
     this.watchlistIdSignal.set(null);
     this.watchlistErrorSignal.set(null);
@@ -135,6 +150,11 @@ export class AssetDetailStore {
     if (symbol) {
       await this.load(symbol);
     }
+  }
+
+  /** Move the related-news list to `page` (1-based), clamped to the valid range. */
+  setRelatedNewsPage(page: number): void {
+    this.relatedNewsPageSignal.set(Math.min(Math.max(1, page), this.relatedNewsPageCount()));
   }
 
   /** Runs the Analyst pipeline for this instrument and surfaces the fresh signal. */
