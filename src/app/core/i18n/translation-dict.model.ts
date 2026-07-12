@@ -234,12 +234,10 @@ export interface TranslationDict {
   'radar.score.bearish': string;
   'radar.score.neutral': string;
   'radar.macro.title': string;
-  'radar.macro.viewAll': string;
   'radar.macro.ratesHint': string;
   'radar.macro.cpiHint': string;
   'radar.macro.dxy': string;
   'radar.timeline.title': string;
-  'radar.timeline.viewAll': string;
   'radar.timeline.analyze': string;
   'radar.timeline.loadMore': string;
   'radar.timeline.ago': string;
