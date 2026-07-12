@@ -7,6 +7,7 @@
   [class.chat-page--hero-collapsing]="heroCollapsing()"
   [class.chat-page--sessions]="auth.isAuthenticated()"
   [class.chat-page--sessions-open]="auth.isAuthenticated() && sessionsOpen()"
+  [class.chat-page--rail-open]="auth.isAuthenticated() && railOpen()"
 >
   <div class="chat-page__stage" aria-hidden="true">
     <div class="chat-page__mesh"></div>
@@ -361,6 +362,32 @@
         </div>
       </footer>
     </div>
+
+    @if (auth.isAuthenticated()) {
+      <button
+        type="button"
+        class="chat-page__rail-toggle"
+        [class.chat-page__rail-toggle--open]="railOpen()"
+        [attr.aria-expanded]="railOpen()"
+        [attr.aria-label]="railOpen() ? i18n.t('chat.rail.hide') : i18n.t('chat.rail.toggle')"
+        [attr.title]="railOpen() ? i18n.t('chat.rail.hide') : i18n.t('chat.rail.toggle')"
+        (click)="railOpen() ? closeContextRail() : openContextRail()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          @if (railOpen()) {
+            <path d="M9 6l6 6-6 6" />
+          } @else {
+            <path d="M15 6l-6 6 6 6" />
+          }
+        </svg>
+      </button>
+    }
 
     @if (auth.isAuthenticated()) {
       <app-chat-context-rail />

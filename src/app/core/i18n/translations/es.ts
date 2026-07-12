@@ -128,6 +128,8 @@ export const ES_TRANSLATIONS = {
   'chat.message.demo': 'Probar con datos de demo',
   'chat.rail.label': 'Contexto de mercado',
   'chat.rail.viewAll': 'Ver todas',
+  'chat.rail.toggle': 'Mostrar contexto de mercado',
+  'chat.rail.hide': 'Ocultar contexto de mercado',
   'chat.rail.macro.title': 'Contexto de mercado',
   'chat.rail.news.title': 'Noticias destacadas',
   'chat.rail.watchlist.title': 'Tus instrumentos seguidos',

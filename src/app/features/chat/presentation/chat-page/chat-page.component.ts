@@ -78,6 +78,7 @@ const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
 };
 
 const SESSIONS_PANEL_STORAGE_KEY = 'taws-chat-sessions-open';
+const CONTEXT_RAIL_STORAGE_KEY = 'taws-chat-rail-open';
 
 type OracleActivity = Exclude<PolyhedronActivity, 'frozen'>;
 
@@ -186,6 +187,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   readonly collapseReady = signal(false);
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
+
+  readonly railOpen = signal(this.readContextRailOpen());
 
   readonly hasMessages = computed(() => this.store.messages().length > 0);
 
@@ -320,6 +323,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   closeSessionsPanel(): void {
     this.setSessionsPanelOpen(false);
+  }
+
+  openContextRail(): void {
+    this.setContextRailOpen(true);
+  }
+
+  closeContextRail(): void {
+    this.setContextRailOpen(false);
   }
 
   focusComposer(): void {
@@ -486,6 +497,22 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(SESSIONS_PANEL_STORAGE_KEY, String(open));
+    }
+  }
+
+  private readContextRailOpen(): boolean {
+    if (typeof localStorage === 'undefined') {
+      return true;
+    }
+
+    return localStorage.getItem(CONTEXT_RAIL_STORAGE_KEY) !== 'false';
+  }
+
+  private setContextRailOpen(open: boolean): void {
+    this.railOpen.set(open);
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(CONTEXT_RAIL_STORAGE_KEY, String(open));
     }
   }
 
