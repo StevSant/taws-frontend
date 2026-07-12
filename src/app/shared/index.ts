@@ -43,3 +43,5 @@ export type { FeatureNavItem } from './feature-nav/feature-nav.component';
 export { FearGreedArcGaugeComponent } from './fear-greed-arc-gauge/fear-greed-arc-gauge.component';
 export { downloadBlob } from './download-blob';
 export { MarkdownPipe } from './markdown/markdown.pipe';
+export type { PriceDirection } from './price';
+export { resolvePriceDirection, formatPrice, formatPriceDelta, PriceDeltaChipComponent } from './price';

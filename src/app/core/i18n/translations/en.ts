@@ -164,6 +164,8 @@ export const EN_TRANSLATIONS = {
   'chat.message.demo': 'Try with demo data',
   'chat.rail.label': 'Market context',
   'chat.rail.viewAll': 'View all',
+  'chat.rail.toggle': 'Show market context',
+  'chat.rail.hide': 'Hide market context',
   'chat.rail.macro.title': 'Market context',
   'chat.rail.news.title': 'Top news',
   'chat.rail.news.ask': 'Ask Midas',

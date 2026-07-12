@@ -2,7 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
-import { InstrumentTickerBadgeComponent } from '../../../../shared';
+import { InstrumentTickerBadgeComponent, PriceDeltaChipComponent, formatPrice } from '../../../../shared';
 import { RadarStore } from '../../../radar/application';
 import { ImpactClass } from '../../../radar/domain';
 
@@ -16,7 +16,13 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 @Component({
   selector: 'app-chat-context-rail',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink, InstrumentTickerBadgeComponent],
+  imports: [
+    DatePipe,
+    DecimalPipe,
+    RouterLink,
+    InstrumentTickerBadgeComponent,
+    PriceDeltaChipComponent,
+  ],
   templateUrl: './chat-context-rail.component.html',
   styleUrl: './chat-context-rail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,11 +59,7 @@ export class ChatContextRailComponent implements OnInit {
     this.askNews.emit(prompt);
   }
 
-  formatDelta(delta?: number): string {
-    if (delta === undefined) {
-      return '—';
-    }
-    const sign = delta > 0 ? '+' : '';
-    return `${sign}${delta.toFixed(2)}%`;
+  formatPrice(value?: number | null): string {
+    return formatPrice(value);
   }
 }

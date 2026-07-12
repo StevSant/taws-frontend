@@ -207,6 +207,8 @@ export interface TranslationDict {
   'chat.message.demo': string;
   'chat.rail.label': string;
   'chat.rail.viewAll': string;
+  'chat.rail.toggle': string;
+  'chat.rail.hide': string;
   'chat.rail.macro.title': string;
   'chat.rail.news.title': string;
   'chat.rail.news.ask': string;
