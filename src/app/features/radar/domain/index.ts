@@ -1,4 +1,5 @@
 export { NewsRepository } from './news-repository';
+export { NewsNotAnalyzableError } from './news-not-analyzable-error';
 export { InstrumentRepository } from './instrument-repository';
 export { SignalRepository } from './signal-repository';
 export { SignalReviewRepository } from './signal-review-repository';
@@ -11,6 +12,7 @@ export type { NewsPage } from './models/news-page.model';
 export type { NewsPageRequest } from './models/news-page-request.model';
 export type { NewsEntity } from './models/news-entity.model';
 export type { AnalysisStatus } from './models/analysis-status.model';
+export type { NewsSkipReason } from './models/news-skip-reason.model';
 export type { ImpactClass } from './models/impact-class.model';
 export type { RadarFilters } from './models/radar-filters.model';
 export { DEFAULT_RADAR_FILTERS, RECENCY_OPTIONS_HOURS } from './models/radar-filters.model';

@@ -137,17 +137,35 @@
         } @else {
           <div class="news-detail__no-signal">
             <p class="news-detail__no-signal-text">{{ i18n.t('radar.detail.noSignal') }}</p>
-            @if (store.primarySymbol()) {
+
+            @if (skipReasonLabel(); as reason) {
+              <p class="news-detail__skip-reason">{{ reason }}</p>
+            }
+
+            @if (store.analyzeError(); as analyzeError) {
+              <p class="news-detail__analyze-error" role="alert">
+                {{ i18n.t('radar.detail.analyzeNow.error') }} {{ analyzeError }}
+              </p>
+            }
+
+            <div class="news-detail__analyze">
               <app-button
                 [label]="
                   store.isGenerating()
-                    ? i18n.t('radar.generate.generating')
-                    : i18n.t('radar.generate.action')
+                    ? i18n.t('radar.detail.analyzeNow.running')
+                    : i18n.t('radar.detail.analyzeNow.action')
                 "
-                [disabled]="store.isGenerating()"
+                [disabled]="!store.canAnalyze()"
                 (pressed)="onAnalyze()"
               />
-            }
+              <p class="news-detail__analyze-hint">
+                {{
+                  store.hasLinkedInstrument()
+                    ? i18n.t('radar.detail.analyzeNow.hint')
+                    : i18n.t('radar.detail.analyzeNow.disabledHint')
+                }}
+              </p>
+            </div>
           </div>
         }
       </section>

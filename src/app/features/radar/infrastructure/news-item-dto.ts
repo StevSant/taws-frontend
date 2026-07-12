@@ -1,4 +1,4 @@
-import { AnalysisStatus } from '../domain';
+import { AnalysisStatus, NewsSkipReason } from '../domain';
 import { NewsEntityDto } from './news-entity-dto';
 
 /** Wire shape of `NewsItemResponse` (both the list `items` array and `GET /api/v1/news/{id}`). */
@@ -22,4 +22,6 @@ export interface NewsItemDto {
   analysis_status?: AnalysisStatus;
   signal_id?: string | null;
   image_url?: string | null;
+  /** Why no signal was produced — `null`/absent when there's nothing to explain. */
+  skip_reason?: NewsSkipReason | null;
 }

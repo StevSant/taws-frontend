@@ -5,7 +5,8 @@
       [class.news-card__badge--positive]="sentiment() === 'positive'"
       [class.news-card__badge--negative]="sentiment() === 'negative'"
       [class.news-card__badge--neutral]="sentiment() === 'neutral'"
-      [class.news-card__badge--pending]="sentiment() === null"
+      [class.news-card__badge--pending]="sentiment() === null && !hasNoInstrument()"
+      [class.news-card__badge--no-instrument]="sentiment() === null && hasNoInstrument()"
     >
       {{ sentimentLabel() }}
     </span>

@@ -2,7 +2,9 @@ import { Injectable, computed, signal } from '@angular/core';
 import {
   MarketStats,
   NewsItem,
+  NewsNotAnalyzableError,
   NewsRepository,
+  NewsSkipReason,
   QuantRepository,
   Signal,
   SignalRepository,
@@ -37,6 +39,8 @@ export class NewsDetailStore {
   private readonly notFoundSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private readonly generatingSignal = signal(false);
+  private readonly analyzeErrorSignal = signal<string | null>(null);
+  private readonly analyzeRejectionSignal = signal<NewsSkipReason | null>(null);
 
   readonly news = this.newsSignal.asReadonly();
   readonly signal = this.linkedSignal.asReadonly();
@@ -59,9 +63,36 @@ export class NewsDetailStore {
   readonly isNotFound = this.notFoundSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
   readonly isGenerating = this.generatingSignal.asReadonly();
+  /** Transport-level failure of the last "Analizar ahora" run (timeout, 5xx, offline). */
+  readonly analyzeError = this.analyzeErrorSignal.asReadonly();
+  /**
+   * Reason the last "Analizar ahora" run was rejected by the backend (a 422), when it ran
+   * but couldn't produce a signal. Distinct from `analyzeError`: this is an explainable
+   * outcome ("not enough distinct sources yet"), not a broken request.
+   */
+  readonly analyzeRejection = this.analyzeRejectionSignal.asReadonly();
 
-  /** Primary instrument the article links to — the target of the "Analizar" action. */
+  /** Primary instrument the article links to — the target of the "Analizar ahora" action. */
   readonly primarySymbol = computed(() => this.newsSignal()?.relatedSymbols[0] ?? null);
+
+  /**
+   * Why this article has no signal — the freshest reason available: a rejection from a
+   * manual run this session, else whatever the backend last persisted on the item.
+   * `null` when there's nothing to explain.
+   */
+  readonly skipReason = computed<NewsSkipReason | null>(
+    () => this.analyzeRejectionSignal() ?? this.newsSignal()?.skipReason ?? null,
+  );
+
+  /**
+   * Whether the article is linked to any instrument. Signals are generated per instrument,
+   * so an article linked to none simply cannot be classified — the "Analizar ahora" button
+   * is disabled (with an explanation) rather than offering an action that cannot succeed.
+   */
+  readonly hasLinkedInstrument = computed(() => this.primarySymbol() !== null);
+
+  /** Whether "Analizar ahora" can run right now. */
+  readonly canAnalyze = computed(() => this.hasLinkedInstrument() && !this.generatingSignal());
 
   constructor(
     private readonly newsRepository: NewsRepository,
@@ -73,6 +104,8 @@ export class NewsDetailStore {
     this.loadingSignal.set(true);
     this.notFoundSignal.set(false);
     this.errorSignal.set(null);
+    this.analyzeErrorSignal.set(null);
+    this.analyzeRejectionSignal.set(null);
     this.newsSignal.set(null);
     this.linkedSignal.set(null);
     this.affectedInstrumentsSignal.set([]);
@@ -139,19 +172,41 @@ export class NewsDetailStore {
     this.relatedNewsPageSignal.set(Math.min(Math.max(1, page), this.relatedNewsPageCount()));
   }
 
-  /** Runs the Analyst pipeline for the linked instrument and shows the fresh signal. */
-  async generate(): Promise<void> {
-    const symbol = this.primarySymbol();
-    if (!symbol || this.generatingSignal()) {
+  /**
+   * "Analizar ahora" (issue #27): force-analyzes THIS article, bypassing the backend's cost
+   * pre-filter, and renders the fresh signal in place — no page reload.
+   *
+   * Previously this called `SignalRepository.generateSignal(symbol)`, which is per-instrument:
+   * it re-classified the whole symbol and never linked the resulting signal back to the
+   * article the user was looking at, so `analysisStatus` stayed as it was and the item still
+   * read as unclassified everywhere else in the app. `NewsRepository.analyzeNewsItem` targets
+   * the item, links the signal, and returns the refreshed row — which is why we replace the
+   * whole `news` state from the response rather than just dropping a `Signal` into place.
+   *
+   * A 422 (`NewsNotAnalyzableError`) is not an error banner: it means the run happened and
+   * couldn't produce a signal for an explainable reason, which the page renders as prose.
+   */
+  async analyze(): Promise<void> {
+    const news = this.newsSignal();
+    if (!news || !this.canAnalyze()) {
       return;
     }
     this.generatingSignal.set(true);
-    this.errorSignal.set(null);
+    this.analyzeErrorSignal.set(null);
+    this.analyzeRejectionSignal.set(null);
     try {
-      const signal = await this.signalRepository.generateSignal(symbol);
-      this.linkedSignal.set(signal);
+      const analyzed = await this.newsRepository.analyzeNewsItem(news.id);
+      this.newsSignal.set(analyzed);
+      this.linkedSignal.set(null);
+      // `refresh: true` is load-bearing: the signal we're looking for was created seconds
+      // ago, so the TTL-cached signal list from page load can't contain it.
+      await this.resolveLinkedSignal(analyzed, { refresh: true });
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      if (error instanceof NewsNotAnalyzableError) {
+        this.analyzeRejectionSignal.set(error.skipReason);
+      } else {
+        this.analyzeErrorSignal.set(this.toErrorMessage(error));
+      }
     } finally {
       this.generatingSignal.set(false);
     }
@@ -163,13 +218,16 @@ export class NewsDetailStore {
    * failure per symbol — the linked signal is enrichment on top of the news
    * detail, so a lookup failing shouldn't blank out the page.
    */
-  private async resolveLinkedSignal(news: NewsItem): Promise<void> {
+  private async resolveLinkedSignal(
+    news: NewsItem,
+    options?: { refresh?: boolean },
+  ): Promise<void> {
     if (!news.signalId) {
       return;
     }
     for (const symbol of news.relatedSymbols) {
       try {
-        const signals = await this.signalRepository.fetchSignals(symbol);
+        const signals = await this.signalRepository.fetchSignals(symbol, options);
         const match = signals.find((candidate) => candidate.id === news.signalId);
         if (match) {
           this.linkedSignal.set(match);

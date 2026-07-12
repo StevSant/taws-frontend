@@ -86,6 +86,14 @@ export const environment = {
    */
   newsRequestTimeoutMs: 20_000,
   /**
+   * Per-request timeout for `POST /api/v1/news/{id}/analyze` ("Analizar ahora"). Much
+   * longer than the read timeout above: this one synchronously runs the whole Analyst
+   * pipeline — news gathering, a historical-analogs vector lookup, and an LLM
+   * classification call with its own bounded retries — so it is an LLM-latency budget,
+   * not an HTTP one.
+   */
+  analyzeNewsRequestTimeoutMs: 90_000,
+  /**
    * Initial timeframe requested when rendering an instrument's price chart via
    * `POST /api/v1/charts/render`. Must be one of the backend's
    * `chart_available_timeframes` tokens (1m/3m/6m/1y/max) — the chart's own

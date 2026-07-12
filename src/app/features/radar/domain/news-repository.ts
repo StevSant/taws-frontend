@@ -28,4 +28,19 @@ export abstract class NewsRepository {
    * so it works after a hard refresh, independent of the in-memory feed.
    */
   abstract getNewsById(id: string): Promise<NewsItem | null>;
+
+  /**
+   * Force-analyzes ONE news item, bypassing the backend's cost pre-filter — the
+   * "Analizar ahora" action (issue #27). Returns the refreshed item, so the caller can
+   * render the fresh signal in place without reloading the page.
+   *
+   * This is deliberately NOT `SignalRepository.generateSignal(symbol)`: that one is
+   * per-instrument, re-classifies the whole symbol, and never links the resulting signal
+   * back to the article the user is actually looking at.
+   *
+   * Throws `NewsNotAnalyzableError` (carrying the skip reason) when the item exists but
+   * cannot produce a signal — e.g. it has no linked instrument, there aren't enough
+   * distinct sources yet, or the output failed the compliance gate.
+   */
+  abstract analyzeNewsItem(id: string): Promise<NewsItem>;
 }
