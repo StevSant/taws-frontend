@@ -479,6 +479,16 @@ export interface TranslationDict {
   'telegram.unlink': string;
   'telegram.expires': string;
   'telegram.loginRequired': string;
+  'telegram.botRegistration.title': string;
+  'telegram.botRegistration.instructions': string;
+  'telegram.botRegistration.placeholder': string;
+  'telegram.botRegistration.register': string;
+  'telegram.botRegistration.registering': string;
+  'telegram.botRegistration.success': string;
+  'telegram.botRegistration.chatId': string;
+  'telegram.botRegistration.error.noToken': string;
+  'telegram.botRegistration.error.noMessages': string;
+  'telegram.botRegistration.error.generic': string;
   'scenarios.description': string;
   'scenarios.disclaimer.static': string;
   'scenarios.mode.preset': string;
