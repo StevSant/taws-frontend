@@ -21,6 +21,8 @@ export class AppConfigService {
    * control that only yields a 503.
    */
   readonly realtimeEnabled: boolean = environment.realtimeEnabled;
+  /** ICE servers (STUN + TURN) for the realtime voice WebRTC connection. */
+  readonly realtimeIceServers: RTCIceServer[] = environment.realtimeIceServers;
   readonly supabaseUrl: string = environment.supabaseUrl;
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */

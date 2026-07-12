@@ -16,15 +16,6 @@ import {
 const SESSION_PATH = '/api/v1/chat/realtime/session';
 const TOOL_PATH = '/api/v1/chat/realtime/tool';
 
-/**
- * Public STUN servers so ICE can discover server-reflexive candidates and keep
- * the peer connection alive through NAT. Without these the browser reports
- * "ICE failed" and the audio drops after a short while.
- */
-const ICE_SERVERS: RTCIceServer[] = [
-  { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-];
-
 interface RealtimeSessionResponse {
   client_secret: string;
   model: string;
@@ -87,7 +78,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       }
       this.tools = session.tools;
 
-      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      const pc = new RTCPeerConnection({ iceServers: this.config.realtimeIceServers });
       this.pc = pc;
       pc.onconnectionstatechange = () => this.handleConnectionStateChange(pc);
       this.attachRemoteAudio(pc);
