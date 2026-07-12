@@ -169,6 +169,106 @@ describe('RealtimeWebrtcService', () => {
     const update = sent.find((m) => m.type === 'session.update');
     expect(update).toBeDefined();
     expect(update.session.tools).toEqual([{ name: 'get_market_data' }]);
+    expect(update.session.tool_choice).toBe('required');
+  });
+
+  it('requires a real tool call when the user starts speaking', async () => {
+    primeHandshake();
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+
+    channel.emitMessage(JSON.stringify({ type: 'input_audio_buffer.speech_started' }));
+
+    const sent = channel.sent.map((message) => JSON.parse(message));
+    const update = sent.find(
+      (message) => message.type === 'session.update' && message.session.tool_choice === 'required',
+    );
+    expect(update).toBeDefined();
+  });
+
+  it('renders a chart directly from transcribed chart intent and a follow-up symbol', async () => {
+    primeHandshake();
+    const events: RealtimeEvent[] = [];
+    service.onEvent((event) => events.push(event));
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+    const chart = {
+      type: 'line',
+      series: [{ name: 'BTC', points: [{ x: '2026-01-01', y: 64_000 }], bars: [] }],
+      xAxis: { label: 'Date', type: 'time' },
+      yAxis: { label: 'Price', type: 'value', format: 'currency' },
+      meta: {
+        title: 'BTC price',
+        source: 'test',
+        timeframe: '1m',
+        timeframes: [],
+        request: { kind: 'price_line', symbols: ['BTC'], timeframe: '1m' },
+      },
+    };
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ call_id: 'ui_chart', output: { summary: 'BTC', chart } }),
+    });
+
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'conversation.item.input_audio_transcription.completed',
+        transcript: 'Quiero que me muestres un gráfico.',
+      }),
+    );
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'conversation.item.input_audio_transcription.completed',
+        transcript: 'Bitcoin.',
+      }),
+    );
+    await flush();
+
+    const chartCall = fetchMock.mock.calls.find(
+      ([url]) => url === 'http://test.local/api/v1/chat/realtime/tool',
+    );
+    expect(JSON.parse(chartCall![1].body)).toMatchObject({
+      name: 'render_price_chart',
+      arguments: { instrument_symbol: 'BTC', timeframe: '1m', chart_type: 'line' },
+    });
+    expect(events).toContainEqual({ kind: 'chart', chart });
+  });
+
+  it('renders the chart even when the assistant claims it cannot show one', async () => {
+    primeHandshake();
+    const events: RealtimeEvent[] = [];
+    service.onEvent((event) => events.push(event));
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+    const chart = {
+      type: 'line',
+      series: [{ name: 'BTC', points: [{ x: '2026-01-01', y: 64_000 }], bars: [] }],
+      xAxis: { label: 'Date', type: 'time' },
+      yAxis: { label: 'Price', type: 'value' },
+      meta: {
+        title: 'BTC price',
+        source: 'test',
+        timeframe: '1m',
+        timeframes: [],
+        request: { kind: 'price_line', symbols: ['BTC'], timeframe: '1m' },
+      },
+    };
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ call_id: 'ui_chart', output: { summary: 'BTC', chart } }),
+    });
+
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'response.output_audio_transcript.delta',
+        delta: 'No puedo mostrar un gráfico de Bitcoin en pantalla.',
+      }),
+    );
+    await flush();
+
+    expect(events).toContainEqual({ kind: 'chart', chart });
   });
 
   it('relays a function_call event to /realtime/tool and sends function_call_output + response.create', async () => {
@@ -212,6 +312,92 @@ describe('RealtimeWebrtcService', () => {
     expect(sent.some((m) => m.type === 'response.create')).toBe(true);
   });
 
+  it('emits chart output to the UI while sending only its summary back to the model', async () => {
+    primeHandshake();
+    const events: RealtimeEvent[] = [];
+    service.onEvent((event) => events.push(event));
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+    const chart = {
+      type: 'line',
+      series: [{ name: 'AAPL', points: [{ x: '2026-01-01', y: 190 }], bars: [] }],
+      xAxis: { label: 'Date', type: 'time' },
+      yAxis: { label: 'Price', type: 'value', format: 'currency' },
+      meta: {
+        title: 'AAPL price',
+        source: 'test',
+        timeframe: '1m',
+        timeframes: [],
+        request: { kind: 'price_line', symbols: ['AAPL'], timeframe: '1m' },
+      },
+    };
+
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          call_id: 'chart_1',
+          output: { summary: 'Rendered AAPL price.', chart },
+        }),
+    });
+
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'response.function_call_arguments.done',
+        call_id: 'chart_1',
+        name: 'render_price_chart',
+        arguments: JSON.stringify({ instrument_symbol: 'AAPL' }),
+      }),
+    );
+    await flush();
+
+    expect(events).toContainEqual({ kind: 'chart', chart });
+    const sent = channel.sent.map((message) => JSON.parse(message));
+    const output = sent.find((message) => message.type === 'conversation.item.create');
+    expect(JSON.parse(output.item.output)).toEqual({ summary: 'Rendered AAPL price.' });
+  });
+
+  it('continues only once after every parallel tool call has completed', async () => {
+    primeHandshake();
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+
+    fetchMock
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ call_id: 'parallel_1', output: { price: 190 } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ call_id: 'parallel_2', output: { signals: [] } }),
+      });
+
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'response.function_call_arguments.done',
+        call_id: 'parallel_1',
+        name: 'get_market_data',
+        arguments: JSON.stringify({ symbol: 'AAPL' }),
+      }),
+    );
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'response.function_call_arguments.done',
+        call_id: 'parallel_2',
+        name: 'list_signals',
+        arguments: JSON.stringify({ symbol: 'AAPL' }),
+      }),
+    );
+    await flush();
+
+    const sent = channel.sent.map((message) => JSON.parse(message));
+    expect(sent.filter((message) => message.type === 'conversation.item.create')).toHaveLength(2);
+    expect(sent.filter((message) => message.type === 'response.create')).toHaveLength(1);
+  });
+
   it('emits tool-call start/finish and transcript/speaking events to the listener', async () => {
     primeHandshake();
     const events: RealtimeEvent[] = [];
@@ -245,6 +431,41 @@ describe('RealtimeWebrtcService', () => {
     expect(events).toContainEqual({ kind: 'speaking-changed', speaking: false });
     expect(events).toContainEqual({ kind: 'tool-call-started', name: 'get_news' });
     expect(events).toContainEqual({ kind: 'tool-call-finished', name: 'get_news' });
+  });
+
+  it('emits only completed user and assistant turns for history capture', async () => {
+    primeHandshake();
+    const events: RealtimeEvent[] = [];
+    service.onEvent((event) => events.push(event));
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'conversation.item.input_audio_transcription.completed',
+        transcript: '  What is Apple trading at?  ',
+      }),
+    );
+    channel.emitMessage(
+      JSON.stringify({ type: 'response.output_audio_transcript.delta', delta: 'Apple is at ' }),
+    );
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'response.output_audio_transcript.done',
+        transcript: '  Apple is at 190 dollars.  ',
+      }),
+    );
+
+    expect(events.filter((event) => event.kind === 'turn-completed')).toEqual([
+      {
+        kind: 'turn-completed',
+        turn: { role: 'user', content: 'What is Apple trading at?' },
+      },
+      {
+        kind: 'turn-completed',
+        turn: { role: 'assistant', content: 'Apple is at 190 dollars.' },
+      },
+    ]);
   });
 
   it('emits an error event when the tool relay fails but still finishes the tool call', async () => {

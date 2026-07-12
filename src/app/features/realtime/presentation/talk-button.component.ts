@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  EventEmitter,
   OnDestroy,
+  Output,
   computed,
   inject,
   signal,
@@ -11,11 +13,12 @@ import {
 import { AppConfigService, TranslationService } from '../../../core';
 import { prefersReducedMotion } from '../../audio';
 import { RealtimeStore } from '../application';
-import { RealtimeSessionProvider } from '../domain';
+import { RealtimeSessionProvider, RealtimeTurn } from '../domain';
 import { RealtimeWebrtcService, isRealtimeSupported } from '../infrastructure';
 import { VoiceModeOverlayComponent } from './voice-mode-overlay.component';
 
 const VOICE_MODE_BODY_CLASS = 'voice-mode-open';
+const VOICE_MODE_EXIT_MS = 320;
 
 /**
  * Compact "Talk to Midas" trigger for the realtime voice agent — DISTINCT from
@@ -47,6 +50,8 @@ const VOICE_MODE_BODY_CLASS = 'voice-mode-open';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TalkButtonComponent implements OnDestroy {
+  @Output() readonly sessionClosed = new EventEmitter<readonly RealtimeTurn[]>();
+
   private readonly store = inject(RealtimeStore);
   private readonly config = inject(AppConfigService);
   readonly i18n = inject(TranslationService);
@@ -57,13 +62,16 @@ export class TalkButtonComponent implements OnDestroy {
   readonly connectionState = this.store.connectionState;
   readonly liveTranscript = this.store.liveTranscript;
   readonly activeToolCall = this.store.activeToolCall;
+  readonly activeChart = this.store.activeChart;
   readonly isModelSpeaking = this.store.isModelSpeaking;
   readonly permissionDenied = this.store.permissionDenied;
 
   /** True while the immersive voice-mode overlay is on screen. */
   readonly overlayOpen = signal(false);
+  readonly overlayClosing = signal(false);
 
   private readonly trigger = viewChild<ElementRef<HTMLButtonElement>>('trigger');
+  private closeTimer: ReturnType<typeof setTimeout> | null = null;
 
   private readonly browserSupported = isRealtimeSupported();
 
@@ -74,8 +82,11 @@ export class TalkButtonComponent implements OnDestroy {
   readonly available = computed(() => this.enabled && this.browserSupported);
 
   ngOnDestroy(): void {
+    if (this.closeTimer !== null) {
+      clearTimeout(this.closeTimer);
+    }
     this.unlockBody();
-    this.store.stop();
+    this.flushSession();
   }
 
   /** Opens the immersive overlay and starts the session (requires this user gesture). */
@@ -83,6 +94,7 @@ export class TalkButtonComponent implements OnDestroy {
     if (this.overlayOpen()) {
       return;
     }
+    this.overlayClosing.set(false);
     this.overlayOpen.set(true);
     this.lockBody();
     void this.store.start();
@@ -90,10 +102,31 @@ export class TalkButtonComponent implements OnDestroy {
 
   /** Stops the session, closes the overlay, and returns focus to the trigger. */
   close(): void {
-    this.store.stop();
-    this.overlayOpen.set(false);
-    this.unlockBody();
-    queueMicrotask(() => this.trigger()?.nativeElement.focus());
+    if (this.overlayClosing()) {
+      return;
+    }
+
+    this.flushSession();
+    this.overlayClosing.set(true);
+    const exitDelay = this.reducedMotion() ? 0 : VOICE_MODE_EXIT_MS;
+    this.closeTimer = setTimeout(() => {
+      this.overlayOpen.set(false);
+      this.overlayClosing.set(false);
+      this.unlockBody();
+      this.closeTimer = null;
+      queueMicrotask(() => this.trigger()?.nativeElement.focus());
+    }, exitDelay);
+  }
+
+  dismissChart(): void {
+    this.store.dismissChart();
+  }
+
+  private flushSession(): void {
+    const turns = this.store.stop();
+    if (turns.length > 0) {
+      this.sessionClosed.emit(turns);
+    }
   }
 
   private lockBody(): void {

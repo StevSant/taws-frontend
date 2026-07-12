@@ -1,3 +1,6 @@
+import { ChartSpec } from '../../../shared/charts';
+import { RealtimeTurn } from './realtime-turn.model';
+
 /**
  * Domain-level events the transport (RealtimeWebrtcService) emits to the store.
  *
@@ -8,8 +11,10 @@
  */
 export type RealtimeEvent =
   | { kind: 'transcript-delta'; delta: string }
+  | { kind: 'turn-completed'; turn: RealtimeTurn }
   | { kind: 'speaking-changed'; speaking: boolean }
   | { kind: 'tool-call-started'; name: string }
   | { kind: 'tool-call-finished'; name: string }
+  | { kind: 'chart'; chart: ChartSpec }
   | { kind: 'error'; message: string }
   | { kind: 'connection-lost' };

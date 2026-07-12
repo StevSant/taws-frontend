@@ -1,4 +1,5 @@
 import { ChartSpec } from '../../../../shared/charts';
+import { RoutingHop } from './routing-hop.model';
 import { ToolHopSnapshot } from './tool-call.model';
 
 export type ChatRole = 'user' | 'assistant';
@@ -16,6 +17,8 @@ export interface ChatMessage {
   charts?: ChartSpec[];
   /** Specialist that authored the reply (when known). */
   agent?: string;
+  /** Specialists that participated in the turn (for tags after streaming). */
+  routingHops?: RoutingHop[];
   /** Tool hops captured during the turn (for transparency after streaming). */
   tools?: ToolHopSnapshot[];
 }

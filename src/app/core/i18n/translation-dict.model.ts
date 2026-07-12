@@ -174,6 +174,7 @@ export interface TranslationDict {
   'chat.realtime.overlaySubtitle': string;
   'chat.realtime.transcriptLabel': string;
   'chat.realtime.transcriptEmpty': string;
+  'chat.realtime.chartKicker': string;
   'chat.oracle.status.idle': string;
   'chat.oracle.status.listening': string;
   'chat.oracle.status.composing': string;

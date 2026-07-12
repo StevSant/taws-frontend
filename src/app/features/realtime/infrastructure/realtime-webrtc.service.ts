@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AppConfigService, AuthTokenService } from '../../../core';
+import { ChartSpec } from '../../../shared/charts';
 import {
   RealtimeEvent,
   RealtimeNotAvailableError,
@@ -15,6 +16,29 @@ import {
 
 const SESSION_PATH = '/api/v1/chat/realtime/session';
 const TOOL_PATH = '/api/v1/chat/realtime/tool';
+const CHART_INTENT_PATTERN =
+  /\b(gr[aá]fic[oa]s?|chart|charts|plot|visual(?:izaci[oó]n)?|mostrar|mu[eé]strame|generar|genera|dibujar|show|create)\b/i;
+const SYMBOL_ALIASES: Readonly<Record<string, string>> = {
+  bitcoin: 'BTC',
+  btc: 'BTC',
+  ethereum: 'ETH',
+  ether: 'ETH',
+  eth: 'ETH',
+  apple: 'AAPL',
+  aapl: 'AAPL',
+  amazon: 'AMZN',
+  amzn: 'AMZN',
+  nvidia: 'NVDA',
+  nvda: 'NVDA',
+  tesla: 'TSLA',
+  tsla: 'TSLA',
+  microsoft: 'MSFT',
+  msft: 'MSFT',
+  google: 'GOOGL',
+  alphabet: 'GOOGL',
+  spy: 'SPY',
+  's&p': 'SPY',
+};
 
 interface RealtimeSessionResponse {
   client_secret: string;
@@ -55,6 +79,11 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
   private micStream: MediaStream | null = null;
   private audioElement: HTMLAudioElement | null = null;
   private tools: unknown[] = [];
+  private pendingToolCalls = 0;
+  private continuationScheduled = false;
+  private visualRequestPending = false;
+  private lastDirectChartRequest: { key: string; at: number } | null = null;
+  private assistantTranscriptBuffer = '';
 
   /**
    * Bumped by every `stop()`. `start()` captures the value it began with and,
@@ -166,6 +195,11 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
 
   /** Releases the mic, closes the data channel + peer connection, removes the audio sink. */
   private teardown(): void {
+    this.pendingToolCalls = 0;
+    this.continuationScheduled = false;
+    this.visualRequestPending = false;
+    this.lastDirectChartRequest = null;
+    this.assistantTranscriptBuffer = '';
     if (this.dataChannel) {
       this.dataChannel.onopen = null;
       this.dataChannel.onmessage = null;
@@ -244,7 +278,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
   private configureSession(): void {
     this.send({
       type: OAI_CLIENT_EVENT.sessionUpdate,
-      session: { tools: this.tools },
+      session: { tools: this.tools, tool_choice: 'required' },
     });
   }
 
@@ -255,11 +289,40 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     }
 
     switch (parsed['type']) {
+      case OAI_EVENT.error: {
+        const error = this.asRecord(parsed['error']);
+        const message =
+          typeof error?.['message'] === 'string' ? error['message'] : 'Realtime protocol error';
+        this.emit({ kind: 'error', message });
+        return;
+      }
+      case OAI_EVENT.inputSpeechStarted:
+        this.requireToolForNextTurn();
+        return;
+      case OAI_EVENT.inputTranscriptDone: {
+        const transcript = parsed['transcript'];
+        if (typeof transcript === 'string') {
+          this.emitCompletedTurn('user', transcript);
+          void this.handleInputTranscript(transcript);
+        }
+        return;
+      }
       case OAI_EVENT.transcriptDelta: {
         const delta = parsed['delta'];
         if (typeof delta === 'string') {
           this.emit({ kind: 'transcript-delta', delta });
+          this.assistantTranscriptBuffer = `${this.assistantTranscriptBuffer}${delta}`.slice(-2_000);
+          void this.handleInputTranscript(this.assistantTranscriptBuffer);
         }
+        return;
+      }
+      case OAI_EVENT.transcriptDone: {
+        const transcript =
+          typeof parsed['transcript'] === 'string'
+            ? parsed['transcript']
+            : this.assistantTranscriptBuffer;
+        this.emitCompletedTurn('assistant', transcript);
+        this.assistantTranscriptBuffer = '';
         return;
       }
       case OAI_EVENT.audioStarted:
@@ -267,6 +330,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         return;
       case OAI_EVENT.audioDone:
         this.emit({ kind: 'speaking-changed', speaking: false });
+        this.requireToolForNextTurn();
         return;
       case OAI_EVENT.functionCallDone:
         void this.relayFunctionCall(parsed);
@@ -288,6 +352,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       return;
     }
 
+    this.pendingToolCalls += 1;
     this.emit({ kind: 'tool-call-started', name });
     try {
       const response = await fetch(`${this.config.apiBaseUrl}${TOOL_PATH}`, {
@@ -301,15 +366,80 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       }
 
       const result = (await response.json()) as { call_id: string; output: unknown };
-      this.send({
-        type: OAI_CLIENT_EVENT.conversationItemCreate,
-        item: {
-          type: 'function_call_output',
-          call_id: callId,
-          output: JSON.stringify(result.output),
-        },
+      const output = this.asRecord(result.output);
+      const chart = output?.['chart'];
+      if (this.isChartSpec(chart)) {
+        this.emit({ kind: 'chart', chart });
+      }
+      const modelOutput =
+        typeof output?.['summary'] === 'string' ? { summary: output['summary'] } : result.output;
+      this.sendToolOutput(callId, modelOutput);
+    } catch (error: unknown) {
+      const message = this.toErrorMessage(error);
+      this.sendToolOutput(callId, { error: message });
+      this.emit({ kind: 'error', message });
+    } finally {
+      this.emit({ kind: 'tool-call-finished', name });
+      this.pendingToolCalls = Math.max(0, this.pendingToolCalls - 1);
+      this.scheduleContinuation();
+    }
+  }
+
+  private sendToolOutput(callId: string, output: unknown): void {
+    this.send({
+      type: OAI_CLIENT_EVENT.conversationItemCreate,
+      item: {
+        type: 'function_call_output',
+        call_id: callId,
+        output: JSON.stringify(output),
+      },
+    });
+  }
+
+  private async handleInputTranscript(transcript: string): Promise<void> {
+    if (CHART_INTENT_PATTERN.test(transcript)) {
+      this.visualRequestPending = true;
+    }
+
+    const symbols = this.extractRequestedSymbols(transcript);
+    if (!this.visualRequestPending || symbols.length === 0) {
+      return;
+    }
+    this.visualRequestPending = false;
+
+    const toolName = symbols.length > 1 ? 'render_comparison_chart' : 'render_price_chart';
+    const key = `${toolName}:${symbols.join(',')}`;
+    const now = Date.now();
+    if (
+      this.lastDirectChartRequest?.key === key &&
+      now - this.lastDirectChartRequest.at < 10_000
+    ) {
+      return;
+    }
+    this.lastDirectChartRequest = { key, at: now };
+
+    const args =
+      symbols.length > 1
+        ? { instrument_symbols: symbols, timeframe: '1m' }
+        : { instrument_symbol: symbols[0], timeframe: '1m', chart_type: 'line' };
+    const callId = `ui_chart_${now}`;
+    this.emit({ kind: 'tool-call-started', name: toolName });
+    try {
+      const response = await fetch(`${this.config.apiBaseUrl}${TOOL_PATH}`, {
+        method: 'POST',
+        headers: this.backendHeaders({ json: true }),
+        body: JSON.stringify({ call_id: callId, name: toolName, arguments: args }),
       });
-      this.send({ type: OAI_CLIENT_EVENT.responseCreate });
+      if (!response.ok) {
+        throw new Error(`Chart request failed with status ${response.status}`);
+      }
+      const result = (await response.json()) as { output: unknown };
+      const output = this.asRecord(result.output);
+      const chart = output?.['chart'];
+      if (!this.isChartSpec(chart)) {
+        throw new Error('Chart tool returned no visual specification');
+      }
+      this.emit({ kind: 'chart', chart });
     } catch (error: unknown) {
       const message = this.toErrorMessage(error);
       this.emit({ kind: 'error', message });
@@ -326,8 +456,43 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       });
       this.send({ type: OAI_CLIENT_EVENT.responseCreate });
     } finally {
-      this.emit({ kind: 'tool-call-finished', name });
+      this.emit({ kind: 'tool-call-finished', name: toolName });
     }
+  }
+
+  private extractRequestedSymbols(transcript: string): string[] {
+    const normalized = transcript.toLocaleLowerCase();
+    const symbols = new Set<string>();
+    for (const [alias, symbol] of Object.entries(SYMBOL_ALIASES)) {
+      if (normalized.includes(alias)) {
+        symbols.add(symbol);
+      }
+    }
+    return [...symbols];
+  }
+
+  private requireToolForNextTurn(): void {
+    this.send({
+      type: OAI_CLIENT_EVENT.sessionUpdate,
+      session: { tool_choice: 'required' },
+    });
+  }
+
+  private scheduleContinuation(): void {
+    if (this.pendingToolCalls > 0 || this.continuationScheduled) {
+      return;
+    }
+    this.continuationScheduled = true;
+    queueMicrotask(() => {
+      this.continuationScheduled = false;
+      if (this.pendingToolCalls === 0) {
+        this.send({
+          type: OAI_CLIENT_EVENT.sessionUpdate,
+          session: { tool_choice: 'auto' },
+        });
+        this.send({ type: OAI_CLIENT_EVENT.responseCreate });
+      }
+    });
   }
 
   /**
@@ -367,6 +532,13 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     this.listener?.(event);
   }
 
+  private emitCompletedTurn(role: 'user' | 'assistant', content: string): void {
+    const trimmed = content.trim();
+    if (trimmed) {
+      this.emit({ kind: 'turn-completed', turn: { role, content: trimmed } });
+    }
+  }
+
   private parseEvent(data: unknown): Record<string, unknown> | null {
     if (typeof data !== 'string') {
       return null;
@@ -393,6 +565,26 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     } catch {
       return {};
     }
+  }
+
+  private asRecord(value: unknown): Record<string, unknown> | null {
+    return typeof value === 'object' && value !== null
+      ? (value as Record<string, unknown>)
+      : null;
+  }
+
+  private isChartSpec(value: unknown): value is ChartSpec {
+    const chart = this.asRecord(value);
+    const meta = this.asRecord(chart?.['meta']);
+    return (
+      chart !== null &&
+      typeof chart['type'] === 'string' &&
+      Array.isArray(chart['series']) &&
+      this.asRecord(chart['xAxis']) !== null &&
+      this.asRecord(chart['yAxis']) !== null &&
+      meta !== null &&
+      typeof meta['title'] === 'string'
+    );
   }
 
   private backendHeaders(options?: { json?: boolean }): Record<string, string> {

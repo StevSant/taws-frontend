@@ -34,10 +34,12 @@ import { ShellSearchService } from '../../../../layout/shell/shell-search.servic
 import {
   ChatMessage,
   ChatRepository,
+  RoutingHop,
   ToolHopSnapshot,
   formatToolName,
   resolveAgentGlyph,
   resolveRespondingAgent,
+  specialistRoutingHops,
 } from '../../domain';
 
 import { SseChatRepository } from '../../infrastructure';
@@ -59,7 +61,7 @@ import {
   WebSpeechTtsProvider,
 } from '../../../audio/infrastructure';
 
-import { TalkButtonComponent } from '../../../realtime';
+import { RealtimeTurn, TalkButtonComponent } from '../../../realtime';
 
 import { ChartComponent } from '../../../../shared/charts';
 
@@ -339,6 +341,26 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     return message.agent ?? null;
   }
 
+  messageRoutingHops(message: ChatMessage): RoutingHop[] {
+    if (message.role !== 'assistant') {
+      return [];
+    }
+
+    if (message.pending && this.isLatestAssistant(message.id)) {
+      return specialistRoutingHops(this.store.routingHops());
+    }
+
+    if (message.routingHops?.length) {
+      return message.routingHops;
+    }
+
+    if (message.agent && message.agent !== 'supervisor') {
+      return [{ agent: message.agent, status: 'done' }];
+    }
+
+    return [];
+  }
+
   messageTools(message: ChatMessage): ToolHopSnapshot[] {
     if (message.pending && this.isLatestAssistant(message.id)) {
       return this.store.toolHops().map(({ name, status }) => ({ name, status }));
@@ -494,6 +516,16 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     await this.dictation.startDictation();
   }
 
+  saveRealtimeConversation(turns: readonly RealtimeTurn[]): void {
+    const messages: ChatMessage[] = turns.map((turn) => ({
+      id: this.nextMessageId(),
+      role: turn.role,
+      content: turn.content,
+      ...(turn.charts?.length ? { charts: [...turn.charts] } : {}),
+    }));
+    this.sessionsStore.appendActiveMessages(messages);
+  }
+
   private appendTranscript(transcript: string): void {
     const clean = transcript.trim();
     if (!clean) {
@@ -608,5 +640,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return;
     }
     viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
+  }
+
+  private nextMessageId(): string {
+    return globalThis.crypto.randomUUID();
   }
 }

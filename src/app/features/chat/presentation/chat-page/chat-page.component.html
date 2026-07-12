@@ -104,7 +104,10 @@
             </p>
 
             @if (auth.isAuthenticated()) {
-              <app-talk-button class="chat-page__talk" />
+              <app-talk-button
+                class="chat-page__talk"
+                (sessionClosed)="saveRealtimeConversation($event)"
+              />
             }
           </header>
         }
@@ -146,7 +149,6 @@
                         [class.chat-page__avatar--settling]="
                           avatarSettling() && isLatestAssistant(message.id)
                         "
-                        [class.chat-page__avatar--agent]="!!agentGlyph(messageAgent(message))"
                       >
                         @if (message.pending && isLatestAssistant(message.id)) {
                           <div class="chat-page__avatar-corona" aria-hidden="true">
@@ -154,18 +156,10 @@
                             <span class="chat-page__avatar-corona-ring"></span>
                           </div>
                         }
-                        @if (agentGlyph(messageAgent(message)); as glyph) {
-                          <app-midas-glyph
-                            [glyph]="glyph"
-                            [size]="avatarSize"
-                            [animated]="!!(message.pending && isLatestAssistant(message.id))"
-                          />
-                        } @else {
-                          <app-golden-polyhedron
-                            [size]="avatarSize"
-                            [activity]="avatarActivity(message.id, !!message.pending)"
-                          />
-                        }
+                        <app-golden-polyhedron
+                          [size]="avatarSize"
+                          [activity]="avatarActivity(message.id, !!message.pending)"
+                        />
                       </div>
 
                       <article
@@ -173,37 +167,29 @@
                         [class.chat-page__bubble--streaming]="message.pending"
                       >
                         <header class="chat-page__bubble-header">
-                          @if (messageAgent(message); as agent) {
-                            <div class="chat-page__agent-identity">
-                              @if (agentGlyph(agent); as glyph) {
-                                <app-midas-glyph
-                                  class="chat-page__agent-glyph"
-                                  [glyph]="glyph"
-                                  [size]="20"
-                                  [animated]="!!(message.pending && isLatestAssistant(message.id))"
-                                />
-                              }
-                              <span class="chat-page__agent-name">{{ agentLabel(agent) }}</span>
-                            </div>
-                          } @else {
+                          <div class="chat-page__agent-identity">
+                            <app-midas-glyph
+                              class="chat-page__agent-glyph"
+                              glyph="brand-neural-orb"
+                              [size]="20"
+                              [animated]="!!(message.pending && isLatestAssistant(message.id))"
+                            />
                             <span class="chat-page__agent-name">{{
                               i18n.t('chat.role.assistant')
                             }}</span>
-                          }
-                          @if (
-                            message.pending &&
-                            isLatestAssistant(message.id) &&
-                            store.routingHops().length > 0
-                          ) {
+                          </div>
+                          @if (messageRoutingHops(message).length > 0) {
                             <div
                               class="chat-page__route-pills"
-                              aria-label="{{ i18n.t('chat.trace.title') }}"
+                              [attr.aria-label]="i18n.t('chat.trace.title')"
                             >
-                              @for (hop of store.routingHops(); track hop.agent) {
+                              @for (hop of messageRoutingHops(message); track hop.agent) {
                                 <span
                                   class="chat-page__route-pill"
                                   [class.chat-page__route-pill--active]="hop.status === 'active'"
-                                  [class.chat-page__route-pill--done]="hop.status === 'done'"
+                                  [class.chat-page__route-pill--done]="
+                                    hop.status === 'done' || hop.status === 'routing'
+                                  "
                                   [attr.title]="hop.detail ?? null"
                                 >
                                   @if (agentGlyph(hop.agent); as glyph) {

@@ -10,6 +10,7 @@ import {
   buildRoutingHops,
   buildToolHops,
   resolveRespondingAgent,
+  snapshotRoutingHops,
   snapshotToolHops,
 } from '../domain';
 import { ChatSessionsStore } from './chat-sessions-store';
@@ -116,6 +117,7 @@ export class ChatStore {
 
   private markSettled(messageId: string): void {
     const agent = resolveRespondingAgent(this.routingHops());
+    const routingHops = snapshotRoutingHops(this.routingHops());
     const tools = snapshotToolHops(this.toolHops());
 
     this.sessionsStore.syncActiveMessages(
@@ -125,6 +127,7 @@ export class ChatStore {
               ...message,
               pending: false,
               ...(agent ? { agent } : {}),
+              ...(routingHops.length > 0 ? { routingHops } : {}),
               ...(tools.length > 0 ? { tools } : {}),
             }
           : message,

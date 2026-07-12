@@ -17,8 +17,12 @@ export const OAI_DATA_CHANNEL = 'oai-events';
 
 /** Server -> client event types the transport reacts to. */
 export const OAI_EVENT = {
+  error: 'error',
   functionCallDone: 'response.function_call_arguments.done',
   transcriptDelta: 'response.output_audio_transcript.delta',
+  transcriptDone: 'response.output_audio_transcript.done',
+  inputTranscriptDone: 'conversation.item.input_audio_transcription.completed',
+  inputSpeechStarted: 'input_audio_buffer.speech_started',
   audioStarted: 'response.output_audio.started',
   audioDone: 'response.output_audio.done',
   responseDone: 'response.done',
