@@ -513,6 +513,7 @@ export const EN_TRANSLATIONS = {
   'radar.detail.watchlist.signInHint': 'Sign in to create and manage watchlists',
   'radar.detail.watchlist.error': 'Could not update watchlist:',
   'radar.detail.watchlist.defaultName': 'My watchlist',
+  'radar.detail.viewOnSource': 'View on',
   'scenarios.title': 'Scenarios',
   'scenarios.guide.title': 'How scenarios work',
   'scenarios.guide.step1': 'Describe an event or situation (e.g. "Fed cuts rates by 50bp").',

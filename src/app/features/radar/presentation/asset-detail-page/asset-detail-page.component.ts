@@ -10,8 +10,8 @@ import {
   PaginationComponent,
   SpinnerComponent,
 } from '../../../../shared';
-import { AssetDetailStore } from '../../application';
-import { AssetClass, ImpactClass } from '../../domain';
+import { AssetDetailStore, buildAssetSource } from '../../application';
+import { AssetClass, AssetSource, ImpactClass, Instrument } from '../../domain';
 import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
 import { AssetPriceChartComponent } from '../asset-price-chart/asset-price-chart.component';
 import { NewsCardComponent } from '../news-card/news-card.component';
@@ -85,6 +85,10 @@ export class AssetDetailPageComponent {
 
   assetClassLabel(assetClass: AssetClass): string {
     return this.i18n.t(ASSET_CLASS_LABELS[assetClass]);
+  }
+
+  assetSource(instrument: Instrument): AssetSource {
+    return buildAssetSource(instrument.symbol, instrument.assetClass);
   }
 
   impactLabel(impact: ImpactClass): string {
