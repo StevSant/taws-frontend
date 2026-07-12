@@ -14,6 +14,8 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 
 const PERCENT_MULTIPLIER = 100;
 const MINUTE_MS = 60_000;
+/** Ticker chips shown before collapsing the rest into a "+N" chip. */
+const MAX_VISIBLE_SYMBOLS = 4;
 
 /**
  * Reusable rich news card: sentiment badge, confidence %, source/provider, relative time and
@@ -55,6 +57,14 @@ export class NewsCardComponent {
 
   providerLabel(): string | null {
     return providerLabel(this.news.provider);
+  }
+
+  visibleSymbols(): string[] {
+    return this.news.relatedSymbols.slice(0, MAX_VISIBLE_SYMBOLS);
+  }
+
+  extraSymbolCount(): number {
+    return Math.max(0, this.news.relatedSymbols.length - MAX_VISIBLE_SYMBOLS);
   }
 
   relativeTime(): string {

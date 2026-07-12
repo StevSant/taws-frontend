@@ -10,11 +10,11 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslationService } from '../../../core';
-import { GoldenPolyhedronComponent } from '../../../shared';
+import { GoldenPolyhedronComponent, MidasGlyphComponent } from '../../../shared';
 import { PolyhedronActivity } from '../../../shared/golden-polyhedron/polyhedron-activity.model';
 import { RealtimeConnectionState } from '../domain';
 
-const ORB_SIZE = 260;
+const ORB_SIZE = 200;
 
 /**
  * Immersive, full-screen voice-mode takeover — the ChatGPT-voice-mode UX for
@@ -35,7 +35,7 @@ const ORB_SIZE = 260;
 @Component({
   selector: 'app-voice-mode-overlay',
   standalone: true,
-  imports: [GoldenPolyhedronComponent],
+  imports: [GoldenPolyhedronComponent, MidasGlyphComponent],
   templateUrl: './voice-mode-overlay.component.html',
   styleUrl: './voice-mode-overlay.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +55,8 @@ export class VoiceModeOverlayComponent {
   readonly close = output<void>();
 
   readonly orbSize = ORB_SIZE;
+
+  readonly waveformBars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
 
   private readonly endButton = viewChild.required<ElementRef<HTMLButtonElement>>('endButton');
 

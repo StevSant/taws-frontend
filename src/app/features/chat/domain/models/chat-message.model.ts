@@ -1,4 +1,5 @@
 import { ChartSpec } from '../../../../shared/charts';
+import { ToolHopSnapshot } from './tool-call.model';
 
 export type ChatRole = 'user' | 'assistant';
 
@@ -13,4 +14,8 @@ export interface ChatMessage {
   content: string;
   pending?: boolean;
   charts?: ChartSpec[];
+  /** Specialist that authored the reply (when known). */
+  agent?: string;
+  /** Tool hops captured during the turn (for transparency after streaming). */
+  tools?: ToolHopSnapshot[];
 }

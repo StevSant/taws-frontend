@@ -36,6 +36,19 @@
         }
       </header>
 
+      @if (news.imageUrl) {
+        <figure class="news-detail__hero">
+          <img
+            class="news-detail__hero-image"
+            [src]="news.imageUrl"
+            [alt]="news.title"
+            loading="lazy"
+            decoding="async"
+            (error)="onImageError($event)"
+          />
+        </figure>
+      }
+
       @if (news.summary) {
         <section class="news-detail__section">
           <h2 class="news-detail__section-title">{{ i18n.t('radar.detail.summary') }}</h2>
@@ -104,10 +117,12 @@
             >
               {{ impactLabel(signal.impactClass) }}
             </span>
-            <span class="news-detail__confidence">
-              {{ i18n.t('radar.card.confidence.label') }}:
-              {{ confidencePercent(signal.confidence) }}%
-            </span>
+            @if (signal.analysisAvailable) {
+              <span class="news-detail__confidence">
+                {{ i18n.t('radar.card.confidence.label') }}:
+                {{ confidencePercent(signal.confidence) }}%
+              </span>
+            }
           </div>
           <app-signal-analysis
             [thesis]="signal.thesis"

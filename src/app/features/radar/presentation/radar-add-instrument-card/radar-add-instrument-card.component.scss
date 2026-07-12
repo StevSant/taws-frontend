@@ -47,17 +47,6 @@
     font-weight: 650;
   }
 
-  &__view-all {
-    font-size: 0.75rem;
-    font-weight: 650;
-    color: var(--color-gold);
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
   &__chips {
     display: flex;
     flex-wrap: wrap;

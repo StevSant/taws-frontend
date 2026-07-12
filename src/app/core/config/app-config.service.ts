@@ -33,6 +33,10 @@ export class AppConfigService {
   readonly watchlistsCacheTtlMs: number = environment.watchlistsCacheTtlMs;
   readonly scenarioPresetsCacheTtlMs: number = environment.scenarioPresetsCacheTtlMs;
   readonly radarSignalFetchBatchSize: number = environment.radarSignalFetchBatchSize;
+  /** Page size for the paginated "all news" list at /radar/news (see news-list-store.ts). */
+  readonly newsListPageSize: number = environment.newsListPageSize;
+  /** Per-request timeout for `GET /api/v1/news` (see http-news-repository.ts). */
+  readonly newsRequestTimeoutMs: number = environment.newsRequestTimeoutMs;
   /** Initial timeframe requested when rendering an instrument price chart (see asset-price-chart). */
   readonly chartDefaultTimeframe: string = environment.chartDefaultTimeframe;
   /** Dev-only demo personas for role-based one-click login. */

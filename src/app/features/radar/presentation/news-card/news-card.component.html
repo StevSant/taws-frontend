@@ -16,10 +16,27 @@
 
   <h3 class="news-card__title">{{ news.title }}</h3>
 
+  @if (news.summary) {
+    <p class="news-card__summary">{{ news.summary }}</p>
+  }
+
+  @if (news.relatedSymbols.length > 0) {
+    <ul class="news-card__symbols" aria-hidden="true">
+      @for (symbol of visibleSymbols(); track symbol) {
+        <li class="news-card__symbol">{{ symbol }}</li>
+      }
+      @if (extraSymbolCount() > 0) {
+        <li class="news-card__symbol news-card__symbol--extra">+{{ extraSymbolCount() }}</li>
+      }
+    </ul>
+  }
+
   <span class="news-card__meta">
     @if (providerLabel(); as provider) {
       <span class="news-card__provider">{{ provider }}</span> ·
     }
     {{ news.source }} · {{ relativeTime() }}
   </span>
+
+  <span class="news-card__cta" aria-hidden="true">{{ i18n.t('radar.card.openDetail') }} →</span>
 </a>

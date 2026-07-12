@@ -40,14 +40,13 @@ export const environment = {
    * `openrelay` TURN below is a FREE public demo relay (fine for hackathon /
    * testing — rate-limited and NOT for production). Swap in your own
    * (Cloudflare TURN or self-hosted coturn) for a reliable deployment.
+   *
+   * Kept to <=5 servers: browsers warn "Using five or more STUN/TURN servers
+   * slows down discovery". One STUN plus the TURN :443 (UDP) and :443?transport=tcp
+   * (TCP fallback for firewalled networks) cover the useful relay paths.
    */
   realtimeIceServers: [
-    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-    {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
-    },
+    { urls: 'stun:stun.l.google.com:19302' },
     {
       urls: 'turn:openrelay.metered.ca:443',
       username: 'openrelayproject',
@@ -78,6 +77,14 @@ export const environment = {
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   /** Max parallel `/api/v1/signals` lookups while enriching the radar feed. */
   radarSignalFetchBatchSize: 6,
+  /** Page size (`limit`) for the paginated "all news" list at /radar/news. */
+  newsListPageSize: 20,
+  /**
+   * Per-request timeout for `GET /api/v1/news`. The backend re-aggregates
+   * upstream providers on cache misses (~5-6s), and concurrent polls queue
+   * behind it — 8s produced spurious "Timeout has occurred" banners.
+   */
+  newsRequestTimeoutMs: 20_000,
   /**
    * Initial timeframe requested when rendering an instrument's price chart via
    * `POST /api/v1/charts/render`. Must be one of the backend's

@@ -17,5 +17,6 @@ export function mapNewsItemDto(dto: NewsItemDto): NewsItem {
     sentimentScore: dto.sentiment_score ?? undefined,
     analysisStatus: dto.analysis_status,
     signalId: dto.signal_id ?? undefined,
+    imageUrl: dto.image_url ?? undefined,
   };
 }

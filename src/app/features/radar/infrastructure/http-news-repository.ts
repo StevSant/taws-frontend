@@ -2,20 +2,26 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
-import { NewsItem, NewsRepository, RadarFilters } from '../domain';
+import { NewsItem, NewsPage, NewsPageRequest, NewsRepository, RadarFilters } from '../domain';
 import { mapNewsItemDto } from './map-news-item-dto';
 import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
 
 const NEWS_PATH = '/api/v1/news';
-const NEWS_REQUEST_TIMEOUT_MS = 8_000;
 const HTTP_NOT_FOUND = 404;
 
 /** Backend may return a bare array or a paginated `{ items }` envelope. */
 type NewsWireResponse = NewsListResponseDto | NewsItemDto[];
 
+/** Unwraps items + `has_more`; a bare-array legacy response has no next page. */
+function unwrapNewsPage(response: NewsWireResponse): { items: NewsItemDto[]; hasMore: boolean } {
+  return Array.isArray(response)
+    ? { items: response, hasMore: false }
+    : { items: response.items ?? [], hasMore: response.has_more ?? false };
+}
+
 function unwrapNewsItems(response: NewsWireResponse): NewsItemDto[] {
-  return Array.isArray(response) ? response : (response.items ?? []);
+  return unwrapNewsPage(response).items;
 }
 
 /**
@@ -40,21 +46,40 @@ export class HttpNewsRepository extends NewsRepository {
   async fetchNews(filters: RadarFilters): Promise<NewsItem[]> {
     const cacheKey = JSON.stringify(filters);
     return cachedFetch(this.cache, 'news', cacheKey, this.config.newsCacheTtlMs, async () => {
-      let params = new HttpParams().set('since_hours', filters.sinceHours);
-      if (filters.symbol) {
-        params = params.set('symbol', filters.symbol);
-      }
-      if (filters.assetClass) {
-        params = params.set('asset_class', filters.assetClass);
-      }
-
-      const response = await firstValueFrom(
-        this.http
-          .get<NewsWireResponse>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
-          .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
-      );
+      const response = await this.requestNews(this.buildNewsParams(filters));
       return unwrapNewsItems(response).map(mapNewsItemDto);
     });
+  }
+
+  async fetchNewsPage(filters: RadarFilters, page: NewsPageRequest): Promise<NewsPage> {
+    const cacheKey = JSON.stringify({ filters, page });
+    return cachedFetch(this.cache, 'news-page', cacheKey, this.config.newsCacheTtlMs, async () => {
+      const params = this.buildNewsParams(filters)
+        .set('limit', page.limit)
+        .set('offset', page.offset);
+      const response = await this.requestNews(params);
+      const { items, hasMore } = unwrapNewsPage(response);
+      return { items: items.map(mapNewsItemDto), hasMore };
+    });
+  }
+
+  private buildNewsParams(filters: RadarFilters): HttpParams {
+    let params = new HttpParams().set('since_hours', filters.sinceHours);
+    if (filters.symbol) {
+      params = params.set('symbol', filters.symbol);
+    }
+    if (filters.assetClass) {
+      params = params.set('asset_class', filters.assetClass);
+    }
+    return params;
+  }
+
+  private async requestNews(params: HttpParams): Promise<NewsWireResponse> {
+    return firstValueFrom(
+      this.http
+        .get<NewsWireResponse>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
+        .pipe(timeout(this.config.newsRequestTimeoutMs)),
+    );
   }
 
   async getNewsById(id: string): Promise<NewsItem | null> {
@@ -63,7 +88,7 @@ export class HttpNewsRepository extends NewsRepository {
         const dto = await firstValueFrom(
           this.http
             .get<NewsItemDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
-            .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
+            .pipe(timeout(this.config.newsRequestTimeoutMs)),
         );
         return mapNewsItemDto(dto);
       } catch (error: unknown) {

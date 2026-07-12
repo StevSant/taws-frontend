@@ -21,4 +21,5 @@ export interface NewsItemDto {
   sentiment_score?: number | null;
   analysis_status?: AnalysisStatus;
   signal_id?: string | null;
+  image_url?: string | null;
 }

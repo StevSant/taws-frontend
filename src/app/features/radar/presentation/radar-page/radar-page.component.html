@@ -90,8 +90,8 @@
             {{ i18n.t('radar.instruments.subtitle') }}
           </p>
         </div>
-        @if (store.unclassifiedCount() > 0) {
-          <div class="radar-page__instruments-action">
+        <div class="radar-page__instruments-action">
+          @if (store.unclassifiedCount() > 0) {
             <app-button
               [label]="
                 store.isGeneratingAny()
@@ -101,8 +101,11 @@
               [disabled]="store.isGeneratingAny()"
               (pressed)="onAnalyzeAll()"
             />
-          </div>
-        }
+          }
+          <a class="radar-page__view-all-btn" routerLink="/radar/explore">
+            {{ i18n.t('radar.instruments.viewAll') }}
+          </a>
+        </div>
       </header>
 
       <div class="radar-page__list-head" aria-hidden="true">

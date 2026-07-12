@@ -1,41 +1,66 @@
-<svg
-  class="return-sparkline"
-  [class.return-sparkline--up]="trendUp()"
-  [class.return-sparkline--down]="!trendUp()"
-  [attr.width]="width()"
-  [attr.height]="height()"
-  viewBox="0 0 220 56"
-  preserveAspectRatio="none"
-  role="img"
-  aria-label="Price trend"
->
-  @if (variant() === 'line') {
-    @if (lineGeometry(); as geo) {
-      <path class="return-sparkline__area" [attr.d]="geo.area" />
-      <path class="return-sparkline__line" [attr.d]="geo.line" />
-      <circle class="return-sparkline__dot" [attr.cx]="geo.end.x" [attr.cy]="geo.end.y" r="2.8" />
+<div class="return-sparkline__host">
+  <svg
+    class="return-sparkline"
+    [class.return-sparkline--up]="trendUp()"
+    [class.return-sparkline--down]="!trendUp()"
+    [attr.width]="width()"
+    [attr.height]="height()"
+    viewBox="0 0 220 56"
+    preserveAspectRatio="none"
+    role="img"
+    aria-label="Price trend"
+    (pointermove)="onPointerMove($event)"
+    (pointerleave)="onPointerLeave()"
+  >
+    @if (variant() === 'line') {
+      @if (lineGeometry(); as geo) {
+        <path class="return-sparkline__area" [attr.d]="geo.area" />
+        <path class="return-sparkline__line" [attr.d]="geo.line" />
+        <circle class="return-sparkline__dot" [attr.cx]="geo.end.x" [attr.cy]="geo.end.y" r="2.8" />
+        @if (hoverPoint(); as pt) {
+          <line
+            class="return-sparkline__hover-guide"
+            [attr.x1]="pt.x"
+            [attr.x2]="pt.x"
+            y1="4"
+            y2="52"
+          />
+          <circle class="return-sparkline__hover-dot" [attr.cx]="pt.x" [attr.cy]="pt.y" r="3.2" />
+        }
+      } @else {
+        <text x="110" y="32" class="return-sparkline__empty" text-anchor="middle">—</text>
+      }
     } @else {
-      <text x="110" y="32" class="return-sparkline__empty" text-anchor="middle">—</text>
-    }
-  } @else {
-    <line x1="10" y1="28" x2="210" y2="28" class="return-sparkline__baseline" />
-    @if (bars().length === 0) {
-      <text x="110" y="32" class="return-sparkline__empty" text-anchor="middle">—</text>
-    } @else {
-      @for (bar of bars(); track bar.index) {
-        <rect
-          class="return-sparkline__bar"
-          [class.return-sparkline__bar--positive]="bar.positive"
-          [class.return-sparkline__bar--negative]="!bar.positive"
-          [attr.x]="bar.x"
-          [attr.y]="bar.positive ? 28 - bar.barHeight : 28"
-          [attr.width]="bar.barWidth"
-          [attr.height]="bar.barHeight"
-          rx="2"
-        >
-          <title>{{ formatTooltip(bar.move) }}</title>
-        </rect>
+      <line x1="10" y1="28" x2="210" y2="28" class="return-sparkline__baseline" />
+      @if (bars().length === 0) {
+        <text x="110" y="32" class="return-sparkline__empty" text-anchor="middle">—</text>
+      } @else {
+        @for (bar of bars(); track bar.index) {
+          <rect
+            class="return-sparkline__bar"
+            [class.return-sparkline__bar--positive]="bar.positive"
+            [class.return-sparkline__bar--negative]="!bar.positive"
+            [attr.x]="bar.x"
+            [attr.y]="bar.positive ? 28 - bar.barHeight : 28"
+            [attr.width]="bar.barWidth"
+            [attr.height]="bar.barHeight"
+            rx="2"
+          >
+            <title>{{ formatTooltip(bar.move) }}</title>
+          </rect>
+        }
       }
     }
+  </svg>
+
+  @if (hoverPoint(); as pt) {
+    <div
+      class="return-sparkline__tooltip"
+      role="tooltip"
+      [style.left.%]="(pt.x / viewWidth) * 100"
+      [style.top.%]="(pt.y / viewHeight) * 100"
+    >
+      {{ hoverLabel(pt) }}
+    </div>
   }
-</svg>
+</div>

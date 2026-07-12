@@ -35,14 +35,13 @@ export const environment = {
    * restrictive NAT blocks a direct path (browser: "ICE failed, add a TURN
    * server"). The `openrelay` TURN is a free public demo relay — replace with
    * your own (Cloudflare TURN / self-hosted coturn) for production reliability.
+   *
+   * Kept to <=5 servers: browsers warn "Using five or more STUN/TURN servers
+   * slows down discovery". One STUN plus the TURN :443 (UDP) and :443?transport=tcp
+   * (TCP fallback for firewalled networks) cover the useful relay paths.
    */
   realtimeIceServers: [
-    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-    {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
-    },
+    { urls: 'stun:stun.l.google.com:19302' },
     {
       urls: 'turn:openrelay.metered.ca:443',
       username: 'openrelayproject',
@@ -66,6 +65,10 @@ export const environment = {
   watchlistsCacheTtlMs: 60_000,
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   radarSignalFetchBatchSize: 6,
+  /** Page size (`limit`) for the paginated "all news" list at /radar/news. */
+  newsListPageSize: 20,
+  /** Per-request timeout for `GET /api/v1/news` (backend re-aggregates on cache misses). */
+  newsRequestTimeoutMs: 20_000,
   /**
    * Initial timeframe requested when rendering an instrument's price chart via
    * `POST /api/v1/charts/render` — one of the backend's timeframe tokens

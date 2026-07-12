@@ -20,7 +20,7 @@ export class ScenarioLabStore {
   private readonly isLoadingPresetsSignal = signal(false);
   private readonly presetsErrorSignal = signal<string | null>(null);
 
-  private readonly modeSignal = signal<ScenarioIntakeMode>('preset');
+  private readonly modeSignal = signal<ScenarioIntakeMode>('freeform');
   private readonly selectedPresetIdSignal = signal<string | null>(null);
   private readonly freeTextSignal = signal('');
 

@@ -131,4 +131,11 @@ export class NewsDetailPageComponent {
       void this.store.load(this.currentId);
     }
   }
+
+  onImageError(event: Event): void {
+    const img = event.target;
+    if (img instanceof HTMLImageElement) {
+      img.closest('.news-detail__hero')?.remove();
+    }
+  }
 }

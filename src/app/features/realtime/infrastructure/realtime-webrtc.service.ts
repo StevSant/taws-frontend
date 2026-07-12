@@ -311,7 +311,20 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       });
       this.send({ type: OAI_CLIENT_EVENT.responseCreate });
     } catch (error: unknown) {
-      this.emit({ kind: 'error', message: this.toErrorMessage(error) });
+      const message = this.toErrorMessage(error);
+      this.emit({ kind: 'error', message });
+      // Never leave the model hanging on an unanswered function call: return a
+      // function_call_output carrying the error for this call_id, then ask the
+      // model to continue so it can recover (retry, ask the user, or move on).
+      this.send({
+        type: OAI_CLIENT_EVENT.conversationItemCreate,
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify({ error: message }),
+        },
+      });
+      this.send({ type: OAI_CLIENT_EVENT.responseCreate });
     } finally {
       this.emit({ kind: 'tool-call-finished', name });
     }

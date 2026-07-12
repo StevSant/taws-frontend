@@ -211,6 +211,16 @@
     color: var(--color-gold);
   }
 
+  &__agent-identity {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__agent-glyph {
+    flex-shrink: 0;
+  }
+
   &__route-pills {
     display: flex;
     flex-wrap: wrap;
@@ -220,6 +230,7 @@
   &__route-pill {
     display: inline-flex;
     align-items: center;
+    gap: 0.25rem;
     padding: 0.15rem 0.5rem;
     border-radius: var(--radius-full);
     border: 1px solid var(--color-border);
@@ -245,6 +256,59 @@
       color: var(--color-gain);
       opacity: 0.85;
     }
+  }
+
+  &__route-pill-glyph {
+    flex-shrink: 0;
+    opacity: 0.95;
+  }
+
+  &__tool-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  &__tool-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.12rem 0.45rem;
+    border-radius: var(--radius-full);
+    border: 1px solid color-mix(in srgb, #38bdf8 28%, var(--color-border));
+    background: color-mix(in srgb, var(--color-surface) 88%, #0ea5e9 12%);
+    font-family: var(--font-family-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, #7dd3fc 70%, var(--color-text-secondary));
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease,
+      background 0.2s ease;
+
+    &--active {
+      border-color: color-mix(in srgb, #38bdf8 55%, transparent);
+      background: color-mix(in srgb, #0ea5e9 16%, var(--color-surface));
+      color: #7dd3fc;
+      animation: toolPulse 1.2s ease-in-out infinite;
+    }
+
+    &--done {
+      border-color: color-mix(in srgb, var(--color-gain) 35%, transparent);
+      color: color-mix(in srgb, var(--color-gain) 80%, var(--color-text-muted));
+      opacity: 0.88;
+    }
+  }
+
+  &__tool-pill-icon {
+    font-size: 0.62rem;
+    line-height: 1;
+    opacity: 0.85;
+  }
+
+  &__avatar--agent {
+    background: color-mix(in srgb, var(--color-surface) 72%, var(--color-gold) 28%);
   }
 
   &__welcome {

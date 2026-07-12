@@ -7,7 +7,7 @@ export type { EvidenceType } from './models/evidence-type.model';
 export type { ScenarioMagnitude } from './models/scenario-magnitude.model';
 export type { ScenarioHorizon } from './models/scenario-horizon.model';
 export type { ScenarioPreset } from './models/scenario-preset.model';
-export type { ScenarioSpec } from './models/scenario-spec.model';
+export type { ScenarioDirection, ScenarioSpec } from './models/scenario-spec.model';
 export type { ScenarioEvidence } from './models/scenario-evidence.model';
 export type { ScenarioAssetClassImpact } from './models/scenario-asset-class-impact.model';
 export type { ConsequenceNode } from './models/consequence-node.model';

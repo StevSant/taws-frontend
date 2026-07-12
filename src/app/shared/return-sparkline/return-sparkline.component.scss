@@ -1,8 +1,29 @@
+.return-sparkline__host {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
 .return-sparkline {
   display: block;
   width: 100%;
   max-width: 100%;
   height: auto;
+  touch-action: none;
+
+  &__hover-guide {
+    stroke: var(--color-border);
+    stroke-width: 1;
+    stroke-dasharray: 2 2;
+    pointer-events: none;
+  }
+
+  &__hover-dot {
+    stroke: var(--color-surface);
+    stroke-width: 1.25;
+    pointer-events: none;
+  }
 
   &__baseline {
     stroke: var(--color-border);
@@ -50,7 +71,8 @@
     .return-sparkline__area {
       fill: var(--color-gain);
     }
-    .return-sparkline__dot {
+    .return-sparkline__dot,
+    .return-sparkline__hover-dot {
       fill: var(--color-gain);
     }
   }
@@ -62,8 +84,25 @@
     .return-sparkline__area {
       fill: var(--color-loss);
     }
-    .return-sparkline__dot {
+    .return-sparkline__dot,
+    .return-sparkline__hover-dot {
       fill: var(--color-loss);
     }
   }
+}
+
+.return-sparkline__tooltip {
+  position: absolute;
+  transform: translate(-50%, -130%);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-mono);
+  font-size: 0.62rem;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
 }

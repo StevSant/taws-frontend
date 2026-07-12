@@ -150,22 +150,25 @@
       padding: var(--space-2);
     }
 
-    &__voice-btn {
+    &__voice-btn,
+    &__send-btn {
       width: 2.25rem;
       height: 2.25rem;
     }
 
-    &__send ::ng-deep .app-button {
-      min-width: auto;
-      padding-inline: 0.85rem;
-      font-size: 0.82rem;
+    &__sessions-toggle,
+    &__rail-toggle {
+      top: var(--space-1);
+      width: 1.85rem;
+      height: 1.85rem;
     }
 
     &__sessions-toggle {
-      top: var(--space-1);
       left: var(--space-2);
-      width: 1.85rem;
-      height: 1.85rem;
+    }
+
+    &__rail-toggle {
+      right: var(--space-2);
     }
 
     &__welcome-title {

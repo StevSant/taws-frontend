@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
@@ -31,6 +31,7 @@ import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/ra
     ButtonComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
+    RouterLink,
   ],
   templateUrl: './radar-page.component.html',
   styleUrl: './radar-page.component.scss',
