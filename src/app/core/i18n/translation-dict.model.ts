@@ -471,6 +471,9 @@ export interface TranslationDict {
   'watchlist.manager.emptyItems': string;
   'watchlist.manager.symbolUnknown': string;
   'watchlist.manager.symbolDuplicate': string;
+  'watchlist.manager.reorderTitle': string;
+  'watchlist.manager.moveUp': string;
+  'watchlist.manager.moveDown': string;
   'briefings.prep.progress': string;
   'telegram.title': string;
   'telegram.linked': string;

@@ -83,6 +83,10 @@
                   <span class="watchlist-manager__name">{{ item.name }}</span>
                 }
               </span>
+              <span class="watchlist-manager__quote">
+                <span class="watchlist-manager__price">{{ formatPrice(item.lastPrice) }}</span>
+                <app-price-delta-chip [value]="item.priceDeltaPct" />
+              </span>
               <button
                 type="button"
                 class="watchlist-manager__remove"
@@ -95,6 +99,50 @@
           }
         </ul>
       }
+    </div>
+  }
+
+  @if (store.watchlists().length > 1) {
+    <div class="watchlist-manager__reorder">
+      <h3 class="watchlist-manager__reorder-title">
+        {{ i18n.t('watchlist.manager.reorderTitle') }}
+      </h3>
+      <ul class="watchlist-manager__order">
+        @for (
+          watchlist of store.watchlists();
+          track watchlist.id;
+          let index = $index, isFirst = $first, isLast = $last
+        ) {
+          <li
+            class="watchlist-manager__order-item"
+            [class.watchlist-manager__order-item--active]="
+              watchlist.id === store.selectedWatchlistId()
+            "
+          >
+            <span class="watchlist-manager__order-name">{{ watchlist.name }}</span>
+            <span class="watchlist-manager__order-controls">
+              <button
+                type="button"
+                class="watchlist-manager__move"
+                [attr.aria-label]="i18n.t('watchlist.manager.moveUp')"
+                [disabled]="isFirst || store.isManagingWatchlist()"
+                (click)="onMoveWatchlist(index, -1)"
+              >
+                ↑
+              </button>
+              <button
+                type="button"
+                class="watchlist-manager__move"
+                [attr.aria-label]="i18n.t('watchlist.manager.moveDown')"
+                [disabled]="isLast || store.isManagingWatchlist()"
+                (click)="onMoveWatchlist(index, 1)"
+              >
+                ↓
+              </button>
+            </span>
+          </li>
+        }
+      </ul>
     </div>
   }
 </section>
