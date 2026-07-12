@@ -31,9 +31,13 @@
     <section class="scenario-result__section">
       <header class="scenario-result__section-header">
         <span class="scenario-result__section-num">·</span>
-        <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.charts.market.title') }}</h3>
+        <h3 class="scenario-result__section-title">
+          {{ i18n.t('scenarios.result.charts.market.title') }}
+        </h3>
       </header>
-      <p class="scenario-result__charts-hint">{{ i18n.t('scenarios.result.charts.market.hint') }}</p>
+      <p class="scenario-result__charts-hint">
+        {{ i18n.t('scenarios.result.charts.market.hint') }}
+      </p>
       <div class="scenario-result__market-charts">
         @for (symbol of marketSymbols; track symbol) {
           <app-scenario-symbol-chart [symbol]="symbol" />

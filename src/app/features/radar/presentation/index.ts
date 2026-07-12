@@ -7,3 +7,4 @@ export { NewsDetailPageComponent } from './news-detail-page/news-detail-page.com
 export { AssetDetailPageComponent } from './asset-detail-page/asset-detail-page.component';
 export { MarketsExplorerPageComponent } from './markets-explorer-page/markets-explorer-page.component';
 export { NewsCardComponent } from './news-card/news-card.component';
+export { MacroDetailPageComponent } from './macro-detail-page/macro-detail-page.component';

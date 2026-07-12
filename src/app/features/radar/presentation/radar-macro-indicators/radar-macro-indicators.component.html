@@ -1,0 +1,79 @@
+<div class="macro-indicators">
+  <header class="macro-indicators__head">
+    <span class="macro-indicators__kicker">{{ i18n.t('radar.macro.indicators.title') }}</span>
+    <div
+      class="macro-indicators__ranges"
+      role="group"
+      [attr.aria-label]="i18n.t('radar.macro.range.label')"
+    >
+      @for (option of rangeOptions; track option) {
+        <button
+          type="button"
+          class="macro-indicators__range"
+          [class.macro-indicators__range--active]="store.range() === option"
+          [attr.aria-pressed]="store.range() === option"
+          (click)="onSelectRange(option)"
+        >
+          {{ option }}d
+        </button>
+      }
+    </div>
+  </header>
+
+  <ul class="macro-indicators__grid" role="list">
+    @if (macro) {
+      <li
+        class="macro-indicators__card macro-indicators__card--vix"
+        [attr.title]="i18n.t('radar.macro.indicator.vix.explanation')"
+      >
+        <div class="macro-indicators__card-top">
+          <span class="macro-indicators__icon" aria-hidden="true">🌡️</span>
+          <span class="macro-indicators__label">{{
+            i18n.t('radar.macro.indicator.vix.label')
+          }}</span>
+        </div>
+        <span class="macro-indicators__value">{{ macro.volatility.vixLevel.toFixed(1) }}</span>
+        <span class="macro-indicators__regime">{{ regimeLabel(macro.volatility.regime) }}</span>
+        <p class="macro-indicators__explanation">
+          {{ i18n.t('radar.macro.indicator.vix.explanation') }}
+        </p>
+      </li>
+    }
+
+    @for (card of cards(); track card.indicator) {
+      <li class="macro-indicators__cell">
+        <button
+          type="button"
+          class="macro-indicators__card macro-indicators__card--interactive"
+          [attr.title]="i18n.t('radar.macro.openDetail')"
+          (click)="openDetail(card.indicator)"
+        >
+          <div class="macro-indicators__card-top">
+            <span class="macro-indicators__icon" aria-hidden="true">{{ card.icon }}</span>
+            <span class="macro-indicators__label">{{ card.label }}</span>
+          </div>
+
+          <div class="macro-indicators__metrics">
+            <span class="macro-indicators__value">{{ card.valueLabel }}</span>
+            @if (card.changePct !== null) {
+              <app-price-delta-chip [value]="card.changePct" />
+            }
+          </div>
+
+          @if (card.hasData) {
+            <app-macro-sparkline [points]="card.points" [positive]="card.positive" />
+          } @else if (card.loading) {
+            <span class="macro-indicators__spark-empty">{{ i18n.t('radar.macro.loading') }}</span>
+          } @else {
+            <span class="macro-indicators__spark-empty">{{ i18n.t('radar.macro.noData') }}</span>
+          }
+
+          <p class="macro-indicators__explanation">{{ card.explanation }}</p>
+          <span class="macro-indicators__cta" aria-hidden="true">{{
+            i18n.t('radar.macro.openDetail')
+          }}</span>
+        </button>
+      </li>
+    }
+  </ul>
+</div>

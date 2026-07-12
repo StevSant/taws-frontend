@@ -3,11 +3,7 @@ import { Router } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../core';
 import { RadarStore } from '../../features/radar/application';
 import { AssetClass, Instrument, InstrumentRepository } from '../../features/radar/domain';
-import {
-  ShellSearchResult,
-  filterShellSearch,
-  shellSearchResultKey,
-} from './filter-shell-search';
+import { ShellSearchResult, filterShellSearch, shellSearchResultKey } from './filter-shell-search';
 
 const ASSET_CLASS_LABEL_KEYS: Record<AssetClass, TranslationKey> = {
   stock: 'radar.assetClass.stock',

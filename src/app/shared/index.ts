@@ -44,4 +44,9 @@ export { FearGreedArcGaugeComponent } from './fear-greed-arc-gauge/fear-greed-ar
 export { downloadBlob } from './download-blob';
 export { MarkdownPipe } from './markdown/markdown.pipe';
 export type { PriceDirection } from './price';
-export { resolvePriceDirection, formatPrice, formatPriceDelta, PriceDeltaChipComponent } from './price';
+export {
+  resolvePriceDirection,
+  formatPrice,
+  formatPriceDelta,
+  PriceDeltaChipComponent,
+} from './price';

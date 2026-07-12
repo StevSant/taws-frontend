@@ -38,30 +38,30 @@
     gap: var(--space-2);
   }
 
+  &__item {
+    display: flex;
+    flex-direction: column;
+  }
+
   &__lane {
     --lane-share: 20;
     --lane-color: var(--color-text-muted);
 
     position: relative;
-    display: block;
+    display: flex;
+    align-items: stretch;
     width: 100%;
     overflow: hidden;
-    padding: 0;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-    color: inherit;
-    text-align: left;
-    cursor: pointer;
     transition:
       border-color 0.15s ease,
-      transform 0.15s ease,
       box-shadow 0.15s ease;
 
     &:hover {
       border-color: var(--color-gold-border);
       box-shadow: 0 6px 18px rgba(212, 160, 23, 0.08);
-      transform: translateY(-1px);
     }
   }
 
@@ -73,17 +73,23 @@
     background: color-mix(in srgb, var(--lane-color) 18%, transparent);
     border-right: 2px solid color-mix(in srgb, var(--lane-color) 55%, transparent);
     pointer-events: none;
-    transition: width 0.4s ease;
   }
 
-  &__lane-body {
+  &__lane-toggle {
     position: relative;
     z-index: 1;
+    flex: 1 1 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
+    min-width: 0;
     padding: 0.75rem 0.9rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
   }
 
   &__lane-lead {
@@ -92,6 +98,16 @@
     gap: 0.5rem;
     min-width: 0;
     flex-wrap: wrap;
+  }
+
+  &__chevron {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease;
+
+    &--open {
+      transform: rotate(90deg);
+    }
   }
 
   &__dot {
@@ -113,11 +129,15 @@
   }
 
   &__lane-metrics {
-    display: grid;
-    grid-template-columns: 3.25rem 2.5rem auto;
-    align-items: baseline;
+    display: flex;
+    align-items: center;
     gap: var(--space-2);
     flex-shrink: 0;
+  }
+
+  &__lane-trend {
+    width: 3.5rem;
+    height: 1.4rem;
   }
 
   &__lane-share {
@@ -126,6 +146,7 @@
     font-weight: 750;
     text-align: right;
     color: var(--color-text-primary);
+    min-width: 2.6rem;
   }
 
   &__lane-score {
@@ -134,6 +155,7 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     text-align: right;
+    min-width: 2rem;
   }
 
   &__lane-sentiment {
@@ -145,6 +167,85 @@
     min-width: 4.5rem;
   }
 
+  &__open {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    width: 2.4rem;
+    border: 0;
+    border-left: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+
+    &:hover {
+      color: var(--color-gold);
+      background: color-mix(in srgb, var(--color-gold) 8%, transparent);
+    }
+  }
+
+  &__instruments {
+    padding: 0.5rem 0.9rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-top: 0;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  }
+
+  &__instruments-note {
+    margin: 0;
+    padding: 0.35rem 0;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  &__instrument-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__instrument {
+    display: grid;
+    grid-template-columns: 4.5rem 1fr auto auto;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.3rem 0;
+    font-size: 0.74rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 45%, transparent);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  &__instrument-symbol {
+    font-family: var(--font-family-mono);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__instrument-name {
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  &__instrument-price {
+    font-family: var(--font-family-mono);
+    color: var(--color-text-secondary);
+    text-align: right;
+  }
+
   &__residual,
   &__empty {
     margin: 0;
@@ -154,19 +255,21 @@
 }
 
 @media (max-width: 640px) {
-  .composition__lane-body {
+  .composition__lane-toggle {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-2);
   }
 
   .composition__lane-metrics {
-    grid-template-columns: auto auto 1fr;
-    justify-content: start;
+    justify-content: flex-start;
   }
 
-  .composition__lane-share,
-  .composition__lane-score {
-    text-align: left;
+  .composition__instrument {
+    grid-template-columns: 3.5rem 1fr auto;
+  }
+
+  .composition__instrument-name {
+    display: none;
   }
 }

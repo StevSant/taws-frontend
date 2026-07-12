@@ -122,7 +122,10 @@ export class AuthStore {
       this.applySession(session);
       return session !== null;
     } catch (error: unknown) {
-      console.error('[auth] Session refresh failed:', error instanceof Error ? error.message : error);
+      console.error(
+        '[auth] Session refresh failed:',
+        error instanceof Error ? error.message : error,
+      );
       this.applySession(null);
       return false;
     }

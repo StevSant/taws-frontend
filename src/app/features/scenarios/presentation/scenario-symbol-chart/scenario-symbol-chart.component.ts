@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { QuantRepository } from '../../../radar/domain';
 import { AssetPriceChartComponent } from '../../../radar/presentation/asset-price-chart/asset-price-chart.component';
 import { OhlcBar } from '../../../../shared/charts';

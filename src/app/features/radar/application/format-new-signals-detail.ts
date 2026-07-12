@@ -47,9 +47,7 @@ export function formatNewNewsNotificationDetail(items: NewsItem[]): string | und
   const symbols = Array.from(new Set(items.flatMap((item) => item.relatedSymbols ?? [])));
   const symbolDetail = formatNewSignalsDetail(symbols);
 
-  const titles = items
-    .map((item) => truncateTitle(item.title))
-    .filter((title) => title.length > 0);
+  const titles = items.map((item) => truncateTitle(item.title)).filter((title) => title.length > 0);
 
   const titleDetail = (() => {
     if (titles.length === 0) {

@@ -52,9 +52,7 @@ export class RadarNewsNotificationPoller {
         'notifications.radar.newSignals',
         newItems.length,
         formatNewNewsNotificationDetail(newItems),
-        latestNewsId
-          ? { commands: ['/radar/news', latestNewsId] }
-          : { commands: ['/radar'] },
+        latestNewsId ? { commands: ['/radar/news', latestNewsId] } : { commands: ['/radar'] },
       );
     } catch {
       // Background poll — never surface errors in the shell.

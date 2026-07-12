@@ -1,6 +1,8 @@
 <div class="bot-registration-panel">
   <header class="bot-registration-panel__header">
-    <span class="bot-registration-panel__title">{{ i18n.t('telegram.botRegistration.title') }}</span>
+    <span class="bot-registration-panel__title">{{
+      i18n.t('telegram.botRegistration.title')
+    }}</span>
   </header>
 
   <p class="bot-registration-panel__hint">
@@ -17,7 +19,11 @@
   ></textarea>
 
   <app-button
-    [label]="store.isPending() ? i18n.t('telegram.botRegistration.registering') : i18n.t('telegram.botRegistration.register')"
+    [label]="
+      store.isPending()
+        ? i18n.t('telegram.botRegistration.registering')
+        : i18n.t('telegram.botRegistration.register')
+    "
     [disabled]="!botfatherText().trim() || store.isPending()"
     (pressed)="onRegister()"
   />

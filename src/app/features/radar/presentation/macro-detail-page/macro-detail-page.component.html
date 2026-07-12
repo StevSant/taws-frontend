@@ -1,0 +1,76 @@
+<div class="feature-page macro-detail">
+  <a class="macro-detail__back" routerLink="/radar">← {{ i18n.t('radar.macro.detail.back') }}</a>
+
+  @if (descriptor(); as descriptor) {
+    <header class="macro-detail__hero">
+      <div class="macro-detail__hero-copy">
+        <span class="macro-detail__icon" aria-hidden="true">{{ descriptor.icon }}</span>
+        <h1 class="macro-detail__title">{{ title() }}</h1>
+      </div>
+      <div
+        class="macro-detail__ranges"
+        role="group"
+        [attr.aria-label]="i18n.t('radar.macro.range.label')"
+      >
+        @for (option of rangeOptions; track option) {
+          <button
+            type="button"
+            class="macro-detail__range"
+            [class.macro-detail__range--active]="store.range() === option"
+            [attr.aria-pressed]="store.range() === option"
+            (click)="onSelectRange(option)"
+          >
+            {{ option }}d
+          </button>
+        }
+      </div>
+    </header>
+
+    <section class="macro-detail__stats feature-panel">
+      <div class="macro-detail__stat">
+        <span class="macro-detail__stat-label">{{ i18n.t('radar.macro.detail.latest') }}</span>
+        <span class="macro-detail__stat-value">{{ latestLabel() }}</span>
+      </div>
+      <div class="macro-detail__stat">
+        <span class="macro-detail__stat-label">{{ i18n.t('radar.macro.detail.change') }}</span>
+        @if (changePct() !== null) {
+          <app-price-delta-chip [value]="changePct()" />
+        } @else {
+          <span class="macro-detail__stat-value">—</span>
+        }
+      </div>
+      <div class="macro-detail__stat">
+        <span class="macro-detail__stat-label">{{ i18n.t('radar.macro.detail.high') }}</span>
+        <span class="macro-detail__stat-value">{{ highLabel() }}</span>
+      </div>
+      <div class="macro-detail__stat">
+        <span class="macro-detail__stat-label">{{ i18n.t('radar.macro.detail.low') }}</span>
+        <span class="macro-detail__stat-value">{{ lowLabel() }}</span>
+      </div>
+    </section>
+
+    <section class="macro-detail__chart feature-panel">
+      @if (store.isLoading()) {
+        <div class="macro-detail__chart-loading"><app-spinner /></div>
+      } @else if (spec(); as chartSpec) {
+        <taws-chart [spec]="chartSpec" />
+      } @else {
+        <app-empty-state
+          [title]="i18n.t('radar.macro.detail.unavailable.title')"
+          [description]="i18n.t('radar.macro.detail.unavailable.description')"
+        />
+      }
+    </section>
+
+    <section class="macro-detail__explainer feature-panel">
+      <h2 class="macro-detail__explainer-title">{{ i18n.t('radar.macro.detail.about') }}</h2>
+      <p class="macro-detail__explainer-body">{{ explanation() }}</p>
+      <p class="macro-detail__note">{{ i18n.t('radar.macro.detail.aiDeferred') }}</p>
+    </section>
+  } @else {
+    <app-empty-state
+      [title]="i18n.t('radar.macro.detail.notFound.title')"
+      [description]="i18n.t('radar.macro.detail.notFound.description')"
+    />
+  }
+</div>

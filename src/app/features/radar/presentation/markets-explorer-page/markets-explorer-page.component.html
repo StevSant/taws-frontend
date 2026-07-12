@@ -32,16 +32,37 @@
   <!-- Highlight leaderboards -->
   @if (!store.error()) {
     <div class="markets-explorer__highlights">
-      @for (group of [
-        { key: 'gainers', title: i18n.t('markets.highlights.gainers'), rows: store.highlights().topGainers },
-        { key: 'losers', title: i18n.t('markets.highlights.losers'), rows: store.highlights().topLosers },
-        { key: 'volatile', title: i18n.t('markets.highlights.volatile'), rows: store.highlights().mostVolatile },
-        { key: 'trending', title: i18n.t('markets.highlights.trending'), rows: store.highlights().trending }
-      ]; track group.key) {
+      @for (
+        group of [
+          {
+            key: 'gainers',
+            title: i18n.t('markets.highlights.gainers'),
+            rows: store.highlights().topGainers,
+          },
+          {
+            key: 'losers',
+            title: i18n.t('markets.highlights.losers'),
+            rows: store.highlights().topLosers,
+          },
+          {
+            key: 'volatile',
+            title: i18n.t('markets.highlights.volatile'),
+            rows: store.highlights().mostVolatile,
+          },
+          {
+            key: 'trending',
+            title: i18n.t('markets.highlights.trending'),
+            rows: store.highlights().trending,
+          },
+        ];
+        track group.key
+      ) {
         <section class="markets-explorer__highlight feature-panel">
           <h2 class="markets-explorer__highlight-title">{{ group.title }}</h2>
           @if (group.rows.length === 0) {
-            <p class="markets-explorer__highlight-empty">{{ i18n.t('markets.highlights.empty') }}</p>
+            <p class="markets-explorer__highlight-empty">
+              {{ i18n.t('markets.highlights.empty') }}
+            </p>
           } @else {
             <ul class="markets-explorer__highlight-list">
               @for (row of group.rows; track row.symbol) {
@@ -120,7 +141,9 @@
               </div>
             </div>
 
-            <span class="markets-explorer__price">{{ formatPrice(row.lastPrice, row.currency) }}</span>
+            <span class="markets-explorer__price">{{
+              formatPrice(row.lastPrice, row.currency)
+            }}</span>
 
             <span
               class="markets-explorer__delta"
@@ -140,8 +163,12 @@
 
             <span
               class="markets-explorer__signal"
-              [class.markets-explorer__signal--positive]="row.latestSignal?.impactClass === 'positive'"
-              [class.markets-explorer__signal--negative]="row.latestSignal?.impactClass === 'negative'"
+              [class.markets-explorer__signal--positive]="
+                row.latestSignal?.impactClass === 'positive'
+              "
+              [class.markets-explorer__signal--negative]="
+                row.latestSignal?.impactClass === 'negative'
+              "
             >
               {{ signalLabel(row) }}
             </span>
@@ -153,7 +180,9 @@
               [disabled]="!store.watchlistAvailable() || store.followBusySymbol() === row.symbol"
               [title]="
                 store.watchlistAvailable()
-                  ? (store.isFollowed(row.symbol) ? i18n.t('markets.following') : i18n.t('markets.follow'))
+                  ? store.isFollowed(row.symbol)
+                    ? i18n.t('markets.following')
+                    : i18n.t('markets.follow')
                   : i18n.t('markets.follow.auth')
               "
               (click)="onFollow(row, $event)"

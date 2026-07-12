@@ -1,5 +1,12 @@
 /** Tab order for main shell navigation — used for directional route transitions. */
-const SHELL_TAB_PREFIXES = ['/radar', '/chat', '/agents', '/scenarios', '/briefings', '/brand-lab'] as const;
+const SHELL_TAB_PREFIXES = [
+  '/radar',
+  '/chat',
+  '/agents',
+  '/scenarios',
+  '/briefings',
+  '/brand-lab',
+] as const;
 
 export type ShellRouteTransition = 'forward' | 'back' | 'neutral';
 

@@ -30,7 +30,9 @@
           <h1 class="asset-detail__symbol">{{ instrument.symbol }}</h1>
           <p class="asset-detail__name">
             {{ instrument.name }} ·
-            <span class="asset-detail__asset-class">{{ assetClassLabel(instrument.assetClass) }}</span>
+            <span class="asset-detail__asset-class">{{
+              assetClassLabel(instrument.assetClass)
+            }}</span>
           </p>
         </div>
       </div>
@@ -73,13 +75,17 @@
           </span>
         </div>
         <div class="asset-detail__stat">
-          <span class="asset-detail__stat-label">{{ i18n.t('radar.detail.stats.priceDelta') }}</span>
+          <span class="asset-detail__stat-label">{{
+            i18n.t('radar.detail.stats.priceDelta')
+          }}</span>
           <span class="asset-detail__stat-value" [class]="deltaClass(stats.priceDeltaPct)">{{
             formatDelta(stats.priceDeltaPct)
           }}</span>
         </div>
         <div class="asset-detail__stat">
-          <span class="asset-detail__stat-label">{{ i18n.t('radar.detail.stats.volatility') }}</span>
+          <span class="asset-detail__stat-label">{{
+            i18n.t('radar.detail.stats.volatility')
+          }}</span>
           <span class="asset-detail__stat-value">
             @if (stats.volatilityPct !== null) {
               {{ stats.volatilityPct | number: '1.1-1' }}%

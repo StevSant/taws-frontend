@@ -56,11 +56,15 @@
                   <span class="news-detail__chip-ticker">{{ symbol }}</span>
                   @if (statFor(symbol); as stat) {
                     @if (stat.lastPrice !== null) {
-                      <span class="news-detail__chip-price">{{ stat.lastPrice | number: '1.2-2' }}</span>
+                      <span class="news-detail__chip-price">{{
+                        stat.lastPrice | number: '1.2-2'
+                      }}</span>
                     }
-                    <span class="news-detail__chip-delta" [class]="deltaClass(stat.priceDeltaPct)">{{
-                      formatDelta(stat.priceDeltaPct)
-                    }}</span>
+                    <span
+                      class="news-detail__chip-delta"
+                      [class]="deltaClass(stat.priceDeltaPct)"
+                      >{{ formatDelta(stat.priceDeltaPct) }}</span
+                    >
                   }
                 </a>
               </li>

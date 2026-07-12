@@ -59,7 +59,9 @@ export class NotificationBellComponent {
   }
 
   linkFor(notification: Notification): NotificationLink | undefined {
-    return notification.link ?? resolveNotificationLink(notification.messageKey, notification.detail);
+    return (
+      notification.link ?? resolveNotificationLink(notification.messageKey, notification.detail)
+    );
   }
 
   onClearAll(): void {

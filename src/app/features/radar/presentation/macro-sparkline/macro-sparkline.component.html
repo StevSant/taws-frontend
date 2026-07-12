@@ -1,0 +1,31 @@
+@if (path(); as d) {
+  <div
+    class="macro-sparkline macro-sparkline--{{ tone() }}"
+    #host
+    (pointermove)="onMove($event, host)"
+    (pointerleave)="clearHover()"
+  >
+    <svg [attr.viewBox]="viewBox" preserveAspectRatio="none" aria-hidden="true">
+      <path class="macro-sparkline__line" [attr.d]="d" fill="none" stroke-width="1.5" />
+      @if (active(); as marker) {
+        <line
+          class="macro-sparkline__guide"
+          [attr.x1]="marker.x"
+          [attr.x2]="marker.x"
+          y1="0"
+          y2="40"
+        />
+        <circle class="macro-sparkline__dot" [attr.cx]="marker.x" [attr.cy]="marker.y" r="2.5" />
+      }
+    </svg>
+
+    @if (active(); as marker) {
+      <span class="macro-sparkline__tooltip" role="status">
+        <span class="macro-sparkline__tooltip-value">{{ marker.point.valueLabel }}</span>
+        <span class="macro-sparkline__tooltip-date">{{ marker.point.dateLabel }}</span>
+      </span>
+    }
+  </div>
+} @else {
+  <span class="macro-sparkline macro-sparkline--empty" aria-hidden="true">—</span>
+}

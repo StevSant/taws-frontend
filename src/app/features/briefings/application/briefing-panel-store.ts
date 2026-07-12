@@ -81,7 +81,10 @@ export class BriefingPanelStore {
   /** Watchlist items enriched with their instrument display name for the preview. */
   readonly watchlistItemViews = computed<WatchlistItemView[]>(() => {
     const nameBySymbol = new Map(
-      this.instrumentsSignal().map((instrument) => [instrument.symbol.toUpperCase(), instrument.name]),
+      this.instrumentsSignal().map((instrument) => [
+        instrument.symbol.toUpperCase(),
+        instrument.name,
+      ]),
     );
     return this.watchlistItemsSignal().map((item) => ({
       id: item.id,

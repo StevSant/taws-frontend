@@ -8,26 +8,46 @@
   @if (rows.length > 0) {
     <ul class="composition__ladder" role="list">
       @for (row of rows; track row.assetClass) {
-        <li>
-          <button
-            type="button"
+        <li class="composition__item">
+          <div
             class="composition__lane"
             [style.--lane-share]="row.sharePct"
             [style.--lane-color]="row.scoreColor"
-            [attr.title]="i18n.t('radar.composition.openHint')"
-            (click)="select(row.assetClass)"
           >
             <span class="composition__lane-fill" aria-hidden="true"></span>
-            <span class="composition__lane-body">
+
+            <button
+              type="button"
+              class="composition__lane-toggle"
+              [attr.aria-expanded]="isExpanded(row.assetClass)"
+              [attr.title]="i18n.t('radar.composition.expandHint')"
+              (click)="toggleExpand(row.assetClass)"
+            >
               <span class="composition__lane-lead">
+                <span
+                  class="composition__chevron"
+                  [class.composition__chevron--open]="isExpanded(row.assetClass)"
+                  aria-hidden="true"
+                  >▸</span
+                >
                 <span class="composition__dot" [style.background]="row.scoreColor"></span>
                 <span class="composition__lane-label">{{ i18n.t(row.labelKey) }}</span>
-                <span class="composition__lane-count">
+                <span
+                  class="composition__lane-count"
+                  [attr.title]="i18n.t('radar.composition.countTooltip')"
+                >
                   {{ row.instrumentCount }} {{ i18n.t('radar.landscape.instruments') }}
                 </span>
               </span>
 
               <span class="composition__lane-metrics">
+                @if (row.trend.length > 1) {
+                  <app-markets-sparkline
+                    class="composition__lane-trend"
+                    [points]="row.trend"
+                    [positive]="row.trendPositive"
+                  />
+                }
                 <span
                   class="composition__lane-share"
                   [attr.title]="i18n.t('radar.composition.shareTooltip')"
@@ -42,8 +62,43 @@
                 </span>
                 <span class="composition__lane-sentiment">{{ i18n.t(row.scoreLabelKey) }}</span>
               </span>
-            </span>
-          </button>
+            </button>
+
+            <button
+              type="button"
+              class="composition__open"
+              [attr.title]="i18n.t('radar.composition.openHint')"
+              [attr.aria-label]="i18n.t('radar.composition.openHint')"
+              (click)="openExplorer(row.assetClass, $event)"
+            >
+              ↗
+            </button>
+          </div>
+
+          @if (isExpanded(row.assetClass)) {
+            <div class="composition__instruments">
+              @if (instruments.isLoading() && row.instruments.length === 0) {
+                <p class="composition__instruments-note">
+                  {{ i18n.t('radar.composition.instrumentsLoading') }}
+                </p>
+              } @else if (row.instruments.length === 0) {
+                <p class="composition__instruments-note">
+                  {{ i18n.t('radar.composition.instrumentsEmpty') }}
+                </p>
+              } @else {
+                <ul class="composition__instrument-list" role="list">
+                  @for (instrument of row.instruments; track instrument.symbol) {
+                    <li class="composition__instrument">
+                      <span class="composition__instrument-symbol">{{ instrument.symbol }}</span>
+                      <span class="composition__instrument-name">{{ instrument.name }}</span>
+                      <span class="composition__instrument-price">{{ price(instrument) }}</span>
+                      <app-price-delta-chip [value]="instrument.priceDeltaPct" />
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
         </li>
       }
     </ul>
