@@ -41,6 +41,8 @@ import {
   HttpSignalRepository,
   HttpSignalReviewRepository,
 } from './features/radar/infrastructure';
+import { NoteRepository } from './features/notes/domain';
+import { HttpNoteRepository } from './features/notes/infrastructure';
 import { ScenarioRepository } from './features/scenarios/domain';
 import { HttpScenarioRepository } from './features/scenarios/infrastructure';
 import { ChartRepository, HttpChartRepository } from './shared/charts';
@@ -65,6 +67,7 @@ export const appConfig: ApplicationConfig = {
     { provide: BriefingRepository, useClass: HttpBriefingRepository },
     { provide: ReviewRepository, useClass: HttpReviewRepository },
     { provide: ScenarioRepository, useClass: HttpScenarioRepository },
+    { provide: NoteRepository, useClass: HttpNoteRepository },
     { provide: ChartRepository, useClass: HttpChartRepository },
     // Restores Supabase session in the background so the shell + Radar can
     // paint immediately. `authGuard` waits for `AuthStore.ready` on guarded
