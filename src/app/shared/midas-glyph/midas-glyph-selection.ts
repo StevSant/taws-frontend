@@ -10,6 +10,9 @@ export const MIDAS_AGENT_GLYPHS: Readonly<Record<MidasAgentId, MidasGlyphId>> = 
   quant: 'quant-tetrahedron',
   advisor: 'advisor-scales',
   consequence: 'consequence-chain',
+  // Reuse closest existing marks until dedicated glyphs land in Brand Lab.
+  macro: 'advisor-compass',
+  sentiment: 'analyst-lens',
 };
 
 export const MIDAS_GLYPH_SELECTION = {

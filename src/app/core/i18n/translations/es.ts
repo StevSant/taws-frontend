@@ -10,6 +10,8 @@ export const ES_TRANSLATIONS = {
   'shell.nav.radar.hint': 'Radar de mercado, noticias y señales',
   'shell.nav.chat': 'Chat',
   'shell.nav.chat.hint': 'Preguntas en lenguaje natural a la IA',
+  'shell.nav.agents': 'Agentes',
+  'shell.nav.agents.hint': 'Equipo de IA: roles y ejemplos',
   'shell.nav.scenarios': 'Escenarios',
   'shell.nav.scenarios.hint': 'Simular qué pasa si ocurre un evento',
   'shell.nav.briefings': 'Informes',
@@ -63,6 +65,13 @@ export const ES_TRANSLATIONS = {
   'auth.login.welcome': 'Bienvenido de vuelta',
   'auth.login.subtitle': 'Entrá con tu correo o elegí una perspectiva demo para explorar Midas.',
   'auth.signup.title': 'Crear una cuenta',
+  'auth.landing.kicker': 'Panel multiagente',
+  'auth.landing.title': 'Un supervisor, seis especialistas',
+  'auth.landing.body':
+    'Midas enruta cada pregunta al agente correcto: noticias, quant, macro, sentimiento, consecuencias y asesoría — con vos en el loop.',
+  'auth.landing.pill.swarm': 'Enjambre IA',
+  'auth.landing.pill.human': 'Decisión humana',
+  'auth.sources.label': 'Fuentes de datos',
   'auth.back': 'Volver',
   'auth.email.label': 'Correo electrónico',
   'auth.password.label': 'Contraseña',
@@ -102,6 +111,34 @@ export const ES_TRANSLATIONS = {
   'chat.agent.quant': 'Quant',
   'chat.agent.advisor': 'Asesor',
   'chat.agent.consequence': 'Consecuencias',
+  'chat.agent.macro': 'Macro',
+  'chat.agent.sentiment': 'Sentimiento',
+  'chat.citations.title': 'Fuentes',
+  'agents.title': 'Equipo de agentes',
+  'agents.subtitle':
+    'El supervisor enruta cada pregunta al especialista correcto. Elige uno y prueba un ejemplo en el Chat.',
+  'agents.ask': 'Preguntar en Chat',
+  'agents.exampleLabel': 'Ejemplo',
+  'agents.kind.router': 'Enrutador',
+  'agents.kind.specialist': 'Especialista',
+  'agents.role.supervisor':
+    'Lee tu pregunta y elige exactamente un especialista del enjambre para responder.',
+  'agents.role.analyst':
+    'Clasifica noticias y filings: impacto positivo, negativo o neutral con evidencia.',
+  'agents.role.quant':
+    'Precios, volatilidad, deltas y estadísticas de mercado con datos cuantitativos.',
+  'agents.role.macro': 'Tasas, inflación, Fed y cómo un evento macro afecta clases de activo.',
+  'agents.role.sentiment':
+    'Tono del mercado y Fear & Greed: miedo, codicia y lectura de titulares.',
+  'agents.role.consequence': 'Cadenas causa → efecto: qué pasa después si ocurre un evento.',
+  'agents.role.advisor': 'Recomendaciones, briefings y narrativa clara sin ejecutar operaciones.',
+  'agents.example.supervisor': '¿Quién debería responder una pregunta sobre NVDA y la Fed?',
+  'agents.example.analyst': '¿Qué impacto tienen las últimas noticias de META?',
+  'agents.example.quant': 'Muéstrame la volatilidad y el delta de precio de BTC en 30 días.',
+  'agents.example.macro': 'Si la Fed sube tasas 25 pb, ¿qué clases de activo se ven más afectadas?',
+  'agents.example.sentiment': '¿Cómo está el Fear & Greed de acciones ahora y qué implica?',
+  'agents.example.consequence': '¿Qué pasa si NVIDIA reporta earnings por debajo de lo esperado?',
+  'agents.example.advisor': 'Resume en lenguaje simple los riesgos de mi watchlist esta semana.',
   'chat.error.banner': 'Ocurrió un error: ',
   'chat.welcome.title': 'Preguntale a Midas',
   'chat.welcome.subtitle':
@@ -130,6 +167,9 @@ export const ES_TRANSLATIONS = {
   'chat.rail.viewAll': 'Ver todas',
   'chat.rail.macro.title': 'Contexto de mercado',
   'chat.rail.news.title': 'Noticias destacadas',
+  'chat.rail.news.ask': 'Preguntar a Midas',
+  'chat.rail.news.askPrompt':
+    'Analiza esta noticia sobre {symbol}: "{title}". Indica la fecha, la fuente, el impacto, los activos afectados y la confianza usando evidencia actual.',
   'chat.rail.watchlist.title': 'Tus instrumentos seguidos',
   'chat.rail.watchlist.add': '+ Añadir instrumento',
   'chat.suggestion.quant': '¿Cuál es la volatilidad reciente de NVDA?',
@@ -350,7 +390,8 @@ export const ES_TRANSLATIONS = {
   'radar.timeline.ago': 'Hace',
   'radar.timeline.confidence': 'Confianza',
   'radar.instruments.title': 'Instrumentos en seguimiento',
-  'radar.instruments.subtitle': 'Lista rápida: precio, movimiento y señal IA. Abre un activo para el detalle.',
+  'radar.instruments.subtitle':
+    'Lista rápida: precio, movimiento y señal IA. Abre un activo para el detalle.',
   'radar.instruments.explainer':
     'Las etiquetas son clasificaciones de señal generadas por IA (positiva / negativa / neutral) inferidas de las noticias recientes de cada activo, con un nivel de confianza. Los activos sin clasificar aún no tienen señal — "Analizar" ejecuta la IA sobre sus noticias para generarla. Toca cualquier tarjeta para ver el detalle completo.',
   'radar.instruments.add': 'Agregar instrumento',

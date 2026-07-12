@@ -58,6 +58,13 @@
               <span class="chat-context-rail__news-meta"
                 >{{ entry.news.source }} · {{ entry.news.publishedAt | date: 'shortTime' }}</span
               >
+              <button
+                class="chat-context-rail__news-ask"
+                type="button"
+                (click)="askAboutNews(entry.news.title, primary.symbol)"
+              >
+                {{ i18n.t('chat.rail.news.ask') }}
+              </button>
             </div>
             <span
               class="chat-context-rail__badge"

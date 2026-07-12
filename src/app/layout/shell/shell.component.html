@@ -23,6 +23,13 @@
         >
         <a
           class="app-shell__tab"
+          routerLink="/agents"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.agents.hint')"
+          >{{ i18n.t('shell.nav.agents') }}</a
+        >
+        <a
+          class="app-shell__tab"
           routerLink="/scenarios"
           routerLinkActive="app-shell__tab--active"
           [attr.title]="i18n.t('shell.nav.scenarios.hint')"

@@ -158,6 +158,12 @@
   .feature-grid {
     grid-template-columns: 1fr;
   }
+
+  .feature-input,
+  .feature-select,
+  .feature-textarea {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {

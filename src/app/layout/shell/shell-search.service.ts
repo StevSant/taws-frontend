@@ -145,6 +145,11 @@ export class ShellSearchService {
     return draft;
   }
 
+  /** Prefill the chat composer and navigate to `/chat` (used by Agents catalog). */
+  async openChatWithDraft(query: string): Promise<void> {
+    await this.goToChatWithQuery(query.trim());
+  }
+
   resultKey(result: ShellSearchResult): string {
     return shellSearchResultKey(result);
   }

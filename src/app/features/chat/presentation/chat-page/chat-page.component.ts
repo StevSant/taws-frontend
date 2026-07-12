@@ -67,17 +67,16 @@ const AVATAR_SETTLE_MS = 380;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
-
   analyst: 'chat.agent.analyst',
-
   quant: 'chat.agent.quant',
-
   advisor: 'chat.agent.advisor',
-
   consequence: 'chat.agent.consequence',
+  macro: 'chat.agent.macro',
+  sentiment: 'chat.agent.sentiment',
 };
 
 const SESSIONS_PANEL_STORAGE_KEY = 'taws-chat-sessions-open';
+const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
 
 type OracleActivity = Exclude<PolyhedronActivity, 'frozen'>;
 
@@ -187,6 +186,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
 
+  private sessionsMobileMq =
+    typeof window !== 'undefined' ? window.matchMedia(SESSIONS_MOBILE_BREAKPOINT) : null;
+  private readonly onSessionsMobileChange = (event: MediaQueryListEvent): void => {
+    if (event.matches) {
+      this.closeSessionsPanel();
+    }
+  };
+
   readonly hasMessages = computed(() => this.store.messages().length > 0);
 
   readonly heroSize = computed(() => HERO_SIZE_IDLE);
@@ -237,7 +244,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
 
     const hops = this.store.routingHops();
-    const activeHop = [...hops].reverse().find((hop) => hop.status === 'active' || hop.status === 'routing');
+    const activeHop = [...hops]
+      .reverse()
+      .find((hop) => hop.status === 'active' || hop.status === 'routing');
 
     if (activeHop?.status === 'routing') {
       return this.i18n.t('chat.thinking.routing');
@@ -335,6 +344,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     document.body.classList.add('route-chat');
 
+    this.sessionsMobileMq?.addEventListener('change', this.onSessionsMobileChange);
+    if (this.sessionsMobileMq?.matches) {
+      this.closeSessionsPanel();
+    }
+
     const pendingQuery = this.shellSearch.consumeChatDraftIntent();
     if (pendingQuery) {
       this.draft.set(pendingQuery);
@@ -342,6 +356,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.sessionsMobileMq?.removeEventListener('change', this.onSessionsMobileChange);
+
     document.documentElement.classList.remove('route-chat');
 
     document.body.classList.remove('route-chat');
@@ -388,6 +404,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   onQuickAction(suggestionKey: string): void {
     this.useSuggestion(suggestionKey as TranslationKey);
+  }
+
+  onNewsQuestion(prompt: string): void {
+    if (!this.auth.isAuthenticated() || this.store.isStreaming()) {
+      return;
+    }
+    this.draft.set(prompt);
+    this.focusComposer();
   }
 
   /**
@@ -474,6 +498,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   private readSessionsPanelOpen(): boolean {
+    if (typeof window !== 'undefined' && window.matchMedia(SESSIONS_MOBILE_BREAKPOINT).matches) {
+      return false;
+    }
+
     if (typeof localStorage === 'undefined') {
       return true;
     }

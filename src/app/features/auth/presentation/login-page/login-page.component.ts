@@ -6,10 +6,13 @@ import { AppConfigService, TranslationKey, TranslationService } from '../../../.
 import {
   ButtonComponent,
   LanguageToggleComponent,
+  MidasGlyphComponent,
   MidasLogoComponent,
   SpinnerComponent,
   ThemeToggleComponent,
+  midasAgentGlyph,
 } from '../../../../shared';
+import { AGENT_CATALOG, AgentProfile } from '../../../agents/domain/agent-catalog';
 import { AuthErrorCode, AuthStore } from '../../application';
 import { DemoAuthPerspective } from '../../domain/models/demo-auth-perspective.model';
 
@@ -38,6 +41,18 @@ const ERROR_LABELS: Record<AuthErrorCode, TranslationKey> = {
 
 const DEFAULT_REDIRECT_PATH = '/radar';
 
+/** Data providers shown in the login “Fuentes” strip (honest labels, not partner claims). */
+const DATA_SOURCES: readonly { id: string; label: string }[] = [
+  { id: 'openai', label: 'OpenAI' },
+  { id: 'cnn', label: 'CNN Fear & Greed' },
+  { id: 'yfinance', label: 'Yahoo Finance' },
+  { id: 'fred', label: 'FRED' },
+  { id: 'marketaux', label: 'Marketaux' },
+  { id: 'newsapi', label: 'NewsAPI' },
+  { id: 'finnhub', label: 'Finnhub' },
+  { id: 'supabase', label: 'Supabase' },
+];
+
 @Component({
   selector: 'app-login-page',
   standalone: true,
@@ -45,6 +60,7 @@ const DEFAULT_REDIRECT_PATH = '/radar';
     FormsModule,
     ButtonComponent,
     LanguageToggleComponent,
+    MidasGlyphComponent,
     MidasLogoComponent,
     SpinnerComponent,
     ThemeToggleComponent,
@@ -76,6 +92,10 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     () => !this.isSubmitting() && this.email().trim().length > 0 && this.password().length > 0,
   );
 
+  readonly supervisor = AGENT_CATALOG.find((agent) => agent.id === 'supervisor')!;
+  readonly specialists = AGENT_CATALOG.filter((agent) => agent.kind === 'specialist');
+  readonly dataSources = DATA_SOURCES;
+
   constructor() {
     effect(() => {
       if (this.store.isAuthenticated()) {
@@ -90,6 +110,10 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     document.body.classList.remove('route-login');
+  }
+
+  glyphFor(agent: AgentProfile) {
+    return midasAgentGlyph(agent.id);
   }
 
   titleLabel(): string {
@@ -121,8 +145,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   goBack(): void {
     const returnUrl = this.safeInternalPath(this.route.snapshot.queryParamMap.get('returnUrl'));
 
-    // returnUrl is for post-login redirect only — navigating there while
-    // unauthenticated bounces straight back to login (auth guard loop).
     if (returnUrl) {
       void this.router.navigateByUrl(DEFAULT_REDIRECT_PATH);
       return;
