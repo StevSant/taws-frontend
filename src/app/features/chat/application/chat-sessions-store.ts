@@ -2,7 +2,6 @@ import { Injectable, computed, signal } from '@angular/core';
 import { ChatMessage } from '../domain';
 import { ChatSession } from '../domain/models/chat-session.model';
 import { loadChatSessions, saveChatSessions } from '../infrastructure/persist-chat-sessions';
-import { truncateSessionTitle } from './truncate-session-title';
 
 const DEFAULT_TITLE_KEY = '__new__';
 
@@ -34,7 +33,6 @@ export class ChatSessionsStore {
     this.userId = userId;
     const loaded = loadChatSessions(userId).map((session) => ({
       ...session,
-      title: truncateSessionTitle(session.title),
       messages: session.messages.map((message) => ({ ...message, pending: false })),
     }));
     this.sessionsSignal.set(loaded);
@@ -163,14 +161,14 @@ export class ChatSessionsStore {
 
   private deriveTitle(currentTitle: string, messages: ChatMessage[]): string {
     if (currentTitle !== DEFAULT_TITLE_KEY) {
-      return truncateSessionTitle(currentTitle);
+      return currentTitle;
     }
     const firstUser = messages.find((message) => message.role === 'user');
     if (!firstUser?.content.trim()) {
       return DEFAULT_TITLE_KEY;
     }
-    const trimmed = firstUser.content.trim().replace(/\s+/g, ' ');
-    return truncateSessionTitle(trimmed === '' ? DEFAULT_TITLE_KEY : trimmed);
+    const normalized = firstUser.content.trim().replace(/\s+/g, ' ');
+    return normalized === '' ? DEFAULT_TITLE_KEY : normalized;
   }
 
   private persist(): void {

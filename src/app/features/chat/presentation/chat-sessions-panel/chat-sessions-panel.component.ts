@@ -9,14 +9,14 @@ import {
 import { Router } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import { ChatSessionsStore } from '../../application/chat-sessions-store';
-import { truncateSessionTitle } from '../../application/truncate-session-title';
+import { MarqueeOnHoverDirective } from './marquee-on-hover.directive';
 
 const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
 
 @Component({
   selector: 'app-chat-sessions-panel',
   standalone: true,
-  imports: [],
+  imports: [MarqueeOnHoverDirective],
   templateUrl: './chat-sessions-panel.component.html',
   styleUrl: './chat-sessions-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,7 +49,7 @@ export class ChatSessionsPanelComponent implements OnDestroy {
     if (this.sessionsStore.isDefaultTitle(title)) {
       return this.i18n.t('chat.sessions.new');
     }
-    return truncateSessionTitle(title);
+    return title;
   }
 
   onClose(): void {
