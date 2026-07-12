@@ -1,0 +1,158 @@
+<div class="feature-page watchlists-page">
+  <app-feature-page-header
+    [title]="i18n.t('watchlists.page.title')"
+    [description]="i18n.t('watchlists.page.subtitle')"
+  />
+
+  @if (!store.available()) {
+    <p class="watchlists-page__auth">{{ i18n.t('watchlists.authRequired') }}</p>
+  } @else {
+    <div class="watchlists-page__grid">
+      <section class="watchlists-page__lists feature-panel">
+        <h2 class="watchlists-page__panel-title">{{ i18n.t('watchlists.lists.title') }}</h2>
+
+        <form class="watchlists-page__create" (ngSubmit)="onCreate()">
+          <input
+            class="feature-input"
+            type="text"
+            name="newWatchlistName"
+            [placeholder]="i18n.t('watchlist.manager.namePlaceholder')"
+            [ngModel]="newName()"
+            (ngModelChange)="newName.set($event)"
+          />
+          <app-button
+            [label]="i18n.t('watchlist.manager.create')"
+            [disabled]="!newName().trim() || store.isBusy()"
+            (pressed)="onCreate()"
+          />
+        </form>
+
+        @if (store.watchlists().length === 0) {
+          <p class="watchlists-page__hint">{{ i18n.t('watchlists.empty') }}</p>
+        } @else {
+          <ul class="watchlists-page__list">
+            @for (list of store.watchlists(); track list.id) {
+              <li
+                class="watchlists-page__list-item"
+                [class.watchlists-page__list-item--active]="list.id === store.activeWatchlistId()"
+              >
+                @if (renamingId() === list.id) {
+                  <form class="watchlists-page__rename" (ngSubmit)="saveRename(list.id)">
+                    <input
+                      class="feature-input"
+                      type="text"
+                      name="renameWatchlist"
+                      [ngModel]="renameDraft()"
+                      (ngModelChange)="renameDraft.set($event)"
+                    />
+                    <button
+                      type="submit"
+                      class="watchlists-page__rename-save"
+                      [disabled]="!renameDraft().trim() || store.isBusy()"
+                    >
+                      {{ i18n.t('watchlists.rename.save') }}
+                    </button>
+                    <button
+                      type="button"
+                      class="watchlists-page__rename-cancel"
+                      (click)="cancelRename()"
+                    >
+                      {{ i18n.t('watchlists.rename.cancel') }}
+                    </button>
+                  </form>
+                } @else {
+                  <button type="button" class="watchlists-page__select" (click)="onSelect(list.id)">
+                    {{ list.name }}
+                  </button>
+                  <span class="watchlists-page__row-actions">
+                    <button type="button" (click)="startRename(list)" [disabled]="store.isBusy()">
+                      {{ i18n.t('watchlists.rename') }}
+                    </button>
+                    <button type="button" (click)="onDelete(list.id)" [disabled]="store.isBusy()">
+                      {{ i18n.t('watchlist.manager.delete') }}
+                    </button>
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="watchlists-page__items feature-panel">
+        @if (store.activeWatchlist(); as active) {
+          <h2 class="watchlists-page__panel-title">
+            {{ i18n.t('watchlists.items.title') }} · {{ active.name }}
+          </h2>
+
+          <div class="watchlists-page__picker">
+            <input
+              type="search"
+              class="feature-input"
+              [placeholder]="i18n.t('radar.addInstrument.search')"
+              [value]="picker.query()"
+              (input)="onSearch($any($event.target).value)"
+              [attr.aria-label]="i18n.t('radar.addInstrument.search')"
+            />
+            @if (picker.results().length === 0) {
+              <p class="watchlists-page__hint">{{ i18n.t('radar.addInstrument.empty') }}</p>
+            } @else {
+              <ul class="watchlists-page__results" role="listbox">
+                @for (result of picker.results(); track result.instrument.symbol) {
+                  <li>
+                    <button
+                      type="button"
+                      class="watchlists-page__result"
+                      [disabled]="
+                        result.followed || picker.busySymbol() === result.instrument.symbol
+                      "
+                      (click)="onAdd(result.instrument)"
+                    >
+                      <span class="watchlists-page__result-symbol">{{
+                        result.instrument.symbol
+                      }}</span>
+                      <span class="watchlists-page__result-name">{{ result.instrument.name }}</span>
+                      <span class="watchlists-page__result-state">
+                        {{ result.followed ? i18n.t('radar.addInstrument.added') : '+' }}
+                      </span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          @if (store.items().length === 0) {
+            <p class="watchlists-page__hint">{{ i18n.t('watchlist.manager.emptyItems') }}</p>
+          } @else {
+            <ul class="watchlists-page__chips" [attr.aria-label]="i18n.t('watchlists.items.title')">
+              @for (item of store.items(); track item.id) {
+                <li class="watchlists-page__chip">
+                  <span>{{ item.symbol }}</span>
+                  <button
+                    type="button"
+                    class="watchlists-page__chip-remove"
+                    [disabled]="picker.busySymbol() === item.symbol"
+                    [attr.aria-label]="i18n.t('radar.addInstrument.remove') + ' ' + item.symbol"
+                    (click)="onRemove(item)"
+                  >
+                    ×
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        } @else {
+          <app-empty-state
+            [title]="i18n.t('watchlists.lists.title')"
+            [description]="i18n.t('watchlists.selectHint')"
+          />
+        }
+
+        @if (store.error(); as error) {
+          <p class="watchlists-page__error" role="alert">{{ error }}</p>
+        }
+      </section>
+    </div>
+  }
+</div>

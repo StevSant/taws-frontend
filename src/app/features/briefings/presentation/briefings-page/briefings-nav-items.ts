@@ -24,7 +24,7 @@ export interface BriefingsNavItemDef {
  * `/radar`) rather than inventing new pages:
  *
  * - Inicio      -> /radar      (real — `''` redirects to `radar`, the app's landing route)
- * - Watchlists  -> /briefings  (fallback — `WatchlistManagerComponent` lives on this page; no dedicated route)
+ * - Watchlists  -> /watchlists (real — dedicated management page, issue #17)
  * - Briefings   -> /briefings  (real — this page itself, exact match)
  * - Escenarios  -> /scenarios  (real)
  * - Variables   -> /radar      (fallback — macro context lives in `RadarMacroCardsComponent`; no dedicated route)
@@ -34,7 +34,7 @@ export interface BriefingsNavItemDef {
  */
 export const BRIEFINGS_NAV_ITEM_DEFS: readonly BriefingsNavItemDef[] = [
   { icon: 'home', labelKey: 'briefings.nav.home', route: '/radar' },
-  { icon: 'star', labelKey: 'shell.sidebar.watchlists', route: '/briefings' },
+  { icon: 'star', labelKey: 'shell.sidebar.watchlists', route: '/watchlists' },
   { icon: 'file-text', labelKey: 'shell.nav.briefings', route: '/briefings', exact: true },
   { icon: 'flask-conical', labelKey: 'shell.nav.scenarios', route: '/scenarios' },
   { icon: 'sliders-horizontal', labelKey: 'briefings.nav.variables', route: '/radar' },

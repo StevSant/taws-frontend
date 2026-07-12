@@ -34,7 +34,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { labelKey: 'shell.sidebar.briefings', route: '/briefings', icon: 'briefings' },
   { labelKey: 'shell.sidebar.alerts', route: '/briefings', icon: 'alerts' },
   { labelKey: 'shell.sidebar.scenarios', route: '/scenarios', icon: 'scenarios' },
-  { labelKey: 'shell.sidebar.watchlists', route: '/briefings', icon: 'watchlists' },
+  { labelKey: 'shell.sidebar.watchlists', route: '/watchlists', icon: 'watchlists' },
   { labelKey: 'shell.sidebar.settings', route: '/radar', icon: 'settings' },
 ];
 

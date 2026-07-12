@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AuthTokenService } from '../../../core';
+import { AuthTokenService, httpErrorDetail, TranslationService } from '../../../core';
 import { WatchlistItem, WatchlistRepository } from '../../briefings/domain';
 import {
   AssetClass,
@@ -85,6 +85,7 @@ export class MarketsExplorerStore {
     private readonly marketsRepository: MarketsRepository,
     private readonly watchlistRepository: WatchlistRepository,
     private readonly authTokenService: AuthTokenService,
+    private readonly i18n: TranslationService,
   ) {}
 
   isFollowed(symbol: string): boolean {
@@ -186,7 +187,7 @@ export class MarketsExplorerStore {
       }
       this.watchlistItemsSignal.set(await this.watchlistRepository.listItems(watchlistId));
     } catch (error: unknown) {
-      this.watchlistErrorSignal.set(this.toErrorMessage(error));
+      this.watchlistErrorSignal.set(this.toWatchlistErrorMessage(error));
     } finally {
       this.followBusySymbolSignal.set(null);
     }
@@ -225,7 +226,15 @@ export class MarketsExplorerStore {
     }
   }
 
+  /** Detail only (HTTP status + server detail / network message); the banner prepends `markets.error`. */
   private toErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : 'Unknown error while loading the market list';
+    console.error('Markets explorer request failed', error);
+    return httpErrorDetail(error, this.i18n);
+  }
+
+  /** Full, translated message shown raw under the follow toggle: watchlist prefix + detail. */
+  private toWatchlistErrorMessage(error: unknown): string {
+    console.error('Watchlist follow failed', error);
+    return `${this.i18n.t('radar.detail.watchlist.error')} ${httpErrorDetail(error, this.i18n)}`;
   }
 }

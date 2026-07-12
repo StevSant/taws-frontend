@@ -1,43 +1,42 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { AuthTokenService } from '../../../core';
-import { WatchlistItem, WatchlistRepository } from '../../briefings/domain';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { WatchlistStore } from '../../briefings/application';
+import { WatchlistItem } from '../../briefings/domain';
 import { Instrument, InstrumentRepository } from '../domain';
 
 /** Max autocomplete results shown at once. */
 const MAX_RESULTS = 8;
 
 /**
- * Component-scoped store backing the "Agregar instrumento" picker (issue #60). Replaces the
- * old dead-end link to /briefings: it searches the instrument universe
- * (`GET /api/v1/instruments`) and, on selection, adds the instrument to the user's watchlist
- * (optimistic + persisted via `WatchlistRepository`), so the tracked set updates without a
- * page reload and survives a refresh.
+ * Component-scoped store backing the "Agregar instrumento" picker (issue #60). Owns only the
+ * widget's local UI state (search query, open/closed, per-symbol busy flag) and searches the
+ * instrument universe (`GET /api/v1/instruments`).
  *
- * Auth-gated (the `/watchlists` API is authenticated): inert for anonymous users. Adding a
- * duplicate is a no-op (the symbol is already followed). Errors surface on `error` and never
- * throw to the page.
+ * The tracked set itself lives in the root-provided `WatchlistStore` (issue #16), so an add/remove
+ * here is reflected immediately on the radar home instruments section and the dedicated
+ * `/watchlists` page — and vice-versa — without a reload. Auth-gated and inert for anonymous users;
+ * adding a duplicate is a no-op; errors surface (translated) on `error` and never throw to the page.
  */
 @Injectable()
 export class AddInstrumentStore {
+  private readonly instrumentRepository = inject(InstrumentRepository);
+  private readonly watchlistStore = inject(WatchlistStore);
+
   private readonly instrumentsSignal = signal<Instrument[]>([]);
   private readonly querySignal = signal('');
-  private readonly followedItemsSignal = signal<WatchlistItem[]>([]);
-  private readonly watchlistIdSignal = signal<string | null>(null);
-  private readonly openSignal = signal(false);
   private readonly busySymbolSignal = signal<string | null>(null);
-  private readonly errorSignal = signal<string | null>(null);
 
   readonly query = this.querySignal.asReadonly();
-  readonly isOpen = this.openSignal.asReadonly();
   readonly busySymbol = this.busySymbolSignal.asReadonly();
-  readonly error = this.errorSignal.asReadonly();
-  readonly followedItems = this.followedItemsSignal.asReadonly();
+  private readonly openSignal = signal(false);
+  readonly isOpen = this.openSignal.asReadonly();
 
-  /** Watchlist actions require an authenticated Supabase session (see class doc). */
-  readonly available = computed(() => this.authTokenService.currentToken() !== null);
+  /** Tracked items + error come straight from the shared store so the widget stays in sync. */
+  readonly followedItems = this.watchlistStore.items;
+  readonly error = this.watchlistStore.error;
+  readonly available = this.watchlistStore.available;
 
   private readonly followedSymbols = computed(
-    () => new Set(this.followedItemsSignal().map((item) => item.symbol.toUpperCase())),
+    () => new Set(this.watchlistStore.items().map((item) => item.symbol.toUpperCase())),
   );
 
   /** Instruments matching the current query (symbol or name), capped, with follow state. */
@@ -58,18 +57,12 @@ export class AddInstrumentStore {
       }));
   });
 
-  constructor(
-    private readonly instrumentRepository: InstrumentRepository,
-    private readonly watchlistRepository: WatchlistRepository,
-    private readonly authTokenService: AuthTokenService,
-  ) {}
-
   isFollowed(symbol: string): boolean {
     return this.followedSymbols().has(symbol.toUpperCase());
   }
 
   async init(): Promise<void> {
-    await Promise.all([this.loadInstruments(), this.loadWatchlist()]);
+    await Promise.all([this.loadInstruments(), this.watchlistStore.ensureLoaded()]);
   }
 
   toggleOpen(): void {
@@ -80,65 +73,30 @@ export class AddInstrumentStore {
     this.querySignal.set(value);
   }
 
-  /**
-   * Adds an instrument to the tracked watchlist. No-op when unauthenticated or already
-   * followed (graceful duplicate handling). Optimistic then re-synced from the API.
-   */
-  async add(symbol: string, fallbackName: string): Promise<void> {
-    if (!this.available() || this.busySymbolSignal()) {
+  /** Adds an instrument to the tracked watchlist via the shared store (auto-creates one if needed). */
+  async add(symbol: string): Promise<void> {
+    if (this.busySymbolSignal()) {
       return;
     }
     const normalized = symbol.toUpperCase();
-    if (this.isFollowed(normalized)) {
-      return;
-    }
     this.busySymbolSignal.set(normalized);
-    this.errorSignal.set(null);
     try {
-      const watchlistId = await this.ensureWatchlistId(fallbackName);
-      await this.watchlistRepository.addItem(watchlistId, normalized);
-      this.followedItemsSignal.set(await this.watchlistRepository.listItems(watchlistId));
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      await this.watchlistStore.addSymbol(normalized);
     } finally {
       this.busySymbolSignal.set(null);
     }
   }
 
   async remove(item: WatchlistItem): Promise<void> {
-    if (!this.available() || this.busySymbolSignal()) {
-      return;
-    }
-    const watchlistId = this.watchlistIdSignal();
-    if (!watchlistId) {
+    if (this.busySymbolSignal()) {
       return;
     }
     this.busySymbolSignal.set(item.symbol.toUpperCase());
-    this.errorSignal.set(null);
     try {
-      await this.watchlistRepository.removeItem(watchlistId, item.id);
-      this.followedItemsSignal.set(await this.watchlistRepository.listItems(watchlistId));
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      await this.watchlistStore.removeItem(item.id);
     } finally {
       this.busySymbolSignal.set(null);
     }
-  }
-
-  private async ensureWatchlistId(fallbackName: string): Promise<string> {
-    const current = this.watchlistIdSignal();
-    if (current) {
-      return current;
-    }
-    const watchlists = await this.watchlistRepository.fetchWatchlists();
-    const existing = watchlists[0];
-    if (existing) {
-      this.watchlistIdSignal.set(existing.id);
-      return existing.id;
-    }
-    const created = await this.watchlistRepository.createWatchlist(fallbackName);
-    this.watchlistIdSignal.set(created.id);
-    return created.id;
   }
 
   private async loadInstruments(): Promise<void> {
@@ -147,26 +105,5 @@ export class AddInstrumentStore {
     } catch {
       this.instrumentsSignal.set([]);
     }
-  }
-
-  private async loadWatchlist(): Promise<void> {
-    if (!this.available()) {
-      return;
-    }
-    try {
-      const watchlists = await this.watchlistRepository.fetchWatchlists();
-      const first = watchlists[0];
-      if (!first) {
-        return;
-      }
-      this.watchlistIdSignal.set(first.id);
-      this.followedItemsSignal.set(await this.watchlistRepository.listItems(first.id));
-    } catch {
-      // Best-effort — a failure just leaves the tracked chips empty.
-    }
-  }
-
-  private toErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : 'Unknown error while updating the watchlist';
   }
 }

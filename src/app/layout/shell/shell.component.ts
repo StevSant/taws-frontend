@@ -38,6 +38,7 @@ const CUSTOM_LAYOUT_ROUTE_PREFIXES = [
   '/agents',
   '/scenarios',
   '/briefings',
+  '/watchlists',
   '/brand-lab',
 ];
 

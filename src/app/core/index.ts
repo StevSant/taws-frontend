@@ -3,6 +3,7 @@ export { AuthTokenService } from './auth/auth-token.service';
 export { SessionRefreshService } from './auth/session-refresh.service';
 export { authInterceptor } from './http/auth.interceptor';
 export { authErrorInterceptor } from './http/auth-error.interceptor';
+export { httpErrorDetail } from './http/http-error-detail';
 export { authGuard } from './guards/auth.guard';
 export { ThemeService } from './theme';
 export type { Theme } from './theme';

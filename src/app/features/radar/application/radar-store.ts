@@ -6,6 +6,7 @@ import {
   NewSignalsTracker,
   NotificationsStore,
 } from '../../../core';
+import { WatchlistStore } from '../../briefings/application';
 import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
   AssetClass,
@@ -21,6 +22,7 @@ import {
   NewsRepository,
   QuantRepository,
   RadarFilters,
+  RadarSignal,
   SentimentRepository,
   Signal,
   SignalRepository,
@@ -144,6 +146,61 @@ export class RadarStore {
       };
     });
   });
+  /** `signals()` indexed by uppercase symbol, so the watchlist view can reuse enriched cards. */
+  private readonly signalCardBySymbol = computed(() => {
+    const map = new Map<string, RadarSignal>();
+    for (const card of this.signals()) {
+      map.set(card.symbol.toUpperCase(), card);
+    }
+    return map;
+  });
+
+  /**
+   * Home instruments section when the user has a non-empty watchlist (issue #16): exactly the
+   * watchlist symbols, in watchlist order. A symbol that already has a news-driven card reuses it
+   * (full news + signal enrichment); one without recent news is synthesized from instrument
+   * metadata plus any latest signal/quant stats, so it still appears — as an "unclassified" card,
+   * the same way the radar renders any instrument the Analyst hasn't scored yet. Empty when the
+   * watchlist is empty, so the page falls back to the news-driven universe.
+   */
+  readonly watchlistSignals = computed<RadarSignal[]>(() => {
+    const symbols = this.watchlistStore.symbols();
+    if (symbols.length === 0) {
+      return [];
+    }
+    const cards = this.signalCardBySymbol();
+    const instrumentsBySymbol = new Map(
+      this.instrumentsSignal().map(
+        (instrument) => [instrument.symbol.toUpperCase(), instrument] as const,
+      ),
+    );
+    const signalsBySymbol = this.signalsBySymbolSignal();
+    const marketStatsBySymbol = this.marketStatsBySymbolSignal();
+    return symbols.map((symbol) => {
+      const existing = cards.get(symbol);
+      if (existing) {
+        return existing;
+      }
+      const signal = signalsBySymbol.get(symbol);
+      const marketStats = marketStatsBySymbol.get(symbol);
+      return {
+        symbol,
+        instrument: instrumentsBySymbol.get(symbol),
+        news: [],
+        impactClass: signal?.impactClass,
+        confidence: signal?.confidence,
+        priceDelta: signal?.priceDelta ?? marketStats?.priceDeltaPct ?? undefined,
+        signalId: signal?.id,
+        thesis: signal?.thesis,
+        keyDrivers: signal?.keyDrivers ?? [],
+        riskFactors: signal?.riskFactors ?? [],
+        analysisAvailable: signal?.analysisAvailable,
+        disclaimer: signal?.disclaimer,
+        marketStats,
+      } satisfies RadarSignal;
+    });
+  });
+
   readonly landscape = computed(() => computeRadarLandscape(this.signals()));
   readonly marketScore = computed((): MarketScore => {
     const landscape = this.landscape();
@@ -233,6 +290,7 @@ export class RadarStore {
     private readonly notifications: NotificationsStore,
     private readonly authTokenService: AuthTokenService,
     private readonly newSignalsTracker: NewSignalsTracker,
+    private readonly watchlistStore: WatchlistStore,
   ) {}
 
   /** Loads instruments + news on first visit; revisits show cached state and refresh silently. */
@@ -240,9 +298,16 @@ export class RadarStore {
     this.startAutoRefresh();
 
     if (this.sessionReady) {
+      // Re-sync the watchlist on every revisit so follows made elsewhere (asset detail,
+      // markets explorer) show up on the home section without a hard reload (issue #16).
+      void this.watchlistStore.refresh();
       void this.loadNews({ background: true });
       return;
     }
+
+    // First paint: load the user's watchlist so the instruments section can reflect it
+    // before the (bottom-of-list) add-instrument widget mounts. Idempotent per session.
+    void this.watchlistStore.ensureLoaded();
 
     void this.loadInstruments();
     void this.loadMarketContext();

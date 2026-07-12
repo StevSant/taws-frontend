@@ -516,6 +516,16 @@ export interface TranslationDict {
   'watchlist.manager.reorderTitle': string;
   'watchlist.manager.moveUp': string;
   'watchlist.manager.moveDown': string;
+  'watchlists.page.title': string;
+  'watchlists.page.subtitle': string;
+  'watchlists.lists.title': string;
+  'watchlists.items.title': string;
+  'watchlists.rename': string;
+  'watchlists.rename.save': string;
+  'watchlists.rename.cancel': string;
+  'watchlists.empty': string;
+  'watchlists.authRequired': string;
+  'watchlists.selectHint': string;
   'briefings.prep.progress': string;
   'telegram.title': string;
   'telegram.linked': string;
@@ -722,6 +732,8 @@ export interface TranslationDict {
   'notifications.radar.signalGenerated': string;
   'notifications.auth.sessionExpired': string;
   'notifications.briefing.generated': string;
+  'errors.network': string;
+  'errors.unknown': string;
   'placeholder.badge': string;
   'brandLab.title': string;
   'brandLab.subtitle': string;

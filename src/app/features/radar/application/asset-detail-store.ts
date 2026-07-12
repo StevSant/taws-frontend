@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AuthTokenService } from '../../../core';
+import { AuthTokenService, httpErrorDetail, TranslationService } from '../../../core';
 import { WatchlistItem, WatchlistRepository } from '../../briefings/domain';
 import {
   Instrument,
@@ -90,6 +90,7 @@ export class AssetDetailStore {
     private readonly newsRepository: NewsRepository,
     private readonly watchlistRepository: WatchlistRepository,
     private readonly authTokenService: AuthTokenService,
+    private readonly i18n: TranslationService,
   ) {}
 
   async load(symbol: string): Promise<void> {
@@ -246,7 +247,13 @@ export class AssetDetailStore {
     }
   }
 
+  /**
+   * The translated **detail** (HTTP status + server detail, or a network-level message). Both
+   * consumers prepend their own context: `error` via `radar.error.banner`, `watchlistError` via
+   * `radar.detail.watchlist.error`. Full error kept in the console.
+   */
   private toErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : 'Unknown error while loading the instrument';
+    console.error('Asset detail request failed', error);
+    return httpErrorDetail(error, this.i18n);
   }
 }
