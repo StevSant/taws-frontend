@@ -11,3 +11,4 @@ export type { ChartRequest, ChartRequestKind } from './domain/chart-request.mode
 export { mapChartSpecToOption } from './infrastructure/map-chart-spec-to-option';
 export { readChartTheme } from './infrastructure/read-chart-theme';
 export type { ChartTheme } from './infrastructure/read-chart-theme';
+export { ChartComponent } from './presentation/chart.component';
