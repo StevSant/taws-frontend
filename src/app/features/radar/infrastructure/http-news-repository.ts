@@ -67,14 +67,18 @@ export class HttpNewsRepository extends NewsRepository {
         );
         return mapNewsItemDto(dto);
       } catch (error: unknown) {
-        // A genuine 404 (unknown id) is an expected empty result, not a
-        // failure — surface it as `null` so the detail page shows a
-        // not-found state instead of an error banner. Anything else rethrows.
         if (error instanceof HttpErrorResponse && error.status === HTTP_NOT_FOUND) {
-          return null;
+          return this.findNewsInRecentFeed(id);
         }
         throw error;
       }
     });
+  }
+
+  /** Fallback when the detail endpoint is unavailable — scan the recent feed. */
+  private async findNewsInRecentFeed(id: string): Promise<NewsItem | null> {
+    const defaultFilters: RadarFilters = { sinceHours: 720, symbol: null, assetClass: null };
+    const news = await this.fetchNews(defaultFilters);
+    return news.find((item) => item.id === id) ?? null;
   }
 }
