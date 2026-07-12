@@ -7,7 +7,9 @@
     <div class="radar-macro-cards__grid">
       <article class="radar-macro-cards__card">
         <span class="radar-macro-cards__label">{{ i18n.t('radar.landscape.vix') }}</span>
-        <span class="radar-macro-cards__value">{{ macro.volatility.vixLevel | number: '1.1-1' }}</span>
+        <span class="radar-macro-cards__value">{{
+          macro.volatility.vixLevel | number: '1.1-1'
+        }}</span>
         <span class="radar-macro-cards__hint">{{ regimeLabel(macro.volatility.regime) }}</span>
         <app-macro-mini-sparkline trend="up" />
       </article>
@@ -29,7 +31,9 @@
       <article class="radar-macro-cards__card">
         <span class="radar-macro-cards__label">{{ i18n.t('radar.macro.dxy') }}</span>
         <span class="radar-macro-cards__value">{{ dxyValue | number: '1.2-2' }}</span>
-        <span class="radar-macro-cards__hint radar-macro-cards__hint--up">+{{ dxyDelta | number: '1.2-2' }}%</span>
+        <span class="radar-macro-cards__hint radar-macro-cards__hint--up"
+          >+{{ dxyDelta | number: '1.2-2' }}%</span
+        >
         <app-macro-mini-sparkline trend="up" />
       </article>
     </div>

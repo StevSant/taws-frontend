@@ -9,17 +9,25 @@
       <div class="chat-context-rail__macro-grid">
         <article class="chat-context-rail__macro">
           <span class="chat-context-rail__macro-label">{{ i18n.t('radar.landscape.vix') }}</span>
-          <span class="chat-context-rail__macro-value">{{ macro.volatility.vixLevel | number: '1.1-1' }}</span>
-          <span class="chat-context-rail__macro-hint">{{ i18n.t('radar.landscape.regime.normal') }}</span>
+          <span class="chat-context-rail__macro-value">{{
+            macro.volatility.vixLevel | number: '1.1-1'
+          }}</span>
+          <span class="chat-context-rail__macro-hint">{{
+            i18n.t('radar.landscape.regime.normal')
+          }}</span>
         </article>
         <article class="chat-context-rail__macro">
           <span class="chat-context-rail__macro-label">{{ i18n.t('radar.landscape.rates') }}</span>
-          <span class="chat-context-rail__macro-value">{{ macro.rates.value | number: '1.2-2' }}%</span>
+          <span class="chat-context-rail__macro-value"
+            >{{ macro.rates.value | number: '1.2-2' }}%</span
+          >
           <span class="chat-context-rail__macro-hint">{{ i18n.t('radar.macro.ratesHint') }}</span>
         </article>
         <article class="chat-context-rail__macro">
           <span class="chat-context-rail__macro-label">{{ i18n.t('radar.landscape.cpi') }}</span>
-          <span class="chat-context-rail__macro-value">{{ macro.cpi.value | number: '1.1-1' }}%</span>
+          <span class="chat-context-rail__macro-value"
+            >{{ macro.cpi.value | number: '1.1-1' }}%</span
+          >
           <span class="chat-context-rail__macro-hint">{{ i18n.t('radar.macro.cpiHint') }}</span>
         </article>
       </div>
@@ -53,7 +61,9 @@
           <span
             class="chat-context-rail__badge"
             [class.chat-context-rail__badge--positive]="entry.impactClass === 'positive'"
-            [class.chat-context-rail__badge--neutral]="!entry.impactClass || entry.impactClass === 'neutral'"
+            [class.chat-context-rail__badge--neutral]="
+              !entry.impactClass || entry.impactClass === 'neutral'
+            "
             >{{ impactLabel(entry.impactClass) }}</span
           >
         </li>
@@ -64,7 +74,9 @@
   <section class="chat-context-rail__card">
     <header class="chat-context-rail__header">
       <h2 class="chat-context-rail__title">{{ i18n.t('chat.rail.watchlist.title') }}</h2>
-      <a class="chat-context-rail__link" routerLink="/briefings">{{ i18n.t('chat.rail.viewAll') }}</a>
+      <a class="chat-context-rail__link" routerLink="/briefings">{{
+        i18n.t('chat.rail.viewAll')
+      }}</a>
     </header>
 
     <ul class="chat-context-rail__watchlist">
@@ -72,8 +84,12 @@
         <li class="chat-context-rail__watch-item">
           <app-instrument-ticker-badge [symbol]="signal.symbol" size="sm" />
           <div class="chat-context-rail__watch-copy">
-            <span class="chat-context-rail__watch-name">{{ signal.instrument?.name ?? signal.symbol }}</span>
-            @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {
+            <span class="chat-context-rail__watch-name">{{
+              signal.instrument?.name ?? signal.symbol
+            }}</span>
+            @if (
+              signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined
+            ) {
               <span class="chat-context-rail__watch-price">{{
                 signal.marketStats!.lastPrice | number: '1.2-2'
               }}</span>
@@ -89,6 +105,8 @@
       }
     </ul>
 
-    <a class="chat-context-rail__add" routerLink="/briefings">{{ i18n.t('chat.rail.watchlist.add') }}</a>
+    <a class="chat-context-rail__add" routerLink="/briefings">{{
+      i18n.t('chat.rail.watchlist.add')
+    }}</a>
   </section>
 </aside>

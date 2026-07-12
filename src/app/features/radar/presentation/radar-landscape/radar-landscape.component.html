@@ -35,7 +35,9 @@
             [class.radar-landscape__asset-cell--negative]="impactClass(assetClass) === 'negative'"
             [class.radar-landscape__asset-cell--neutral]="impactClass(assetClass) === 'neutral'"
             [class.radar-landscape__asset-cell--uncertain]="impactClass(assetClass) === 'uncertain'"
-            [class.radar-landscape__asset-cell--unclassified]="impactClass(assetClass) === 'unclassified'"
+            [class.radar-landscape__asset-cell--unclassified]="
+              impactClass(assetClass) === 'unclassified'
+            "
             [class.radar-landscape__asset-cell--empty]="!cellFor(assetClass)"
             [class.radar-landscape__asset-cell--active]="activeAssetClass === assetClass"
             [attr.aria-pressed]="activeAssetClass === assetClass"
@@ -44,7 +46,9 @@
           >
             <span class="radar-landscape__asset-label">{{ assetClassLabel(assetClass) }}</span>
             <span class="radar-landscape__asset-count">{{ cellFor(assetClass)?.count ?? 0 }}</span>
-            <span class="radar-landscape__asset-impact">{{ impactLabel(impactClass(assetClass)) }}</span>
+            <span class="radar-landscape__asset-impact">{{
+              impactLabel(impactClass(assetClass))
+            }}</span>
           </button>
         }
       </div>

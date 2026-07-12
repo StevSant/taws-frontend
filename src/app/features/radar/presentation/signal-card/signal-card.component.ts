@@ -1,12 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, inject, signal } from '@angular/core';
 import { AssetClass, ImpactClass, RadarSignal } from '../../domain';
 import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
 import { RadarStore } from '../../application';
@@ -134,10 +127,6 @@ export class SignalCardComponent implements OnInit {
     if (!this.signal.signalId) {
       return;
     }
-    void this.store.submitSignalReview(
-      this.signal.signalId,
-      event.decision,
-      event.justification,
-    );
+    void this.store.submitSignalReview(this.signal.signalId, event.decision, event.justification);
   }
 }

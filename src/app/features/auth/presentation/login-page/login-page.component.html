@@ -6,7 +6,13 @@
       [attr.aria-label]="i18n.t('auth.back')"
       (click)="goBack()"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        aria-hidden="true"
+      >
         <path d="M15 6l-6 6 6 6" />
       </svg>
       <span>{{ i18n.t('auth.back') }}</span>
@@ -20,7 +26,11 @@
 
   <div class="login-page__glow" aria-hidden="true"></div>
 
-  <form class="login-page__card glass" [class.login-page__card--demo]="showDemoPerspectives()" (ngSubmit)="onSubmit()">
+  <form
+    class="login-page__card glass"
+    [class.login-page__card--demo]="showDemoPerspectives()"
+    (ngSubmit)="onSubmit()"
+  >
     <div class="login-page__brand">
       <app-midas-logo class="login-page__brand-mark" [size]="40" />
       <div class="login-page__brand-text">
@@ -93,7 +103,11 @@
             <span>{{ i18n.t('auth.demo.divider') }}</span>
           </div>
 
-          <div class="login-page__demo-grid" role="group" [attr.aria-label]="i18n.t('auth.demo.divider')">
+          <div
+            class="login-page__demo-grid"
+            role="group"
+            [attr.aria-label]="i18n.t('auth.demo.divider')"
+          >
             @for (perspective of demoPerspectives; track perspective.id) {
               <button
                 type="button"
@@ -102,7 +116,11 @@
                 [disabled]="isSubmitting()"
                 (click)="loginAsPerspective(perspective)"
               >
-                <span class="login-page__demo-icon" [attr.data-icon]="perspective.icon" aria-hidden="true">
+                <span
+                  class="login-page__demo-icon"
+                  [attr.data-icon]="perspective.icon"
+                  aria-hidden="true"
+                >
                   @switch (perspective.icon) {
                     @case ('analyst') {
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">

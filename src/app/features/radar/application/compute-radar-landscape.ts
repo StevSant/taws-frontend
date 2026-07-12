@@ -28,9 +28,7 @@ const IMPACT_ORDER: (ImpactClass | 'unclassified')[] = [
 
 /** Aggregates the current radar feed into chart-friendly buckets. */
 export function computeRadarLandscape(signals: RadarSignal[]): RadarLandscape {
-  const counts = new Map<ImpactClass | 'unclassified', number>(
-    IMPACT_ORDER.map((key) => [key, 0]),
-  );
+  const counts = new Map<ImpactClass | 'unclassified', number>(IMPACT_ORDER.map((key) => [key, 0]));
 
   const assetClassBuckets = new Map<
     AssetClass,

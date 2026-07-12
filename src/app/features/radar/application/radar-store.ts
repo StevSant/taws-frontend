@@ -346,7 +346,10 @@ export class RadarStore {
     }
   }
 
-  private async loadNews(options?: { background?: boolean; forceLoading?: boolean }): Promise<void> {
+  private async loadNews(options?: {
+    background?: boolean;
+    forceLoading?: boolean;
+  }): Promise<void> {
     const background = options?.background ?? false;
     const forceLoading = options?.forceLoading ?? false;
     if (forceLoading || (!background && this.newsSignal().length === 0)) {
@@ -394,14 +397,18 @@ export class RadarStore {
 
   private async loadMarketStats(news: NewsItem[]): Promise<void> {
     const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
-    const fetched = await mapInBatches(symbols, this.config.radarSignalFetchBatchSize, async (symbol) => {
-      try {
-        const stats = await this.quantRepository.fetchMarketStats(symbol);
-        return [symbol, stats] as const;
-      } catch {
-        return null;
-      }
-    });
+    const fetched = await mapInBatches(
+      symbols,
+      this.config.radarSignalFetchBatchSize,
+      async (symbol) => {
+        try {
+          const stats = await this.quantRepository.fetchMarketStats(symbol);
+          return [symbol, stats] as const;
+        } catch {
+          return null;
+        }
+      },
+    );
 
     const next = new Map(this.marketStatsBySymbolSignal());
     for (const entry of fetched) {
@@ -421,13 +428,17 @@ export class RadarStore {
    */
   private async loadSignals(news: NewsItem[]): Promise<void> {
     const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
-    const fetched = await mapInBatches(symbols, this.config.radarSignalFetchBatchSize, async (symbol) => {
-      try {
-        return await this.signalRepository.fetchSignals(symbol);
-      } catch {
-        return [];
-      }
-    });
+    const fetched = await mapInBatches(
+      symbols,
+      this.config.radarSignalFetchBatchSize,
+      async (symbol) => {
+        try {
+          return await this.signalRepository.fetchSignals(symbol);
+        } catch {
+          return [];
+        }
+      },
+    );
     this.signalsBySymbolSignal.set(latestSignalBySymbol(fetched.flat()));
   }
 
@@ -437,8 +448,8 @@ export class RadarStore {
       return;
     }
 
-    this.pollSubscription = interval(this.config.radarPollIntervalMs).subscribe(() =>
-      void this.pollNews(),
+    this.pollSubscription = interval(this.config.radarPollIntervalMs).subscribe(
+      () => void this.pollNews(),
     );
   }
 

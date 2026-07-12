@@ -1,25 +1,27 @@
 <div class="feature-page scenarios-page">
-    <app-feature-page-header
-      [title]="i18n.t('scenarios.title')"
-      [description]="i18n.t('scenarios.description')"
-    />
+  <app-feature-page-header
+    [title]="i18n.t('scenarios.title')"
+    [description]="i18n.t('scenarios.description')"
+  />
 
-    <app-guide-notes-tabs
-      [guideTitle]="i18n.t('scenarios.guide.title')"
-      [guideSteps]="guideSteps()"
-      [notesTitle]="i18n.t('scenarios.notes.title')"
-      [notes]="scenarioNotes"
-      [guideTabLabel]="i18n.t('scenarios.guide.tabLabel')"
-      [notesTabLabel]="i18n.t('scenarios.notes.tabLabel')"
-      [notesEmptyLabel]="i18n.t('scenarios.notes.empty')"
-    />
+  <app-guide-notes-tabs
+    [guideTitle]="i18n.t('scenarios.guide.title')"
+    [guideSteps]="guideSteps()"
+    [notesTitle]="i18n.t('scenarios.notes.title')"
+    [notes]="scenarioNotes"
+    [guideTabLabel]="i18n.t('scenarios.guide.tabLabel')"
+    [notesTabLabel]="i18n.t('scenarios.notes.tabLabel')"
+    [notesEmptyLabel]="i18n.t('scenarios.notes.empty')"
+  />
 
-    <div class="scenarios-page__layout">
+  <div class="scenarios-page__layout">
     <div class="scenarios-page__main">
       <div class="scenarios-page__composer feature-panel">
         <header class="scenarios-page__composer-header">
           <h2 class="scenarios-page__composer-title">{{ i18n.t('scenarios.composer.title') }}</h2>
-          <p class="scenarios-page__composer-subtitle">{{ i18n.t('scenarios.composer.subtitle') }}</p>
+          <p class="scenarios-page__composer-subtitle">
+            {{ i18n.t('scenarios.composer.subtitle') }}
+          </p>
         </header>
 
         <div class="scenarios-page__mode-toggle" role="tablist">
@@ -86,13 +88,17 @@
               (ngModelChange)="onFreeTextChange($event)"
               [placeholder]="i18n.t('scenarios.freeform.placeholder')"
             ></textarea>
-            <span class="scenarios-page__hint">{{ i18n.t('scenarios.freeform.maxLengthHint') }}</span>
+            <span class="scenarios-page__hint">{{
+              i18n.t('scenarios.freeform.maxLengthHint')
+            }}</span>
           </label>
         }
 
         <div class="scenarios-page__actions">
           <app-button
-            [label]="store.isGenerating() ? i18n.t('scenarios.generating') : i18n.t('scenarios.generate')"
+            [label]="
+              store.isGenerating() ? i18n.t('scenarios.generating') : i18n.t('scenarios.generate')
+            "
             [disabled]="!store.canGenerate()"
             (pressed)="onGenerate()"
           />

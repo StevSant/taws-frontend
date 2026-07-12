@@ -62,7 +62,8 @@ export const EN_TRANSLATIONS = {
   'auth.error.unknown': 'Please check your details and try again.',
   'auth.demo.divider': 'Demo · Perspective',
   'auth.demo.footer': 'You can switch perspective by signing out and logging in again.',
-  'auth.demo.hint': 'Midas — Supabase Auth. Create the demo users in the dashboard before using these shortcuts.',
+  'auth.demo.hint':
+    'Midas — Supabase Auth. Create the demo users in the dashboard before using these shortcuts.',
   'auth.demo.role.analyst': 'Analyst',
   'auth.demo.role.portfolio': 'Portfolio',
   'auth.demo.role.compliance': 'Compliance',
@@ -142,9 +143,12 @@ export const EN_TRANSLATIONS = {
   'radar.summary.events': 'relevant events in',
   'radar.summary.pending': 'need AI review.',
   'radar.guide.title': 'How to read Radar',
-  'radar.guide.step1': 'The landscape shows impact mix, asset classes, and macro backdrop (VIX, rates, inflation).',
-  'radar.guide.step2': 'Each card = one asset with recent news. The headline tells the story; green/red bars show price moves.',
-  'radar.guide.step3': 'If it says "Pending analysis", hit the button so the AI classifies impact and confidence.',
+  'radar.guide.step1':
+    'The landscape shows impact mix, asset classes, and macro backdrop (VIX, rates, inflation).',
+  'radar.guide.step2':
+    'Each card = one asset with recent news. The headline tells the story; green/red bars show price moves.',
+  'radar.guide.step3':
+    'If it says "Pending analysis", hit the button so the AI classifies impact and confidence.',
   'radar.filters.type.label': 'Instrument type',
   'radar.filters.type.all': 'All types',
   'radar.filters.asset.label': 'Asset',
@@ -186,7 +190,8 @@ export const EN_TRANSLATIONS = {
     'Informational only — not personalized financial advice. We never execute trades.',
   'radar.generate.action': 'Analyze with AI',
   'radar.generate.generating': 'AI analyzing…',
-  'radar.generate.hint': 'The AI reads the asset news and estimates whether impact is positive, negative, or uncertain.',
+  'radar.generate.hint':
+    'The AI reads the asset news and estimates whether impact is positive, negative, or uncertain.',
   'radar.generate.all': 'Analyze all pending',
   'radar.generate.allRunning': 'Batch analyzing…',
   'radar.landscape.title': 'Market landscape',
@@ -257,16 +262,20 @@ export const EN_TRANSLATIONS = {
   'scenarios.description':
     'Simulate "what if…?" and the AI shows impact per asset class, a step-by-step causal chain, and suggested actions.',
   'scenarios.guide.title': 'How to use the lab',
-  'scenarios.guide.step1': 'Pick a curated preset (e.g. OPEC cut) or write your own free-form scenario.',
+  'scenarios.guide.step1':
+    'Pick a curated preset (e.g. OPEC cut) or write your own free-form scenario.',
   'scenarios.guide.step2': 'Hit "Run scenario" — the AI analyzes the event against market data.',
-  'scenarios.guide.step3': 'Read the heatmap (green/red per asset class), causal chain, and recommended actions.',
+  'scenarios.guide.step3':
+    'Read the heatmap (green/red per asset class), causal chain, and recommended actions.',
   'scenarios.composer.title': 'Define your scenario',
   'scenarios.composer.subtitle': 'Select a preset or describe a hypothetical event, then run it.',
   'scenarios.preview.title': 'What you will get',
   'scenarios.preview.description': 'Running a scenario produces three clear blocks:',
   'scenarios.preview.item1': 'Heatmap — which asset classes rise or fall and with what confidence.',
-  'scenarios.preview.item2': 'Causal chain — how the event propagates step by step (cause → effect).',
-  'scenarios.preview.item3': 'Suggested actions — what to monitor or consider (informational only).',
+  'scenarios.preview.item2':
+    'Causal chain — how the event propagates step by step (cause → effect).',
+  'scenarios.preview.item3':
+    'Suggested actions — what to monitor or consider (informational only).',
   'scenarios.disclaimer.static':
     'Informational only — not personalized financial advice. We never execute trades.',
   'scenarios.mode.preset': 'Curated presets',
@@ -361,8 +370,10 @@ export const EN_TRANSLATIONS = {
     'Automatic summaries for assets you track. Create a list, generate a report, and mark your review (seen, escalate, or discard).',
   'briefings.guide.title': 'How it works',
   'briefings.guide.step1': 'Create a watch list and add tickers (e.g. AAPL, BTC).',
-  'briefings.guide.step2': 'Select the list and hit "Generate report" — the AI summarizes signals and news.',
-  'briefings.guide.step3': 'Review each report: mark seen, escalate if it needs attention, or discard.',
+  'briefings.guide.step2':
+    'Select the list and hit "Generate report" — the AI summarizes signals and news.',
+  'briefings.guide.step3':
+    'Review each report: mark seen, escalate if it needs attention, or discard.',
   'briefings.disclaimer.static':
     'This panel provides analysis and alerts only — it never executes trades. Every briefing requires your review; treat every summary as informational, not personalized investment advice.',
   'briefings.watchlist.label': 'Watchlist',

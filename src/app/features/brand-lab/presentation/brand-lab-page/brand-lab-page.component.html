@@ -49,7 +49,9 @@
   </section>
 
   <section class="brand-lab__section" aria-labelledby="brand-lab-master">
-    <h2 id="brand-lab-master" class="brand-lab__section-title">{{ i18n.t('brandLab.brand.title') }}</h2>
+    <h2 id="brand-lab-master" class="brand-lab__section-title">
+      {{ i18n.t('brandLab.brand.title') }}
+    </h2>
     <p class="brand-lab__section-desc">{{ i18n.t('brandLab.brand.desc') }}</p>
 
     <div class="brand-lab__grid">
@@ -104,7 +106,10 @@
       </article>
 
       @for (meta of brandGlyphs; track meta.id) {
-        <article class="brand-lab__card" [class.brand-lab__card--icosa]="meta.id === 'brand-icosahedron'">
+        <article
+          class="brand-lab__card"
+          [class.brand-lab__card--icosa]="meta.id === 'brand-icosahedron'"
+        >
           <div
             class="brand-lab__preview"
             [class.brand-lab__preview--3d]="meta.id === 'brand-icosahedron'"
@@ -141,7 +146,9 @@
   </section>
 
   <section class="brand-lab__section brand-lab__section--myth" aria-labelledby="brand-lab-myth">
-    <h2 id="brand-lab-myth" class="brand-lab__section-title">{{ i18n.t('brandLab.myth.title') }}</h2>
+    <h2 id="brand-lab-myth" class="brand-lab__section-title">
+      {{ i18n.t('brandLab.myth.title') }}
+    </h2>
     <p class="brand-lab__section-desc">{{ i18n.t('brandLab.myth.desc') }}</p>
 
     <div class="brand-lab__grid">
@@ -176,7 +183,9 @@
   </section>
 
   <section class="brand-lab__section" aria-labelledby="brand-lab-agents">
-    <h2 id="brand-lab-agents" class="brand-lab__section-title">{{ i18n.t('brandLab.agents.title') }}</h2>
+    <h2 id="brand-lab-agents" class="brand-lab__section-title">
+      {{ i18n.t('brandLab.agents.title') }}
+    </h2>
     <p class="brand-lab__section-desc">{{ i18n.t('brandLab.agents.desc') }}</p>
 
     @for (agent of agentOrder; track agent) {

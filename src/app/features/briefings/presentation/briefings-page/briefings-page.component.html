@@ -1,106 +1,108 @@
 <div class="feature-page briefings-page">
   <div class="briefings-page__content">
-      <app-feature-page-header
-        [title]="i18n.t('briefings.title')"
-        [description]="i18n.t('briefings.description')"
-        [stats]="headerStats()"
-      />
+    <app-feature-page-header
+      [title]="i18n.t('briefings.title')"
+      [description]="i18n.t('briefings.description')"
+      [stats]="headerStats()"
+    />
 
-      <app-guide-notes-tabs
-        [guideTitle]="i18n.t('briefings.guide.title')"
-        [guideSteps]="guideSteps()"
-        [notesTitle]="i18n.t('briefings.notes.title')"
-        [notes]="notes"
-        [guideTabLabel]="i18n.t('briefings.guide.tab.guide')"
-        [notesTabLabel]="i18n.t('briefings.guide.tab.notes')"
-        [notesEmptyLabel]="i18n.t('briefings.notes.empty')"
-      />
+    <app-guide-notes-tabs
+      [guideTitle]="i18n.t('briefings.guide.title')"
+      [guideSteps]="guideSteps()"
+      [notesTitle]="i18n.t('briefings.notes.title')"
+      [notes]="notes"
+      [guideTabLabel]="i18n.t('briefings.guide.tab.guide')"
+      [notesTabLabel]="i18n.t('briefings.guide.tab.notes')"
+      [notesEmptyLabel]="i18n.t('briefings.notes.empty')"
+    />
 
-      <p class="feature-disclaimer" role="note">
-        {{ i18n.t('briefings.disclaimer.static') }}
-      </p>
+    <p class="feature-disclaimer" role="note">
+      {{ i18n.t('briefings.disclaimer.static') }}
+    </p>
 
-      <app-watchlist-manager />
+    <app-watchlist-manager />
 
-      <form class="briefings-page__toolbar feature-panel">
-        <label class="feature-field briefings-page__field">
-          <span class="feature-label">{{ i18n.t('briefings.watchlist.label') }}</span>
-          <select
-            class="feature-select"
-            name="watchlist"
-            [ngModel]="store.selectedWatchlistId()"
-            (ngModelChange)="onWatchlistChange($event)"
-          >
-            <option [ngValue]="null" disabled>{{ i18n.t('briefings.watchlist.placeholder') }}</option>
-            @for (watchlist of store.watchlists(); track watchlist.id) {
-              <option [ngValue]="watchlist.id">{{ watchlist.name }}</option>
-            }
-          </select>
-        </label>
-
-        <app-button
-          [label]="store.isGenerating() ? i18n.t('briefings.generating') : i18n.t('briefings.generate')"
-          [disabled]="!store.selectedWatchlistId() || store.isGenerating()"
-          (pressed)="onGenerate()"
-        />
-      </form>
-
-      @if (store.isLoadingWatchlists() || store.isLoadingBriefings()) {
-        <div class="feature-grid briefings-page__skeletons" aria-busy="true">
-          @for (item of [1, 2, 3]; track item) {
-            <app-skeleton-card />
+    <form class="briefings-page__toolbar feature-panel">
+      <label class="feature-field briefings-page__field">
+        <span class="feature-label">{{ i18n.t('briefings.watchlist.label') }}</span>
+        <select
+          class="feature-select"
+          name="watchlist"
+          [ngModel]="store.selectedWatchlistId()"
+          (ngModelChange)="onWatchlistChange($event)"
+        >
+          <option [ngValue]="null" disabled>{{ i18n.t('briefings.watchlist.placeholder') }}</option>
+          @for (watchlist of store.watchlists(); track watchlist.id) {
+            <option [ngValue]="watchlist.id">{{ watchlist.name }}</option>
           }
-        </div>
-      }
+        </select>
+      </label>
 
-      @if (!store.isLoadingWatchlists() && !store.hasWatchlists()) {
-        <app-empty-state
-          [title]="i18n.t('briefings.watchlist.empty')"
-          [description]="i18n.t('briefings.watchlist.emptyDescription')"
-        />
-      }
-
-      @if (store.error(); as error) {
-        <div class="feature-error" role="alert">
-          <span>{{ i18n.t('briefings.error.banner') }}{{ error }}</span>
-          <app-button [label]="i18n.t('briefings.error.retry')" (pressed)="onRetry()" />
-        </div>
-      }
-
-      @if (!store.selectedWatchlistId() && store.hasWatchlists() && !store.isLoadingWatchlists()) {
-        <p class="briefings-page__prompt">{{ i18n.t('briefings.selectPrompt') }}</p>
-      }
-
-      @if (store.isEmpty() && store.selectedWatchlistId() && !store.isLoadingBriefings()) {
-        <app-empty-state
-          [title]="i18n.t('briefings.empty.title')"
-          [description]="i18n.t('briefings.empty.description')"
-        />
-      }
-
-      @if (!store.isLoadingBriefings() && store.briefings().length > 0) {
-        <div class="feature-grid feature-stagger briefings-page__grid">
-          @for (briefing of store.briefings(); track briefing.id) {
-            <app-briefing-card
-              [attr.id]="'briefing-card-' + briefing.id"
-              [briefing]="briefing"
-              [history]="store.reviewHistoryFor(briefing.id)"
-              [isSubmitting]="store.isSubmittingReviewFor(briefing.id)"
-              [submitError]="store.reviewErrorFor(briefing.id)"
-              [isExporting]="store.isExportingFor(briefing.id)"
-              [exportError]="store.exportErrorFor(briefing.id)"
-              (submitReview)="onSubmitReview(briefing.id, $event)"
-              (exportPdf)="onExportPdf(briefing.id)"
-            />
-          }
-        </div>
-      }
-
-      <app-activity-feed
-        [title]="i18n.t('briefings.activity.title')"
-        [items]="recentActivity()"
-        [emptyLabel]="i18n.t('briefings.activity.empty')"
-        (select)="onActivitySelect($event)"
+      <app-button
+        [label]="
+          store.isGenerating() ? i18n.t('briefings.generating') : i18n.t('briefings.generate')
+        "
+        [disabled]="!store.selectedWatchlistId() || store.isGenerating()"
+        (pressed)="onGenerate()"
       />
+    </form>
+
+    @if (store.isLoadingWatchlists() || store.isLoadingBriefings()) {
+      <div class="feature-grid briefings-page__skeletons" aria-busy="true">
+        @for (item of [1, 2, 3]; track item) {
+          <app-skeleton-card />
+        }
+      </div>
+    }
+
+    @if (!store.isLoadingWatchlists() && !store.hasWatchlists()) {
+      <app-empty-state
+        [title]="i18n.t('briefings.watchlist.empty')"
+        [description]="i18n.t('briefings.watchlist.emptyDescription')"
+      />
+    }
+
+    @if (store.error(); as error) {
+      <div class="feature-error" role="alert">
+        <span>{{ i18n.t('briefings.error.banner') }}{{ error }}</span>
+        <app-button [label]="i18n.t('briefings.error.retry')" (pressed)="onRetry()" />
+      </div>
+    }
+
+    @if (!store.selectedWatchlistId() && store.hasWatchlists() && !store.isLoadingWatchlists()) {
+      <p class="briefings-page__prompt">{{ i18n.t('briefings.selectPrompt') }}</p>
+    }
+
+    @if (store.isEmpty() && store.selectedWatchlistId() && !store.isLoadingBriefings()) {
+      <app-empty-state
+        [title]="i18n.t('briefings.empty.title')"
+        [description]="i18n.t('briefings.empty.description')"
+      />
+    }
+
+    @if (!store.isLoadingBriefings() && store.briefings().length > 0) {
+      <div class="feature-grid feature-stagger briefings-page__grid">
+        @for (briefing of store.briefings(); track briefing.id) {
+          <app-briefing-card
+            [attr.id]="'briefing-card-' + briefing.id"
+            [briefing]="briefing"
+            [history]="store.reviewHistoryFor(briefing.id)"
+            [isSubmitting]="store.isSubmittingReviewFor(briefing.id)"
+            [submitError]="store.reviewErrorFor(briefing.id)"
+            [isExporting]="store.isExportingFor(briefing.id)"
+            [exportError]="store.exportErrorFor(briefing.id)"
+            (submitReview)="onSubmitReview(briefing.id, $event)"
+            (exportPdf)="onExportPdf(briefing.id)"
+          />
+        }
+      </div>
+    }
+
+    <app-activity-feed
+      [title]="i18n.t('briefings.activity.title')"
+      [items]="recentActivity()"
+      [emptyLabel]="i18n.t('briefings.activity.empty')"
+      (select)="onActivitySelect($event)"
+    />
   </div>
 </div>

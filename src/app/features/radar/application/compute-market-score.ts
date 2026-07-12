@@ -51,8 +51,7 @@ export function computeMarketScore(
 
   const avg = weightedSum / classifiedCount;
   const score = Math.round(Math.min(100, Math.max(0, 50 + avg * 50)));
-  const label: MarketScoreLabel =
-    score >= 60 ? 'bullish' : score <= 40 ? 'bearish' : 'neutral';
+  const label: MarketScoreLabel = score >= 60 ? 'bullish' : score <= 40 ? 'bearish' : 'neutral';
 
   return { score, label, processedPct, classifiedCount, totalCount: totalInstruments };
 }
