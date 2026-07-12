@@ -24,6 +24,13 @@
         >
         <a
           class="app-shell__tab"
+          routerLink="/radar/news"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.news.hint')"
+          >{{ i18n.t('shell.nav.news') }}</a
+        >
+        <a
+          class="app-shell__tab"
           routerLink="/chat"
           routerLinkActive="app-shell__tab--active"
           [attr.title]="i18n.t('shell.nav.chat.hint')"

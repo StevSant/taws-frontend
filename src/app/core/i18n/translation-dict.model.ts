@@ -13,6 +13,8 @@ export interface TranslationDict {
   'shell.nav.radar.hint': string;
   'shell.nav.markets': string;
   'shell.nav.markets.hint': string;
+  'shell.nav.news': string;
+  'shell.nav.news.hint': string;
   'shell.nav.chat': string;
   'shell.nav.chat.hint': string;
   'shell.nav.agents': string;

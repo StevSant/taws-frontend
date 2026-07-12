@@ -10,6 +10,8 @@ export const EN_TRANSLATIONS = {
   'shell.nav.radar.hint': 'Market radar, news, and signals',
   'shell.nav.markets': 'Markets',
   'shell.nav.markets.hint': 'Browse every asset with filters and signals',
+  'shell.nav.news': 'News',
+  'shell.nav.news.hint': 'All market news with filters and pagination',
   'shell.nav.chat': 'Chat',
   'shell.nav.chat.hint': 'Natural-language questions to the AI',
   'shell.nav.agents': 'Agents',

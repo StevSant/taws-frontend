@@ -1,4 +1,8 @@
-/** Tab order for main shell navigation — used for directional route transitions. */
+/**
+ * Tab order for main shell navigation — used for directional route transitions.
+ * `/radar/explore` (Markets tab) and `/radar/news` (News tab) intentionally share
+ * the `/radar` index: switches within the radar family animate as `neutral`.
+ */
 const SHELL_TAB_PREFIXES = ['/radar', '/chat', '/agents', '/scenarios', '/briefings', '/brand-lab'] as const;
 
 export type ShellRouteTransition = 'forward' | 'back' | 'neutral';
