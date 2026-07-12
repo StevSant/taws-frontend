@@ -37,5 +37,24 @@
       i18n.t('radar.analysis.unavailable')
     }}</span>
     <p class="signal-analysis__unavailable-hint">{{ i18n.t('radar.analysis.unavailableHint') }}</p>
+
+    @if (canRegenerate) {
+      <div class="signal-analysis__regenerate">
+        <app-button
+          [label]="
+            isRegenerating
+              ? i18n.t('radar.analysis.regenerating')
+              : i18n.t('radar.analysis.regenerate')
+          "
+          [disabled]="isRegenerating"
+          (pressed)="onRegenerate()"
+        />
+        @if (regenerateError; as error) {
+          <span class="signal-analysis__regenerate-error" role="alert"
+            >{{ i18n.t('radar.analysis.regenerateError') }} {{ error }}</span
+          >
+        }
+      </div>
+    }
   </div>
 }

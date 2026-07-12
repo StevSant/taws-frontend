@@ -140,11 +140,18 @@
             {{ confidencePercent(signal.confidence) }}%</span
           >
         </div>
+        <!-- `canRegenerate` is what makes the "análisis no disponible" state a way out rather
+             than a dead end (issue #21): a classified signal with no thesis/drivers/risks can
+             be re-run from here. `SignalAnalysisComponent` only shows it in that state. -->
         <app-signal-analysis
           [thesis]="signal.thesis"
           [keyDrivers]="signal.keyDrivers"
           [riskFactors]="signal.riskFactors"
           [analysisAvailable]="signal.analysisAvailable"
+          [canRegenerate]="true"
+          [isRegenerating]="store.isGenerating()"
+          [regenerateError]="store.generateError()"
+          (regenerate)="onGenerate()"
         />
       } @else {
         <p class="asset-detail__no-signal">{{ i18n.t('radar.detail.noSignal') }}</p>
@@ -157,6 +164,11 @@
           [disabled]="store.isGenerating()"
           (pressed)="onGenerate()"
         />
+        @if (store.generateError(); as generateError) {
+          <span class="asset-detail__generate-error" role="alert"
+            >{{ i18n.t('radar.analysis.regenerateError') }} {{ generateError }}</span
+          >
+        }
       }
     </section>
 

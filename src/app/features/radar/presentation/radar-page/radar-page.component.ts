@@ -139,6 +139,11 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     void this.store.retry();
   }
 
+  /** Retries only the news feed, from the scoped "couldn't load news" state (issue taws#71). */
+  onRetryNews(): void {
+    void this.store.retryNews();
+  }
+
   onAnalyzeAll(): void {
     void this.store.generateAllUnclassified();
   }

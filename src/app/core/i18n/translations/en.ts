@@ -316,6 +316,16 @@ export const EN_TRANSLATIONS = {
   'radar.analysis.unavailableHint': 'AI analysis was not produced for this signal.',
   'radar.analysis.expand': 'Expand analysis',
   'radar.analysis.collapse': 'Collapse analysis',
+  // Way out of the "analysis unavailable" dead end (taws-frontend#21) + scoped news-feed
+  // failure on the radar home (taws#71).
+  'radar.analysis.regenerate': 'Regenerate analysis',
+  'radar.analysis.regenerating': 'Regenerating analysis…',
+  'radar.analysis.regenerateError': 'Could not regenerate the analysis.',
+  'radar.news.error.title': 'Could not load the news feed',
+  'radar.news.error.description':
+    'The rest of the radar is still available. Try again in a few seconds.',
+  'radar.news.error.retry': 'Retry news',
+  'radar.news.error.retrying': 'Retrying…',
   'radar.cards.title': 'Signals',
   'radar.cards.subtitle': 'AI-generated signals from news, filings, and macro data.',
   'radar.summary.prefix': 'Markets are showing',

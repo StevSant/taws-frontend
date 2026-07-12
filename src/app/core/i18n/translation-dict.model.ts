@@ -309,6 +309,15 @@ export interface TranslationDict {
   'radar.analysis.unavailableHint': string;
   'radar.analysis.expand': string;
   'radar.analysis.collapse': string;
+  // Way out of the "análisis no disponible" dead end (taws-frontend#21) + scoped news-feed
+  // failure on the radar home (taws#71).
+  'radar.analysis.regenerate': string;
+  'radar.analysis.regenerating': string;
+  'radar.analysis.regenerateError': string;
+  'radar.news.error.title': string;
+  'radar.news.error.description': string;
+  'radar.news.error.retry': string;
+  'radar.news.error.retrying': string;
   'radar.cards.title': string;
   'radar.cards.subtitle': string;
   'radar.summary.prefix': string;
