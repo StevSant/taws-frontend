@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent } from '../../../../shared';
 import { RadarStore, NewsTimelineEntry } from '../../application/radar-store';
@@ -16,7 +15,7 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 @Component({
   selector: 'app-news-timeline',
   standalone: true,
-  imports: [DatePipe, RouterLink, InstrumentTickerBadgeComponent],
+  imports: [DatePipe, InstrumentTickerBadgeComponent],
   templateUrl: './news-timeline.component.html',
   styleUrl: './news-timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

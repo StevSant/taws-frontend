@@ -1,6 +1,5 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { MacroMiniSparklineComponent } from '../../../../shared';
 import { TranslationService } from '../../../../core';
 import { MacroState } from '../../domain';
@@ -9,7 +8,7 @@ import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
 @Component({
   selector: 'app-radar-macro-cards',
   standalone: true,
-  imports: [DecimalPipe, MacroMiniSparklineComponent, RouterLink],
+  imports: [DecimalPipe, MacroMiniSparklineComponent],
   templateUrl: './radar-macro-cards.component.html',
   styleUrl: './radar-macro-cards.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
