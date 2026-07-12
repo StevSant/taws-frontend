@@ -1,0 +1,17 @@
+.price-delta-chip {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+
+  &--up {
+    color: var(--color-gain);
+  }
+
+  &--down {
+    color: var(--color-loss);
+  }
+
+  &--flat {
+    color: var(--color-text-secondary);
+  }
+}

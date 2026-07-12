@@ -20,7 +20,7 @@
   overflow: hidden;
   background: transparent;
   --chat-sessions-width: 0px;
-  --chat-context-width: 320px;
+  --chat-context-width: 0px;
   --chat-layout-ease: cubic-bezier(0.4, 0, 0.2, 1);
   --chat-layout-duration: 0.32s;
   --texture-energy: 0.5;
@@ -155,6 +155,22 @@
     --chat-thread-gutter: clamp(0.85rem, 1.5vw, 1.25rem);
   }
 
+  &--rail-open {
+    --chat-context-width: 320px;
+  }
+
+  // Fade the rail contents in/out alongside the column-width animation.
+  & app-chat-context-rail {
+    opacity: 0;
+    transition: opacity var(--chat-layout-duration) var(--chat-layout-ease);
+    pointer-events: none;
+  }
+
+  &--rail-open app-chat-context-rail {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   &--sessions &__viewport {
     grid-template-columns: var(--chat-sessions-width) minmax(0, 1fr) var(--chat-context-width);
     gap: 0;
@@ -228,6 +244,42 @@
     transition:
       opacity 0.24s ease,
       transform 0.24s ease,
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background 0.15s ease;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &:hover {
+      color: var(--color-gold);
+      border-color: var(--color-gold-border);
+      background: var(--color-gold-dim-bg);
+    }
+  }
+
+  &__rail-toggle {
+    position: absolute;
+    top: var(--space-2);
+    right: calc(var(--chat-context-width) + var(--space-2));
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition:
+      right var(--chat-layout-duration) var(--chat-layout-ease),
       color 0.15s ease,
       border-color 0.15s ease,
       background 0.15s ease;
@@ -1601,6 +1653,10 @@ html[data-theme='light'] .chat-page {
     > app-chat-context-rail {
       display: none;
     }
+  }
+
+  .chat-page__rail-toggle {
+    display: none;
   }
 }
 
