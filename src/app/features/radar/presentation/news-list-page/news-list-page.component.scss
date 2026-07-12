@@ -1,0 +1,46 @@
+.news-list-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  &__hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  &__hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    max-width: 48rem;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+
+  &__summary {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  &__skeletons,
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: var(--space-4);
+  }
+
+  &__more {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-4) 0;
+  }
+}

@@ -16,15 +16,6 @@ import {
 const SESSION_PATH = '/api/v1/chat/realtime/session';
 const TOOL_PATH = '/api/v1/chat/realtime/tool';
 
-/**
- * Public STUN servers so ICE can discover server-reflexive candidates and keep
- * the peer connection alive through NAT. Without these the browser reports
- * "ICE failed" and the audio drops after a short while.
- */
-const ICE_SERVERS: RTCIceServer[] = [
-  { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-];
-
 interface RealtimeSessionResponse {
   client_secret: string;
   model: string;
@@ -87,7 +78,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       }
       this.tools = session.tools;
 
-      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      const pc = new RTCPeerConnection({ iceServers: this.config.realtimeIceServers });
       this.pc = pc;
       pc.onconnectionstatechange = () => this.handleConnectionStateChange(pc);
       this.attachRemoteAudio(pc);
@@ -320,7 +311,20 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       });
       this.send({ type: OAI_CLIENT_EVENT.responseCreate });
     } catch (error: unknown) {
-      this.emit({ kind: 'error', message: this.toErrorMessage(error) });
+      const message = this.toErrorMessage(error);
+      this.emit({ kind: 'error', message });
+      // Never leave the model hanging on an unanswered function call: return a
+      // function_call_output carrying the error for this call_id, then ask the
+      // model to continue so it can recover (retry, ask the user, or move on).
+      this.send({
+        type: OAI_CLIENT_EVENT.conversationItemCreate,
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify({ error: message }),
+        },
+      });
+      this.send({ type: OAI_CLIENT_EVENT.responseCreate });
     } finally {
       this.emit({ kind: 'tool-call-finished', name });
     }

@@ -1,4 +1,6 @@
 import { NewsItem } from './models/news-item.model';
+import { NewsPage } from './models/news-page.model';
+import { NewsPageRequest } from './models/news-page-request.model';
 import { RadarFilters } from './models/radar-filters.model';
 
 /**
@@ -12,6 +14,13 @@ import { RadarFilters } from './models/radar-filters.model';
 export abstract class NewsRepository {
   /** Returns recent news, most-recent first, filtered by `filters`. */
   abstract fetchNews(filters: RadarFilters): Promise<NewsItem[]>;
+
+  /**
+   * Returns one page of news (most-recent first) plus the backend's
+   * `has_more` flag, for paginated "see all" views. `fetchNews` remains the
+   * unpaginated feed used by the radar home timeline.
+   */
+  abstract fetchNewsPage(filters: RadarFilters, page: NewsPageRequest): Promise<NewsPage>;
 
   /**
    * Returns a single persisted news item by id, or `null` when the backend

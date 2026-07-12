@@ -14,6 +14,50 @@
       </p>
     }
     <blockquote class="scenario-result__narrative">{{ result.narrative }}</blockquote>
+    @if (result.spec.targetPrice; as targetPrice) {
+      <section class="scenario-result__target">
+        <div class="scenario-result__target-main">
+          <span class="scenario-result__target-label">{{
+            i18n.t('scenarios.result.target.label')
+          }}</span>
+          <strong class="scenario-result__target-value">{{ formatTargetPrice(targetPrice) }}</strong>
+          <span class="scenario-result__target-meta">
+            {{ primarySymbol }} · {{ directionLabel() }}
+            @if (result.spec.timeframeDays; as days) {
+              · {{ days }} {{ i18n.t('scenarios.result.target.days') }}
+            }
+          </span>
+        </div>
+        <div class="scenario-result__likelihood">
+          <span class="scenario-result__target-label">{{
+            i18n.t('scenarios.result.likelihood.label')
+          }}</span>
+          <strong class="scenario-result__likelihood-value">{{ formatLikelihood() }}</strong>
+          <span class="scenario-result__target-meta">{{ likelihoodLabel() }}</span>
+          @if (result.spec.likelihoodSampleSize > 0) {
+            <span class="scenario-result__likelihood-sample">
+              {{ result.spec.likelihoodOccurrences }}/{{ result.spec.likelihoodSampleSize }}
+              {{ i18n.t('scenarios.result.likelihood.windows') }}
+            </span>
+          }
+        </div>
+        <div class="scenario-result__target-confidence">
+          <span>{{ i18n.t('scenarios.result.impact.confidence.label') }}</span>
+          <app-confidence-gauge [value]="primaryConfidence" [size]="52" />
+        </div>
+      </section>
+      <p class="scenario-result__likelihood-note">
+        {{ i18n.t('scenarios.result.likelihood.note') }}
+      </p>
+    }
+    <div class="scenario-result__agent-strip">
+      <span class="scenario-result__agent-label">{{ i18n.t('scenarios.result.team.label') }}</span>
+      <span class="scenario-result__agent">Quant</span>
+      <span class="scenario-result__agent">Analyst</span>
+      <span class="scenario-result__agent">Macro</span>
+      <span class="scenario-result__agent">Consequence</span>
+      <span class="scenario-result__agent">Advisor</span>
+    </div>
   </header>
 
   <section class="scenario-result__section scenario-result__section--featured">

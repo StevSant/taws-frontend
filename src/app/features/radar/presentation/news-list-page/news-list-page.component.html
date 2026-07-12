@@ -1,0 +1,59 @@
+<div class="feature-page news-list-page">
+  <header class="news-list-page__hero">
+    <div class="news-list-page__hero-copy">
+      <h1 class="news-list-page__title">{{ i18n.t('radar.newsList.title') }}</h1>
+      <p class="news-list-page__summary">{{ i18n.t('radar.newsList.description') }}</p>
+    </div>
+
+    <app-radar-filters
+      class="news-list-page__filters"
+      [filters]="store.filters()"
+      [instrumentOptions]="store.instrumentOptions()"
+      (assetClassChange)="store.setAssetClass($event)"
+      (symbolChange)="store.setSymbol($event)"
+      (sinceHoursChange)="store.setSinceHours($event)"
+    />
+  </header>
+
+  @if (store.isLoading()) {
+    <div class="news-list-page__skeletons" aria-busy="true">
+      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+        <app-skeleton-card />
+      }
+    </div>
+  }
+
+  @if (store.error(); as error) {
+    <div class="feature-error" role="alert">
+      <span>{{ i18n.t('radar.error.banner') }}{{ error }}</span>
+      <app-button [label]="i18n.t('radar.error.retry')" (pressed)="onRetry()" />
+    </div>
+  }
+
+  @if (store.isEmpty()) {
+    <app-empty-state
+      [title]="i18n.t('radar.newsList.empty.title')"
+      [description]="i18n.t('radar.newsList.empty.description')"
+    />
+  }
+
+  @if (!store.isLoading() && store.items().length > 0) {
+    <div class="news-list-page__grid">
+      @for (item of store.items(); track item.id) {
+        <app-news-card [news]="item" />
+      }
+    </div>
+
+    @if (store.hasMore()) {
+      <div class="news-list-page__more">
+        <app-button
+          [label]="
+            store.isLoadingMore() ? i18n.t('radar.loading') : i18n.t('radar.timeline.loadMore')
+          "
+          [disabled]="store.isLoadingMore()"
+          (pressed)="onLoadMore()"
+        />
+      </div>
+    }
+  }
+</div>

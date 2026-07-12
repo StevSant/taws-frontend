@@ -35,9 +35,14 @@ export class ChatContextRailComponent implements OnInit {
   readonly radar = inject(RadarStore);
   readonly i18n = inject(TranslationService);
   readonly askNews = output<string>();
+  readonly closePanel = output<void>();
 
   ngOnInit(): void {
     void this.radar.init();
+  }
+
+  onClose(): void {
+    this.closePanel.emit();
   }
 
   topNews() {

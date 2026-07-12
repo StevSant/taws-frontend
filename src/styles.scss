@@ -100,6 +100,16 @@ body.route-chat .app-shell {
   background: var(--color-background);
 }
 
+body.voice-mode-open {
+  overflow: hidden;
+}
+
+body.voice-mode-open .chat-page__footer,
+body.voice-mode-open .chat-page__voice-hint {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 body.route-chat .app-shell__main {
   height: 100dvh;
   max-height: 100dvh;

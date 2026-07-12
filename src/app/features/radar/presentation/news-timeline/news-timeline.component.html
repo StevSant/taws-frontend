@@ -1,14 +1,41 @@
 <section class="news-timeline feature-panel">
   <header class="news-timeline__header">
     <h2 class="news-timeline__title">{{ i18n.t('radar.timeline.title') }}</h2>
+    <a class="news-timeline__view-all" routerLink="/radar/news">
+      {{ i18n.t('radar.timeline.viewAll') }}
+    </a>
   </header>
 
   <ul class="news-timeline__list">
     @for (entry of visibleEntries(); track entry.news.id) {
-      <li class="news-timeline__item">
+      <li
+        class="news-timeline__item"
+        role="link"
+        tabindex="0"
+        [attr.aria-label]="entry.news.title"
+        (click)="onOpenEntry($event, entry)"
+        (keydown.enter)="onOpenEntry($event, entry)"
+      >
         <time class="news-timeline__time">{{ entry.news.publishedAt | date: 'HH:mm' }}</time>
 
-        <div class="news-timeline__copy">
+        <div class="news-timeline__body">
+          @if (entry.news.imageUrl) {
+            <a
+              class="news-timeline__thumb"
+              [routerLink]="['/radar/news', entry.news.id]"
+              [attr.aria-label]="entry.news.title"
+            >
+              <img
+                [src]="entry.news.imageUrl"
+                [alt]="entry.news.title"
+                loading="lazy"
+                decoding="async"
+                (error)="onImageError($event)"
+              />
+            </a>
+          }
+
+          <div class="news-timeline__copy">
           <div class="news-timeline__headline-row">
             <a class="news-timeline__headline" [routerLink]="['/radar/news', entry.news.id]">{{
               entry.news.title
@@ -33,6 +60,9 @@
               <span class="news-timeline__provider">{{ provider }}</span> ·
             }
             {{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}
+            <span class="news-timeline__open" aria-hidden="true"
+              >{{ i18n.t('radar.card.openDetail') }} →</span
+            >
           </span>
 
           <ul class="news-timeline__symbols">
@@ -77,6 +107,7 @@
               </li>
             }
           </ul>
+        </div>
         </div>
       </li>
     }

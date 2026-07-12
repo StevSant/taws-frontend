@@ -21,7 +21,9 @@ import { TranslationKey, TranslationService } from '../../../../core';
 
 import { AuthStore } from '../../../auth/application';
 
-import { ButtonComponent, GoldenPolyhedronComponent, MarkdownPipe } from '../../../../shared';
+import { GoldenPolyhedronComponent, MarkdownPipe, MidasGlyphComponent } from '../../../../shared';
+
+import { MidasGlyphId } from '../../../../shared/midas-glyph/midas-glyph.model';
 
 import { PolyhedronActivity } from '../../../../shared/golden-polyhedron/polyhedron-activity.model';
 
@@ -29,7 +31,14 @@ import { ChatSessionsStore, ChatStore } from '../../application';
 
 import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 
-import { ChatRepository } from '../../domain';
+import {
+  ChatMessage,
+  ChatRepository,
+  ToolHopSnapshot,
+  formatToolName,
+  resolveAgentGlyph,
+  resolveRespondingAgent,
+} from '../../domain';
 
 import { SseChatRepository } from '../../infrastructure';
 
@@ -101,9 +110,9 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
 
     RouterLink,
 
-    ButtonComponent,
-
     GoldenPolyhedronComponent,
+
+    MidasGlyphComponent,
 
     MarkdownPipe,
 
@@ -233,11 +242,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   );
 
   readonly respondingAgentLabel = computed(() => {
-    const hops = this.store.routingHops();
+    const agent = resolveRespondingAgent(this.store.routingHops());
 
-    const hop = [...hops].reverse().find((h) => h.status === 'active' || h.status === 'done');
-
-    return hop ? this.agentLabel(hop.agent) : this.i18n.t('chat.role.assistant');
+    return agent ? this.agentLabel(agent) : this.i18n.t('chat.role.assistant');
   });
 
   /** Live status line while the backend routes agents or streams tokens. */
@@ -252,6 +259,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     if (latestAssistant?.content) {
       return this.i18n.t('chat.thinking.writing');
+    }
+
+    const activeTool = [...this.store.toolHops()]
+      .reverse()
+      .find((hop) => hop.status === 'active');
+
+    if (activeTool) {
+      return `${this.i18n.t('chat.thinking.tool')} ${this.toolLabel(activeTool.name)}…`;
     }
 
     const hops = this.store.routingHops();
@@ -308,6 +323,34 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     const key = AGENT_LABEL_KEYS[agent];
 
     return key ? this.i18n.t(key) : agent;
+  }
+
+  agentGlyph(agent: string | null | undefined): MidasGlyphId | null {
+    return agent ? resolveAgentGlyph(agent) : null;
+  }
+
+  messageAgent(message: ChatMessage): string | null {
+    if (message.role !== 'assistant') {
+      return null;
+    }
+
+    if (message.pending && this.isLatestAssistant(message.id)) {
+      return resolveRespondingAgent(this.store.routingHops()) ?? message.agent ?? null;
+    }
+
+    return message.agent ?? null;
+  }
+
+  messageTools(message: ChatMessage): ToolHopSnapshot[] {
+    if (message.pending && this.isLatestAssistant(message.id)) {
+      return this.store.toolHops().map(({ name, status }) => ({ name, status }));
+    }
+
+    return message.tools ?? [];
+  }
+
+  toolLabel(name: string): string {
+    return formatToolName(name);
   }
 
   isLatestAssistant(messageId: string): boolean {

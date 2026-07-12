@@ -10,6 +10,7 @@ import {
   WatchlistItemAddRequestDto,
   WatchlistItemDto,
   WatchlistRenameRequestDto,
+  WatchlistReorderRequestDto,
 } from './watchlist-item-dto';
 import { WatchlistDto } from './watchlist-dto';
 
@@ -62,6 +63,15 @@ export class HttpWatchlistRepository extends WatchlistRepository {
     await firstValueFrom(
       this.http.delete<void>(`${this.config.apiBaseUrl}${WATCHLISTS_PATH}/${id}`),
     );
+    this.cache.clearNamespace('watchlists');
+  }
+
+  async reorder(orderedIds: string[]): Promise<void> {
+    const body: WatchlistReorderRequestDto = { ordered_ids: orderedIds };
+    await firstValueFrom(
+      this.http.patch<void>(`${this.config.apiBaseUrl}${WATCHLISTS_PATH}/reorder`, body),
+    );
+    // Invalidate the cached list so the next fetch reflects the persisted order.
     this.cache.clearNamespace('watchlists');
   }
 

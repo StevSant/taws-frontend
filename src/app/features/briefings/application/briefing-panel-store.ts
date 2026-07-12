@@ -1,7 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { NotificationsStore } from '../../../core';
-import { Instrument, InstrumentRepository, SignalRepository } from '../../radar/domain';
+import {
+  EnrichedInstrument,
+  Instrument,
+  InstrumentRepository,
+  MarketsRepository,
+  SignalRepository,
+} from '../../radar/domain';
 import { downloadBlob } from '../../../shared';
 import {
   Briefing,
@@ -23,11 +29,19 @@ export interface SignalPrepProgress {
   total: number;
 }
 
-/** A watchlist item enriched with its instrument's display name for the preview. */
+/**
+ * A watchlist item enriched for the preview with its instrument display name
+ * plus the latest market quote (last price + % change). Quote fields are
+ * `null` until the enriched-instruments fetch resolves or when the symbol has
+ * no computed market data — the UI renders a neutral em dash rather than a
+ * fabricated value (issue #66).
+ */
 export interface WatchlistItemView {
   id: string;
   symbol: string;
   name: string;
+  lastPrice: number | null;
+  priceDeltaPct: number | null;
 }
 
 /**
@@ -55,6 +69,7 @@ export class BriefingPanelStore {
   private readonly isLoadingItemsSignal = signal(false);
   private readonly isManagingWatchlistSignal = signal(false);
   private readonly instrumentsSignal = signal<Instrument[]>([]);
+  private readonly enrichedInstrumentsSignal = signal<EnrichedInstrument[]>([]);
   private readonly addSymbolErrorSignal = signal<AddSymbolError | null>(null);
   private readonly signalPrepProgressSignal = signal<SignalPrepProgress | null>(null);
   private sessionReady = false;
@@ -78,7 +93,12 @@ export class BriefingPanelStore {
     () => new Set(this.instrumentsSignal().map((instrument) => instrument.symbol.toUpperCase())),
   );
 
-  /** Watchlist items enriched with their instrument display name for the preview. */
+  /**
+   * Watchlist items enriched for the preview with their instrument display
+   * name and latest market quote (last price + % change). The quote is matched
+   * by symbol against the enriched-instruments fetch (issue #66); an unmatched
+   * symbol keeps `null` quote fields so the UI shows a neutral placeholder.
+   */
   readonly watchlistItemViews = computed<WatchlistItemView[]>(() => {
     const nameBySymbol = new Map(
       this.instrumentsSignal().map((instrument) => [
@@ -86,11 +106,20 @@ export class BriefingPanelStore {
         instrument.name,
       ]),
     );
-    return this.watchlistItemsSignal().map((item) => ({
-      id: item.id,
-      symbol: item.symbol,
-      name: nameBySymbol.get(item.symbol.toUpperCase()) ?? item.symbol,
-    }));
+    const quoteBySymbol = new Map(
+      this.enrichedInstrumentsSignal().map((enriched) => [enriched.symbol.toUpperCase(), enriched]),
+    );
+    return this.watchlistItemsSignal().map((item) => {
+      const key = item.symbol.toUpperCase();
+      const quote = quoteBySymbol.get(key);
+      return {
+        id: item.id,
+        symbol: item.symbol,
+        name: nameBySymbol.get(key) ?? item.symbol,
+        lastPrice: quote?.lastPrice ?? null,
+        priceDeltaPct: quote?.priceDeltaPct ?? null,
+      };
+    });
   });
 
   readonly selectedWatchlist = computed<Watchlist | null>(
@@ -117,14 +146,16 @@ export class BriefingPanelStore {
     private readonly notifications: NotificationsStore,
     private readonly instrumentRepository: InstrumentRepository,
     private readonly signalRepository: SignalRepository,
+    private readonly marketsRepository: MarketsRepository,
   ) {}
 
   /** Loads the user's watchlists and auto-selects the first one, if any. */
   async init(): Promise<void> {
     // The known-instrument universe backs the add-symbol autocomplete/validation and the
     // enriched preview (issue #61); load it in the background — a failure just degrades to
-    // no autocomplete, never blocks the page.
-    void this.loadInstruments();
+    // no autocomplete, never blocks the page. The enriched-instruments fetch (issue #66)
+    // then hangs the per-symbol live price + %change off it; both are best-effort.
+    void this.loadMarketData();
 
     if (this.sessionReady && this.watchlistsSignal().length > 0) {
       void this.loadWatchlists({ background: true });
@@ -191,6 +222,40 @@ export class BriefingPanelStore {
         await this.selectWatchlist(next);
       }
     } catch (error: unknown) {
+      this.errorSignal.set(this.toErrorMessage(error));
+    } finally {
+      this.isManagingWatchlistSignal.set(false);
+    }
+  }
+
+  /**
+   * Reorders the user's watchlists to match `orderedIds` and persists the new
+   * order (issue #66). Updates the local order optimistically for an instant UI
+   * response, then calls `PATCH /api/v1/watchlists/reorder`; on failure the
+   * previous order is restored and the error surfaced. `orderedIds` must be a
+   * permutation of the current ids — a mismatch is ignored rather than risking
+   * dropping a list from the view.
+   */
+  async reorderWatchlists(orderedIds: string[]): Promise<void> {
+    if (this.isManagingWatchlistSignal()) {
+      return;
+    }
+    const previous = this.watchlistsSignal();
+    const byId = new Map(previous.map((watchlist) => [watchlist.id, watchlist]));
+    const next = orderedIds
+      .map((id) => byId.get(id))
+      .filter((watchlist): watchlist is Watchlist => watchlist !== undefined);
+    if (next.length !== previous.length) {
+      return;
+    }
+
+    this.watchlistsSignal.set(next);
+    this.isManagingWatchlistSignal.set(true);
+    this.errorSignal.set(null);
+    try {
+      await this.watchlistRepository.reorder(orderedIds);
+    } catch (error: unknown) {
+      this.watchlistsSignal.set(previous);
       this.errorSignal.set(this.toErrorMessage(error));
     } finally {
       this.isManagingWatchlistSignal.set(false);
@@ -381,6 +446,18 @@ export class BriefingPanelStore {
     }
   }
 
+  /**
+   * Loads the instrument universe, then the enriched market quotes for the
+   * live watchlist preview (issue #66). Sequenced so the enriched page can be
+   * sized to the universe and fetched once, matched by symbol in
+   * `watchlistItemViews`. Both steps are best-effort — a failure degrades the
+   * preview to name-only, never blocks the page.
+   */
+  private async loadMarketData(): Promise<void> {
+    await this.loadInstruments();
+    await this.loadEnrichedInstruments();
+  }
+
   private async loadInstruments(): Promise<void> {
     if (this.instrumentsSignal().length > 0) {
       return;
@@ -389,6 +466,30 @@ export class BriefingPanelStore {
       this.instrumentsSignal.set(await this.instrumentRepository.fetchInstruments());
     } catch {
       this.instrumentsSignal.set([]);
+    }
+  }
+
+  /**
+   * Fetches the enriched instruments (last price + % change) once and caches
+   * them for the watchlist preview. The page is sized to the loaded universe so
+   * a single request covers every symbol a watchlist could reference — no
+   * hardcoded page size and no per-symbol fan-out.
+   */
+  private async loadEnrichedInstruments(): Promise<void> {
+    if (this.enrichedInstrumentsSignal().length > 0) {
+      return;
+    }
+    const universeSize = this.instrumentsSignal().length;
+    if (universeSize === 0) {
+      return;
+    }
+    try {
+      const page = await this.marketsRepository.fetchEnrichedInstruments({
+        pageSize: universeSize,
+      });
+      this.enrichedInstrumentsSignal.set(page.items);
+    } catch {
+      this.enrichedInstrumentsSignal.set([]);
     }
   }
 

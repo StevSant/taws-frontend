@@ -1,13 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import {
-  AgentTrace,
-  ChartSpec,
-  ChatMessage,
-  ChatRepository,
-  ChatStreamEvent,
-  buildRoutingHops,
-} from '../domain';
+import { AgentTrace, ChartSpec, ChatMessage, ChatRepository, ChatStreamEvent, ToolCall, buildRoutingHops, buildToolHops, resolveRespondingAgent, snapshotToolHops } from '../domain';
 import { ChatSessionsStore } from './chat-sessions-store';
 
 const ASSISTANT_ROLE = 'assistant';
@@ -24,12 +17,15 @@ export class ChatStore {
 
   private readonly streamingSignal = signal(false);
   private readonly tracesSignal = signal<AgentTrace[]>([]);
+  private readonly toolCallsSignal = signal<ToolCall[]>([]);
   private readonly errorSignal = signal<string | null>(null);
 
   readonly messages = this.sessionsStore.activeMessages;
   readonly isStreaming = this.streamingSignal.asReadonly();
   readonly traces = this.tracesSignal.asReadonly();
+  readonly toolCalls = this.toolCallsSignal.asReadonly();
   readonly routingHops = computed(() => buildRoutingHops(this.tracesSignal()));
+  readonly toolHops = computed(() => buildToolHops(this.toolCallsSignal()));
   readonly error = this.errorSignal.asReadonly();
   readonly canSend = computed(() => !this.streamingSignal());
 
@@ -50,6 +46,7 @@ export class ChatStore {
     const assistantId = this.nextId();
     this.appendMessage({ id: assistantId, role: ASSISTANT_ROLE, content: '', pending: true });
     this.tracesSignal.set([]);
+    this.toolCallsSignal.set([]);
 
     try {
       for await (const event of this.chatRepository.streamReply(trimmed, threadId)) {
@@ -71,6 +68,9 @@ export class ChatStore {
         break;
       case 'trace':
         this.tracesSignal.update((traces) => [...traces, event.trace]);
+        break;
+      case 'tool':
+        this.toolCallsSignal.update((calls) => [...calls, event.tool]);
         break;
       case 'chart':
         this.appendChart(assistantId, event.chart);
@@ -104,9 +104,19 @@ export class ChatStore {
   }
 
   private markSettled(messageId: string): void {
+    const agent = resolveRespondingAgent(this.routingHops());
+    const tools = snapshotToolHops(this.toolHops());
+
     this.sessionsStore.syncActiveMessages(
       this.messages().map((message) =>
-        message.id === messageId ? { ...message, pending: false } : message,
+        message.id === messageId
+          ? {
+              ...message,
+              pending: false,
+              ...(agent ? { agent } : {}),
+              ...(tools.length > 0 ? { tools } : {}),
+            }
+          : message,
       ),
     );
   }
