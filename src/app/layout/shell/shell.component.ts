@@ -27,7 +27,14 @@ import { ShellSearchResult } from './filter-shell-search';
 import { ShellSearchService } from './shell-search.service';
 
 // Routes that hide the shell's demo-disclaimer footer (full-width app views).
-const CUSTOM_LAYOUT_ROUTE_PREFIXES = ['/radar', '/chat', '/scenarios', '/briefings', '/brand-lab'];
+const CUSTOM_LAYOUT_ROUTE_PREFIXES = [
+  '/radar',
+  '/chat',
+  '/agents',
+  '/scenarios',
+  '/briefings',
+  '/brand-lab',
+];
 
 @Component({
   selector: 'app-shell',

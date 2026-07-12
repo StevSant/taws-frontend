@@ -118,6 +118,19 @@ body.route-login app-root {
   overflow: hidden;
 }
 
+@media (max-width: 980px) {
+  body.route-login {
+    overflow: auto;
+  }
+
+  body.route-login app-root {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
 body.route-chat .app-shell__content {
   overflow: hidden;
   background: transparent;

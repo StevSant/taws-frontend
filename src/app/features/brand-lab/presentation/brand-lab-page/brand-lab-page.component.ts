@@ -12,7 +12,15 @@ import { MidasGlyphComponent } from '../../../../shared/midas-glyph/midas-glyph.
 import { GoldenPolyhedronComponent } from '../../../../shared/golden-polyhedron/golden-polyhedron.component';
 import { BrandLabStore } from '../../application/brand-lab-store';
 
-const AGENT_ORDER: MidasAgentId[] = ['supervisor', 'analyst', 'quant', 'advisor', 'consequence'];
+const AGENT_ORDER: MidasAgentId[] = [
+  'supervisor',
+  'analyst',
+  'quant',
+  'macro',
+  'sentiment',
+  'consequence',
+  'advisor',
+];
 
 const AGENT_LABEL_KEYS: Record<MidasAgentId, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
@@ -20,6 +28,8 @@ const AGENT_LABEL_KEYS: Record<MidasAgentId, TranslationKey> = {
   quant: 'chat.agent.quant',
   advisor: 'chat.agent.advisor',
   consequence: 'chat.agent.consequence',
+  macro: 'chat.agent.macro',
+  sentiment: 'chat.agent.sentiment',
 };
 
 @Component({

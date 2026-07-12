@@ -1,5 +1,6 @@
 import type { EChartsOption } from 'echarts';
 import { ChartSpec } from '../domain/chart-spec.model';
+import { createTimeAxisFormatter } from './create-time-axis-formatter';
 import { ChartTheme } from './read-chart-theme';
 
 /**
@@ -7,8 +8,15 @@ import { ChartTheme } from './read-chart-theme';
  * app that knows ECharts option shapes — every other layer speaks `ChartSpec`. Phase 1
  * handles `candlestick` and `line`; Phase 2 extends with `comparison`, `distribution`,
  * `drawdown`, and `gauge`.
+ *
+ * `locale` drives the shared date-axis formatter so every date-bearing axis renders
+ * locale-formatted labels (`29 jun`) instead of raw ISO timestamps.
  */
-export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+export function mapChartSpecToOption(
+  spec: ChartSpec,
+  theme: ChartTheme,
+  locale: string,
+): EChartsOption {
   const base: EChartsOption = {
     backgroundColor: 'transparent',
     title: {
@@ -21,18 +29,20 @@ export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChart
     textStyle: { color: theme.textSecondary },
   };
 
+  const formatDate = createTimeAxisFormatter(locale);
+
   switch (spec.type) {
     case 'candlestick':
-      return { ...base, ...candlestickOption(spec, theme) };
+      return { ...base, ...candlestickOption(spec, theme, formatDate) };
     case 'line':
     case 'area':
-      return { ...base, ...lineOption(spec, theme) };
+      return { ...base, ...lineOption(spec, theme, formatDate) };
     case 'comparison':
-      return { ...base, ...comparisonOption(spec, theme) };
+      return { ...base, ...comparisonOption(spec, theme, formatDate) };
     case 'distribution':
       return { ...base, ...distributionOption(spec, theme) };
     case 'drawdown':
-      return { ...base, ...drawdownOption(spec, theme) };
+      return { ...base, ...drawdownOption(spec, theme, formatDate) };
     case 'gauge':
       return gaugeOption(spec, theme);
     default:
@@ -41,6 +51,9 @@ export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChart
   }
 }
 
+/** Shared `axisLabel.formatter` type for the date axes below. */
+type DateAxisFormatter = (value: string | number) => string;
+
 /**
  * Fraction of the plot height the volume bars occupy at the bottom. The volume value axis is
  * given a `max` of `peakVolume / VOLUME_PLOT_FRACTION`, so the tallest bar fills this fraction
@@ -48,7 +61,11 @@ export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChart
  */
 const VOLUME_PLOT_FRACTION = 0.28;
 
-function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+function candlestickOption(
+  spec: ChartSpec,
+  theme: ChartTheme,
+  formatDate: DateAxisFormatter,
+): EChartsOption {
   const series = spec.series[0];
   if (!series) {
     return {};
@@ -63,7 +80,7 @@ function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
         type: 'category',
         data: categories,
         axisLine: { lineStyle: { color: theme.grid } },
-        axisLabel: { color: theme.textSecondary },
+        axisLabel: { color: theme.textSecondary, formatter: formatDate },
       },
       yAxis: {
         type: 'value',
@@ -104,6 +121,7 @@ function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
         type: 'category',
         data: categories,
         axisLine: { lineStyle: { color: theme.grid } },
+        axisLabel: { color: theme.textSecondary, formatter: formatDate },
       },
       yAxis: {
         type: 'value',
@@ -124,7 +142,12 @@ function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   }));
 
   return {
-    xAxis: { type: 'category', data: categories, axisLine: { lineStyle: { color: theme.grid } } },
+    xAxis: {
+      type: 'category',
+      data: categories,
+      axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary, formatter: formatDate },
+    },
     yAxis: [
       {
         type: 'value',
@@ -151,11 +174,16 @@ function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   };
 }
 
-function lineOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+function lineOption(
+  spec: ChartSpec,
+  theme: ChartTheme,
+  formatDate: DateAxisFormatter,
+): EChartsOption {
   return {
     xAxis: {
       type: 'time',
       axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary, formatter: formatDate },
     },
     yAxis: {
       type: 'value',
@@ -174,11 +202,19 @@ function lineOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   };
 }
 
-function comparisonOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+function comparisonOption(
+  spec: ChartSpec,
+  theme: ChartTheme,
+  formatDate: DateAxisFormatter,
+): EChartsOption {
   const palette = [theme.gold, theme.gain, theme.loss, theme.textSecondary];
   return {
     legend: { textStyle: { color: theme.textSecondary } },
-    xAxis: { type: 'time', axisLine: { lineStyle: { color: theme.grid } } },
+    xAxis: {
+      type: 'time',
+      axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary, formatter: formatDate },
+    },
     yAxis: {
       type: 'value',
       scale: true,
@@ -232,13 +268,21 @@ function distributionOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   };
 }
 
-function drawdownOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+function drawdownOption(
+  spec: ChartSpec,
+  theme: ChartTheme,
+  formatDate: DateAxisFormatter,
+): EChartsOption {
   const series = spec.series[0];
   if (!series) {
     return {};
   }
   return {
-    xAxis: { type: 'time', axisLine: { lineStyle: { color: theme.grid } } },
+    xAxis: {
+      type: 'time',
+      axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary, formatter: formatDate },
+    },
     yAxis: {
       type: 'value',
       max: 0,

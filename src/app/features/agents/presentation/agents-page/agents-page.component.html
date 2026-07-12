@@ -1,0 +1,34 @@
+<div class="feature-page feature-page--narrow agents-page">
+  <header class="agents-page__hero">
+    <h1 class="agents-page__title">{{ i18n.t('agents.title') }}</h1>
+    <p class="agents-page__subtitle">{{ i18n.t('agents.subtitle') }}</p>
+  </header>
+
+  <div class="agents-page__grid">
+    @for (agent of agents; track agent.id) {
+      <article
+        class="agents-page__card"
+        [class.agents-page__card--router]="agent.kind === 'router'"
+      >
+        <div class="agents-page__card-top">
+          <app-midas-glyph [glyph]="glyphFor(agent)" [size]="52" />
+          <div class="agents-page__card-meta">
+            <span class="agents-page__kind">{{ kindLabel(agent) }}</span>
+            <h2 class="agents-page__name">{{ i18n.t(agent.nameKey) }}</h2>
+          </div>
+        </div>
+
+        <p class="agents-page__role">{{ i18n.t(agent.roleKey) }}</p>
+
+        <p class="agents-page__example">
+          <span class="agents-page__example-label">{{ i18n.t('agents.exampleLabel') }}</span>
+          {{ i18n.t(agent.exampleKey) }}
+        </p>
+
+        <button type="button" class="agents-page__ask" (click)="ask(agent)">
+          {{ i18n.t('agents.ask') }}
+        </button>
+      </article>
+    }
+  </div>
+</div>

@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { NotificationsStore } from '../../../core';
+import { Instrument, InstrumentRepository, SignalRepository } from '../../radar/domain';
 import { downloadBlob } from '../../../shared';
 import {
   Briefing,
@@ -12,6 +13,22 @@ import {
   WatchlistItem,
   WatchlistRepository,
 } from '../domain';
+
+/** Reason an "add symbol" attempt was rejected client-side, mapped to i18n by the UI. */
+export type AddSymbolError = 'unknown' | 'duplicate';
+
+/** Progress of the pre-briefing Analyst pipeline run (issue #61). */
+export interface SignalPrepProgress {
+  current: number;
+  total: number;
+}
+
+/** A watchlist item enriched with its instrument's display name for the preview. */
+export interface WatchlistItemView {
+  id: string;
+  symbol: string;
+  name: string;
+}
 
 /**
  * Signal-based state + facade for the briefing/review panel. Presentation
@@ -37,6 +54,9 @@ export class BriefingPanelStore {
   private readonly watchlistItemsSignal = signal<WatchlistItem[]>([]);
   private readonly isLoadingItemsSignal = signal(false);
   private readonly isManagingWatchlistSignal = signal(false);
+  private readonly instrumentsSignal = signal<Instrument[]>([]);
+  private readonly addSymbolErrorSignal = signal<AddSymbolError | null>(null);
+  private readonly signalPrepProgressSignal = signal<SignalPrepProgress | null>(null);
   private sessionReady = false;
 
   readonly watchlists = this.watchlistsSignal.asReadonly();
@@ -49,6 +69,26 @@ export class BriefingPanelStore {
   readonly isLoadingBriefings = this.isLoadingBriefingsSignal.asReadonly();
   readonly isGenerating = this.isGeneratingSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
+  readonly instruments = this.instrumentsSignal.asReadonly();
+  readonly addSymbolError = this.addSymbolErrorSignal.asReadonly();
+  readonly signalPrepProgress = this.signalPrepProgressSignal.asReadonly();
+
+  /** Uppercased set of every known instrument symbol, for O(1) validation/autocomplete. */
+  readonly knownSymbols = computed(
+    () => new Set(this.instrumentsSignal().map((instrument) => instrument.symbol.toUpperCase())),
+  );
+
+  /** Watchlist items enriched with their instrument display name for the preview. */
+  readonly watchlistItemViews = computed<WatchlistItemView[]>(() => {
+    const nameBySymbol = new Map(
+      this.instrumentsSignal().map((instrument) => [instrument.symbol.toUpperCase(), instrument.name]),
+    );
+    return this.watchlistItemsSignal().map((item) => ({
+      id: item.id,
+      symbol: item.symbol,
+      name: nameBySymbol.get(item.symbol.toUpperCase()) ?? item.symbol,
+    }));
+  });
 
   readonly selectedWatchlist = computed<Watchlist | null>(
     () =>
@@ -72,10 +112,17 @@ export class BriefingPanelStore {
     private readonly briefingRepository: BriefingRepository,
     private readonly reviewRepository: ReviewRepository,
     private readonly notifications: NotificationsStore,
+    private readonly instrumentRepository: InstrumentRepository,
+    private readonly signalRepository: SignalRepository,
   ) {}
 
   /** Loads the user's watchlists and auto-selects the first one, if any. */
   async init(): Promise<void> {
+    // The known-instrument universe backs the add-symbol autocomplete/validation and the
+    // enriched preview (issue #61); load it in the background — a failure just degrades to
+    // no autocomplete, never blocks the page.
+    void this.loadInstruments();
+
     if (this.sessionReady && this.watchlistsSignal().length > 0) {
       void this.loadWatchlists({ background: true });
       return;
@@ -147,12 +194,33 @@ export class BriefingPanelStore {
     }
   }
 
+  /** Clears the "add symbol" validation error (e.g. when the user edits the input). */
+  clearAddSymbolError(): void {
+    this.addSymbolErrorSignal.set(null);
+  }
+
   async addWatchlistItem(symbol: string): Promise<void> {
     const watchlistId = this.selectedWatchlistIdSignal();
     const trimmed = symbol.trim().toUpperCase();
     if (!watchlistId || !trimmed || this.isManagingWatchlistSignal()) {
       return;
     }
+
+    // Validate against the known-instrument universe (issue #61): reject unknown tickers
+    // like "APPPSDPSDP" up front instead of persisting garbage. Only enforced once the
+    // universe has actually loaded, so a failed instruments fetch degrades to "no
+    // client-side validation" rather than blocking every add.
+    const known = this.knownSymbols();
+    if (known.size > 0 && !known.has(trimmed)) {
+      this.addSymbolErrorSignal.set('unknown');
+      return;
+    }
+    if (this.watchlistItemsSignal().some((item) => item.symbol.toUpperCase() === trimmed)) {
+      this.addSymbolErrorSignal.set('duplicate');
+      return;
+    }
+
+    this.addSymbolErrorSignal.set(null);
     this.isManagingWatchlistSignal.set(true);
     this.errorSignal.set(null);
     try {
@@ -182,7 +250,15 @@ export class BriefingPanelStore {
     }
   }
 
-  /** Triggers on-demand briefing generation for the selected watchlist (HU3). */
+  /**
+   * Triggers on-demand briefing generation for the selected watchlist (HU3).
+   *
+   * Issue #61: before composing, auto-runs the Analyst pipeline for any watchlist symbol
+   * that has no signals yet (with visible progress), so the user never has to know about
+   * `POST /api/v1/signals/generate` and the resulting briefing is grounded in real signals
+   * instead of an empty state. Signal prep is best-effort — a per-symbol failure is
+   * swallowed so one unanalyzable instrument doesn't block the whole briefing.
+   */
   async generateBriefing(): Promise<void> {
     const watchlistId = this.selectedWatchlistIdSignal();
     if (!watchlistId || this.isGeneratingSignal()) {
@@ -192,6 +268,7 @@ export class BriefingPanelStore {
     this.isGeneratingSignal.set(true);
     this.errorSignal.set(null);
     try {
+      await this.ensureSignalsForWatchlist();
       const briefing = await this.briefingRepository.generateBriefing(watchlistId);
       this.briefingsSignal.update((briefings) => [briefing, ...briefings]);
       await this.loadReviewHistory(briefing.id);
@@ -199,7 +276,31 @@ export class BriefingPanelStore {
     } catch (error: unknown) {
       this.errorSignal.set(this.toErrorMessage(error));
     } finally {
+      this.signalPrepProgressSignal.set(null);
       this.isGeneratingSignal.set(false);
+    }
+  }
+
+  /** Runs the Analyst pipeline for every selected-watchlist symbol missing signals. */
+  private async ensureSignalsForWatchlist(): Promise<void> {
+    const symbols = this.watchlistItemsSignal().map((item) => item.symbol);
+    if (symbols.length === 0) {
+      return;
+    }
+    this.signalPrepProgressSignal.set({ current: 0, total: symbols.length });
+    for (const [index, symbol] of symbols.entries()) {
+      try {
+        const existing = await this.signalRepository.fetchSignals(symbol);
+        if (existing.length === 0) {
+          await this.signalRepository.generateSignal(symbol);
+        }
+      } catch {
+        // Best-effort: a symbol that can't be analyzed (e.g. transient failure) simply
+        // won't contribute signals; the briefing still generates and the backend shows a
+        // friendly empty section for it rather than a hard error.
+      } finally {
+        this.signalPrepProgressSignal.set({ current: index + 1, total: symbols.length });
+      }
     }
   }
 
@@ -274,6 +375,17 @@ export class BriefingPanelStore {
       this.setReviewError(briefingId, this.toErrorMessage(error));
     } finally {
       this.removeSubmittingBriefingId(briefingId);
+    }
+  }
+
+  private async loadInstruments(): Promise<void> {
+    if (this.instrumentsSignal().length > 0) {
+      return;
+    }
+    try {
+      this.instrumentsSignal.set(await this.instrumentRepository.fetchInstruments());
+    } catch {
+      this.instrumentsSignal.set([]);
     }
   }
 

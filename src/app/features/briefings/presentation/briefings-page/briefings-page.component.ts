@@ -12,6 +12,7 @@ import {
   GuideNotesTabsComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
+import { NotesPanelComponent } from '../../../notes/presentation';
 import { BriefingPanelStore } from '../../application';
 import { ReviewDecisionSubmitted } from '../review-panel/review-panel.component';
 import { BriefingCardComponent } from '../briefing-card/briefing-card.component';
@@ -33,6 +34,7 @@ const ACTIVITY_FEED_LIMIT = 8;
     ActivityFeedComponent,
     BriefingCardComponent,
     WatchlistManagerComponent,
+    NotesPanelComponent,
   ],
   providers: [DatePipe],
   templateUrl: './briefings-page.component.html',
@@ -44,9 +46,6 @@ export class BriefingsPageComponent implements OnInit {
     this.i18n.t('briefings.guide.step2'),
     this.i18n.t('briefings.guide.step3'),
   ]);
-
-  /** No notes feature exists yet — placeholder empty list for `app-guide-notes-tabs`. */
-  readonly notes: readonly string[] = [];
 
   readonly headerStats = computed<FeaturePageStat[]>(() => {
     if (this.store.isLoadingWatchlists()) {

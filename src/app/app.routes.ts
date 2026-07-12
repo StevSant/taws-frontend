@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/chat/chat.routes').then((m) => m.CHAT_ROUTES),
       },
       {
+        path: 'agents',
+        loadChildren: () => import('./features/agents/agents.routes').then((m) => m.AGENTS_ROUTES),
+      },
+      {
         path: 'scenarios',
         loadChildren: () =>
           import('./features/scenarios/scenarios.routes').then((m) => m.SCENARIOS_ROUTES),

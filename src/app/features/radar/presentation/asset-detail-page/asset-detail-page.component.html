@@ -147,11 +147,7 @@
         <ul class="asset-detail__news-list">
           @for (item of store.relatedNews(); track item.id) {
             <li class="asset-detail__news-item">
-              <time class="asset-detail__news-time">{{ item.publishedAt | date: 'MMM d, HH:mm' }}</time>
-              <a class="asset-detail__news-title" [routerLink]="['/radar/news', item.id]">{{
-                item.title
-              }}</a>
-              <span class="asset-detail__news-source">{{ item.source }}</span>
+              <app-news-card [news]="item" />
             </li>
           }
         </ul>

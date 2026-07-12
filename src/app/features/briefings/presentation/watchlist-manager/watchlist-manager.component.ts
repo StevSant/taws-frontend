@@ -25,9 +25,18 @@ export class WatchlistManagerComponent {
     });
   }
 
+  onSymbolChange(value: string): void {
+    this.newSymbol.set(value);
+    this.store.clearAddSymbolError();
+  }
+
   onAddSymbol(): void {
-    void this.store.addWatchlistItem(this.newSymbol()).then(() => {
-      this.newSymbol.set('');
+    const before = this.newSymbol();
+    void this.store.addWatchlistItem(before).then(() => {
+      // Only clear the input on a successful add (no validation error left behind).
+      if (!this.store.addSymbolError()) {
+        this.newSymbol.set('');
+      }
     });
   }
 
