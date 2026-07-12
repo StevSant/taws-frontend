@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
-import { AppConfigService, AuthTokenService, NotificationsStore } from '../../../core';
+import { AppConfigService, AuthTokenService, NewSignalsTracker, NotificationsStore } from '../../../core';
 import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
   AssetClass,
@@ -23,7 +23,6 @@ import { computeRadarLandscape } from './compute-radar-landscape';
 import { computeMarketScore, MarketScore } from './compute-market-score';
 import { computeAssetClassSegments } from './compute-asset-class-segments';
 import { computeMarketComposition } from './compute-market-composition';
-import { formatNewNewsNotificationDetail } from './format-new-signals-detail';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
@@ -65,13 +64,9 @@ export interface RadarKpiSummary {
  * not hardcoded) so the radar view picks up new signals without a manual
  * reload. The poll tick is a *silent* background refetch (it never toggles
  * `isLoading`/`error`, so it can't blow away the current filters/scroll
- * position with a full-page spinner or error banner) and diffs the fetched
- * news IDs against the previous tick's IDs to detect genuinely new items,
- * pushing exactly one `NotificationsStore.notify(...)` call per tick that
- * has new items — never one per tick regardless of change, and never one
- * per new item. That call's `detail` names the distinct instrument symbols
- * the new items relate to (via `formatNewSignalsDetail`), truncated past a
- * small count, so the notification isn't just a bare number.
+ * position with a full-page spinner or error banner). Bell notifications for
+ * new news are owned by `RadarNewsNotificationPoller` in the shell (global
+ * poll on every page); this store only refreshes the radar UI.
  *
  * `RadarStore` is app-scoped (`providedIn: 'root'`) so revisiting Radar shows
  * the last loaded feed instantly and refreshes in the background. The poll loop
@@ -94,10 +89,6 @@ export class RadarStore {
   private readonly reviewHistorySignal = signal<Record<string, ReviewState[]>>({});
   private readonly reviewErrorsSignal = signal<Record<string, string | null>>({});
   private readonly submittingSignalIdsSignal = signal<ReadonlySet<string>>(new Set());
-  /** IDs from the last successful fetch (initial or poll). `null` until the
-   * first fetch resolves, so the very first poll tick after `init()` never
-   * fires a "new items" notification for the whole initial page load. */
-  private lastSeenNewsIds: Set<string> | null = null;
   private pollSubscription: Subscription | null = null;
   private sessionReady = false;
 
@@ -231,6 +222,7 @@ export class RadarStore {
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
     private readonly authTokenService: AuthTokenService,
+    private readonly newSignalsTracker: NewSignalsTracker,
   ) {}
 
   /** Loads instruments + news on first visit; revisits show cached state and refresh silently. */
@@ -437,12 +429,9 @@ export class RadarStore {
     try {
       const news = await this.newsRepository.fetchNews(this.filtersSignal());
       this.newsSignal.set(news);
-      // A foreground load (initial load or a filter change) re-establishes
-      // the "known items" baseline without notifying — only a background
-      // poll tick (see `pollNews`) diffs against this baseline and notifies,
-      // so switching filters never spams a "new signals" notification for
-      // items that were simply outside the old filter.
-      this.lastSeenNewsIds = new Set(news.map((item) => item.id));
+      if (this.usesDefaultFilters()) {
+        this.newSignalsTracker.syncBaseline(news);
+      }
       if (!background) {
         this.loadingSignal.set(false);
       }
@@ -545,37 +534,13 @@ export class RadarStore {
     }
     try {
       const news = await this.newsRepository.fetchNews(this.filtersSignal());
-      const currentIds = new Set(news.map((item) => item.id));
-      const isFirstFetch = this.lastSeenNewsIds === null;
-      const newItems = isFirstFetch
-        ? []
-        : news.filter((item) => !this.lastSeenNewsIds!.has(item.id));
+      const previousIds = new Set(this.newsSignal().map((item) => item.id));
+      const isEmptyFeed = previousIds.size === 0;
+      const newItems = news.filter((item) => !previousIds.has(item.id));
 
-      if (newItems.length > 0) {
-        const latestNewsId = newItems[0]?.id;
-        this.notifications.notify(
-          'radar',
-          'notifications.radar.newSignals',
-          newItems.length,
-          formatNewNewsNotificationDetail(newItems),
-          latestNewsId
-            ? { commands: ['/radar/news', latestNewsId] }
-            : { commands: ['/radar'] },
-        );
-      }
-
-      this.lastSeenNewsIds = currentIds;
       this.newsSignal.set(news);
 
-      // Only re-run the 2×N signal/quant fan-out when the feed actually
-      // changed. Between ticks the news set is usually identical, so a
-      // re-enrichment would produce byte-for-byte the same maps — skipping it
-      // (rather than firing 2×N lookups every tick and leaning on the HTTP
-      // cache to swallow them) keeps a steady-state poll loop from doing
-      // needless work. A tick that brings new items enriches just like a
-      // foreground load does; `isFirstFetch` covers a poll that runs before
-      // any successful foreground load (e.g. the initial load failed).
-      if (isFirstFetch || newItems.length > 0) {
+      if (isEmptyFeed || newItems.length > 0) {
         await this.enrichFeed(news);
       }
     } catch {
@@ -586,5 +551,14 @@ export class RadarStore {
 
   private toErrorMessage(error: unknown): string {
     return error instanceof Error ? error.message : 'Unknown error while loading radar data';
+  }
+
+  private usesDefaultFilters(): boolean {
+    const filters = this.filtersSignal();
+    return (
+      filters.sinceHours === DEFAULT_RADAR_FILTERS.sinceHours &&
+      filters.symbol === DEFAULT_RADAR_FILTERS.symbol &&
+      filters.assetClass === DEFAULT_RADAR_FILTERS.assetClass
+    );
   }
 }

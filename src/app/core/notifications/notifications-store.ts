@@ -11,9 +11,9 @@ const MAX_NOTIFICATIONS = 50;
  * the bell dropdown in `ShellComponent`. Deliberately simple for T2 scope:
  * in-memory only (cleared on reload), no backend-persisted read-state.
  *
- * Feeds: `RadarStore`'s auto-refresh polling (new signals) and
- * `BriefingPanelStore`'s on-demand generation (new briefing) both call
- * `notify(...)` directly — see their `constructor`s. Kept in `core/` rather
+ * Feeds: `RadarNewsNotificationPoller` (global shell poll for new news),
+ * `RadarStore`'s on-demand signal generation, and `BriefingPanelStore`'s
+ * briefing generation all call `notify(...)` directly. Kept in `core/` rather
  * than `features/` because it's cross-cutting infrastructure other features
  * hook into, not a page of its own (same reasoning as `core/auth`).
  */

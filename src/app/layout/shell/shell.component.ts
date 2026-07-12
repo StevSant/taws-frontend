@@ -15,6 +15,7 @@ import { NotificationBellComponent, Notification, NotificationsStore, Translatio
 import { resolveNotificationLink } from '../../core/notifications/resolve-notification-link';
 import { AuthStore } from '../../features/auth/application';
 import { RadarStore } from '../../features/radar/application';
+import { RadarNewsNotificationPoller } from '../../features/radar/application/radar-news-notification-poller.service';
 import {
   LanguageToggleComponent,
   MidasLogoComponent,
@@ -53,6 +54,7 @@ export class ShellComponent {
   readonly search = inject(ShellSearchService);
   private readonly router = inject(Router);
   private readonly radarStore = inject(RadarStore);
+  private readonly newsNotificationPoller = inject(RadarNewsNotificationPoller);
 
   readonly usesCustomLayout = signal(this.hasFeatureOwnedSidebar(this.router.url));
   readonly routeTransition = signal<ShellRouteTransition>('neutral');
@@ -69,6 +71,7 @@ export class ShellComponent {
   private previousShellUrl = this.router.url;
 
   constructor() {
+    this.newsNotificationPoller.start();
     void this.search.ensureInstrumentsLoaded();
 
     this.router.events
