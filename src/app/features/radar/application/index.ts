@@ -12,3 +12,4 @@ export { CompositionInstrumentsStore } from './composition-instruments-store';
 export type { ClassInstruments } from './composition-instruments-store';
 export { computeClassTrend } from './compute-class-trend';
 export { buildMacroLineSpec } from './build-macro-line-spec';
+export { buildAssetSource } from './build-asset-source';
