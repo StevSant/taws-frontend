@@ -66,8 +66,7 @@ export class VoiceModeOverlayComponent implements AfterViewInit, OnDestroy {
 
   private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   private readonly endButton = viewChild.required<ElementRef<HTMLButtonElement>>('endButton');
-  private readonly transcriptViewport =
-    viewChild<ElementRef<HTMLDivElement>>('transcriptViewport');
+  private readonly transcriptViewport = viewChild<ElementRef<HTMLDivElement>>('transcriptViewport');
 
   readonly isNotAvailable = computed(() => this.connectionState() === 'not-available');
   readonly isError = computed(() => this.connectionState() === 'error' && !this.isNotAvailable());
