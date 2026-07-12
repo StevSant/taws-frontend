@@ -214,6 +214,14 @@ export interface TranslationDict {
   'radar.card.status.pending': string;
   'radar.card.moreNews': string;
   'radar.card.lessNews': string;
+  'radar.analysis.title': string;
+  'radar.analysis.thesis': string;
+  'radar.analysis.drivers': string;
+  'radar.analysis.risks': string;
+  'radar.analysis.unavailable': string;
+  'radar.analysis.unavailableHint': string;
+  'radar.analysis.expand': string;
+  'radar.analysis.collapse': string;
   'radar.cards.title': string;
   'radar.cards.subtitle': string;
   'radar.summary.prefix': string;

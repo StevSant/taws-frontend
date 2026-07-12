@@ -49,4 +49,26 @@
       }
     </span>
   </footer>
+
+  @if (hasSignal()) {
+    <button
+      type="button"
+      class="instrument-card-compact__analysis-toggle"
+      [attr.aria-expanded]="showAnalysis()"
+      (click)="toggleAnalysis()"
+    >
+      {{
+        showAnalysis() ? i18n.t('radar.analysis.collapse') : i18n.t('radar.analysis.expand')
+      }}
+    </button>
+
+    @if (showAnalysis()) {
+      <app-signal-analysis
+        [thesis]="signal.thesis"
+        [keyDrivers]="signal.keyDrivers ?? []"
+        [riskFactors]="signal.riskFactors ?? []"
+        [analysisAvailable]="signal.analysisAvailable ?? false"
+      />
+    }
+  }
 </article>

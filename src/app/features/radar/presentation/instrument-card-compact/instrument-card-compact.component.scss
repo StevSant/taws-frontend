@@ -121,4 +121,19 @@
       color: var(--color-gold);
     }
   }
+
+  &__analysis-toggle {
+    align-self: flex-start;
+    border: none;
+    background: none;
+    padding: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-gold-bright);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

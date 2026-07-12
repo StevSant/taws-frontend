@@ -1,8 +1,9 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent, ReturnSparklineComponent } from '../../../../shared';
 import { RadarSignal, ImpactClass } from '../../domain';
+import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -14,7 +15,12 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 @Component({
   selector: 'app-instrument-card-compact',
   standalone: true,
-  imports: [DecimalPipe, ReturnSparklineComponent, InstrumentTickerBadgeComponent],
+  imports: [
+    DecimalPipe,
+    ReturnSparklineComponent,
+    InstrumentTickerBadgeComponent,
+    SignalAnalysisComponent,
+  ],
   templateUrl: './instrument-card-compact.component.html',
   styleUrl: './instrument-card-compact.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +29,16 @@ export class InstrumentCardCompactComponent {
   @Input({ required: true }) signal!: RadarSignal;
 
   readonly i18n = inject(TranslationService);
+  readonly showAnalysis = signal(false);
+
+  /** A persisted Analyst signal exists for this instrument (analysis to expand). */
+  hasSignal(): boolean {
+    return !!this.signal.signalId;
+  }
+
+  toggleAnalysis(): void {
+    this.showAnalysis.update((value) => !value);
+  }
 
   impactLabel(): string {
     if (!this.signal.impactClass) {

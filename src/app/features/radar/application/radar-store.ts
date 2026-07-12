@@ -133,6 +133,11 @@ export class RadarStore {
         confidence: signal?.confidence,
         priceDelta: signal?.priceDelta ?? marketStats?.priceDeltaPct ?? undefined,
         signalId: signal?.id,
+        thesis: signal?.thesis,
+        keyDrivers: signal?.keyDrivers ?? [],
+        riskFactors: signal?.riskFactors ?? [],
+        analysisAvailable: signal?.analysisAvailable,
+        disclaimer: signal?.disclaimer,
         marketStats,
       };
     });

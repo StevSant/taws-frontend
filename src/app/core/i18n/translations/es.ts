@@ -228,6 +228,15 @@ export const ES_TRANSLATIONS = {
   'radar.card.status.pending': 'Pendiente — analizar con IA',
   'radar.card.moreNews': 'Ver más titulares',
   'radar.card.lessNews': 'Ver menos',
+  'radar.analysis.title': 'Análisis IA',
+  'radar.analysis.thesis': 'Tesis',
+  'radar.analysis.drivers': 'Factores clave',
+  'radar.analysis.risks': 'Riesgos',
+  'radar.analysis.unavailable': 'Análisis no disponible',
+  'radar.analysis.unavailableHint':
+    'La IA no pudo generar un análisis completo para esta señal (sin clasificación confiable). Intenta analizar de nuevo más tarde.',
+  'radar.analysis.expand': 'Ver análisis IA',
+  'radar.analysis.collapse': 'Ocultar análisis IA',
   'radar.cards.title': 'Tarjetas por activo',
   'radar.cards.subtitle':
     'Una tarjeta por instrumento con noticias vinculadas en el período seleccionado.',
