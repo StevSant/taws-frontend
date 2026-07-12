@@ -67,7 +67,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
   readonly demoPerspectives = this.config.demoAuthPerspectives;
   readonly showDemoPerspectives = computed(
-    () => !this.config.production && this.demoPerspectives.length > 0 && this.mode() === 'login',
+    () => this.demoPerspectives.length > 0 && this.mode() === 'login',
   );
 
   readonly isSubmitting = computed(() => this.store.status() === 'submitting');

@@ -1,4 +1,4 @@
-import { DemoAuthPerspective } from '../app/features/auth/domain/models/demo-auth-perspective.model';
+import { DEMO_AUTH_PERSPECTIVES } from './demo-auth-perspectives';
 /**
  * Production environment configuration.
  * Swapped in for environment.ts during production builds (see angular.json fileReplacements).
@@ -21,5 +21,10 @@ export const environment = {
   watchlistsCacheTtlMs: 60_000,
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   radarSignalFetchBatchSize: 6,
-  demoAuthPerspectives: [] as DemoAuthPerspective[],
+  /**
+   * Demo perspective accounts are intentionally shipped in production so
+   * hackathon reviewers can one-click sign in. These are throwaway @midas.demo
+   * accounts with no real data — clear this list to hide the demo picker.
+   */
+  demoAuthPerspectives: DEMO_AUTH_PERSPECTIVES,
 };
