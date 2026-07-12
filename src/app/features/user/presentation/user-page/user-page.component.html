@@ -55,6 +55,11 @@
     </dl>
   </section>
 
+  <section class="user-page__section feature-panel">
+    <h2 class="user-page__section-title">{{ i18n.t('telegram.botRegistration.title') }}</h2>
+    <app-bot-registration-panel />
+  </section>
+
   <div class="user-page__actions">
     <app-button [label]="i18n.t('shell.auth.logout')" (pressed)="logout()" />
   </div>
