@@ -21,7 +21,7 @@ import { TranslationKey, TranslationService } from '../../../../core';
 
 import { AuthStore } from '../../../auth/application';
 
-import { ButtonComponent, GoldenPolyhedronComponent } from '../../../../shared';
+import { ButtonComponent, GoldenPolyhedronComponent, MarkdownPipe } from '../../../../shared';
 
 import { PolyhedronActivity } from '../../../../shared/golden-polyhedron/polyhedron-activity.model';
 
@@ -62,7 +62,8 @@ import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-acti
 
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
-const HERO_COLLAPSE_MS = 720;
+const HERO_COLLAPSE_MS = 920;
+const AVATAR_SETTLE_MS = 380;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
@@ -103,6 +104,8 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ButtonComponent,
 
     GoldenPolyhedronComponent,
+
+    MarkdownPipe,
 
     ChatSessionsPanelComponent,
 
@@ -177,6 +180,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   /** True while the hero orb animates down to avatar size on the first send. */
   readonly heroCollapsing = signal(false);
+  /** Brief crossfade once the flying orb lands on the avatar slot. */
+  readonly avatarSettling = signal(false);
+  readonly collapseStyle = signal<Record<string, string>>({});
+  readonly collapseReady = signal(false);
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
 
@@ -192,12 +199,12 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return 'listening';
     }
 
-    if (this.store.isStreaming()) {
-      return 'streaming';
-    }
-
     if (this.heroCollapsing()) {
       return 'composing';
+    }
+
+    if (this.store.isStreaming()) {
+      return 'streaming';
     }
 
     return 'idle';
@@ -215,8 +222,38 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     return hop ? this.agentLabel(hop.agent) : this.i18n.t('chat.role.assistant');
   });
 
+  /** Live status line while the backend routes agents or streams tokens. */
+  readonly thinkingStatusLabel = computed(() => {
+    if (!this.store.isStreaming()) {
+      return '';
+    }
+
+    const latestAssistant = [...this.store.messages()]
+      .reverse()
+      .find((message) => message.role === 'assistant');
+
+    if (latestAssistant?.content) {
+      return this.i18n.t('chat.thinking.writing');
+    }
+
+    const hops = this.store.routingHops();
+    const activeHop = [...hops].reverse().find((hop) => hop.status === 'active' || hop.status === 'routing');
+
+    if (activeHop?.status === 'routing') {
+      return this.i18n.t('chat.thinking.routing');
+    }
+
+    if (activeHop) {
+      return `${this.i18n.t('chat.thinking.consulting')} ${this.agentLabel(activeHop.agent)}…`;
+    }
+
+    return this.i18n.t('chat.thinking.analyzing');
+  });
+
   private readonly composerInput = viewChild<ElementRef<HTMLInputElement>>('composerInput');
+  private readonly messagesViewport = viewChild<ElementRef<HTMLElement>>('messagesViewport');
   private heroCollapseTimer: ReturnType<typeof setTimeout> | null = null;
+  private avatarSettleTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -238,6 +275,13 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       }
       void this.syncSessionRoute(params.get('sessionId'));
     });
+
+    effect(() => {
+      this.store.messages();
+      this.store.isStreaming();
+      this.thinkingStatusLabel();
+      queueMicrotask(() => this.scrollToLatest());
+    });
   }
 
   agentLabel(agent: string): string {
@@ -250,6 +294,16 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     const assistants = this.store.messages().filter((m) => m.role === 'assistant');
 
     return assistants[assistants.length - 1]?.id === messageId;
+  }
+
+  isThinkingMessage(messageId: string, pending: boolean, content: string): boolean {
+    if (!this.isLatestAssistant(messageId)) {
+      return false;
+    }
+    if (content.trim()) {
+      return false;
+    }
+    return pending || this.store.isStreaming();
   }
 
   avatarActivity(messageId: string, pending: boolean): PolyhedronActivity {
@@ -309,11 +363,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.draft.set('');
 
     const isFirstMessage = !this.hasMessages();
-    if (isFirstMessage) {
-      this.startHeroCollapse();
-    }
-
     void this.store.send(message);
+    if (isFirstMessage) {
+      this.beginHeroCollapse();
+    }
   }
 
   /**
@@ -367,19 +420,56 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.draft.set(current ? `${current} ${clean}` : clean);
   }
 
-  private startHeroCollapse(): void {
+  private beginHeroCollapse(): void {
     this.heroCollapsing.set(true);
+    this.avatarSettling.set(false);
+    this.collapseReady.set(false);
+    this.collapseStyle.set({});
     this.clearHeroCollapseTimer();
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.measureCollapsePath());
+    });
+
     this.heroCollapseTimer = setTimeout(() => {
       this.heroCollapsing.set(false);
-      this.heroCollapseTimer = null;
+      this.collapseReady.set(false);
+      this.collapseStyle.set({});
+      this.avatarSettling.set(true);
+      this.avatarSettleTimer = setTimeout(() => {
+        this.avatarSettling.set(false);
+        this.avatarSettleTimer = null;
+      }, AVATAR_SETTLE_MS);
     }, HERO_COLLAPSE_MS);
+  }
+
+  private measureCollapsePath(): void {
+    const frame = document.querySelector('.chat-page__frame')?.getBoundingClientRect();
+    const anchor = document.querySelector('[data-chat-avatar-anchor]')?.getBoundingClientRect();
+
+    const startX = frame ? frame.left + frame.width / 2 : window.innerWidth / 2;
+    const startY = frame ? frame.top + frame.height * 0.3 : window.innerHeight * 0.32;
+    const endX = anchor ? anchor.left + anchor.width / 2 : startX;
+    const endY = anchor ? anchor.top + anchor.height / 2 : startY + 140;
+
+    this.collapseStyle.set({
+      '--collapse-start-x': `${startX}px`,
+      '--collapse-start-y': `${startY}px`,
+      '--collapse-end-x': `${endX}px`,
+      '--collapse-end-y': `${endY}px`,
+      '--collapse-duration': `${HERO_COLLAPSE_MS}ms`,
+    });
+    this.collapseReady.set(true);
   }
 
   private clearHeroCollapseTimer(): void {
     if (this.heroCollapseTimer !== null) {
       clearTimeout(this.heroCollapseTimer);
       this.heroCollapseTimer = null;
+    }
+    if (this.avatarSettleTimer !== null) {
+      clearTimeout(this.avatarSettleTimer);
+      this.avatarSettleTimer = null;
     }
   }
 
@@ -406,5 +496,13 @@ export class ChatPageComponent implements OnInit, OnDestroy {
         replaceUrl: sessionId === null,
       });
     }
+  }
+
+  private scrollToLatest(): void {
+    const viewport = this.messagesViewport()?.nativeElement;
+    if (!viewport) {
+      return;
+    }
+    viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
   }
 }

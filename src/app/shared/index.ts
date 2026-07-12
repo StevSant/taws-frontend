@@ -41,3 +41,4 @@ export type { ActivityFeedItem } from './activity-feed/activity-feed.component';
 export { FeatureNavComponent } from './feature-nav/feature-nav.component';
 export type { FeatureNavItem } from './feature-nav/feature-nav.component';
 export { downloadBlob } from './download-blob';
+export { MarkdownPipe } from './markdown/markdown.pipe';

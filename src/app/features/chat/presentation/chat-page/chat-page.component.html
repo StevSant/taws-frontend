@@ -108,16 +108,22 @@
             </div>
           } @else {
             <div class="chat-page__conversation">
-              <ul class="chat-page__messages">
+              <ul #messagesViewport class="chat-page__messages">
                 @for (message of store.messages(); track message.id) {
                   @if (message.role === 'assistant') {
                     <li class="chat-page__message-row chat-page__message-row--assistant">
                       <div
                         class="chat-page__avatar"
+                        [attr.data-chat-avatar-anchor]="isLatestAssistant(message.id) ? true : null"
                         [class.chat-page__avatar--live]="
                           message.pending && isLatestAssistant(message.id)
                         "
-                        [class.chat-page__avatar--hidden]="heroCollapsing()"
+                        [class.chat-page__avatar--hidden]="
+                          heroCollapsing() && isLatestAssistant(message.id)
+                        "
+                        [class.chat-page__avatar--settling]="
+                          avatarSettling() && isLatestAssistant(message.id)
+                        "
                       >
                         @if (message.pending && isLatestAssistant(message.id)) {
                           <div class="chat-page__avatar-corona" aria-hidden="true">
@@ -166,12 +172,11 @@
                         </header>
 
                         @if (message.content) {
-                          <p
-                            class="chat-page__content"
+                          <div
+                            class="chat-page__content taws-markdown"
                             [class.chat-page__content--streaming]="message.pending"
-                          >
-                            {{ message.content }}
-                          </p>
+                            [innerHTML]="message.content | markdown"
+                          ></div>
                         }
 
                         @if (message.charts?.length) {
@@ -229,23 +234,30 @@
                           </footer>
                         }
 
-                        @if (message.pending && !message.content) {
-                          <span
-                            class="chat-page__typing"
+                        @if (isThinkingMessage(message.id, !!message.pending, message.content)) {
+                          <p
+                            class="chat-page__content chat-page__content--thinking"
                             role="status"
-                            [attr.aria-label]="i18n.t('chat.streaming')"
+                            aria-live="polite"
+                            [attr.aria-label]="thinkingStatusLabel()"
                           >
-                            <span class="chat-page__typing-dot"></span>
-                            <span class="chat-page__typing-dot"></span>
-                            <span class="chat-page__typing-dot"></span>
-                          </span>
+                            {{ thinkingStatusLabel() }}
+                            <span class="chat-page__typing" aria-hidden="true">
+                              <span class="chat-page__typing-dot"></span>
+                              <span class="chat-page__typing-dot"></span>
+                              <span class="chat-page__typing-dot"></span>
+                            </span>
+                          </p>
                         }
                       </article>
                     </li>
                   } @else {
                     <li class="chat-page__message-row chat-page__message-row--user">
                       <article class="chat-page__bubble chat-page__bubble--user">
-                        <p class="chat-page__content">{{ message.content }}</p>
+                        <div
+                          class="chat-page__content taws-markdown"
+                          [innerHTML]="message.content | markdown"
+                        ></div>
                       </article>
                     </li>
                   }
@@ -262,7 +274,12 @@
         </section>
 
         @if (heroCollapsing()) {
-          <div class="chat-page__hero-collapse" aria-hidden="true">
+          <div
+            class="chat-page__hero-collapse"
+            [class.chat-page__hero-collapse--ready]="collapseReady()"
+            aria-hidden="true"
+            [style]="collapseStyle()"
+          >
             <div class="chat-page__hero-collapse-corona">
               <span class="chat-page__hero-collapse-glow"></span>
               <span class="chat-page__hero-collapse-ring"></span>

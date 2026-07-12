@@ -493,18 +493,29 @@
     z-index: 1;
   }
 
+  &--hero-collapsing &__message-row--assistant {
+    animation: none;
+  }
+
   &__hero-collapse {
-    position: absolute;
-    z-index: 6;
-    top: 22%;
-    left: 50%;
+    position: fixed;
+    z-index: 20;
     width: 136px;
     height: 136px;
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    animation: heroCollapseToAvatar 720ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    left: var(--collapse-start-x, 50%);
+    top: var(--collapse-start-y, 32%);
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+
+    &--ready {
+      opacity: 1;
+      animation: heroCollapseFly var(--collapse-duration, 920ms) cubic-bezier(0.34, 1.15, 0.64, 1)
+        forwards;
+    }
   }
 
   &__hero-collapse-corona {
@@ -663,6 +674,10 @@
 
     &--hidden {
       visibility: hidden;
+    }
+
+    &--settling {
+      animation: avatarSettleIn 380ms ease both;
     }
 
     &--user {
@@ -968,7 +983,6 @@
 
   &__content {
     margin: 0;
-    white-space: pre-wrap;
     line-height: 1.65;
     font-size: 0.95rem;
     color: var(--color-text-primary);
@@ -985,13 +999,23 @@
       background: var(--color-gold);
       animation: blink 0.9s step-end infinite;
     }
+
+    &--thinking {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--color-text-secondary);
+      font-style: italic;
+    }
   }
 
   &__typing {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    margin-top: var(--space-1);
+    gap: 0.25rem;
+    margin-left: 0.15rem;
+    vertical-align: middle;
   }
 
   &__typing-dot {
@@ -1420,18 +1444,31 @@ html[data-theme='light'] .chat-page {
   }
 }
 
-@keyframes heroCollapseToAvatar {
+@keyframes heroCollapseFly {
   0% {
-    top: 22%;
-    left: 50%;
+    left: var(--collapse-start-x);
+    top: var(--collapse-start-y);
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
+
   100% {
-    top: 5.5rem;
-    left: calc(var(--space-4) + 24px);
+    left: var(--collapse-end-x);
+    top: var(--collapse-end-y);
     transform: translate(-50%, -50%) scale(0.353);
+    opacity: 0;
+  }
+}
+
+@keyframes avatarSettleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+
+  to {
     opacity: 1;
+    transform: scale(1);
   }
 }
 

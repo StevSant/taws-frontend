@@ -142,6 +142,10 @@ export interface TranslationDict {
   'chat.oracle.status.listening': string;
   'chat.oracle.status.composing': string;
   'chat.oracle.status.streaming': string;
+  'chat.thinking.analyzing': string;
+  'chat.thinking.routing': string;
+  'chat.thinking.consulting': string;
+  'chat.thinking.writing': string;
   'chat.sessions.title': string;
   'chat.sessions.new': string;
   'chat.sessions.newChat': string;
