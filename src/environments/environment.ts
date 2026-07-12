@@ -78,6 +78,8 @@ export const environment = {
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   /** Max parallel `/api/v1/signals` lookups while enriching the radar feed. */
   radarSignalFetchBatchSize: 6,
+  /** Page size (`limit`) for the paginated "all news" list at /radar/news. */
+  newsListPageSize: 20,
   /**
    * Initial timeframe requested when rendering an instrument's price chart via
    * `POST /api/v1/charts/render`. Must be one of the backend's

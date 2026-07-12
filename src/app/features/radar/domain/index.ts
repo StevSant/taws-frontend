@@ -6,6 +6,8 @@ export type { AssetClass } from './models/asset-class.model';
 export { ASSET_CLASSES } from './models/asset-class.model';
 export type { Instrument } from './models/instrument.model';
 export type { NewsItem } from './models/news-item.model';
+export type { NewsPage } from './models/news-page.model';
+export type { NewsPageRequest } from './models/news-page-request.model';
 export type { NewsEntity } from './models/news-entity.model';
 export type { AnalysisStatus } from './models/analysis-status.model';
 export type { ImpactClass } from './models/impact-class.model';
