@@ -41,7 +41,7 @@ export class HttpInstrumentRepository extends InstrumentRepository {
             params,
           }),
         );
-        return dtos.map(mapInstrumentDto);
+        return (Array.isArray(dtos) ? dtos : []).map(mapInstrumentDto);
       },
     );
   }

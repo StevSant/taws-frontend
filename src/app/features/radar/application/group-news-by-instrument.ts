@@ -16,11 +16,12 @@ export function groupNewsByInstrument(
   let unlinkedCount = 0;
 
   for (const item of news) {
-    if (item.relatedSymbols.length === 0) {
+    const relatedSymbols = item.relatedSymbols ?? [];
+    if (relatedSymbols.length === 0) {
       unlinkedCount += 1;
       continue;
     }
-    for (const symbol of item.relatedSymbols) {
+    for (const symbol of relatedSymbols) {
       const existing = newsBySymbol.get(symbol);
       if (existing) {
         existing.push(item);

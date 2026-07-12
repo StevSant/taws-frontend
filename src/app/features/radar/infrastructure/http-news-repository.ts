@@ -11,6 +11,13 @@ const NEWS_PATH = '/api/v1/news';
 const NEWS_REQUEST_TIMEOUT_MS = 8_000;
 const HTTP_NOT_FOUND = 404;
 
+/** Backend may return a bare array or a paginated `{ items }` envelope. */
+type NewsWireResponse = NewsListResponseDto | NewsItemDto[];
+
+function unwrapNewsItems(response: NewsWireResponse): NewsItemDto[] {
+  return Array.isArray(response) ? response : (response.items ?? []);
+}
+
 /**
  * Infrastructure adapter for `NewsRepository`. Calls the real
  * `GET /api/v1/news` endpoint via `HttpClient` (picks up the app-wide auth
@@ -43,10 +50,10 @@ export class HttpNewsRepository extends NewsRepository {
 
       const response = await firstValueFrom(
         this.http
-          .get<NewsListResponseDto>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
+          .get<NewsWireResponse>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
           .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
       );
-      return response.items.map(mapNewsItemDto);
+      return unwrapNewsItems(response).map(mapNewsItemDto);
     });
   }
 

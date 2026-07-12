@@ -9,7 +9,7 @@ export function mapMarketStatsDto(dto: MarketStatsDto): MarketStats {
     priceDeltaPct: dto.price_delta_pct,
     volatilityPct: dto.volatility_pct,
     volatilityRegime: dto.volatility_regime,
-    unusualMoves: dto.unusual_moves.map((move) => ({
+    unusualMoves: (dto.unusual_moves ?? []).map((move) => ({
       date: new Date(move.date),
       returnPct: move.return_pct,
       zScore: move.z_score,

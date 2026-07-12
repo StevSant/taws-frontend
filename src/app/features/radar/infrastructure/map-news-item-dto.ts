@@ -11,7 +11,7 @@ export function mapNewsItemDto(dto: NewsItemDto): NewsItem {
     url: dto.url,
     source: dto.source,
     publishedAt: dto.published_at,
-    relatedSymbols: dto.related_symbols,
+    relatedSymbols: dto.related_symbols ?? [],
     provider: dto.provider,
     entities: dto.entities ? dto.entities.map(mapNewsEntityDto) : undefined,
     sentimentScore: dto.sentiment_score ?? undefined,

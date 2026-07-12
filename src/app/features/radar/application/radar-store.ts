@@ -389,7 +389,9 @@ export class RadarStore {
    * slow/failed instruments fetch never blanks out enrichment.
    */
   private trackedSymbols(news: NewsItem[]): string[] {
-    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
+    const symbols = Array.from(
+      new Set(news.flatMap((item) => item.relatedSymbols ?? [])),
+    );
     const instruments = this.instrumentsSignal();
     if (instruments.length === 0) {
       return symbols;

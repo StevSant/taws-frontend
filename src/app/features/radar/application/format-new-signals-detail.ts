@@ -44,7 +44,7 @@ export function formatNewNewsNotificationDetail(items: NewsItem[]): string | und
     return undefined;
   }
 
-  const symbols = Array.from(new Set(items.flatMap((item) => item.relatedSymbols)));
+  const symbols = Array.from(new Set(items.flatMap((item) => item.relatedSymbols ?? [])));
   const symbolDetail = formatNewSignalsDetail(symbols);
 
   const titles = items
