@@ -8,7 +8,11 @@
       <li class="news-timeline__item">
         <time class="news-timeline__time">{{ entry.news.publishedAt | date: 'HH:mm' }}</time>
 
-        <app-instrument-ticker-badge class="news-timeline__badge-icon" [symbol]="entry.symbol" size="sm" />
+        <app-instrument-ticker-badge
+          class="news-timeline__badge-icon"
+          [symbol]="entry.symbol"
+          size="sm"
+        />
 
         <div class="news-timeline__copy">
           <div class="news-timeline__headline-row">
@@ -21,9 +25,12 @@
               >{{ entry.news.title }}</a
             >
           </div>
-          <span class="news-timeline__meta"
-            >{{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}</span
-          >
+          <span class="news-timeline__meta">
+            @if (providerLabel(entry.news.provider); as provider) {
+              <span class="news-timeline__provider">{{ provider }}</span> ·
+            }
+            {{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}
+          </span>
         </div>
 
         <div class="news-timeline__actions">

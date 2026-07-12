@@ -11,5 +11,6 @@ export function mapNewsItemDto(dto: NewsItemDto): NewsItem {
     source: dto.source,
     publishedAt: dto.published_at,
     relatedSymbols: dto.related_symbols,
+    provider: dto.provider,
   };
 }
