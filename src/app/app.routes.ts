@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { ShellComponent } from './layout';
-import { ChatPageComponent } from './features/chat/presentation';
 import { authGuard } from './core';
 
 export const routes: Routes = [
@@ -18,7 +17,10 @@ export const routes: Routes = [
         path: 'radar',
         loadChildren: () => import('./features/radar/radar.routes').then((m) => m.RADAR_ROUTES),
       },
-      { path: 'chat', component: ChatPageComponent },
+      {
+        path: 'chat',
+        loadChildren: () => import('./features/chat/chat.routes').then((m) => m.CHAT_ROUTES),
+      },
       {
         path: 'scenarios',
         loadChildren: () =>

@@ -31,6 +31,13 @@ const RECENCY_LABELS: Record<number, TranslationKey> = {
   720: 'radar.filters.recency.720h',
 };
 
+const RECENCY_SHORT_LABELS: Record<number, TranslationKey> = {
+  24: 'radar.filters.recency.short.24h',
+  48: 'radar.filters.recency.short.48h',
+  168: 'radar.filters.recency.short.168h',
+  720: 'radar.filters.recency.short.720h',
+};
+
 /**
  * Presentational filter bar: instrument type (asset class), asset
  * (instrument symbol, scoped to the selected type), and recency. Pure
@@ -48,6 +55,7 @@ const RECENCY_LABELS: Record<number, TranslationKey> = {
 export class RadarFiltersComponent {
   @Input({ required: true }) filters!: RadarFilters;
   @Input() instrumentOptions: Instrument[] = [];
+  @Input() compact = false;
 
   @Output() assetClassChange = new EventEmitter<AssetClass | null>();
   @Output() symbolChange = new EventEmitter<string | null>();
@@ -63,7 +71,9 @@ export class RadarFiltersComponent {
   }
 
   recencyLabel(hours: number): string {
-    const key = RECENCY_LABELS[hours];
+    const key = this.compact
+      ? RECENCY_SHORT_LABELS[hours]
+      : RECENCY_LABELS[hours];
     return key ? this.i18n.t(key) : `${hours}h`;
   }
 

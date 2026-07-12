@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="EURUSD">
+  <rect width="24" height="24" rx="6" fill="#0f172a"/>
+  <circle cx="9" cy="12" r="5" fill="#003399"/>
+  <circle cx="15" cy="12" r="5" fill="#22c55e"/>
+  <text x="9" y="13.5" text-anchor="middle" fill="#f8fafc" font-size="6" font-family="Arial,sans-serif" font-weight="700">¬</text>
+  <text x="15" y="13.5" text-anchor="middle" fill="#052e16" font-size="6" font-family="Arial,sans-serif" font-weight="700">$</text>
+</svg>

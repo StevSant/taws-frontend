@@ -1,0 +1,35 @@
+<div class="radar-kpi-row">
+  <article class="radar-kpi-row__card">
+    <span class="radar-kpi-row__label">{{ i18n.t('radar.kpi.news') }}</span>
+    <span class="radar-kpi-row__value">{{ kpis.newsDetected }}</span>
+  @if (kpis.newsTrend !== 0) {
+      <span
+        class="radar-kpi-row__trend"
+        [class.radar-kpi-row__trend--up]="kpis.newsTrend > 0"
+        [class.radar-kpi-row__trend--down]="kpis.newsTrend < 0"
+      >
+        {{ trendLabel() }}
+      </span>
+    } @else {
+      <span class="radar-kpi-row__hint">{{ i18n.t('radar.kpi.newsHint') }}</span>
+    }
+  </article>
+
+  <article class="radar-kpi-row__card">
+    <span class="radar-kpi-row__label">{{ i18n.t('radar.kpi.pending') }}</span>
+    <span class="radar-kpi-row__value">{{ kpis.pendingReview }}</span>
+    <span class="radar-kpi-row__hint">{{ pendingPct() }} {{ i18n.t('radar.kpi.pendingHint') }}</span>
+  </article>
+
+  <article class="radar-kpi-row__card">
+    <span class="radar-kpi-row__label">{{ i18n.t('radar.kpi.instruments') }}</span>
+    <span class="radar-kpi-row__value">{{ kpis.instruments }}</span>
+    <span class="radar-kpi-row__hint">{{ i18n.t('radar.kpi.instrumentsHint') }}</span>
+  </article>
+
+  <article class="radar-kpi-row__card radar-kpi-row__card--alert">
+    <span class="radar-kpi-row__label">{{ i18n.t('radar.kpi.alerts') }}</span>
+    <span class="radar-kpi-row__value">{{ kpis.activeAlerts }}</span>
+    <span class="radar-kpi-row__hint radar-kpi-row__hint--alert">{{ i18n.t('radar.kpi.alertsHint') }}</span>
+  </article>
+</div>

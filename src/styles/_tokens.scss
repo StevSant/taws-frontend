@@ -83,6 +83,14 @@ html:not([data-theme]) {
   --glass-blur: 20px;
   --shell-header-height: calc(3rem + (2 * var(--space-2)));
   --shell-header-bg: color-mix(in srgb, var(--color-background) 98%, transparent);
+  --shell-sidebar-width: 13.5rem;
+  --shell-sidebar-width-collapsed: 4.25rem;
+  --shell-sidebar-bg: #111111;
+  --shell-sidebar-border: rgba(255, 255, 255, 0.06);
+  --shell-sidebar-text: #f1f5f9;
+  --shell-sidebar-muted: #94a3b8;
+  --shell-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --shell-sidebar-active: rgba(212, 160, 23, 0.12);
   --card-outline-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -143,5 +151,13 @@ html[data-theme='light'] {
   --glass-blur: 18px;
   --shell-header-height: calc(3rem + (2 * var(--space-2)));
   --shell-header-bg: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  --shell-sidebar-width: 13.5rem;
+  --shell-sidebar-width-collapsed: 4.25rem;
+  --shell-sidebar-bg: #1c1917;
+  --shell-sidebar-border: rgba(28, 25, 23, 0.12);
+  --shell-sidebar-text: #1c1917;
+  --shell-sidebar-muted: #78716c;
+  --shell-sidebar-hover: rgba(28, 25, 23, 0.05);
+  --shell-sidebar-active: rgba(200, 146, 14, 0.14);
   --card-outline-shadow: 0 0 0 1px rgba(28, 25, 23, 0.06);
 }

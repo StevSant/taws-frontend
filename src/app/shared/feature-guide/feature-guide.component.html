@@ -1,0 +1,11 @@
+<section class="feature-guide" [attr.aria-label]="title()">
+  <h2 class="feature-guide__title">{{ title() }}</h2>
+  <ol class="feature-guide__steps">
+    @for (step of steps(); track $index) {
+      <li class="feature-guide__step">
+        <span class="feature-guide__num">{{ $index + 1 }}</span>
+        <span>{{ step }}</span>
+      </li>
+    }
+  </ol>
+</section>

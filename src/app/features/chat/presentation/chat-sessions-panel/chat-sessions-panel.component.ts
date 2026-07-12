@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnDestroy, output } from '@angular/core';
 import { TranslationService } from '../../../../core';
 import { ChatSessionsStore } from '../../application/chat-sessions-store';
+import { truncateSessionTitle } from '../../application/truncate-session-title';
 
 const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
 
@@ -35,9 +36,10 @@ export class ChatSessionsPanelComponent implements OnDestroy {
   }
 
   sessionTitle(title: string): string {
-    return this.sessionsStore.isDefaultTitle(title)
-      ? this.i18n.t('chat.sessions.new')
-      : title;
+    if (this.sessionsStore.isDefaultTitle(title)) {
+      return this.i18n.t('chat.sessions.new');
+    }
+    return truncateSessionTitle(title);
   }
 
   onClose(): void {

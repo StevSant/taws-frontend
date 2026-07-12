@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "generated": "2026-07-11",
+  "instruments": {
+    "stocks": ["AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "GOOGL", "META", "JPM"],
+    "crypto": ["BTC", "ETH", "SOL", "BNB", "XRP"],
+    "etfs": ["LQD", "HYG", "TLT", "GLD", "USO"],
+    "forex": ["EURUSD"]
+  },
+  "macro": ["vix", "fed", "cpi", "dxy"],
+  "ui": ["radar", "news", "briefings", "scenarios", "chat", "watchlist"],
+  "notes": {
+    "stocks": "Brand marks from Simple Icons (MIT). JPM uses Chase mark as closest free alternative.",
+    "etfs": "Custom Midas icons — replace with issuer marks if design provides them.",
+    "forex": "Custom pair badge for EURUSD."
+  }
+}

@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationService } from '../../../../core';
 import {
   ButtonComponent,
   EmptyStateComponent,
   FeaturePageHeaderComponent,
+  FeatureGuideComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
 import { AuthStore } from '../../../auth/application';
@@ -46,6 +47,7 @@ const FREE_TEXT_MAX_LENGTH = 1000;
     FormsModule,
     ButtonComponent,
     FeaturePageHeaderComponent,
+    FeatureGuideComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
     PresetPickerComponent,
@@ -56,6 +58,12 @@ const FREE_TEXT_MAX_LENGTH = 1000;
 })
 export class ScenariosPageComponent implements OnInit {
   readonly freeTextMaxLength = FREE_TEXT_MAX_LENGTH;
+
+  readonly guideSteps = computed(() => [
+    this.i18n.t('scenarios.guide.step1'),
+    this.i18n.t('scenarios.guide.step2'),
+    this.i18n.t('scenarios.guide.step3'),
+  ]);
 
   constructor(
     readonly store: ScenarioLabStore,

@@ -50,14 +50,14 @@
             {{ i18n.t('telegram.unlink') }}
           </button>
         } @else {
-          <p class="telegram-link__hint">{{ i18n.t('telegram.connect') }}</p>
+          <p class="telegram-link__hint">{{ i18n.t('telegram.intro') }}</p>
           <button
             type="button"
             class="telegram-link__action"
             [disabled]="store.isActionPending()"
             (click)="onConnect()"
           >
-            {{ i18n.t('telegram.connect') }}
+            {{ i18n.t('telegram.connectAction') }}
           </button>
 
           @if (store.pendingToken(); as token) {

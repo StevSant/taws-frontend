@@ -1,12 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, timeout } from 'rxjs';
 import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
 import { NewsItem, NewsRepository, RadarFilters } from '../domain';
 import { mapNewsItemDto } from './map-news-item-dto';
 import { NewsItemDto } from './news-item-dto';
 
 const NEWS_PATH = '/api/v1/news';
+const NEWS_REQUEST_TIMEOUT_MS = 8_000;
 
 /**
  * Infrastructure adapter for `NewsRepository`. Calls the real
@@ -44,7 +45,9 @@ export class HttpNewsRepository extends NewsRepository {
         }
 
         const dtos = await firstValueFrom(
-          this.http.get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params }),
+          this.http
+            .get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
+            .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
         );
         return dtos.map(mapNewsItemDto);
       },

@@ -61,12 +61,12 @@ export const appConfig: ApplicationConfig = {
     { provide: ReviewRepository, useClass: HttpReviewRepository },
     { provide: ScenarioRepository, useClass: HttpScenarioRepository },
     { provide: ChartRepository, useClass: HttpChartRepository },
-    // Restores any persisted Supabase session before the router's initial
-    // navigation runs, so authGuard never sees a false "logged out" on
-    // refresh (provideRouter blocks initial navigation on app initializers
-    // by default).
-    provideAppInitializer(() => inject(AuthStore).initialize()),
+    // Restores Supabase session in the background so the shell + Radar can
+    // paint immediately. `authGuard` waits for `AuthStore.ready` on guarded
+    // routes so a refresh on /briefings doesn't false-redirect to login.
     provideAppInitializer(() => {
+      void inject(AuthStore).initialize();
+    }),    provideAppInitializer(() => {
       const theme = inject(ThemeService);
       theme.setTheme(theme.theme());
     }),

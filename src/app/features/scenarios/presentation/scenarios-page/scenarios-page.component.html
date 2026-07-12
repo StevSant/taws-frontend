@@ -4,23 +4,10 @@
     [description]="i18n.t('scenarios.description')"
   />
 
-  <section class="scenarios-page__guide" [attr.aria-label]="i18n.t('scenarios.guide.title')">
-    <h2 class="scenarios-page__guide-title">{{ i18n.t('scenarios.guide.title') }}</h2>
-    <ol class="scenarios-page__guide-steps">
-      <li class="scenarios-page__guide-step">
-        <span class="scenarios-page__guide-num">1</span>
-        <span>{{ i18n.t('scenarios.guide.step1') }}</span>
-      </li>
-      <li class="scenarios-page__guide-step">
-        <span class="scenarios-page__guide-num">2</span>
-        <span>{{ i18n.t('scenarios.guide.step2') }}</span>
-      </li>
-      <li class="scenarios-page__guide-step">
-        <span class="scenarios-page__guide-num">3</span>
-        <span>{{ i18n.t('scenarios.guide.step3') }}</span>
-      </li>
-    </ol>
-  </section>
+  <app-feature-guide
+    [title]="i18n.t('scenarios.guide.title')"
+    [steps]="guideSteps()"
+  />
 
   <div class="scenarios-page__layout">
     <div class="scenarios-page__main">

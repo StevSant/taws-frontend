@@ -1,20 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import {
-  HttpTelegramRepository,
   NotificationBellComponent,
   NotificationsStore,
-  TelegramLinkPanelComponent,
-  TelegramRepository,
-  TelegramSettingsStore,
   TranslationService,
 } from '../../core';
 import { AuthStore } from '../../features/auth/application';
 import { LanguageToggleComponent, MidasLogoComponent, ThemeToggleComponent } from '../../shared';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 
-/**
- * Application-wide layout: header (brand + section nav + utilities) + routed content.
- */
 @Component({
   selector: 'app-shell',
   standalone: true,
@@ -23,14 +18,10 @@ import { LanguageToggleComponent, MidasLogoComponent, ThemeToggleComponent } fro
     RouterLink,
     RouterLinkActive,
     NotificationBellComponent,
-    TelegramLinkPanelComponent,
+    SidebarComponent,
     MidasLogoComponent,
     ThemeToggleComponent,
     LanguageToggleComponent,
-  ],
-  providers: [
-    TelegramSettingsStore,
-    { provide: TelegramRepository, useClass: HttpTelegramRepository },
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.scss',
@@ -41,6 +32,16 @@ export class ShellComponent {
   readonly auth = inject(AuthStore);
   readonly notifications = inject(NotificationsStore);
   private readonly router = inject(Router);
+
+  readonly isChatRoute = signal(this.router.url.startsWith('/chat'));
+
+  constructor() {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.isChatRoute.set(this.router.url.startsWith('/chat'));
+      });
+  }
 
   logout(): void {
     void this.auth.logout().then(() => this.router.navigateByUrl('/login'));

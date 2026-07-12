@@ -23,6 +23,13 @@
     color: var(--color-text-muted);
   }
 
+  &__hint {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+  }
+
   &__justification {
     resize: vertical;
     min-height: 2.5rem;

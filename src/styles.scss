@@ -88,7 +88,7 @@ body.route-chat {
   overflow: hidden;
   height: 100dvh;
   max-height: 100dvh;
-  background: var(--color-background-deep);
+  background: var(--color-background);
 }
 
 body.route-chat .app-shell {
@@ -96,7 +96,7 @@ body.route-chat .app-shell {
   max-height: 100dvh;
   min-height: 0;
   overflow: hidden;
-  background: transparent;
+  background: var(--color-background);
 }
 
 body.route-login {
@@ -112,17 +112,15 @@ body.route-login app-root {
 
 body.route-chat .app-shell__content {
   overflow: hidden;
-  background: transparent;
+  background: var(--color-background);
   display: flex;
   flex-direction: column;
   min-height: 0;
+  flex: 1;
 }
 
-body.route-chat .app-shell__header {
-  min-height: 3rem;
-  padding: 0 var(--space-3);
-  background: var(--color-background-deep);
-  border-bottom-color: var(--color-border);
+body.route-chat .app-shell__topbar {
+  background: var(--color-surface);
 }
 
 .glass {

@@ -1,0 +1,70 @@
+.radar-market-pulse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 100%;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__link {
+    font-size: 0.72rem;
+    color: var(--color-gold);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  &__swatch {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  &__bar {
+    display: flex;
+    height: 0.65rem;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    background: var(--color-border);
+  }
+
+  &__segment {
+    min-width: 2px;
+    transition: flex-grow 0.2s ease;
+  }
+
+  &__processed {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+}

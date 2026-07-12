@@ -4,125 +4,130 @@
 }
 
 .radar-page {
-  &__guide {
-    margin: 0 var(--space-4) var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-gold-border);
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-gold-dim-bg) 80%, transparent),
-      color-mix(in srgb, var(--color-surface) 95%, var(--color-gold) 5%)
-    );
-  }
+  gap: var(--space-4);
+  padding: var(--space-5);
+  max-width: 90rem;
+  width: 100%;
+  margin: 0 auto;
 
-  &__guide-title {
-    margin: 0 0 var(--space-2);
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--color-gold-bright);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-
-  &__guide-steps {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-3);
-  }
-
-  &__guide-step {
+  &__hero {
     display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    font-size: 0.78rem;
-    line-height: 1.45;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+
+  &__summary {
+    margin: var(--space-2) 0 0;
+    max-width: 42rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
     color: var(--color-text-secondary);
   }
 
-  &__guide-num {
-    flex-shrink: 0;
-    width: 1.35rem;
-    height: 1.35rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-full);
-    background: var(--color-gold);
-    color: var(--color-background);
-    font-family: var(--font-family-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
+  &__filters--inline {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
   }
 
-  &__filters {
-    padding: var(--space-3) var(--space-4);
+  &__kpis {
+    display: block;
+  }
+
+  &__overview {
+    display: grid;
+    grid-template-columns: 1.4fr 0.9fr 1.2fr;
+    gap: var(--space-3);
+    align-items: stretch;
   }
 
   &__enriching {
     margin: 0;
-    padding: 0 var(--space-4);
     font-family: var(--font-family-mono);
     font-size: 0.72rem;
     color: var(--color-gold-bright);
     text-align: center;
   }
 
-  &__unlinked-note {
-    margin: 0 var(--space-4);
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--color-gold-dim-bg) 60%, transparent);
-    color: var(--color-text-muted);
-    font-family: var(--font-family-mono);
-    font-size: 0.72rem;
+  &__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: var(--space-4);
+    align-items: start;
   }
 
-  &__cards-header {
+  &__instruments-header {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-3);
-    padding: var(--space-4) var(--space-4) var(--space-2);
+    margin-bottom: var(--space-3);
   }
 
-  &__cards-title {
+  &__instruments-title {
     margin: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: var(--color-text-primary);
   }
 
-  &__cards-subtitle {
-    margin: 0.25rem 0 0;
-    font-size: 0.8rem;
+  &__instruments-subtitle {
+    margin: 0.2rem 0 0;
+    font-size: 0.78rem;
     color: var(--color-text-muted);
-    max-width: 36rem;
   }
 
-  &__grid,
+  &__instrument-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
   &__skeletons {
-    padding: 0 var(--space-4) var(--space-5);
-    gap: var(--space-5);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
-    align-items: start;
-  }
-
-  @media (min-width: 1100px) {
-    &__grid,
-    &__skeletons {
-      gap: var(--space-6);
-      grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
-    }
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-3);
   }
 }
 
-@media (max-width: 900px) {
-  .radar-page__guide-steps {
+@media (max-width: 1200px) {
+  .radar-page__overview {
     grid-template-columns: 1fr;
+  }
+
+  .radar-page__split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .radar-page {
+    padding: var(--space-3);
+  }
+
+  .radar-page__instrument-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .radar-page__skeletons {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1100px) {
+  .radar-page__instrument-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

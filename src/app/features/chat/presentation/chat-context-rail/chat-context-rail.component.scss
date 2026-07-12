@@ -1,0 +1,215 @@
+.chat-context-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  min-height: 0;
+  padding: var(--space-4) var(--space-3);
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow-y: auto;
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-background);
+    box-shadow: var(--elevation-1);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__link {
+    font-size: 0.68rem;
+    color: var(--color-gold);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__macro-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  &__macro {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: var(--space-2);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  &__macro-label {
+    font-size: 0.6rem;
+    font-family: var(--font-family-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+
+  &__macro-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  &__macro-hint {
+    font-size: 0.62rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+
+  &__news,
+  &__watchlist {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__news-item,
+  &__watch-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-2);
+    align-items: start;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  &__news-symbol,
+  &__watch-symbol {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--radius-md);
+    display: grid;
+    place-items: center;
+    font-size: 0.62rem;
+    font-weight: 800;
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold);
+  }
+
+  &__news-copy,
+  &__watch-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  &__news-headline {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    line-height: 1.35;
+
+    &:hover {
+      color: var(--color-gold);
+    }
+  }
+
+  &__news-meta {
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+  }
+
+  &__badge {
+    font-size: 0.62rem;
+    font-weight: 600;
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-text-muted) 12%, transparent);
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+
+    &--positive {
+      background: var(--color-gain-dim);
+      color: var(--color-gain);
+    }
+
+    &--neutral {
+      background: var(--color-warn-dim);
+      color: var(--color-warn);
+    }
+  }
+
+  &__watch-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  &__watch-price {
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+  }
+
+  &__watch-delta {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+
+    &--up {
+      color: var(--color-gain);
+    }
+
+    &--down {
+      color: var(--color-loss);
+    }
+  }
+
+  &__add {
+    margin-top: var(--space-1);
+    padding: 0.45rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+
+    &:hover {
+      border-color: var(--color-gold-border);
+      color: var(--color-gold);
+    }
+  }
+}
+
+@media (max-width: 1180px) {
+  :host {
+    display: none;
+  }
+}

@@ -99,16 +99,26 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
+    overflow-x: hidden;
     overflow-y: auto;
     min-height: 0;
+    min-width: 0;
     flex: 1;
   }
 
-  &__list > li {
-    display: grid;
-    grid-template-columns: 1fr auto;
+  &__row {
+    display: flex;
+    align-items: center;
     gap: 0.25rem;
-    align-items: stretch;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  &__item-wrap {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: calc(100% - 1.75rem);
+    overflow: hidden;
   }
 
   &__item {
@@ -117,6 +127,9 @@
     align-items: flex-start;
     gap: 0.2rem;
     width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
     padding: var(--space-2) var(--space-3);
     border: 1px solid transparent;
     border-radius: var(--radius-md);
@@ -139,6 +152,9 @@
   }
 
   &__item-title {
+    display: block;
+    width: 100%;
+    min-width: 0;
     font-size: 0.82rem;
     font-weight: 600;
     color: var(--color-text-primary);
@@ -146,13 +162,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 100%;
+    word-break: break-all;
   }
 
   &__item-meta {
+    display: block;
+    width: 100%;
+    min-width: 0;
     font-size: 0.68rem;
     color: var(--color-text-muted);
     font-family: var(--font-family-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   &__delete {

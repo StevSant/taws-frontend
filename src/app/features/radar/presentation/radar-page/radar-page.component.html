@@ -1,53 +1,28 @@
 <div class="feature-page radar-page">
-  <app-feature-page-header
-    [title]="i18n.t('radar.title')"
-    [description]="i18n.t('radar.description')"
-    [stats]="headerStats()"
-  />
+  <header class="radar-page__hero">
+    <div class="radar-page__hero-copy">
+      <h1 class="radar-page__title">{{ i18n.t('radar.title') }}</h1>
+      @if (!store.isLoading() && store.signals().length > 0) {
+        <p class="radar-page__summary">{{ summaryText() }}</p>
+      } @else {
+        <p class="radar-page__summary">{{ i18n.t('radar.description') }}</p>
+      }
+    </div>
 
-  <section class="radar-page__guide" [attr.aria-label]="i18n.t('radar.guide.title')">
-    <h2 class="radar-page__guide-title">{{ i18n.t('radar.guide.title') }}</h2>
-    <ol class="radar-page__guide-steps">
-      <li class="radar-page__guide-step">
-        <span class="radar-page__guide-num">1</span>
-        <span>{{ i18n.t('radar.guide.step1') }}</span>
-      </li>
-      <li class="radar-page__guide-step">
-        <span class="radar-page__guide-num">2</span>
-        <span>{{ i18n.t('radar.guide.step2') }}</span>
-      </li>
-      <li class="radar-page__guide-step">
-        <span class="radar-page__guide-num">3</span>
-        <span>{{ i18n.t('radar.guide.step3') }}</span>
-      </li>
-    </ol>
-  </section>
-
-  <app-radar-filters
-    class="radar-page__filters"
-    [filters]="store.filters()"
-    [instrumentOptions]="store.instrumentOptions()"
-    (assetClassChange)="store.setAssetClass($event)"
-    (symbolChange)="store.setSymbol($event)"
-    (sinceHoursChange)="store.setSinceHours($event)"
-  />
-
-  @if (!store.isLoading() && store.signals().length > 0) {
-    <app-radar-landscape
-      [landscape]="store.landscape()"
-      [macro]="store.macroState()"
-      [activeAssetClass]="store.filters().assetClass"
-      (assetClassFilter)="onLandscapeAssetClass($event)"
+    <app-radar-filters
+      class="radar-page__filters radar-page__filters--inline"
+      [compact]="true"
+      [filters]="store.filters()"
+      [instrumentOptions]="store.instrumentOptions()"
+      (assetClassChange)="store.setAssetClass($event)"
+      (symbolChange)="store.setSymbol($event)"
+      (sinceHoursChange)="store.setSinceHours($event)"
     />
-  }
-
-  @if (store.isEnriching() && !store.isLoading()) {
-    <p class="radar-page__enriching" aria-live="polite">{{ i18n.t('radar.landscape.enriching') }}</p>
-  }
+  </header>
 
   @if (store.isLoading()) {
-    <div class="feature-grid radar-page__skeletons" aria-busy="true">
-      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+    <div class="radar-page__skeletons" aria-busy="true">
+      @for (item of [1, 2, 3, 4]; track item) {
         <app-skeleton-card />
       }
     </div>
@@ -67,35 +42,55 @@
     />
   }
 
-  @if (store.unlinkedNewsCount() > 0 && !store.isLoading()) {
-    <p class="radar-page__unlinked-note">
-      {{ i18n.t('radar.unlinked.note') }} {{ store.unlinkedNewsCount() }}
-    </p>
-  }
-
   @if (!store.isLoading() && store.signals().length > 0) {
-    <header class="radar-page__cards-header">
-      <div>
-        <h2 class="radar-page__cards-title">{{ i18n.t('radar.cards.title') }}</h2>
-        <p class="radar-page__cards-subtitle">{{ i18n.t('radar.cards.subtitle') }}</p>
-      </div>
-      @if (store.unclassifiedCount() > 0) {
-        <app-button
-          [label]="
-            store.isGeneratingAny()
-              ? i18n.t('radar.generate.allRunning')
-              : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
-          "
-          [disabled]="store.isGeneratingAny()"
-          (pressed)="onAnalyzeAll()"
-        />
-      }
-    </header>
+    <app-radar-kpi-row
+      class="radar-page__kpis"
+      [kpis]="store.kpiSummary()"
+      [sinceHours]="store.filters().sinceHours"
+    />
 
-    <div class="feature-grid feature-stagger radar-page__grid">
-      @for (signal of store.signals(); track signal.symbol) {
-        <app-signal-card [signal]="signal" />
-      }
+    <div class="radar-page__overview">
+      <app-radar-market-pulse
+        [distribution]="store.landscape().distribution"
+        [marketScore]="store.marketScore()"
+      />
+      <app-radar-market-score [marketScore]="store.marketScore()" />
+      <app-radar-macro-cards [macro]="store.macroState()" />
+    </div>
+
+    @if (store.isEnriching()) {
+      <p class="radar-page__enriching" aria-live="polite">{{ i18n.t('radar.landscape.enriching') }}</p>
+    }
+
+    <div class="radar-page__split">
+      <app-news-timeline class="radar-page__timeline" [entries]="store.newsTimeline()" />
+
+      <section class="radar-page__instruments">
+        <header class="radar-page__instruments-header">
+          <div>
+            <h2 class="radar-page__instruments-title">{{ i18n.t('radar.instruments.title') }}</h2>
+            <p class="radar-page__instruments-subtitle">{{ i18n.t('radar.instruments.subtitle') }}</p>
+          </div>
+          @if (store.unclassifiedCount() > 0) {
+            <app-button
+              [label]="
+                store.isGeneratingAny()
+                  ? i18n.t('radar.generate.allRunning')
+                  : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
+              "
+              [disabled]="store.isGeneratingAny()"
+              (pressed)="onAnalyzeAll()"
+            />
+          }
+        </header>
+
+        <div class="radar-page__instrument-grid">
+          @for (signal of store.signals(); track signal.symbol) {
+            <app-instrument-card-compact [signal]="signal" />
+          }
+          <app-radar-add-instrument-card />
+        </div>
+      </section>
     </div>
   }
 </div>

@@ -54,4 +54,13 @@
   &__select {
     min-width: 12rem;
   }
+
+  &--compact {
+    gap: 0;
+
+    .radar-filters__pill {
+      min-width: 2.75rem;
+      text-align: center;
+    }
+  }
 }

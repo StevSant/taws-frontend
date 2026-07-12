@@ -5,6 +5,11 @@
     [stats]="headerStats()"
   />
 
+  <app-feature-guide
+    [title]="i18n.t('briefings.guide.title')"
+    [steps]="guideSteps()"
+  />
+
   <p class="feature-disclaimer" role="note">
     {{ i18n.t('briefings.disclaimer.static') }}
   </p>
@@ -45,7 +50,7 @@
   @if (!store.isLoadingWatchlists() && !store.hasWatchlists()) {
     <app-empty-state
       [title]="i18n.t('briefings.watchlist.empty')"
-      [description]="i18n.t('briefings.selectPrompt')"
+      [description]="i18n.t('briefings.watchlist.emptyDescription')"
     />
   }
 

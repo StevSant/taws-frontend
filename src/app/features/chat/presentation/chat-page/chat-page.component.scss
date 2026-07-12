@@ -793,6 +793,8 @@
     line-height: 1.65;
     font-size: 0.95rem;
     color: var(--color-text-primary);
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     &--streaming::after {
       content: '';

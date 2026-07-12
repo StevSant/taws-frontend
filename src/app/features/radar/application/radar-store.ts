@@ -5,6 +5,7 @@ import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
   AssetClass,
   DEFAULT_RADAR_FILTERS,
+  ImpactClass,
   Instrument,
   InstrumentRepository,
   MacroRepository,
@@ -19,9 +20,25 @@ import {
   SignalReviewRepository,
 } from '../domain';
 import { computeRadarLandscape } from './compute-radar-landscape';
+import { computeMarketScore, MarketScore } from './compute-market-score';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
+
+export interface NewsTimelineEntry {
+  news: NewsItem;
+  symbol: string;
+  impactClass?: ImpactClass;
+  confidence?: number;
+}
+
+export interface RadarKpiSummary {
+  newsDetected: number;
+  pendingReview: number;
+  instruments: number;
+  activeAlerts: number;
+  newsTrend: number;
+}
 
 /**
  * Signal-based state + facade for the radar feature. Presentation components
@@ -106,6 +123,50 @@ export class RadarStore {
     });
   });
   readonly landscape = computed(() => computeRadarLandscape(this.signals()));
+  readonly marketScore = computed((): MarketScore => {
+    const landscape = this.landscape();
+    return computeMarketScore(landscape.distribution, landscape.totalInstruments);
+  });
+  readonly newsTimeline = computed((): NewsTimelineEntry[] => {
+    const entries: NewsTimelineEntry[] = [];
+    for (const signal of this.signals()) {
+      for (const news of signal.news) {
+        entries.push({
+          news,
+          symbol: signal.symbol,
+          impactClass: signal.impactClass,
+          confidence: signal.confidence,
+        });
+      }
+    }
+    return entries.sort(
+      (left, right) =>
+        new Date(right.news.publishedAt).getTime() - new Date(left.news.publishedAt).getTime(),
+    );
+  });
+  readonly kpiSummary = computed((): RadarKpiSummary => {
+    const landscape = this.landscape();
+    const sinceHours = this.filtersSignal().sinceHours;
+    const midpoint = Date.now() - (sinceHours / 2) * 3_600_000;
+    let recentHalf = 0;
+    let olderHalf = 0;
+
+    for (const item of this.newsSignal()) {
+      if (new Date(item.publishedAt).getTime() >= midpoint) {
+        recentHalf += 1;
+      } else {
+        olderHalf += 1;
+      }
+    }
+
+    return {
+      newsDetected: landscape.totalNewsItems,
+      pendingReview: this.unclassifiedCount(),
+      instruments: landscape.totalInstruments,
+      activeAlerts: this.unclassifiedCount(),
+      newsTrend: recentHalf - olderHalf,
+    };
+  });
   /** News items fetched but not linked to any instrument — surfaced, not dropped silently. */
   readonly unlinkedNewsCount = computed(() => this.grouped().unlinkedCount);
   readonly isEmpty = computed(
@@ -136,7 +197,9 @@ export class RadarStore {
       return;
     }
 
-    await Promise.all([this.loadInstruments(), this.loadMacroState(), this.loadNews()]);
+    void this.loadInstruments();
+    void this.loadMacroState();
+    await this.loadNews();
     this.sessionReady = true;
   }
 
@@ -298,7 +361,7 @@ export class RadarStore {
       if (!background) {
         this.loadingSignal.set(false);
       }
-      await this.enrichFeed(news);
+      void this.enrichFeed(news);
     } catch (error: unknown) {
       this.errorSignal.set(this.toErrorMessage(error));
       this.newsSignal.set([]);

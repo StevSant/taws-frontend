@@ -5,6 +5,7 @@ import {
   ButtonComponent,
   EmptyStateComponent,
   FeaturePageHeaderComponent,
+  FeatureGuideComponent,
   FeaturePageStat,
   SkeletonCardComponent,
 } from '../../../../shared';
@@ -20,6 +21,7 @@ import { WatchlistManagerComponent } from '../watchlist-manager/watchlist-manage
     FormsModule,
     ButtonComponent,
     FeaturePageHeaderComponent,
+    FeatureGuideComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
     BriefingCardComponent,
@@ -29,6 +31,12 @@ import { WatchlistManagerComponent } from '../watchlist-manager/watchlist-manage
   styleUrl: './briefings-page.component.scss',
 })
 export class BriefingsPageComponent implements OnInit {
+  readonly guideSteps = computed(() => [
+    this.i18n.t('briefings.guide.step1'),
+    this.i18n.t('briefings.guide.step2'),
+    this.i18n.t('briefings.guide.step3'),
+  ]);
+
   readonly headerStats = computed<FeaturePageStat[]>(() => {
     if (this.store.isLoadingWatchlists()) {
       return [];

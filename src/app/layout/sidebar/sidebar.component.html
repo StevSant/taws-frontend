@@ -1,0 +1,23 @@
+<nav class="app-sidebar" [attr.aria-label]="i18n.t('shell.sidebar.label')">
+  <a class="app-sidebar__brand" routerLink="/radar">
+    <app-midas-logo class="app-sidebar__logo" [size]="28" />
+    <span class="app-sidebar__brand-name">{{ i18n.t('shell.brand') }}</span>
+  </a>
+
+  <ul class="app-sidebar__nav">
+    @for (item of items; track item.labelKey) {
+      <li>
+        <a
+          class="app-sidebar__link"
+          [routerLink]="item.route"
+          routerLinkActive="app-sidebar__link--active"
+          [routerLinkActiveOptions]="{ exact: item.icon === 'radar' }"
+          [attr.title]="i18n.t(item.labelKey)"
+        >
+          <span class="app-sidebar__icon" [attr.data-icon]="item.icon" aria-hidden="true"></span>
+          <span class="app-sidebar__label">{{ i18n.t(item.labelKey) }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</nav>

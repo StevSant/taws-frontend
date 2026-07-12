@@ -1,0 +1,32 @@
+<section class="radar-market-score feature-panel">
+  <header class="radar-market-score__header">
+    <h2 class="radar-market-score__title">{{ i18n.t('radar.score.title') }}</h2>
+    <a class="radar-market-score__link" href="#">{{ i18n.t('radar.score.viewAll') }}</a>
+  </header>
+
+  <div class="radar-market-score__body">
+    <div
+      class="radar-market-score__donut"
+      role="img"
+      [attr.aria-label]="i18n.t('radar.score.title')"
+      [style.background]="scoreGradient()"
+    >
+      <div class="radar-market-score__hole">
+        <span class="radar-market-score__value">{{ marketScore.score }}</span>
+        <span class="radar-market-score__label">{{ i18n.t(labelKey()) }}</span>
+      </div>
+    </div>
+
+    <p class="radar-market-score__caption">
+      {{ i18n.t('radar.score.caption') }}
+      <span
+        class="radar-market-score__trend"
+        [class.radar-market-score__trend--up]="marketScore.label === 'bullish'"
+        [class.radar-market-score__trend--down]="marketScore.label === 'bearish'"
+        aria-hidden="true"
+      >
+        {{ marketScore.label === 'bullish' ? '↑' : marketScore.label === 'bearish' ? '↓' : '→' }}
+      </span>
+    </p>
+  </div>
+</section>

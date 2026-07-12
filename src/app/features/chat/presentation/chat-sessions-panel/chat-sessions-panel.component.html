@@ -24,18 +24,22 @@
 
   <ul class="chat-sessions__list">
     @for (session of sessionsStore.sessions(); track session.id) {
-      <li>
-        <button
-          type="button"
-          class="chat-sessions__item"
-          [class.chat-sessions__item--active]="sessionsStore.activeSessionId() === session.id"
-          (click)="onSelect(session.id)"
-        >
-          <span class="chat-sessions__item-title">{{ sessionTitle(session.title) }}</span>
-          <span class="chat-sessions__item-meta">
-            {{ session.messages.length }} {{ i18n.t('chat.sessions.messages') }}
-          </span>
-        </button>
+      <li class="chat-sessions__row">
+        <div class="chat-sessions__item-wrap">
+          <button
+            type="button"
+            class="chat-sessions__item"
+            [class.chat-sessions__item--active]="sessionsStore.activeSessionId() === session.id"
+            (click)="onSelect(session.id)"
+          >
+            <span class="chat-sessions__item-title" [attr.title]="sessionTitle(session.title)">{{
+              sessionTitle(session.title)
+            }}</span>
+            <span class="chat-sessions__item-meta">
+              {{ session.messages.length }} {{ i18n.t('chat.sessions.messages') }}
+            </span>
+          </button>
+        </div>
         <button
           type="button"
           class="chat-sessions__delete"
