@@ -21,6 +21,7 @@ import {
 } from '../domain';
 import { computeRadarLandscape } from './compute-radar-landscape';
 import { computeMarketScore, MarketScore } from './compute-market-score';
+import { formatNewSignalsDetail } from './format-new-signals-detail';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
@@ -54,7 +55,10 @@ export interface RadarKpiSummary {
  * position with a full-page spinner or error banner) and diffs the fetched
  * news IDs against the previous tick's IDs to detect genuinely new items,
  * pushing exactly one `NotificationsStore.notify(...)` call per tick that
- * has new items — never one per tick regardless of change.
+ * has new items — never one per tick regardless of change, and never one
+ * per new item. That call's `detail` names the distinct instrument symbols
+ * the new items relate to (via `formatNewSignalsDetail`), truncated past a
+ * small count, so the notification isn't just a bare number.
  *
  * `RadarStore` is app-scoped (`providedIn: 'root'`) so revisiting Radar shows
  * the last loaded feed instantly and refreshes in the background. The poll loop
@@ -457,7 +461,13 @@ export class RadarStore {
       if (this.lastSeenNewsIds) {
         const newItems = news.filter((item) => !this.lastSeenNewsIds!.has(item.id));
         if (newItems.length > 0) {
-          this.notifications.notify('radar', 'notifications.radar.newSignals', newItems.length);
+          const symbols = Array.from(new Set(newItems.flatMap((item) => item.relatedSymbols)));
+          this.notifications.notify(
+            'radar',
+            'notifications.radar.newSignals',
+            newItems.length,
+            formatNewSignalsDetail(symbols),
+          );
         }
       }
 

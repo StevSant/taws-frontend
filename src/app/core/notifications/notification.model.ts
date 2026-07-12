@@ -20,6 +20,14 @@ export interface Notification {
   messageKey: TranslationKey;
   /** How many new items this notification represents (e.g. 3 new signals). */
   count: number;
+  /**
+   * Optional, already-formatted extra context shown alongside `messageKey`
+   * (e.g. the instrument symbols behind a batch of new radar signals, such
+   * as `"AAPL, TSLA +2 more"`). Pre-formatted rather than a raw list so the
+   * producer (e.g. `RadarStore.pollNews`) controls truncation/summarization
+   * — the bell dropdown just renders it verbatim.
+   */
+  detail?: string;
   /** ISO-8601 timestamp of when the notification was created. */
   createdAt: string;
 }
