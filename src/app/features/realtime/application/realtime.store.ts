@@ -108,6 +108,14 @@ export class RealtimeStore {
       case 'error':
         this.errorSignal.set(event.message);
         return;
+      case 'connection-lost':
+        // A live connection dropped (ICE failed): end the session with a
+        // retryable error rather than dying silently.
+        this.isModelSpeakingSignal.set(false);
+        this.activeToolCallSignal.set(null);
+        this.errorSignal.set('Realtime connection lost');
+        this.connectionStateSignal.set('error');
+        return;
     }
   }
 

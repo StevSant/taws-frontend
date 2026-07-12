@@ -11,4 +11,5 @@ export type RealtimeEvent =
   | { kind: 'speaking-changed'; speaking: boolean }
   | { kind: 'tool-call-started'; name: string }
   | { kind: 'tool-call-finished'; name: string }
-  | { kind: 'error'; message: string };
+  | { kind: 'error'; message: string }
+  | { kind: 'connection-lost' };

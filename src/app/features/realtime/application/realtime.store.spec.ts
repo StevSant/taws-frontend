@@ -71,6 +71,19 @@ describe('RealtimeStore', () => {
     expect(store.error()).toBeNull();
   });
 
+  it('ends a live session with a retryable error when the connection drops', async () => {
+    const started = store.start();
+    provider.resolveStart?.();
+    await started;
+    expect(store.connectionState()).toBe('live');
+
+    provider.emit({ kind: 'connection-lost' });
+
+    expect(store.connectionState()).toBe('error');
+    expect(store.error()).not.toBeNull();
+    expect(store.isModelSpeaking()).toBe(false);
+  });
+
   it('is a no-op when start is called while already connecting', async () => {
     void store.start();
     void store.start();
