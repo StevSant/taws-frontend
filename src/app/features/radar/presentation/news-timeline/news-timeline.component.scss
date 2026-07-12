@@ -88,6 +88,18 @@
     color: var(--color-text-muted);
   }
 
+  &__provider {
+    display: inline-block;
+    padding: 0.02rem 0.35rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
   &__actions {
     display: flex;
     flex-direction: column;

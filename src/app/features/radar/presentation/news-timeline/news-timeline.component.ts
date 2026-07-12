@@ -5,6 +5,7 @@ import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent } from '../../../../shared';
 import { RadarStore, NewsTimelineEntry } from '../../application/radar-store';
 import { ImpactClass } from '../../domain';
+import { providerLabel } from './provider-label';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -40,6 +41,10 @@ export class NewsTimelineComponent {
       return null;
     }
     return `${Math.round(confidence * 100)}%`;
+  }
+
+  providerLabel(provider?: string): string | null {
+    return providerLabel(provider);
   }
 
   relativeTime(iso: string): string {
