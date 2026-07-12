@@ -4,3 +4,4 @@ export { SignalCardComponent } from './signal-card/signal-card.component';
 export { SignalAnalysisComponent } from './signal-analysis/signal-analysis.component';
 export { AssetPriceChartComponent } from './asset-price-chart/asset-price-chart.component';
 export { NewsDetailPageComponent } from './news-detail-page/news-detail-page.component';
+export { AssetDetailPageComponent } from './asset-detail-page/asset-detail-page.component';

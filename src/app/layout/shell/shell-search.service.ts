@@ -163,11 +163,10 @@ export class ShellSearchService {
   }
 
   private async goToInstrument(symbol: string): Promise<void> {
-    await this.router.navigate(['/radar']);
-    if (this.radarStore.filters().assetClass !== null) {
-      await this.radarStore.setAssetClass(null);
-    }
-    await this.radarStore.setSymbol(symbol);
+    // Selecting an instrument opens its per-asset detail page (issue #43) —
+    // the full price chart, quant stats, signal analysis, and related news for
+    // that one symbol — rather than just filtering the radar feed.
+    await this.router.navigate(['/radar', symbol]);
   }
 
   private async goToAssetClass(assetClass: AssetClass): Promise<void> {
