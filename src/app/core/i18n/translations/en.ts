@@ -385,6 +385,12 @@ export const EN_TRANSLATIONS = {
   'radar.timeline.loadMore': 'Load more news',
   'radar.timeline.ago': 'Ago',
   'radar.timeline.confidence': 'Confidence',
+  'radar.timeline.viewAll': 'View all',
+  'radar.newsList.title': 'All news',
+  'radar.newsList.description':
+    'Browse every market headline with filters by type, asset and recency.',
+  'radar.newsList.empty.title': 'No news',
+  'radar.newsList.empty.description': 'No news match the selected filters.',
   'radar.instruments.title': 'Tracked instruments',
   'radar.instruments.subtitle':
     'Quick list: price, move, and AI signal. Open an asset for full detail.',

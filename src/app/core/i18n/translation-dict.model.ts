@@ -366,6 +366,11 @@ export interface TranslationDict {
   'radar.timeline.loadMore': string;
   'radar.timeline.ago': string;
   'radar.timeline.confidence': string;
+  'radar.timeline.viewAll': string;
+  'radar.newsList.title': string;
+  'radar.newsList.description': string;
+  'radar.newsList.empty.title': string;
+  'radar.newsList.empty.description': string;
   'radar.instruments.title': string;
   'radar.instruments.subtitle': string;
   'radar.instruments.explainer': string;

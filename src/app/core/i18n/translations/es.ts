@@ -391,6 +391,12 @@ export const ES_TRANSLATIONS = {
   'radar.timeline.loadMore': 'Cargar más noticias',
   'radar.timeline.ago': 'Hace',
   'radar.timeline.confidence': 'Confianza',
+  'radar.timeline.viewAll': 'Ver todas',
+  'radar.newsList.title': 'Todas las noticias',
+  'radar.newsList.description':
+    'Explora todas las noticias del mercado con filtros por tipo, activo y recencia.',
+  'radar.newsList.empty.title': 'Sin noticias',
+  'radar.newsList.empty.description': 'No hay noticias para los filtros seleccionados.',
   'radar.instruments.title': 'Instrumentos en seguimiento',
   'radar.instruments.subtitle':
     'Lista rápida: precio, movimiento y señal IA. Abre un activo para el detalle.',
