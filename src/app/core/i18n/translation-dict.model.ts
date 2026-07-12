@@ -227,10 +227,8 @@ export interface TranslationDict {
   'radar.kpi.alerts': string;
   'radar.kpi.alertsHint': string;
   'radar.pulse.title': string;
-  'radar.pulse.viewAll': string;
   'radar.pulse.processed': string;
   'radar.score.title': string;
-  'radar.score.viewAll': string;
   'radar.score.caption': string;
   'radar.score.bullish': string;
   'radar.score.bearish': string;
