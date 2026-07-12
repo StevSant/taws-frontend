@@ -450,6 +450,7 @@ export const ES_TRANSLATIONS = {
   'notifications.dismiss': 'Descartar',
   'notifications.radar.newSignals': 'Nuevas señales en tu radar',
   'notifications.radar.signalGenerated': 'Análisis de IA completado',
+  'notifications.auth.sessionExpired': 'Tu sesión expiró — inicia sesión de nuevo',
   'notifications.briefing.generated': 'Nuevo informe generado',
   'telegram.title': 'Alertas Telegram',
   'telegram.linked': 'Vinculado',

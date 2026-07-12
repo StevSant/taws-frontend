@@ -24,6 +24,14 @@ export abstract class AuthRepository {
   abstract getSession(): Promise<AuthSession | null>;
 
   /**
+   * Forces an access-token refresh using the persisted refresh token.
+   * Returns the new session, or `null` when no session can be refreshed
+   * (e.g. the refresh token itself is expired/revoked). Used to recover from
+   * a `401` on our own API before giving up and signing the user out.
+   */
+  abstract refreshSession(): Promise<AuthSession | null>;
+
+  /**
    * Subscribes to session changes (token refresh, sign-out from another tab,
    * sign-in). Returns an unsubscribe function.
    */

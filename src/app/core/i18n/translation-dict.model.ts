@@ -425,6 +425,7 @@ export interface TranslationDict {
   'notifications.dismiss': string;
   'notifications.radar.newSignals': string;
   'notifications.radar.signalGenerated': string;
+  'notifications.auth.sessionExpired': string;
   'notifications.briefing.generated': string;
   'placeholder.badge': string;
   'brandLab.title': string;

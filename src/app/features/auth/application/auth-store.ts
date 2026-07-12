@@ -109,6 +109,25 @@ export class AuthStore {
     }
   }
 
+  /**
+   * Refreshes the Supabase access token and re-syncs `AuthTokenService`.
+   * Returns `true` when a fresh session was obtained; on failure (or when no
+   * session can be refreshed) the local session is cleared and `false` is
+   * returned. Intentionally free of navigation/UI side effects — the HTTP
+   * error interceptor (via `SessionRefreshService`) decides what to do next.
+   */
+  async refreshSession(): Promise<boolean> {
+    try {
+      const session = await this.authRepository.refreshSession();
+      this.applySession(session);
+      return session !== null;
+    } catch (error: unknown) {
+      console.error('[auth] Session refresh failed:', error instanceof Error ? error.message : error);
+      this.applySession(null);
+      return false;
+    }
+  }
+
   async logout(): Promise<void> {
     try {
       await this.authRepository.signOut();

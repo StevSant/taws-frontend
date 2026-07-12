@@ -1,7 +1,7 @@
 import { TranslationKey } from '../i18n';
 
 /** Where an in-app notification originated — drives icon/styling if needed later. */
-export type NotificationSource = 'radar' | 'briefing';
+export type NotificationSource = 'radar' | 'briefing' | 'auth';
 
 /**
  * One in-app notification (bell dropdown). In-memory only — no backend

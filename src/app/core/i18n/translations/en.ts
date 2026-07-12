@@ -444,6 +444,7 @@ export const EN_TRANSLATIONS = {
   'notifications.dismiss': 'Dismiss',
   'notifications.radar.newSignals': 'New signals on your radar',
   'notifications.radar.signalGenerated': 'AI analysis complete',
+  'notifications.auth.sessionExpired': 'Your session expired — please sign in again',
   'telegram.intro': 'Get Telegram alerts when a monitored scenario starts to materialize.',
   'telegram.connectAction': 'Connect Telegram',
   'notifications.briefing.generated': 'New briefing generated',
