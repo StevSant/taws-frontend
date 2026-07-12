@@ -1,6 +1,17 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AgentTrace, ChartSpec, ChatMessage, ChatRepository, ChatStreamEvent, ToolCall, buildRoutingHops, buildToolHops, resolveRespondingAgent, snapshotToolHops } from '../domain';
+import {
+  AgentTrace,
+  ChartSpec,
+  ChatMessage,
+  ChatRepository,
+  ChatStreamEvent,
+  ToolCall,
+  buildRoutingHops,
+  buildToolHops,
+  resolveRespondingAgent,
+  snapshotToolHops,
+} from '../domain';
 import { ChatSessionsStore } from './chat-sessions-store';
 
 const ASSISTANT_ROLE = 'assistant';

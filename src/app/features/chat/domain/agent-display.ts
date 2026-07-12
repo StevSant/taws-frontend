@@ -1,5 +1,8 @@
 import { MidasAgentId, MidasGlyphId } from '../../../shared/midas-glyph/midas-glyph.model';
-import { MIDAS_AGENT_GLYPHS, midasAgentGlyph } from '../../../shared/midas-glyph/midas-glyph-selection';
+import {
+  MIDAS_AGENT_GLYPHS,
+  midasAgentGlyph,
+} from '../../../shared/midas-glyph/midas-glyph-selection';
 import { RoutingHop } from './models/routing-hop.model';
 
 export function isKnownAgent(agent: string): agent is MidasAgentId {

@@ -20,7 +20,9 @@
           <span class="scenario-result__target-label">{{
             i18n.t('scenarios.result.target.label')
           }}</span>
-          <strong class="scenario-result__target-value">{{ formatTargetPrice(targetPrice) }}</strong>
+          <strong class="scenario-result__target-value">{{
+            formatTargetPrice(targetPrice)
+          }}</strong>
           <span class="scenario-result__target-meta">
             {{ primarySymbol }} · {{ directionLabel() }}
             @if (result.spec.timeframeDays; as days) {

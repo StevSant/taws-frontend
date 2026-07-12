@@ -442,10 +442,7 @@
     </div>
 
     @if (auth.isAuthenticated()) {
-      <app-chat-context-rail
-        (askNews)="onNewsQuestion($event)"
-        (closePanel)="closeContextRail()"
-      />
+      <app-chat-context-rail (askNews)="onNewsQuestion($event)" (closePanel)="closeContextRail()" />
     }
   </div>
 </div>
