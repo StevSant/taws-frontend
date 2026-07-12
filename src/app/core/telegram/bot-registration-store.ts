@@ -27,10 +27,9 @@ export class BotRegistrationStore {
     this.resultSignal.set(null);
     try {
       const dto = await firstValueFrom(
-        this.http.post<RegisterBotDto>(
-          `${this.config.apiBaseUrl}/api/v1/telegram/register-bot`,
-          { botfather_text: botfatherText },
-        ),
+        this.http.post<RegisterBotDto>(`${this.config.apiBaseUrl}/api/v1/telegram/register-bot`, {
+          botfather_text: botfatherText,
+        }),
       );
       this.resultSignal.set(mapRegisterBotDto(dto));
     } catch (error: unknown) {

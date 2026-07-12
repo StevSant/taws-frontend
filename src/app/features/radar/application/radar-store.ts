@@ -1,6 +1,11 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
-import { AppConfigService, AuthTokenService, NewSignalsTracker, NotificationsStore } from '../../../core';
+import {
+  AppConfigService,
+  AuthTokenService,
+  NewSignalsTracker,
+  NotificationsStore,
+} from '../../../core';
 import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
   AssetClass,
@@ -398,9 +403,7 @@ export class RadarStore {
    * slow/failed instruments fetch never blanks out enrichment.
    */
   private trackedSymbols(news: NewsItem[]): string[] {
-    const symbols = Array.from(
-      new Set(news.flatMap((item) => item.relatedSymbols ?? [])),
-    );
+    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols ?? [])));
     const instruments = this.instrumentsSignal();
     if (instruments.length === 0) {
       return symbols;

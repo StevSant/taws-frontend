@@ -95,7 +95,11 @@
               <p class="app-shell__search-empty">{{ i18n.t('shell.search.noResults') }}</p>
             } @else {
               <ul class="app-shell__search-list">
-                @for (result of search.visibleResults(); track resultKey(result); let index = $index) {
+                @for (
+                  result of search.visibleResults();
+                  track resultKey(result);
+                  let index = $index
+                ) {
                   <li
                     role="option"
                     [attr.aria-selected]="index === search.activeIndex()"

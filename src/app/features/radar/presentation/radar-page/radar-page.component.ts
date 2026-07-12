@@ -68,7 +68,9 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     if (selected === null) {
       return null;
     }
-    return this.store.assetClassSegments().find((segment) => segment.assetClass === selected) ?? null;
+    return (
+      this.store.assetClassSegments().find((segment) => segment.assetClass === selected) ?? null
+    );
   });
 
   /** Signals shown in the watchlist: all or scoped to the active class, sorted by urgency. */

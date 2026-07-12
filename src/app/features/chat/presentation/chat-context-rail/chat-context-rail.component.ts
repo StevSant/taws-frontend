@@ -2,7 +2,11 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
-import { InstrumentTickerBadgeComponent, PriceDeltaChipComponent, formatPrice } from '../../../../shared';
+import {
+  InstrumentTickerBadgeComponent,
+  PriceDeltaChipComponent,
+  formatPrice,
+} from '../../../../shared';
 import { RadarStore } from '../../../radar/application';
 import { ImpactClass } from '../../../radar/domain';
 

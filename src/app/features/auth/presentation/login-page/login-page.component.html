@@ -212,7 +212,9 @@
     <ul class="login-page__sources-list">
       @for (source of dataSources; track source.id) {
         <li>
-          <span class="login-page__source-mark" aria-hidden="true">{{ source.label.charAt(0) }}</span>
+          <span class="login-page__source-mark" aria-hidden="true">{{
+            source.label.charAt(0)
+          }}</span>
           {{ source.label }}
         </li>
       }

@@ -70,13 +70,11 @@ export class NewsBlurbService {
   private async fetchBlurbs(items: NewsItem[]): Promise<void> {
     const payload = {
       locale: 'es',
-      items: items.slice(0, 12).map(
-        (item): BlurbSourceDto => ({
-          id: item.id,
-          title: item.title.slice(0, 500),
-          summary: stripHtml(item.summary).slice(0, 4000),
-        }),
-      ),
+      items: items.slice(0, 12).map((item): BlurbSourceDto => ({
+        id: item.id,
+        title: item.title.slice(0, 500),
+        summary: stripHtml(item.summary).slice(0, 4000),
+      })),
     };
 
     const response = await firstValueFrom(

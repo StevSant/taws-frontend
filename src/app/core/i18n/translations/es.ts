@@ -88,7 +88,8 @@ export const ES_TRANSLATIONS = {
   'auth.confirmation.required':
     'Revisá tu bandeja de entrada para confirmar tu correo antes de iniciar sesión.',
   'auth.error.banner': 'Algo salió mal: ',
-  'auth.error.configMissing': 'La autenticación no está completamente configurada. Contactá a soporte.',
+  'auth.error.configMissing':
+    'La autenticación no está completamente configurada. Contactá a soporte.',
   'auth.error.noSession': 'No pudimos iniciar tu sesión. Intentá de nuevo.',
   'auth.error.unknown': 'Revisá tus datos e intentá de nuevo.',
   'auth.demo.divider': 'Demo · Perspectiva',
@@ -233,10 +234,12 @@ export const ES_TRANSLATIONS = {
   'chat.sessions.toggle': 'Abrir panel de sesiones',
   'chat.sessions.hide': 'Ocultar sesiones',
   'radar.title': 'Radar de mercado',
-  'radar.description': 'Vigilancia de mercado potenciada por IA — señales, noticias y contexto macro.',
+  'radar.description':
+    'Vigilancia de mercado potenciada por IA — señales, noticias y contexto macro.',
   'radar.guide.title': 'Cómo leer el radar',
   'radar.guide.step1': 'Señales: cada tarjeta es una señal de IA sobre un instrumento o evento.',
-  'radar.guide.step2': 'Panorama: contexto macro, composición del mercado por clase de activo, fear & greed.',
+  'radar.guide.step2':
+    'Panorama: contexto macro, composición del mercado por clase de activo, fear & greed.',
   'radar.guide.step3': 'Timeline: todas las noticias recientes, filtradas por tipo y actualidad.',
   'radar.filters.type.label': 'Tipo',
   'radar.filters.type.all': 'Todas las señales',
@@ -278,7 +281,8 @@ export const ES_TRANSLATIONS = {
   'radar.card.disclaimer': 'Solo informativo — no es asesoramiento financiero.',
   'radar.generate.action': 'Analizar',
   'radar.generate.generating': 'Analizando…',
-  'radar.generate.hint': 'Ejecutá análisis de IA sobre noticias recientes en todos los instrumentos.',
+  'radar.generate.hint':
+    'Ejecutá análisis de IA sobre noticias recientes en todos los instrumentos.',
   'radar.generate.all': 'Analizar todo',
   'radar.generate.allRunning': 'Analizando todos los instrumentos…',
   'radar.landscape.title': 'Panorama del mercado',
@@ -295,7 +299,8 @@ export const ES_TRANSLATIONS = {
   'radar.landscape.uncertain': 'Incierto',
   'radar.landscape.unclassified': 'Sin clasificar',
   'radar.landscape.unclassifiedHint': 'Esperando clasificación de señal',
-  'radar.landscape.filterHint': 'Filtrá el radar por clase de activo para ver todas las señales de esa clase.',
+  'radar.landscape.filterHint':
+    'Filtrá el radar por clase de activo para ver todas las señales de esa clase.',
   'radar.landscape.macroUnavailable': 'El enriquecimiento macro no está disponible temporalmente.',
   'radar.landscape.vix': 'VIX',
   'radar.landscape.rates': 'Tasas',
@@ -321,7 +326,8 @@ export const ES_TRANSLATIONS = {
   'radar.analysis.expand': 'Expandir análisis',
   'radar.analysis.collapse': 'Contraer análisis',
   'radar.cards.title': 'Señales',
-  'radar.cards.subtitle': 'Señales generadas por IA a partir de noticias, documentos y datos macro.',
+  'radar.cards.subtitle':
+    'Señales generadas por IA a partir de noticias, documentos y datos macro.',
   'radar.summary.prefix': 'Los mercados muestran',
   'radar.summary.events': 'eventos destacados',
   'radar.summary.pending': 'análisis pendientes',
@@ -351,12 +357,53 @@ export const ES_TRANSLATIONS = {
   'radar.composition.legend':
     'El ancho de cada barra es el peso de la clase en el universo monitoreado; el número es su puntaje de sentimiento (0–100), derivado de las señales de esa clase.',
   'radar.composition.shareTooltip': 'Peso de esta clase dentro del universo monitoreado',
-  'radar.composition.scoreTooltip': 'Puntaje de sentimiento (0–100) derivado de las señales',
+  'radar.composition.scoreTooltip':
+    'Puntaje de sentimiento (0–100) derivado de las señales de IA de la clase: 50 es neutral, mayor a 60 es alcista y menor a 40 es bajista.',
   'radar.composition.openHint': 'Abrir en el explorador filtrado por esta clase',
+  'radar.composition.expandHint': 'Ver los instrumentos de esta clase',
+  'radar.composition.countTooltip': 'Instrumentos monitoreados en esta clase',
+  'radar.composition.instrumentsLoading': 'Cargando instrumentos…',
+  'radar.composition.instrumentsEmpty': 'No hay instrumentos con datos para esta clase.',
   'radar.macro.title': 'Contexto de mercado',
   'radar.macro.ratesHint': 'Sin cambios recientes',
   'radar.macro.cpiHint': 'Inflación interanual',
   'radar.macro.dxy': 'Dólar (DXY)',
+  'radar.macro.indicators.title': 'Indicadores macro',
+  'radar.macro.range.label': 'Rango de tiempo',
+  'radar.macro.openDetail': 'Ver histórico completo',
+  'radar.macro.loading': 'Cargando…',
+  'radar.macro.noData': 'Sin datos',
+  'radar.macro.indicator.rates.label': 'Tasa Fed',
+  'radar.macro.indicator.rates.explanation':
+    'Tasa de interés de referencia de la Reserva Federal de EE. UU. Tasas más altas encarecen el crédito y suelen frenar acciones y cripto.',
+  'radar.macro.indicator.cpi.label': 'IPC (interanual)',
+  'radar.macro.indicator.cpi.explanation':
+    'Inflación de precios al consumidor interanual. Un IPC alto presiona a la Fed a subir tasas; cerca del 2 % se considera saludable.',
+  'radar.macro.indicator.treasury_10y.label': 'Tesoro 10 años',
+  'radar.macro.indicator.treasury_10y.explanation':
+    'Rendimiento del bono del Tesoro de EE. UU. a 10 años, referencia del costo del dinero a largo plazo. Al subir compite con las acciones y presiona su valuación.',
+  'radar.macro.indicator.gold.label': 'Oro',
+  'radar.macro.indicator.gold.explanation':
+    'Precio del oro por onza. Suele actuar como refugio: tiende a subir cuando crece el miedo o cae el dólar.',
+  'radar.macro.indicator.oil.label': 'Petróleo',
+  'radar.macro.indicator.oil.explanation':
+    'Precio del crudo por barril. Impulsa la inflación y los costos de energía; sus movimientos afectan a la economía global.',
+  'radar.macro.indicator.vix.label': 'VIX',
+  'radar.macro.indicator.vix.explanation':
+    'Índice de volatilidad esperada del S&P 500 ("índice del miedo"). Bajo 15 indica calma; sobre 25, tensión en el mercado.',
+  'radar.macro.detail.back': 'Volver al radar',
+  'radar.macro.detail.latest': 'Último',
+  'radar.macro.detail.change': 'Cambio del período',
+  'radar.macro.detail.high': 'Máximo',
+  'radar.macro.detail.low': 'Mínimo',
+  'radar.macro.detail.about': 'Qué es y por qué importa',
+  'radar.macro.detail.aiDeferred':
+    'El análisis de IA por indicador está pendiente: la fuente de IA macro disponible interpreta el estado macro general, no la serie de un solo indicador.',
+  'radar.macro.detail.unavailable.title': 'Sin histórico disponible',
+  'radar.macro.detail.unavailable.description':
+    'No hay datos históricos para este indicador en el rango seleccionado.',
+  'radar.macro.detail.notFound.title': 'Indicador desconocido',
+  'radar.macro.detail.notFound.description': 'Este indicador macro no existe.',
   'radar.macro.fearGreed.title': 'Fear & Greed (acciones)',
   'radar.macro.fearGreed.hint':
     '0 = miedo extremo, 100 = codicia extrema. Índice de sentimiento del mercado de acciones CNN.',
@@ -481,7 +528,8 @@ export const ES_TRANSLATIONS = {
   'scenarios.title': 'Escenarios',
   'scenarios.guide.title': 'Cómo funcionan los escenarios',
   'scenarios.guide.step1': 'Describí un evento o situación (ej. "La Fed baja tasas 50pb").',
-  'scenarios.guide.step2': 'La IA analiza el impacto de mercado en instrumentos y clases de activo.',
+  'scenarios.guide.step2':
+    'La IA analiza el impacto de mercado en instrumentos y clases de activo.',
   'scenarios.guide.step3':
     'Revisá la cadena de efectos simulada, y después monitoreá o generá un informe.',
   'scenarios.composer.title': 'Crear un escenario',
@@ -615,12 +663,14 @@ export const ES_TRANSLATIONS = {
   'scenarios.result.charts.causal.title': 'Flujo causal',
   'scenarios.result.charts.causal.subtitle': 'Cómo se propaga el evento en el mercado',
   'scenarios.result.charts.market.title': 'Contexto de mercado',
-  'scenarios.result.charts.market.hint': 'Usalo junto con el flujo causal para tener una visión completa.',
+  'scenarios.result.charts.market.hint':
+    'Usalo junto con el flujo causal para tener una visión completa.',
   'scenarios.result.details.toggle': 'Detalles',
   'scenarios.result.chain.title': 'Cadena causal',
   'scenarios.result.chain.nodes.title': 'Nodos',
   'scenarios.result.chain.edges.title': 'Aristas',
-  'scenarios.result.chain.interactionHint': 'Tocá un nodo para ver detalles, arrastrá para reposicionar.',
+  'scenarios.result.chain.interactionHint':
+    'Tocá un nodo para ver detalles, arrastrá para reposicionar.',
   'scenarios.result.chain.empty': 'No hay datos de cadena causal para este escenario.',
   'scenarios.result.actions.title': 'Acciones',
   'scenarios.result.disclaimer.label': 'Aviso legal',
@@ -630,7 +680,8 @@ export const ES_TRANSLATIONS = {
     'Incluí este escenario en tu próximo informe para consulta rápida.',
   'scenarios.result.addToBriefing.copied': 'Agregado al informe',
   'scenarios.result.addToBriefing.error': 'No se pudo agregar el escenario al informe.',
-  'scenarios.result.monitor.explain': 'Recibí notificaciones cuando este escenario empiece a concretarse.',
+  'scenarios.result.monitor.explain':
+    'Recibí notificaciones cuando este escenario empiece a concretarse.',
   'scenarios.result.monitor.arm.action': 'Monitorear escenario',
   'scenarios.result.monitor.disarm.action': 'Dejar de monitorear',
   'scenarios.result.monitor.arming': 'Activando monitor…',
@@ -701,8 +752,7 @@ export const ES_TRANSLATIONS = {
   'briefings.review.decision.escalated': 'Escalado',
   'briefings.review.decision.discarded': 'Descartado',
   'briefings.review.justification.label': 'Justificación',
-  'briefings.review.justification.placeholder':
-    '¿Por qué se revisó/escaló/descartó esta señal?',
+  'briefings.review.justification.placeholder': '¿Por qué se revisó/escaló/descartó esta señal?',
   'briefings.review.action.reviewed': 'Marcar como revisado',
   'briefings.review.action.escalated': 'Escalar',
   'briefings.review.action.discarded': 'Descartar',

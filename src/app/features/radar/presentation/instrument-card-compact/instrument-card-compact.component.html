@@ -41,7 +41,9 @@
 
   <div class="instrument-row__quote">
     @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {
-      <span class="instrument-row__price">{{ signal.marketStats!.lastPrice | number: '1.2-2' }}</span>
+      <span class="instrument-row__price">{{
+        signal.marketStats!.lastPrice | number: '1.2-2'
+      }}</span>
     } @else {
       <span class="instrument-row__price">—</span>
     }
@@ -73,7 +75,9 @@
         [disabled]="isGenerating()"
         (click)="onAnalyze($event)"
       >
-        {{ isGenerating() ? i18n.t('radar.generate.generating') : i18n.t('radar.timeline.analyze') }}
+        {{
+          isGenerating() ? i18n.t('radar.generate.generating') : i18n.t('radar.timeline.analyze')
+        }}
       </button>
     }
   </div>

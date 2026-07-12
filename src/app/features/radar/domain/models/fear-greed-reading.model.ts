@@ -1,9 +1,5 @@
 export type FearGreedClassification =
-  | 'extreme_fear'
-  | 'fear'
-  | 'neutral'
-  | 'greed'
-  | 'extreme_greed';
+  'extreme_fear' | 'fear' | 'neutral' | 'greed' | 'extreme_greed';
 
 export interface FearGreedReading {
   value: number;

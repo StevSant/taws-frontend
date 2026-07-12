@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Input, computed } from '@angular/co
 import { TranslationKey, TranslationService } from '../../../../core';
 import { FearGreedArcGaugeComponent } from '../../../../shared';
 import { FearGreedClassification, MacroState, MarketPulse } from '../../domain';
-import { RadarMacroStripComponent } from '../radar-macro-strip/radar-macro-strip.component';
+import { RadarMacroIndicatorsComponent } from '../radar-macro-indicators/radar-macro-indicators.component';
 
 const CLASSIFICATION_KEYS: Record<FearGreedClassification, TranslationKey> = {
   extreme_fear: 'radar.macro.fearGreed.extremeFear',
@@ -51,7 +51,7 @@ export interface MacroInsight {
 @Component({
   selector: 'app-radar-macro-cards',
   standalone: true,
-  imports: [DecimalPipe, FearGreedArcGaugeComponent, RadarMacroStripComponent],
+  imports: [DecimalPipe, FearGreedArcGaugeComponent, RadarMacroIndicatorsComponent],
   templateUrl: './radar-macro-cards.component.html',
   styleUrl: './radar-macro-cards.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

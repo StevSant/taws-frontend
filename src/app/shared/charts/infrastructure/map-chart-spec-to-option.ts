@@ -245,7 +245,11 @@ function distributionOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
       type: 'category',
       data: series.points.map((point) => point.x),
       axisLine: { lineStyle: { color: theme.grid } },
-      axisLabel: { color: theme.textSecondary, interval: 0, rotate: series.points.length > 4 ? 24 : 0 },
+      axisLabel: {
+        color: theme.textSecondary,
+        interval: 0,
+        rotate: series.points.length > 4 ? 24 : 0,
+      },
     },
     yAxis: {
       type: 'value',
@@ -259,8 +263,7 @@ function distributionOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
         data: series.points.map((point) => ({
           value: point.y,
           itemStyle: {
-            color:
-              point.y > 0 ? theme.gain : point.y < 0 ? theme.loss : theme.textSecondary,
+            color: point.y > 0 ? theme.gain : point.y < 0 ? theme.loss : theme.textSecondary,
           },
         })),
       },

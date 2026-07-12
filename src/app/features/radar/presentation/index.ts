@@ -8,3 +8,4 @@ export { NewsListPageComponent } from './news-list-page/news-list-page.component
 export { AssetDetailPageComponent } from './asset-detail-page/asset-detail-page.component';
 export { MarketsExplorerPageComponent } from './markets-explorer-page/markets-explorer-page.component';
 export { NewsCardComponent } from './news-card/news-card.component';
+export { MacroDetailPageComponent } from './macro-detail-page/macro-detail-page.component';

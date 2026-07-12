@@ -345,12 +345,53 @@ export const EN_TRANSLATIONS = {
   'radar.composition.legend':
     "Each bar's width is the class's weight in the tracked universe; the number is its sentiment score (0–100), derived from that class's signals.",
   'radar.composition.shareTooltip': 'Weight of this class within the tracked universe',
-  'radar.composition.scoreTooltip': "Sentiment score (0–100) derived from the class's signals",
+  'radar.composition.scoreTooltip':
+    "Sentiment score (0–100) derived from the class's AI signals: 50 is neutral, above 60 is bullish and below 40 is bearish.",
   'radar.composition.openHint': 'Open in the explorer filtered by this class',
+  'radar.composition.expandHint': "See this class's instruments",
+  'radar.composition.countTooltip': 'Instruments tracked in this class',
+  'radar.composition.instrumentsLoading': 'Loading instruments…',
+  'radar.composition.instrumentsEmpty': 'No instruments with data for this class.',
   'radar.macro.title': 'Market context',
   'radar.macro.ratesHint': 'No recent change',
   'radar.macro.cpiHint': 'Year-over-year inflation',
   'radar.macro.dxy': 'Dollar (DXY)',
+  'radar.macro.indicators.title': 'Macro indicators',
+  'radar.macro.range.label': 'Time range',
+  'radar.macro.openDetail': 'View full history',
+  'radar.macro.loading': 'Loading…',
+  'radar.macro.noData': 'No data',
+  'radar.macro.indicator.rates.label': 'Fed rate',
+  'radar.macro.indicator.rates.explanation':
+    'The US Federal Reserve benchmark interest rate. Higher rates make credit more expensive and tend to weigh on stocks and crypto.',
+  'radar.macro.indicator.cpi.label': 'CPI (YoY)',
+  'radar.macro.indicator.cpi.explanation':
+    'Year-over-year consumer price inflation. A high CPI pressures the Fed to raise rates; near 2% is considered healthy.',
+  'radar.macro.indicator.treasury_10y.label': '10Y Treasury',
+  'radar.macro.indicator.treasury_10y.explanation':
+    'The US 10-year Treasury yield, the benchmark for long-term borrowing costs. When it rises it competes with stocks and pressures their valuations.',
+  'radar.macro.indicator.gold.label': 'Gold',
+  'radar.macro.indicator.gold.explanation':
+    'Gold price per ounce. Often a safe haven: it tends to rise when fear grows or the dollar weakens.',
+  'radar.macro.indicator.oil.label': 'Oil',
+  'radar.macro.indicator.oil.explanation':
+    'Crude oil price per barrel. It drives inflation and energy costs; its moves ripple through the global economy.',
+  'radar.macro.indicator.vix.label': 'VIX',
+  'radar.macro.indicator.vix.explanation':
+    'Expected S&P 500 volatility (the "fear index"). Below 15 signals calm; above 25 signals market stress.',
+  'radar.macro.detail.back': 'Back to radar',
+  'radar.macro.detail.latest': 'Latest',
+  'radar.macro.detail.change': 'Period change',
+  'radar.macro.detail.high': 'High',
+  'radar.macro.detail.low': 'Low',
+  'radar.macro.detail.about': 'What it is and why it matters',
+  'radar.macro.detail.aiDeferred':
+    'Per-indicator AI analysis is pending: the available macro AI source interprets the overall macro state, not a single indicator series.',
+  'radar.macro.detail.unavailable.title': 'No history available',
+  'radar.macro.detail.unavailable.description':
+    'There is no historical data for this indicator in the selected range.',
+  'radar.macro.detail.notFound.title': 'Unknown indicator',
+  'radar.macro.detail.notFound.description': 'This macro indicator does not exist.',
   'radar.macro.fearGreed.title': 'Fear & Greed (stocks)',
   'radar.macro.fearGreed.hint':
     '0 = extreme fear, 100 = extreme greed. CNN stock-market sentiment index.',

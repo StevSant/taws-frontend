@@ -11,7 +11,12 @@ import {
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { LucideSearch } from '@lucide/angular';
-import { NotificationBellComponent, Notification, NotificationsStore, TranslationService } from '../../core';
+import {
+  NotificationBellComponent,
+  Notification,
+  NotificationsStore,
+  TranslationService,
+} from '../../core';
 import { resolveNotificationLink } from '../../core/notifications/resolve-notification-link';
 import { AuthStore } from '../../features/auth/application';
 import { RadarStore } from '../../features/radar/application';

@@ -25,13 +25,11 @@ export function mapMarketPulseDto(dto: MarketPulseDto): MarketPulse {
     deltaPoints: dto.delta_points,
     market: dto.market,
     source: dto.source,
-    indices: dto.indices.map(
-      (index): MarketIndexQuote => ({
-        symbol: index.symbol,
-        label: index.label,
-        price: index.price,
-        changePct: index.change_pct,
-      }),
-    ),
+    indices: dto.indices.map((index): MarketIndexQuote => ({
+      symbol: index.symbol,
+      label: index.label,
+      price: index.price,
+      changePct: index.change_pct,
+    })),
   };
 }

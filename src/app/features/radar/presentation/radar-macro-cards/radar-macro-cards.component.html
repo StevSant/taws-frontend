@@ -62,9 +62,7 @@
       </article>
     }
 
-    @if (macro) {
-      <app-radar-macro-strip class="radar-macro-cards__strip" [macro]="macro" />
-    }
+    <app-radar-macro-indicators class="radar-macro-cards__strip" [macro]="macro" />
   } @else {
     <p class="radar-macro-cards__empty">{{ i18n.t('radar.landscape.macroUnavailable') }}</p>
   }

@@ -17,9 +17,7 @@ export class FearGreedArcGaugeComponent {
   protected readonly radius = RADIUS;
   protected readonly arcLength = ARC_LENGTH;
 
-  protected readonly clampedValue = computed(() =>
-    Math.min(100, Math.max(0, this.value())),
-  );
+  protected readonly clampedValue = computed(() => Math.min(100, Math.max(0, this.value())));
 
   protected readonly needleOffset = computed(
     () => ARC_LENGTH - (this.clampedValue() / 100) * ARC_LENGTH,

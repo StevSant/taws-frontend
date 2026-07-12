@@ -16,7 +16,11 @@ export { DEFAULT_RADAR_FILTERS, RECENCY_OPTIONS_HOURS } from './models/radar-fil
 export type { RadarSignal } from './models/radar-signal.model';
 export type { Signal } from './models/signal.model';
 export type { MarketStats } from './models/market-stats.model';
-export type { MacroState } from './models/macro-state.model';
+export type { MacroObservation, MacroState, VolatilityRegime } from './models/macro-state.model';
+export type { MacroSeries } from './models/macro-series.model';
+export type { MacroIndicator } from './models/macro-indicator.model';
+export { MACRO_INDICATORS } from './models/macro-indicator.model';
+export { MACRO_RANGE_OPTIONS_DAYS, DEFAULT_MACRO_RANGE_DAYS } from './models/macro-range.model';
 export type { FearGreedClassification, FearGreedReading } from './models/fear-greed-reading.model';
 export type { MarketIndexQuote, MarketPulse } from './models/market-pulse.model';
 export type { UnusualMove } from './models/unusual-move.model';
