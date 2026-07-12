@@ -80,6 +80,12 @@ export const environment = {
   /** Page size (`limit`) for the paginated "all news" list at /radar/news. */
   newsListPageSize: 20,
   /**
+   * Per-request timeout for `GET /api/v1/news`. The backend re-aggregates
+   * upstream providers on cache misses (~5-6s), and concurrent polls queue
+   * behind it — 8s produced spurious "Timeout has occurred" banners.
+   */
+  newsRequestTimeoutMs: 20_000,
+  /**
    * Initial timeframe requested when rendering an instrument's price chart via
    * `POST /api/v1/charts/render`. Must be one of the backend's
    * `chart_available_timeframes` tokens (1m/3m/6m/1y/max) — the chart's own

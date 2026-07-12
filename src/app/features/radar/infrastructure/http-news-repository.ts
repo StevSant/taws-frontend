@@ -8,7 +8,6 @@ import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
 
 const NEWS_PATH = '/api/v1/news';
-const NEWS_REQUEST_TIMEOUT_MS = 8_000;
 const HTTP_NOT_FOUND = 404;
 
 /** Backend may return a bare array or a paginated `{ items }` envelope. */
@@ -79,7 +78,7 @@ export class HttpNewsRepository extends NewsRepository {
     return firstValueFrom(
       this.http
         .get<NewsWireResponse>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
-        .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
+        .pipe(timeout(this.config.newsRequestTimeoutMs)),
     );
   }
 
@@ -89,7 +88,7 @@ export class HttpNewsRepository extends NewsRepository {
         const dto = await firstValueFrom(
           this.http
             .get<NewsItemDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
-            .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
+            .pipe(timeout(this.config.newsRequestTimeoutMs)),
         );
         return mapNewsItemDto(dto);
       } catch (error: unknown) {

@@ -7,7 +7,6 @@
 
     <app-radar-filters
       class="news-list-page__filters"
-      [compact]="true"
       [filters]="store.filters()"
       [instrumentOptions]="store.instrumentOptions()"
       (assetClassChange)="store.setAssetClass($event)"

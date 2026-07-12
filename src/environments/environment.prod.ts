@@ -67,6 +67,8 @@ export const environment = {
   radarSignalFetchBatchSize: 6,
   /** Page size (`limit`) for the paginated "all news" list at /radar/news. */
   newsListPageSize: 20,
+  /** Per-request timeout for `GET /api/v1/news` (backend re-aggregates on cache misses). */
+  newsRequestTimeoutMs: 20_000,
   /**
    * Initial timeframe requested when rendering an instrument's price chart via
    * `POST /api/v1/charts/render` — one of the backend's timeframe tokens
