@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { Subscription, interval } from 'rxjs';
-import { AppConfigService, NotificationsStore } from '../../../core';
+import { AppConfigService, AuthTokenService, NotificationsStore } from '../../../core';
 import { ReviewDecision, ReviewState } from '../../briefings/domain';
 import {
   AssetClass,
@@ -213,6 +213,7 @@ export class RadarStore {
     private readonly macroRepository: MacroRepository,
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
+    private readonly authTokenService: AuthTokenService,
   ) {}
 
   /** Loads instruments + news on first visit; revisits show cached state and refresh silently. */
@@ -285,11 +286,27 @@ export class RadarStore {
     if (this.reviewHistorySignal()[signalId]) {
       return;
     }
+    // Signal reviews are an authenticated-only resource, so fetching them
+    // while anonymous is a guaranteed 401. Skip the request entirely for
+    // anonymous users — they simply see no review history — instead of firing
+    // a call that can't succeed (issue #39). Nothing is cached, so the fetch
+    // runs normally once the user signs in and this is called again.
+    if (!this.authTokenService.currentToken()) {
+      return;
+    }
+    this.reviewErrorsSignal.update((errors) => ({ ...errors, [signalId]: null }));
     try {
       const history = await this.signalReviewRepository.listSignalReviews(signalId);
       this.reviewHistorySignal.update((current) => ({ ...current, [signalId]: history }));
-    } catch {
-      this.reviewHistorySignal.update((current) => ({ ...current, [signalId]: [] }));
+    } catch (error: unknown) {
+      // Don't collapse a failure into an empty history — that would
+      // masquerade as "no reviews" and hide the problem. Surface it via the
+      // review error channel instead. An expired-session 401 is handled
+      // upstream by `authErrorInterceptor` (refresh + retry, or sign-out).
+      this.reviewErrorsSignal.update((errors) => ({
+        ...errors,
+        [signalId]: this.toErrorMessage(error),
+      }));
     }
   }
 
