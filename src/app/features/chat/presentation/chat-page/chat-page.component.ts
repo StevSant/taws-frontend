@@ -33,6 +33,10 @@ import { ChartComponent } from '../../../../shared/charts';
 
 import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions-panel.component';
 
+import { ChatContextRailComponent } from '../chat-context-rail/chat-context-rail.component';
+
+import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
+
 import { CHAT_VOICE_DUMMY_LISTEN_MS } from './chat-voice-dummy';
 
 const HERO_SIZE_IDLE = 168;
@@ -49,14 +53,6 @@ const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
 
   consequence: 'chat.agent.consequence',
 };
-
-const SUGGESTION_KEYS = [
-  'chat.suggestion.quant',
-
-  'chat.suggestion.news',
-
-  'chat.suggestion.macro',
-] as const satisfies readonly TranslationKey[];
 
 const SESSIONS_PANEL_STORAGE_KEY = 'taws-chat-sessions-open';
 
@@ -87,6 +83,10 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     GoldenPolyhedronComponent,
 
     ChatSessionsPanelComponent,
+
+    ChatContextRailComponent,
+
+    ChatQuickActionsComponent,
 
     ChartComponent,
   ],
@@ -119,8 +119,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   readonly isListening = signal(false);
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
-
-  readonly suggestionKeys = SUGGESTION_KEYS;
 
   readonly hasMessages = computed(() => this.store.messages().length > 0);
 
@@ -250,6 +248,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
 
     this.draft.set(this.i18n.t(key));
+  }
+
+  onQuickAction(suggestionKey: string): void {
+    this.useSuggestion(suggestionKey as TranslationKey);
   }
 
   toggleVoiceDummy(): void {

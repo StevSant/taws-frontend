@@ -119,14 +119,14 @@
   }
 
   &--sessions &__viewport {
-    grid-template-columns: 0 minmax(0, 1fr);
+    grid-template-columns: 0 minmax(0, 1fr) 320px;
     gap: 0;
     background: transparent;
     transition: grid-template-columns 0.22s ease;
   }
 
   &--sessions-open &__viewport {
-    grid-template-columns: 248px minmax(0, 1fr);
+    grid-template-columns: 248px minmax(0, 1fr) 320px;
   }
 
   &__workspace {
@@ -1178,6 +1178,19 @@ html[data-theme='light'] .chat-page {
 
   .chat-page__hero--compact {
     transform: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  /* app-chat-context-rail hides itself (display: none) below this width via its
+     own :host media query — collapse the third grid track in sync so it doesn't
+     leave a reserved, empty 320px gutter. */
+  .chat-page--sessions .chat-page__viewport {
+    grid-template-columns: 0 minmax(0, 1fr);
+  }
+
+  .chat-page--sessions-open .chat-page__viewport {
+    grid-template-columns: 248px minmax(0, 1fr);
   }
 }
 

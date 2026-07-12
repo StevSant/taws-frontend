@@ -1,15 +1,20 @@
 <div class="feature-page scenarios-page">
-  <app-feature-page-header
-    [title]="i18n.t('scenarios.title')"
-    [description]="i18n.t('scenarios.description')"
-  />
+    <app-feature-page-header
+      [title]="i18n.t('scenarios.title')"
+      [description]="i18n.t('scenarios.description')"
+    />
 
-  <app-feature-guide
-    [title]="i18n.t('scenarios.guide.title')"
-    [steps]="guideSteps()"
-  />
+    <app-guide-notes-tabs
+      [guideTitle]="i18n.t('scenarios.guide.title')"
+      [guideSteps]="guideSteps()"
+      [notesTitle]="i18n.t('scenarios.notes.title')"
+      [notes]="scenarioNotes"
+      [guideTabLabel]="i18n.t('scenarios.guide.tabLabel')"
+      [notesTabLabel]="i18n.t('scenarios.notes.tabLabel')"
+      [notesEmptyLabel]="i18n.t('scenarios.notes.empty')"
+    />
 
-  <div class="scenarios-page__layout">
+    <div class="scenarios-page__layout">
     <div class="scenarios-page__main">
       <div class="scenarios-page__composer feature-panel">
         <header class="scenarios-page__composer-header">
@@ -134,7 +139,6 @@
     </div>
 
     <aside class="scenarios-page__sidebar feature-panel">
-      <h2 class="scenarios-page__history-title">{{ i18n.t('scenarios.history.title') }}</h2>
       <p class="scenarios-page__history-hint">{{ i18n.t('scenarios.history.hint') }}</p>
       @if (store.isLoadingRecent()) {
         <div class="scenarios-page__skeletons" aria-busy="true">
@@ -142,24 +146,13 @@
             <app-skeleton-card [lines]="1" />
           }
         </div>
-      } @else if (store.recentScenarios().length === 0) {
-        <p class="scenarios-page__history-empty">{{ i18n.t('scenarios.history.empty') }}</p>
       } @else {
-        <ul class="scenarios-page__history-list">
-          @for (scenario of store.recentScenarios(); track scenario.id) {
-            <li>
-              <button
-                type="button"
-                class="scenarios-page__history-item"
-                [class.scenarios-page__history-item--active]="store.result()?.id === scenario.id"
-                (click)="onLoadScenario(scenario.id)"
-              >
-                <span class="scenarios-page__history-item-title">{{ scenario.title }}</span>
-                <span class="scenarios-page__history-item-date">{{ scenario.createdAt | date: 'short' }}</span>
-              </button>
-            </li>
-          }
-        </ul>
+        <app-activity-feed
+          [title]="i18n.t('scenarios.history.title')"
+          [items]="recentScenarioItems()"
+          [emptyLabel]="i18n.t('scenarios.history.empty')"
+          (select)="onLoadScenario($event)"
+        />
       }
     </aside>
   </div>

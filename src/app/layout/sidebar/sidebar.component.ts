@@ -1,12 +1,30 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import {
+  LucideBell,
+  LucideFileText,
+  LucideFlaskConical,
+  LucideLineChart,
+  LucideNewspaper,
+  LucideRadar,
+  LucideSettings,
+  LucideStar,
+} from '@lucide/angular';
 import { TranslationKey, TranslationService } from '../../core';
 import { MidasLogoComponent } from '../../shared';
 
 interface SidebarItem {
   labelKey: TranslationKey;
   route: string;
-  icon: 'radar' | 'news' | 'instruments' | 'briefings' | 'alerts' | 'scenarios' | 'watchlists' | 'settings';
+  icon:
+    | 'radar'
+    | 'news'
+    | 'instruments'
+    | 'briefings'
+    | 'alerts'
+    | 'scenarios'
+    | 'watchlists'
+    | 'settings';
 }
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
@@ -23,7 +41,19 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, MidasLogoComponent],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    MidasLogoComponent,
+    LucideRadar,
+    LucideNewspaper,
+    LucideLineChart,
+    LucideFileText,
+    LucideBell,
+    LucideFlaskConical,
+    LucideStar,
+    LucideSettings,
+  ],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

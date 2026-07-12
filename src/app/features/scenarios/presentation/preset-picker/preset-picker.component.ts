@@ -1,4 +1,14 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  LucideDroplet,
+  LucideFileWarning,
+  LucideGavel,
+  LucidePercent,
+  LucideShieldAlert,
+  LucideSparkles,
+  LucideTrendingDown,
+  LucideTrendingUp,
+} from '@lucide/angular';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { ScenarioPreset } from '../../domain';
 
@@ -23,9 +33,38 @@ const ASSET_CLASS_LABELS: Record<string, TranslationKey> = {
   forex: 'scenarios.assetClass.forex',
 };
 
+/**
+ * Preset `eventType` -> lucide icon key, mirroring this file's existing
+ * `Record<string, TranslationKey>` lookup-map pattern above. Rendered via the
+ * `@switch` in the template. This map only needs to cover the event types the
+ * curated seed presets use today — anything unmapped (e.g. a future preset's
+ * `eventType`) falls back to `DEFAULT_PRESET_ICON_KEY`.
+ */
+const PRESET_ICON_KEYS: Record<string, string> = {
+  rate_cut: 'trending-down',
+  rate_hike: 'trending-up',
+  opec_supply_cut: 'droplet',
+  geopolitical_conflict: 'shield-alert',
+  inflation_surprise: 'percent',
+  earnings_miss: 'file-warning',
+  regulatory_action: 'gavel',
+};
+
+const DEFAULT_PRESET_ICON_KEY = 'sparkles';
+
 @Component({
   selector: 'app-preset-picker',
   standalone: true,
+  imports: [
+    LucideTrendingDown,
+    LucideTrendingUp,
+    LucideDroplet,
+    LucideShieldAlert,
+    LucidePercent,
+    LucideFileWarning,
+    LucideGavel,
+    LucideSparkles,
+  ],
   templateUrl: './preset-picker.component.html',
   styleUrl: './preset-picker.component.scss',
 })
@@ -57,6 +96,11 @@ export class PresetPickerComponent {
   assetClassLabel(assetClass: string): string {
     const key = ASSET_CLASS_LABELS[assetClass];
     return key ? this.i18n.t(key) : assetClass;
+  }
+
+  /** Lucide icon key for this preset's event type, rendered via the template's `@switch`. */
+  presetIcon(preset: ScenarioPreset): string {
+    return PRESET_ICON_KEYS[preset.eventType] ?? DEFAULT_PRESET_ICON_KEY;
   }
 
   onSelect(preset: ScenarioPreset): void {

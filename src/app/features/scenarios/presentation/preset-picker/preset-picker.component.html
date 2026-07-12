@@ -11,6 +11,34 @@
       @if (preset.id === selectedId) {
         <span class="preset-picker__check" aria-hidden="true">✓</span>
       }
+      <span class="preset-picker__icon" aria-hidden="true">
+        @switch (presetIcon(preset)) {
+          @case ('trending-down') {
+            <svg lucideTrendingDown [size]="16"></svg>
+          }
+          @case ('trending-up') {
+            <svg lucideTrendingUp [size]="16"></svg>
+          }
+          @case ('droplet') {
+            <svg lucideDroplet [size]="16"></svg>
+          }
+          @case ('shield-alert') {
+            <svg lucideShieldAlert [size]="16"></svg>
+          }
+          @case ('percent') {
+            <svg lucidePercent [size]="16"></svg>
+          }
+          @case ('file-warning') {
+            <svg lucideFileWarning [size]="16"></svg>
+          }
+          @case ('gavel') {
+            <svg lucideGavel [size]="16"></svg>
+          }
+          @default {
+            <svg lucideSparkles [size]="16"></svg>
+          }
+        }
+      </span>
       <span class="preset-picker__title">{{ title(preset) }}</span>
       <span class="preset-picker__description">{{ description(preset) }}</span>
       <span class="preset-picker__meta">

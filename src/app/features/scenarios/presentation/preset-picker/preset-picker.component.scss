@@ -60,11 +60,28 @@
     font-weight: 700;
   }
 
+  // Icon tile, keyed by preset `eventType` (see PRESET_ICON_KEYS).
+  &__icon {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-md);
+    background: var(--color-gold-dim-bg);
+    border: 1px solid var(--color-gold-border);
+    color: var(--color-gold);
+  }
+
   &__title {
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--color-text-primary);
     padding-right: 1.5rem;
+    padding-left: 2rem;
     line-height: 1.35;
   }
 

@@ -14,7 +14,34 @@
           [routerLinkActiveOptions]="{ exact: item.icon === 'radar' }"
           [attr.title]="i18n.t(item.labelKey)"
         >
-          <span class="app-sidebar__icon" [attr.data-icon]="item.icon" aria-hidden="true"></span>
+          <span class="app-sidebar__icon" aria-hidden="true">
+            @switch (item.icon) {
+              @case ('radar') {
+                <svg lucideRadar [size]="18"></svg>
+              }
+              @case ('news') {
+                <svg lucideNewspaper [size]="18"></svg>
+              }
+              @case ('instruments') {
+                <svg lucideLineChart [size]="18"></svg>
+              }
+              @case ('briefings') {
+                <svg lucideFileText [size]="18"></svg>
+              }
+              @case ('alerts') {
+                <svg lucideBell [size]="18"></svg>
+              }
+              @case ('scenarios') {
+                <svg lucideFlaskConical [size]="18"></svg>
+              }
+              @case ('watchlists') {
+                <svg lucideStar [size]="18"></svg>
+              }
+              @case ('settings') {
+                <svg lucideSettings [size]="18"></svg>
+              }
+            }
+          </span>
           <span class="app-sidebar__label">{{ i18n.t(item.labelKey) }}</span>
         </a>
       </li>

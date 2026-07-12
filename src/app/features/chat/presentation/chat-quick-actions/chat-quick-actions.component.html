@@ -1,0 +1,31 @@
+<div class="chat-quick-actions">
+  @for (action of actions; track action.suggestionKey) {
+    <button
+      type="button"
+      class="chat-quick-actions__card"
+      [disabled]="disabled()"
+      (click)="onSelect(action)"
+    >
+      <span class="chat-quick-actions__icon" aria-hidden="true">
+        @switch (action.icon) {
+          @case ('radar') {
+            <svg lucideRadar [size]="18"></svg>
+          }
+          @case ('signals') {
+            <svg lucideZap [size]="18"></svg>
+          }
+          @case ('briefing') {
+            <svg lucideFileText [size]="18"></svg>
+          }
+          @case ('compare') {
+            <svg lucideGitCompare [size]="18"></svg>
+          }
+        }
+      </span>
+      <span class="chat-quick-actions__copy">
+        <span class="chat-quick-actions__title">{{ i18n.t(action.titleKey) }}</span>
+        <span class="chat-quick-actions__desc">{{ i18n.t(action.descKey) }}</span>
+      </span>
+    </button>
+  }
+</div>

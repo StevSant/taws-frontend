@@ -1,0 +1,26 @@
+<section class="activity-feed" [attr.aria-label]="title()">
+  <h2 class="activity-feed__title">{{ title() }}</h2>
+
+  @if (items().length === 0) {
+    <p class="activity-feed__empty">{{ emptyLabel() }}</p>
+  } @else {
+    <ul class="activity-feed__list">
+      @for (item of items(); track item.id) {
+        <li>
+          <button
+            type="button"
+            class="activity-feed__item"
+            [class.activity-feed__item--active]="item.active"
+            (click)="onSelect(item.id)"
+          >
+            <span class="activity-feed__dot" aria-hidden="true"></span>
+            <span class="activity-feed__copy">
+              <span class="activity-feed__item-title">{{ item.title }}</span>
+              <span class="activity-feed__item-meta">{{ item.meta }}</span>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>

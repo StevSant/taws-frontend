@@ -37,7 +37,7 @@
     <ul class="chat-context-rail__news">
       @for (entry of topNews(); track entry.news.id) {
         <li class="chat-context-rail__news-item">
-          <span class="chat-context-rail__news-symbol">{{ entry.symbol }}</span>
+          <app-instrument-ticker-badge [symbol]="entry.symbol" size="sm" />
           <div class="chat-context-rail__news-copy">
             <a
               class="chat-context-rail__news-headline"
@@ -70,7 +70,7 @@
     <ul class="chat-context-rail__watchlist">
       @for (signal of trackedSignals(); track signal.symbol) {
         <li class="chat-context-rail__watch-item">
-          <span class="chat-context-rail__watch-symbol">{{ signal.symbol }}</span>
+          <app-instrument-ticker-badge [symbol]="signal.symbol" size="sm" />
           <div class="chat-context-rail__watch-copy">
             <span class="chat-context-rail__watch-name">{{ signal.instrument?.name ?? signal.symbol }}</span>
             @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {

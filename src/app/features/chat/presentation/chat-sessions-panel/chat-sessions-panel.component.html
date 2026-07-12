@@ -51,4 +51,19 @@
       </li>
     }
   </ul>
+
+  <footer class="chat-sessions__footer">
+    <app-plan-usage-widget
+      [planName]="i18n.t('chat.plan.name')"
+      [planStatusLabel]="i18n.t('chat.plan.status')"
+      [usageLabel]="i18n.t('chat.plan.usage')"
+      [usagePercent]="planUsagePercent"
+      [resetHint]="i18n.t('chat.plan.resetHint')"
+    />
+    <app-user-profile-chip
+      [initial]="userInitial()"
+      [email]="userEmail()"
+      [roleLabel]="i18n.t('chat.profile.guest')"
+    />
+  </footer>
 </aside>

@@ -1,0 +1,21 @@
+<section class="plan-usage" [attr.aria-label]="planName()">
+  <header class="plan-usage__header">
+    <span class="plan-usage__name">{{ planName() }}</span>
+    <span class="plan-usage__badge">{{ planStatusLabel() }}</span>
+  </header>
+
+  <div class="plan-usage__meter">
+    <span class="plan-usage__usage-label">{{ usageLabel() }}</span>
+    <div
+      class="plan-usage__track"
+      role="progressbar"
+      [attr.aria-valuenow]="clampedUsagePercent()"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <div class="plan-usage__fill" [style.width.%]="clampedUsagePercent()"></div>
+    </div>
+  </div>
+
+  <p class="plan-usage__hint">{{ resetHint() }}</p>
+</section>

@@ -1,0 +1,41 @@
+<div class="guide-notes-tabs">
+  <div class="guide-notes-tabs__header" role="tablist">
+    <button
+      type="button"
+      class="guide-notes-tabs__tab"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'guide'"
+      [class.guide-notes-tabs__tab--active]="activeTab() === 'guide'"
+      (click)="selectTab('guide')"
+    >
+      {{ guideTabLabel() }}
+    </button>
+    <button
+      type="button"
+      class="guide-notes-tabs__tab"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'notes'"
+      [class.guide-notes-tabs__tab--active]="activeTab() === 'notes'"
+      (click)="selectTab('notes')"
+    >
+      {{ notesTabLabel() }}
+    </button>
+  </div>
+
+  <div class="guide-notes-tabs__panel">
+    @if (activeTab() === 'guide') {
+      <app-feature-guide [title]="guideTitle()" [steps]="guideSteps()" />
+    } @else {
+      <h2 class="guide-notes-tabs__notes-title">{{ notesTitle() }}</h2>
+      @if (notes().length === 0) {
+        <p class="guide-notes-tabs__empty">{{ notesEmptyLabel() }}</p>
+      } @else {
+        <ul class="guide-notes-tabs__notes">
+          @for (note of notes(); track $index) {
+            <li class="guide-notes-tabs__note">{{ note }}</li>
+          }
+        </ul>
+      }
+    }
+  </div>
+</div>

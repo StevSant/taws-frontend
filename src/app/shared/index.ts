@@ -16,15 +16,18 @@ export {
   macroIconPath,
   uiIconPath,
 } from './instrument-logo';
-export type {
-  InstrumentLogoSymbol,
-  MacroIconId,
-  UiIconId,
-} from './instrument-logo';
+export type { InstrumentLogoSymbol, MacroIconId, UiIconId } from './instrument-logo';
 export { MacroMiniSparklineComponent } from './macro-mini-sparkline/macro-mini-sparkline.component';
 export { FeaturePageHeaderComponent } from './feature-page-header/feature-page-header.component';
 export type { FeaturePageStat } from './feature-page-header/feature-page-header.component';
 export { SkeletonCardComponent } from './skeleton-card/skeleton-card.component';
 export { EmptyStateComponent } from './empty-state/empty-state.component';
 export { FeatureGuideComponent } from './feature-guide/feature-guide.component';
+export { PlanUsageWidgetComponent } from './plan-usage-widget/plan-usage-widget.component';
+export { UserProfileChipComponent } from './user-profile-chip/user-profile-chip.component';
+export { GuideNotesTabsComponent } from './guide-notes-tabs/guide-notes-tabs.component';
+export { ActivityFeedComponent } from './activity-feed/activity-feed.component';
+export type { ActivityFeedItem } from './activity-feed/activity-feed.component';
+export { FeatureNavComponent } from './feature-nav/feature-nav.component';
+export type { FeatureNavItem } from './feature-nav/feature-nav.component';
 export { downloadBlob } from './download-blob';

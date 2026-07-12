@@ -1,0 +1,61 @@
+<nav class="feature-nav" [attr.aria-label]="brandLabel() || null">
+  @if (brandLabel()) {
+    <div class="feature-nav__brand">
+      <span class="feature-nav__brand-name">{{ brandLabel() }}</span>
+    </div>
+  }
+
+  <ul class="feature-nav__list">
+    @for (item of items(); track item.route) {
+      <li>
+        <a
+          class="feature-nav__link"
+          [routerLink]="item.route"
+          routerLinkActive="feature-nav__link--active"
+          [routerLinkActiveOptions]="{ exact: !!item.exact }"
+          [attr.title]="item.label"
+        >
+          <span class="feature-nav__icon" aria-hidden="true">
+            @switch (item.icon) {
+              @case ('flask-conical') {
+                <svg lucideFlaskConical [size]="16"></svg>
+              }
+              @case ('bookmark') {
+                <svg lucideBookmark [size]="16"></svg>
+              }
+              @case ('layout-template') {
+                <svg lucideLayoutTemplate [size]="16"></svg>
+              }
+              @case ('sliders-horizontal') {
+                <svg lucideSlidersHorizontal [size]="16"></svg>
+              }
+              @case ('history') {
+                <svg lucideHistory [size]="16"></svg>
+              }
+              @case ('file-text') {
+                <svg lucideFileText [size]="16"></svg>
+              }
+              @case ('settings') {
+                <svg lucideSettings [size]="16"></svg>
+              }
+              @case ('home') {
+                <svg lucideHome [size]="16"></svg>
+              }
+              @case ('star') {
+                <svg lucideStar [size]="16"></svg>
+              }
+              @case ('bell') {
+                <svg lucideBell [size]="16"></svg>
+              }
+            }
+          </span>
+          <span class="feature-nav__label">{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <div class="feature-nav__footer">
+    <ng-content />
+  </div>
+</nav>

@@ -1,13 +1,7 @@
-<div class="app-shell" [class.app-shell--chat]="isChatRoute()">
-  @if (!isChatRoute()) {
-    <aside class="app-shell__sidebar">
-      <app-sidebar />
-    </aside>
-  }
-
+<div class="app-shell">
   <div class="app-shell__main">
     <header class="app-shell__topbar">
-      @if (isChatRoute()) {
+      @if (usesCustomLayout()) {
         <a class="app-shell__brand" routerLink="/radar">
           <app-midas-logo class="app-shell__brand-mark" [size]="24" />
           <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
@@ -46,11 +40,12 @@
       </nav>
 
       <div class="app-shell__search">
+        <svg lucideSearch class="app-shell__search-icon" [size]="16" aria-hidden="true"></svg>
         <input
+          #searchInput
           class="app-shell__search-input"
           type="search"
           [placeholder]="i18n.t('shell.search.placeholder')"
-          disabled
           [attr.aria-label]="i18n.t('shell.search.label')"
         />
       </div>
@@ -81,7 +76,7 @@
       <router-outlet></router-outlet>
     </main>
 
-    @if (!isChatRoute()) {
+    @if (!usesCustomLayout()) {
       <footer class="app-shell__footer">
         <span class="app-shell__disclaimer">{{ i18n.t('shell.footer.disclaimer') }}</span>
         <span class="app-shell__status">

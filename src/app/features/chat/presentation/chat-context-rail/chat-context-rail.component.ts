@@ -2,6 +2,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
+import { InstrumentTickerBadgeComponent } from '../../../../shared';
 import { RadarStore } from '../../../radar/application';
 import { ImpactClass } from '../../../radar/domain';
 
@@ -15,7 +16,7 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 @Component({
   selector: 'app-chat-context-rail',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, RouterLink, InstrumentTickerBadgeComponent],
   templateUrl: './chat-context-rail.component.html',
   styleUrl: './chat-context-rail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
