@@ -268,6 +268,36 @@ describe('RealtimeWebrtcService', () => {
     expect(events).toContainEqual({ kind: 'tool-call-finished', name: 'get_market_data' });
   });
 
+  it('sends a function_call_output with an error payload + response.create when the tool call fails (non-OK)', async () => {
+    primeHandshake();
+    await service.start();
+    const channel = FakePeerConnection.last!.channel;
+
+    // Backend rejects the tool call (e.g. 422 validation error).
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 422 });
+
+    channel.emitMessage(
+      JSON.stringify({
+        type: 'response.function_call_arguments.done',
+        call_id: 'call_fail',
+        name: 'get_market_data',
+        arguments: JSON.stringify({ symbol: 'AAPL' }),
+      }),
+    );
+    await flush();
+
+    // The model must not be left hanging: an error output is returned for the
+    // same call_id, followed by response.create so it can recover.
+    const sent = channel.sent.map((s) => JSON.parse(s));
+    const output = sent.find((m) => m.type === 'conversation.item.create');
+    expect(output).toBeDefined();
+    expect(output.item.type).toBe('function_call_output');
+    expect(output.item.call_id).toBe('call_fail');
+    const parsedOutput = JSON.parse(output.item.output);
+    expect(parsedOutput.error).toBeTruthy();
+    expect(sent.some((m) => m.type === 'response.create')).toBe(true);
+  });
+
   it('stop() releases the mic tracks and closes the peer connection and data channel', async () => {
     primeHandshake();
     await service.start();
