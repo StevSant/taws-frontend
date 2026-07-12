@@ -1,0 +1,44 @@
+<div class="bot-registration-panel">
+  <header class="bot-registration-panel__header">
+    <span class="bot-registration-panel__title">{{ i18n.t('telegram.botRegistration.title') }}</span>
+  </header>
+
+  <p class="bot-registration-panel__hint">
+    {{ i18n.t('telegram.botRegistration.instructions') }}
+  </p>
+
+  <textarea
+    class="bot-registration-panel__textarea feature-textarea"
+    [ngModel]="botfatherText()"
+    (ngModelChange)="botfatherText.set($event)"
+    [placeholder]="i18n.t('telegram.botRegistration.placeholder')"
+    [readonly]="store.isPending()"
+    rows="4"
+  ></textarea>
+
+  <app-button
+    [label]="store.isPending() ? i18n.t('telegram.botRegistration.registering') : i18n.t('telegram.botRegistration.register')"
+    [disabled]="!botfatherText().trim() || store.isPending()"
+    (pressed)="onRegister()"
+  />
+
+  @if (store.error(); as error) {
+    <div class="bot-registration-panel__error feature-error" role="alert">
+      {{ error }}
+    </div>
+  }
+
+  @if (store.result(); as result) {
+    <div class="bot-registration-panel__success">
+      <span class="bot-registration-panel__success-icon">&#x2705;</span>
+      <div class="bot-registration-panel__success-body">
+        <p class="bot-registration-panel__success-text">
+          {{ i18n.t('telegram.botRegistration.success').replace('{username}', result.botUsername) }}
+        </p>
+        <p class="bot-registration-panel__success-chat">
+          {{ i18n.t('telegram.botRegistration.chatId').replace('{chatId}', result.chatId) }}
+        </p>
+      </div>
+    </div>
+  }
+</div>
