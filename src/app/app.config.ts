@@ -13,7 +13,11 @@ import { authInterceptor, ThemeService } from './core';
 import { AuthStore } from './features/auth/application';
 import { AuthRepository } from './features/auth/domain';
 import { SupabaseAuthRepository } from './features/auth/infrastructure';
-import { BriefingRepository, ReviewRepository, WatchlistRepository } from './features/briefings/domain';
+import {
+  BriefingRepository,
+  ReviewRepository,
+  WatchlistRepository,
+} from './features/briefings/domain';
 import {
   HttpBriefingRepository,
   HttpReviewRepository,
@@ -37,6 +41,7 @@ import {
 } from './features/radar/infrastructure';
 import { ScenarioRepository } from './features/scenarios/domain';
 import { HttpScenarioRepository } from './features/scenarios/infrastructure';
+import { ChartRepository, HttpChartRepository } from './shared/charts';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -55,6 +60,7 @@ export const appConfig: ApplicationConfig = {
     { provide: BriefingRepository, useClass: HttpBriefingRepository },
     { provide: ReviewRepository, useClass: HttpReviewRepository },
     { provide: ScenarioRepository, useClass: HttpScenarioRepository },
+    { provide: ChartRepository, useClass: HttpChartRepository },
     // Restores any persisted Supabase session before the router's initial
     // navigation runs, so authGuard never sees a false "logged out" on
     // refresh (provideRouter blocks initial navigation on app initializers
