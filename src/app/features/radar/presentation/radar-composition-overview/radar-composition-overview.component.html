@@ -2,6 +2,7 @@
   <header class="composition__header">
     <h2 class="composition__title">{{ i18n.t('radar.composition.title') }}</h2>
     <p class="composition__subtitle">{{ i18n.t('radar.composition.subtitle') }}</p>
+    <p class="composition__legend">{{ i18n.t('radar.composition.legend') }}</p>
   </header>
 
   @if (rows.length > 0) {
@@ -13,6 +14,7 @@
             class="composition__lane"
             [style.--lane-share]="row.sharePct"
             [style.--lane-color]="row.scoreColor"
+            [attr.title]="i18n.t('radar.composition.openHint')"
             (click)="select(row.assetClass)"
           >
             <span class="composition__lane-fill" aria-hidden="true"></span>
@@ -26,8 +28,16 @@
               </span>
 
               <span class="composition__lane-metrics">
-                <span class="composition__lane-share">{{ formatPct(row.sharePct) }}</span>
-                <span class="composition__lane-score" [style.color]="row.scoreColor">
+                <span
+                  class="composition__lane-share"
+                  [attr.title]="i18n.t('radar.composition.shareTooltip')"
+                  >{{ formatPct(row.sharePct) }}</span
+                >
+                <span
+                  class="composition__lane-score"
+                  [style.color]="row.scoreColor"
+                  [attr.title]="i18n.t('radar.composition.scoreTooltip')"
+                >
                   {{ row.marketScore.score }}
                 </span>
                 <span class="composition__lane-sentiment">{{ i18n.t(row.scoreLabelKey) }}</span>

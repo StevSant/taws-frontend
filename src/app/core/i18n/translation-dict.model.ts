@@ -295,6 +295,10 @@ export interface TranslationDict {
   'radar.composition.subtitle': string;
   'radar.composition.unclassified': string;
   'radar.composition.empty': string;
+  'radar.composition.legend': string;
+  'radar.composition.shareTooltip': string;
+  'radar.composition.scoreTooltip': string;
+  'radar.composition.openHint': string;
   'radar.macro.title': string;
   'radar.macro.ratesHint': string;
   'radar.macro.cpiHint': string;

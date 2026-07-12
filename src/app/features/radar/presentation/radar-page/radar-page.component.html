@@ -64,7 +64,7 @@
         <app-radar-composition-overview
           class="radar-page__overview-main"
           [composition]="store.marketComposition()"
-          (selectClass)="onSelectClass($event)"
+          (selectClass)="navigateToExplorer($event)"
         />
       }
       <app-radar-macro-cards

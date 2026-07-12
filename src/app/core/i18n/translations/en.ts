@@ -339,6 +339,11 @@ export const EN_TRANSLATIONS = {
     'Weight and score per asset class. Tap a row to filter the radar.',
   'radar.composition.unclassified': 'not classified by asset class',
   'radar.composition.empty': 'No instruments classified by asset class yet.',
+  'radar.composition.legend':
+    "Each bar's width is the class's weight in the tracked universe; the number is its sentiment score (0–100), derived from that class's signals.",
+  'radar.composition.shareTooltip': 'Weight of this class within the tracked universe',
+  'radar.composition.scoreTooltip': "Sentiment score (0–100) derived from the class's signals",
+  'radar.composition.openHint': 'Open in the explorer filtered by this class',
   'radar.macro.title': 'Market context',
   'radar.macro.ratesHint': 'No recent change',
   'radar.macro.cpiHint': 'Year-over-year inflation',

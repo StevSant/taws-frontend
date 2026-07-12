@@ -311,6 +311,12 @@ export const ES_TRANSLATIONS = {
     'Peso y score propios por clase. Pulsa una fila para filtrar el radar.',
   'radar.composition.unclassified': 'sin clasificar por clase de activo',
   'radar.composition.empty': 'Aún no hay instrumentos clasificados por clase de activo.',
+  'radar.composition.legend':
+    'El ancho de cada barra es el peso de la clase en el universo seguido; el número es su puntuación de sentimiento (0–100), derivada de las señales de esa clase.',
+  'radar.composition.shareTooltip': 'Peso de esta clase dentro del universo seguido',
+  'radar.composition.scoreTooltip':
+    'Puntuación de sentimiento (0–100) derivada de las señales de la clase',
+  'radar.composition.openHint': 'Abrir en el explorador filtrado por esta clase',
   'radar.macro.title': 'Contexto de mercado',
   'radar.macro.ratesHint': 'Sin cambios recientes',
   'radar.macro.cpiHint': 'Inflación interanual',
