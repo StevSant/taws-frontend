@@ -259,6 +259,7 @@ export interface TranslationDict {
   'radar.timeline.confidence': string;
   'radar.instruments.title': string;
   'radar.instruments.subtitle': string;
+  'radar.instruments.explainer': string;
   'radar.instruments.add': string;
   'radar.review.title': string;
   'radar.review.subtitle': string;

@@ -15,6 +15,19 @@
     box-shadow: var(--elevation-2);
   }
 
+  &--clickable {
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-gold, #c8920e);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-gold, #c8920e);
+      outline-offset: 2px;
+    }
+  }
+
   &__header {
     display: flex;
     align-items: flex-start;

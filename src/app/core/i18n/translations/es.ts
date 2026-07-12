@@ -272,6 +272,8 @@ export const ES_TRANSLATIONS = {
   'radar.timeline.confidence': 'Confianza',
   'radar.instruments.title': 'Instrumentos en seguimiento',
   'radar.instruments.subtitle': 'Precio, tendencia y sentimiento por activo.',
+  'radar.instruments.explainer':
+    'Las etiquetas son clasificaciones de señal generadas por IA (positiva / negativa / neutral) inferidas de las noticias recientes de cada activo, con un nivel de confianza. Los activos sin clasificar aún no tienen señal — "Analizar" ejecuta la IA sobre sus noticias para generarla. Toca cualquier tarjeta para ver el detalle completo.',
   'radar.instruments.add': 'Agregar instrumento',
   'radar.review.title': 'Tu revisión',
   'radar.review.subtitle': 'Registro humano de tu decisión — no es recomendación de inversión.',

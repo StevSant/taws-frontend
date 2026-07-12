@@ -302,6 +302,8 @@ export const EN_TRANSLATIONS = {
   'radar.timeline.confidence': 'Confidence',
   'radar.instruments.title': 'Tracked instruments',
   'radar.instruments.subtitle': 'Price, trend, and sentiment per asset.',
+  'radar.instruments.explainer':
+    'The badges are AI signal classifications (positive / negative / neutral) inferred from each asset’s recent news, with a confidence score. Unclassified assets have no signal yet — "Analyze" runs the AI on that asset’s news to produce one. Tap any card for the full detail view.',
   'radar.instruments.add': 'Add instrument',
   'scenarios.title': 'Scenario Lab',
   'scenarios.description':

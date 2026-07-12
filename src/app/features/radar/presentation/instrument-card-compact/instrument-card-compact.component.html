@@ -1,7 +1,12 @@
 <article
-  class="instrument-card-compact"
+  class="instrument-card-compact instrument-card-compact--clickable"
   [class.instrument-card-compact--positive]="signal.impactClass === 'positive'"
   [class.instrument-card-compact--negative]="signal.impactClass === 'negative'"
+  role="link"
+  tabindex="0"
+  [attr.aria-label]="signal.symbol"
+  (click)="onCardActivate($event)"
+  (keydown.enter)="onCardActivate($event)"
 >
   <header class="instrument-card-compact__header">
     <div class="instrument-card-compact__identity">
@@ -50,12 +55,23 @@
     </span>
   </footer>
 
+  @if (isUnclassified()) {
+    <button
+      type="button"
+      class="instrument-card-compact__analysis-toggle"
+      [disabled]="isGenerating()"
+      (click)="onAnalyze($event)"
+    >
+      {{ isGenerating() ? i18n.t('radar.generate.generating') : i18n.t('radar.timeline.analyze') }}
+    </button>
+  }
+
   @if (hasSignal()) {
     <button
       type="button"
       class="instrument-card-compact__analysis-toggle"
       [attr.aria-expanded]="showAnalysis()"
-      (click)="toggleAnalysis()"
+      (click)="toggleAnalysis(); $event.stopPropagation()"
     >
       {{
         showAnalysis() ? i18n.t('radar.analysis.collapse') : i18n.t('radar.analysis.expand')

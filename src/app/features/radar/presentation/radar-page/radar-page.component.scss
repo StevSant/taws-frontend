@@ -135,6 +135,15 @@
     color: var(--color-text-muted);
   }
 
+  &__instruments-explainer {
+    margin: 0.35rem 0 0;
+    max-width: 46ch;
+    font-size: 0.74rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+  }
+
   &__instrument-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

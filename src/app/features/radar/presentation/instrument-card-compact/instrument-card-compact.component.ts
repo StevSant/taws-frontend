@@ -1,7 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent, ReturnSparklineComponent } from '../../../../shared';
+import { RadarStore } from '../../application';
 import { RadarSignal, ImpactClass } from '../../domain';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
 
@@ -29,6 +31,8 @@ export class InstrumentCardCompactComponent {
   @Input({ required: true }) signal!: RadarSignal;
 
   readonly i18n = inject(TranslationService);
+  readonly store = inject(RadarStore);
+  private readonly router = inject(Router);
   readonly showAnalysis = signal(false);
 
   /** A persisted Analyst signal exists for this instrument (analysis to expand). */
@@ -36,8 +40,30 @@ export class InstrumentCardCompactComponent {
     return !!this.signal.signalId;
   }
 
+  /** No Analyst classification yet — the card offers an inline "Analizar" action. */
+  isUnclassified(): boolean {
+    return !this.signal.impactClass;
+  }
+
+  isGenerating(): boolean {
+    return this.store.isGeneratingFor(this.signal.symbol);
+  }
+
   toggleAnalysis(): void {
     this.showAnalysis.update((value) => !value);
+  }
+
+  /** Opens the per-asset detail page (issue #43); ignores clicks on inner controls. */
+  onCardActivate(event: Event): void {
+    if ((event.target as HTMLElement).closest('button')) {
+      return;
+    }
+    void this.router.navigate(['/radar', this.signal.symbol]);
+  }
+
+  onAnalyze(event: Event): void {
+    event.stopPropagation();
+    void this.store.generateSignal(this.signal.symbol);
   }
 
   impactLabel(): string {
