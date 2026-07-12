@@ -1,3 +1,25 @@
 <figure class="taws-chart">
-  <div #chartHost class="taws-chart__canvas" role="img" [attr.aria-label]="spec().meta.title"></div>
+  @if (current(); as spec) {
+    @if (spec.meta.timeframes.length) {
+      <div class="taws-chart__timeframes" role="group" [attr.aria-label]="'Timeframe'">
+        @for (tf of spec.meta.timeframes; track tf) {
+          <button
+            type="button"
+            class="taws-chart__timeframe"
+            [class.taws-chart__timeframe--active]="tf === spec.meta.timeframe"
+            [disabled]="loading()"
+            (click)="selectTimeframe(tf)"
+          >
+            {{ tf }}
+          </button>
+        }
+      </div>
+    }
+  }
+  <div
+    #chartHost
+    class="taws-chart__canvas"
+    role="img"
+    [attr.aria-label]="current()?.meta?.title ?? ''"
+  ></div>
 </figure>
