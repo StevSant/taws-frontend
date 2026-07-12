@@ -19,10 +19,7 @@ import {
   ThemeToggleComponent,
   UserMenuComponent,
 } from '../../shared';
-import {
-  ShellRouteTransition,
-  getShellRouteTransition,
-} from './shell-tab-order';
+import { ShellRouteTransition, getShellRouteTransition } from './shell-tab-order';
 
 // Routes that hide the shell's demo-disclaimer footer (full-width app views).
 const CUSTOM_LAYOUT_ROUTE_PREFIXES = ['/radar', '/chat', '/scenarios', '/briefings', '/brand-lab'];
@@ -65,14 +62,16 @@ export class ShellComponent {
   private previousShellUrl = this.router.url;
 
   constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event) => {
-      const navigation = event as NavigationEnd;
-      this.routeTransition.set(
-        getShellRouteTransition(this.previousShellUrl, navigation.urlAfterRedirects),
-      );
-      this.previousShellUrl = navigation.urlAfterRedirects;
-      this.usesCustomLayout.set(this.hasFeatureOwnedSidebar(navigation.urlAfterRedirects));
-    });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        const navigation = event as NavigationEnd;
+        this.routeTransition.set(
+          getShellRouteTransition(this.previousShellUrl, navigation.urlAfterRedirects),
+        );
+        this.previousShellUrl = navigation.urlAfterRedirects;
+        this.usesCustomLayout.set(this.hasFeatureOwnedSidebar(navigation.urlAfterRedirects));
+      });
   }
 
   logout(): void {

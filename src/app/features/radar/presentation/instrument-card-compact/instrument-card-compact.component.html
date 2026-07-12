@@ -19,7 +19,9 @@
           signal.marketStats!.lastPrice | number: '1.2-2'
         }}</span>
       }
-      <span class="instrument-card-compact__delta" [class]="priceDeltaClass()">{{ formatDelta() }}</span>
+      <span class="instrument-card-compact__delta" [class]="priceDeltaClass()">{{
+        formatDelta()
+      }}</span>
     </div>
   </header>
 

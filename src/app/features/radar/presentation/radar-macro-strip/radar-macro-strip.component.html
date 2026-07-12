@@ -1,6 +1,9 @@
 @if (macro) {
   <div class="radar-macro-strip">
-    <div class="radar-macro-strip__vix" [class]="'radar-macro-strip__vix--' + macro.volatility.regime">
+    <div
+      class="radar-macro-strip__vix"
+      [class]="'radar-macro-strip__vix--' + macro.volatility.regime"
+    >
       <div class="radar-macro-strip__vix-gauge" aria-hidden="true">
         <svg viewBox="0 0 80 44">
           <path class="radar-macro-strip__vix-track" d="M8 38 A34 34 0 0 1 72 38" />
@@ -12,7 +15,9 @@
         </svg>
       </div>
       <span class="radar-macro-strip__label">{{ i18n.t('radar.landscape.vix') }}</span>
-      <span class="radar-macro-strip__value">{{ macro.volatility.vixLevel | number: '1.1-1' }}</span>
+      <span class="radar-macro-strip__value">{{
+        macro.volatility.vixLevel | number: '1.1-1'
+      }}</span>
       <span class="radar-macro-strip__regime">{{ regimeLabel(macro.volatility.regime) }}</span>
     </div>
 
@@ -28,7 +33,10 @@
       <span class="radar-macro-strip__label">{{ i18n.t('radar.landscape.cpi') }}</span>
       <span class="radar-macro-strip__value">{{ macro.cpi.value | number: '1.1-1' }}%</span>
       <span class="radar-macro-strip__bar" aria-hidden="true">
-        <span class="radar-macro-strip__bar-fill radar-macro-strip__bar-fill--cpi" [style.width.%]="cpiBarWidth()"></span>
+        <span
+          class="radar-macro-strip__bar-fill radar-macro-strip__bar-fill--cpi"
+          [style.width.%]="cpiBarWidth()"
+        ></span>
       </span>
     </div>
   </div>

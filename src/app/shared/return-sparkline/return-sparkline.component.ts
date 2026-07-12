@@ -36,7 +36,8 @@ export class ReturnSparklineComponent {
   formatTooltip(move: UnusualMove): string {
     const sign = move.returnPct > 0 ? '+' : '';
     const date = move.date ? new Date(move.date).toLocaleDateString() : '';
-    const z = move.zScore !== undefined && move.zScore !== null ? ` · z=${move.zScore.toFixed(1)}` : '';
+    const z =
+      move.zScore !== undefined && move.zScore !== null ? ` · z=${move.zScore.toFixed(1)}` : '';
     return `${date}: ${sign}${move.returnPct.toFixed(2)}%${z}`;
   }
 }

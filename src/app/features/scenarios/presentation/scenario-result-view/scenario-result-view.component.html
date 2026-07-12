@@ -56,8 +56,12 @@
           [class.scenario-result__impact-card--uncertain]="impact.direction === 'uncertain'"
         >
           <header class="scenario-result__impact-header">
-            <span class="scenario-result__impact-asset">{{ assetClassLabel(impact.assetClass) }}</span>
-            <span class="scenario-result__impact-direction">{{ impactDirectionLabel(impact.direction) }}</span>
+            <span class="scenario-result__impact-asset">{{
+              assetClassLabel(impact.assetClass)
+            }}</span>
+            <span class="scenario-result__impact-direction">{{
+              impactDirectionLabel(impact.direction)
+            }}</span>
           </header>
           <div class="scenario-result__impact-confidence">
             <span class="scenario-result__impact-confidence-label">
@@ -78,7 +82,9 @@
 
     <div class="scenario-result__footer-actions">
       <section class="scenario-result__briefing">
-        <p class="scenario-result__briefing-explain">{{ i18n.t('scenarios.result.addToBriefing.explain') }}</p>
+        <p class="scenario-result__briefing-explain">
+          {{ i18n.t('scenarios.result.addToBriefing.explain') }}
+        </p>
         <button type="button" class="scenario-result__briefing-action" (click)="onAddToBriefing()">
           {{ i18n.t('scenarios.result.copySummary.action') }}
         </button>
@@ -88,14 +94,19 @@
           </p>
         }
         @if (briefingActionStatus === 'error') {
-          <p class="scenario-result__briefing-status scenario-result__briefing-status--error" role="alert">
+          <p
+            class="scenario-result__briefing-status scenario-result__briefing-status--error"
+            role="alert"
+          >
             {{ i18n.t('scenarios.result.addToBriefing.error') }}
           </p>
         }
       </section>
 
       <section class="scenario-result__monitor">
-        <p class="scenario-result__monitor-explain">{{ i18n.t('scenarios.result.monitor.explain') }}</p>
+        <p class="scenario-result__monitor-explain">
+          {{ i18n.t('scenarios.result.monitor.explain') }}
+        </p>
         @if (isAuthenticated) {
           @if (monitor && monitor.status !== 'expired') {
             <div class="scenario-result__monitor-status" role="status">
@@ -127,7 +138,9 @@
           } @else {
             @if (monitor?.status === 'expired') {
               <p class="scenario-result__monitor-status" role="status">
-                <span class="scenario-result__monitor-badge">{{ monitorStatusLabel('expired') }}</span>
+                <span class="scenario-result__monitor-badge">{{
+                  monitorStatusLabel('expired')
+                }}</span>
               </p>
             }
             <button
@@ -144,7 +157,10 @@
             </button>
           }
           @if (monitorError) {
-            <p class="scenario-result__monitor-status scenario-result__monitor-status--error" role="alert">
+            <p
+              class="scenario-result__monitor-status scenario-result__monitor-status--error"
+              role="alert"
+            >
               {{ i18n.t('scenarios.result.monitor.error.banner') }}{{ monitorError }}
             </p>
           }

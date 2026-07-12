@@ -69,7 +69,8 @@ export const MIDAS_GLYPH_CATALOG: readonly MidasGlyphMeta[] = [
     category: 'brand',
     titleEs: 'Orbe neural (actual)',
     titleEn: 'Neural orb (current)',
-    symbolismEs: 'Logo actual del header: núcleo + red de 5 nodos. Lectura rápida a tamaño pequeño.',
+    symbolismEs:
+      'Logo actual del header: núcleo + red de 5 nodos. Lectura rápida a tamaño pequeño.',
     symbolismEn: 'Current header logo: core plus a 5-node mesh. Reads clearly at small sizes.',
   },
   {

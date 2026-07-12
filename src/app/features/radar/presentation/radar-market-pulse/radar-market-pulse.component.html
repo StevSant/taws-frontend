@@ -12,11 +12,7 @@
     }
   </div>
 
-  <div
-    class="radar-market-pulse__bar"
-    role="img"
-    [attr.aria-label]="i18n.t('radar.pulse.title')"
-  >
+  <div class="radar-market-pulse__bar" role="img" [attr.aria-label]="i18n.t('radar.pulse.title')">
     @for (segment of segments; track segment.key) {
       <span
         class="radar-market-pulse__segment"

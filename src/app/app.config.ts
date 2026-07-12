@@ -66,7 +66,8 @@ export const appConfig: ApplicationConfig = {
     // routes so a refresh on /briefings doesn't false-redirect to login.
     provideAppInitializer(() => {
       void inject(AuthStore).initialize();
-    }),    provideAppInitializer(() => {
+    }),
+    provideAppInitializer(() => {
       const theme = inject(ThemeService);
       theme.setTheme(theme.theme());
     }),

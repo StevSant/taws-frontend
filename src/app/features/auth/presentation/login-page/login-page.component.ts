@@ -176,7 +176,10 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   }
 
   private resolveReturnUrl(): string {
-    return this.safeInternalPath(this.route.snapshot.queryParamMap.get('returnUrl')) ?? DEFAULT_REDIRECT_PATH;
+    return (
+      this.safeInternalPath(this.route.snapshot.queryParamMap.get('returnUrl')) ??
+      DEFAULT_REDIRECT_PATH
+    );
   }
 
   private safeInternalPath(url: string | null): string | null {

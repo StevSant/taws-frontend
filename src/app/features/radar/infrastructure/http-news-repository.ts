@@ -30,27 +30,21 @@ export class HttpNewsRepository extends NewsRepository {
 
   async fetchNews(filters: RadarFilters): Promise<NewsItem[]> {
     const cacheKey = JSON.stringify(filters);
-    return cachedFetch(
-      this.cache,
-      'news',
-      cacheKey,
-      this.config.newsCacheTtlMs,
-      async () => {
-        let params = new HttpParams().set('since_hours', filters.sinceHours);
-        if (filters.symbol) {
-          params = params.set('symbol', filters.symbol);
-        }
-        if (filters.assetClass) {
-          params = params.set('asset_class', filters.assetClass);
-        }
+    return cachedFetch(this.cache, 'news', cacheKey, this.config.newsCacheTtlMs, async () => {
+      let params = new HttpParams().set('since_hours', filters.sinceHours);
+      if (filters.symbol) {
+        params = params.set('symbol', filters.symbol);
+      }
+      if (filters.assetClass) {
+        params = params.set('asset_class', filters.assetClass);
+      }
 
-        const dtos = await firstValueFrom(
-          this.http
-            .get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
-            .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
-        );
-        return dtos.map(mapNewsItemDto);
-      },
-    );
+      const dtos = await firstValueFrom(
+        this.http
+          .get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
+          .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
+      );
+      return dtos.map(mapNewsItemDto);
+    });
   }
 }

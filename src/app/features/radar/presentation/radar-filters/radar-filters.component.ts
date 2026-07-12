@@ -71,9 +71,7 @@ export class RadarFiltersComponent {
   }
 
   recencyLabel(hours: number): string {
-    const key = this.compact
-      ? RECENCY_SHORT_LABELS[hours]
-      : RECENCY_LABELS[hours];
+    const key = this.compact ? RECENCY_SHORT_LABELS[hours] : RECENCY_LABELS[hours];
     return key ? this.i18n.t(key) : `${hours}h`;
   }
 

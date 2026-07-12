@@ -38,7 +38,9 @@
               </span>
               {{ directionLabel(impact.direction) }}
             </span>
-            <span class="impact-heatmap__confidence">{{ impact.confidence | percent: '1.0-0' }}</span>
+            <span class="impact-heatmap__confidence">{{
+              impact.confidence | percent: '1.0-0'
+            }}</span>
           } @else {
             <span class="impact-heatmap__direction impact-heatmap__direction--empty">
               {{ i18n.t('scenarios.result.heatmap.notAssessed') }}

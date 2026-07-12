@@ -20,11 +20,17 @@ export class HttpMacroRepository extends MacroRepository {
   }
 
   async fetchMacroState(): Promise<MacroState> {
-    return cachedFetch(this.cache, 'macro', 'state', this.config.instrumentsCacheTtlMs, async () => {
-      const dto = await firstValueFrom(
-        this.http.get<MacroStateDto>(`${this.config.apiBaseUrl}${MACRO_PATH}`),
-      );
-      return mapMacroStateDto(dto);
-    });
+    return cachedFetch(
+      this.cache,
+      'macro',
+      'state',
+      this.config.instrumentsCacheTtlMs,
+      async () => {
+        const dto = await firstValueFrom(
+          this.http.get<MacroStateDto>(`${this.config.apiBaseUrl}${MACRO_PATH}`),
+        );
+        return mapMacroStateDto(dto);
+      },
+    );
   }
 }

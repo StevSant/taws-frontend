@@ -153,7 +153,9 @@
     cursor: pointer;
     border-radius: var(--radius-sm);
     padding: 0;
-    transition: color 0.2s ease, background 0.2s ease;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease;
 
     &:hover {
       color: var(--color-danger);

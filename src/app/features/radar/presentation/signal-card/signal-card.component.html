@@ -20,7 +20,9 @@
       <span class="signal-card__ticker">{{ signal.symbol }}</span>
       @if (signal.instrument) {
         <span class="signal-card__name">{{ signal.instrument.name }}</span>
-        <span class="signal-card__asset-class">{{ assetClassLabel(signal.instrument.assetClass) }}</span>
+        <span class="signal-card__asset-class">{{
+          assetClassLabel(signal.instrument.assetClass)
+        }}</span>
       }
       @if (signal.marketStats?.volatilityRegime; as regime) {
         <span class="signal-card__vol-chip" [attr.data-regime]="regime">
@@ -75,9 +77,14 @@
             signal.priceDelta !== undefined
               ? formatPriceDelta(signal.priceDelta)
               : i18n.t('radar.card.priceDelta.unavailable')
-          }}@if (signal.priceDelta !== undefined) {%}
+          }}
+          @if (signal.priceDelta !== undefined) {
+            %
+          }
         </span>
-        @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {
+        @if (
+          signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined
+        ) {
           <span class="signal-card__last-price">
             {{ signal.marketStats!.lastPrice | number: '1.2-2' }}
           </span>
@@ -111,7 +118,8 @@
             [href]="item.url"
             target="_blank"
             rel="noopener noreferrer"
-          >{{ item.title }}</a>
+            >{{ item.title }}</a
+          >
           <div class="signal-card__evidence-meta">
             <span class="signal-card__evidence-source">{{ item.source }}</span>
             <span class="signal-card__evidence-date">{{ item.publishedAt | date: 'short' }}</span>

@@ -1,13 +1,4 @@
-const STOCK_LOGOS = [
-  'AAPL',
-  'MSFT',
-  'NVDA',
-  'TSLA',
-  'AMZN',
-  'GOOGL',
-  'META',
-  'JPM',
-] as const;
+const STOCK_LOGOS = ['AAPL', 'MSFT', 'NVDA', 'TSLA', 'AMZN', 'GOOGL', 'META', 'JPM'] as const;
 
 const CRYPTO_LOGOS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP'] as const;
 
@@ -20,10 +11,7 @@ export type CryptoLogoSymbol = (typeof CRYPTO_LOGOS)[number];
 export type EtfLogoSymbol = (typeof ETF_LOGOS)[number];
 export type ForexLogoSymbol = (typeof FOREX_LOGOS)[number];
 export type InstrumentLogoSymbol =
-  | StockLogoSymbol
-  | CryptoLogoSymbol
-  | EtfLogoSymbol
-  | ForexLogoSymbol;
+  StockLogoSymbol | CryptoLogoSymbol | EtfLogoSymbol | ForexLogoSymbol;
 
 export type MacroIconId = 'vix' | 'fed' | 'cpi' | 'dxy';
 

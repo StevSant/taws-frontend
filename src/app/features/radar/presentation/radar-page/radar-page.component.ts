@@ -1,10 +1,6 @@
 import { Component, OnDestroy, OnInit, computed } from '@angular/core';
 import { TranslationService } from '../../../../core';
-import {
-  ButtonComponent,
-  EmptyStateComponent,
-  SkeletonCardComponent,
-} from '../../../../shared';
+import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
 import { RadarStore } from '../../application';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { RadarKpiRowComponent } from '../radar-kpi-row/radar-kpi-row.component';

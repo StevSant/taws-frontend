@@ -45,8 +45,7 @@ export const ES_TRANSLATIONS = {
   'auth.login.title': 'Iniciar sesión',
   'auth.login.eyebrow': 'Iniciar sesión',
   'auth.login.welcome': 'Bienvenido de vuelta',
-  'auth.login.subtitle':
-    'Entrá con tu correo o elegí una perspectiva demo para explorar Midas.',
+  'auth.login.subtitle': 'Entrá con tu correo o elegí una perspectiva demo para explorar Midas.',
   'auth.signup.title': 'Crear una cuenta',
   'auth.back': 'Volver',
   'auth.email.label': 'Correo electrónico',
@@ -65,7 +64,8 @@ export const ES_TRANSLATIONS = {
   'auth.error.unknown': 'Revisá tus datos e intentá de nuevo.',
   'auth.demo.divider': 'Demo · Perspectiva',
   'auth.demo.footer': 'Podés cambiar de perspectiva cerrando sesión y volviendo a entrar.',
-  'auth.demo.hint': 'Midas — Supabase Auth. Creá los usuarios demo en el dashboard antes de usar estos accesos.',
+  'auth.demo.hint':
+    'Midas — Supabase Auth. Creá los usuarios demo en el dashboard antes de usar estos accesos.',
   'auth.demo.role.analyst': 'Analista',
   'auth.demo.role.portfolio': 'Gestor',
   'auth.demo.role.compliance': 'Cumplimiento',
@@ -145,9 +145,12 @@ export const ES_TRANSLATIONS = {
   'radar.summary.events': 'eventos relevantes en',
   'radar.summary.pending': 'requieren revisión con IA.',
   'radar.guide.title': 'Cómo leer el Radar',
-  'radar.guide.step1': 'Arriba ves el panorama: mix de impacto, clases de activo y contexto macro (VIX, tasas, inflación).',
-  'radar.guide.step2': 'Cada tarjeta = un activo con noticias recientes. El titular te dice de qué trata; las barras verdes/rojas muestran movimientos de precio.',
-  'radar.guide.step3': 'Si dice "Pendiente Analyst", pulsá el botón para que la IA clasifique impacto (positivo/negativo) y confianza.',
+  'radar.guide.step1':
+    'Arriba ves el panorama: mix de impacto, clases de activo y contexto macro (VIX, tasas, inflación).',
+  'radar.guide.step2':
+    'Cada tarjeta = un activo con noticias recientes. El titular te dice de qué trata; las barras verdes/rojas muestran movimientos de precio.',
+  'radar.guide.step3':
+    'Si dice "Pendiente Analyst", pulsá el botón para que la IA clasifique impacto (positivo/negativo) y confianza.',
   'radar.filters.type.label': 'Tipo de instrumento',
   'radar.filters.type.all': 'Todos los tipos',
   'radar.filters.asset.label': 'Activo',
@@ -189,7 +192,8 @@ export const ES_TRANSLATIONS = {
     'Solo informativo — no es asesoría financiera personalizada. Nunca ejecutamos operaciones.',
   'radar.generate.action': 'Analizar con IA',
   'radar.generate.generating': 'Analizando con IA…',
-  'radar.generate.hint': 'La IA lee las noticias del activo y estima impacto (positivo/negativo), confianza y contexto de precio.',
+  'radar.generate.hint':
+    'La IA lee las noticias del activo y estima impacto (positivo/negativo), confianza y contexto de precio.',
   'radar.generate.all': 'Analizar todos pendientes',
   'radar.generate.allRunning': 'Analizando en lote…',
   'radar.landscape.title': 'Panorama de mercado',
@@ -225,7 +229,8 @@ export const ES_TRANSLATIONS = {
   'radar.card.moreNews': 'Ver más titulares',
   'radar.card.lessNews': 'Ver menos',
   'radar.cards.title': 'Tarjetas por activo',
-  'radar.cards.subtitle': 'Una tarjeta por instrumento con noticias vinculadas en el período seleccionado.',
+  'radar.cards.subtitle':
+    'Una tarjeta por instrumento con noticias vinculadas en el período seleccionado.',
   'radar.kpi.news': 'Noticias detectadas',
   'radar.kpi.newsHint': 'en la ventana seleccionada',
   'radar.kpi.newsTrendSuffix': 'vs.',
@@ -260,15 +265,21 @@ export const ES_TRANSLATIONS = {
   'scenarios.description':
     'Simulá "¿qué pasa si…?" y la IA te muestra impacto por activo, la cadena causal paso a paso y acciones sugeridas.',
   'scenarios.guide.title': 'Cómo usar el laboratorio',
-  'scenarios.guide.step1': 'Elegí un escenario preconfigurado (ej. recorte OPEP) o escribí el tuyo en texto libre.',
-  'scenarios.guide.step2': 'Pulsá "Ejecutar escenario" — la IA analiza el evento contra datos de mercado.',
-  'scenarios.guide.step3': 'Leé el mapa de calor (verde/rojo por clase de activo), la cadena causal y las acciones recomendadas.',
+  'scenarios.guide.step1':
+    'Elegí un escenario preconfigurado (ej. recorte OPEP) o escribí el tuyo en texto libre.',
+  'scenarios.guide.step2':
+    'Pulsá "Ejecutar escenario" — la IA analiza el evento contra datos de mercado.',
+  'scenarios.guide.step3':
+    'Leé el mapa de calor (verde/rojo por clase de activo), la cadena causal y las acciones recomendadas.',
   'scenarios.composer.title': 'Definí tu escenario',
-  'scenarios.composer.subtitle': 'Seleccioná un preset o describí un evento hipotético, luego ejecutalo.',
+  'scenarios.composer.subtitle':
+    'Seleccioná un preset o describí un evento hipotético, luego ejecutalo.',
   'scenarios.preview.title': '¿Qué vas a obtener?',
   'scenarios.preview.description': 'Al ejecutar un escenario verás tres bloques claros:',
-  'scenarios.preview.item1': 'Mapa de calor — qué clases de activo suben o bajan y con qué confianza.',
-  'scenarios.preview.item2': 'Cadena causal — cómo el evento se propaga paso a paso (causa → efecto).',
+  'scenarios.preview.item1':
+    'Mapa de calor — qué clases de activo suben o bajan y con qué confianza.',
+  'scenarios.preview.item2':
+    'Cadena causal — cómo el evento se propaga paso a paso (causa → efecto).',
   'scenarios.preview.item3': 'Acciones sugeridas — qué monitorear o considerar (solo informativo).',
   'scenarios.disclaimer.static':
     'Solo informativo — no es asesoría financiera personalizada. Nunca ejecutamos operaciones.',
@@ -365,8 +376,10 @@ export const ES_TRANSLATIONS = {
     'Resúmenes automáticos de los activos que seguís. Creá una lista, generá un informe y marcá tu revisión (visto, escalar o descartar).',
   'briefings.guide.title': 'Cómo funciona',
   'briefings.guide.step1': 'Creá una lista de seguimiento y agregá tickers (ej. AAPL, BTC).',
-  'briefings.guide.step2': 'Seleccioná la lista y pulsá "Generar informe" — la IA resume señales y noticias.',
-  'briefings.guide.step3': 'Revisá cada informe: marcá como visto, escalá si requiere atención, o descartá.',
+  'briefings.guide.step2':
+    'Seleccioná la lista y pulsá "Generar informe" — la IA resume señales y noticias.',
+  'briefings.guide.step3':
+    'Revisá cada informe: marcá como visto, escalá si requiere atención, o descartá.',
   'briefings.disclaimer.static':
     'Este panel solo brinda análisis y alertas — nunca ejecuta operaciones. Cada briefing requiere tu revisión; tratá cada resumen como información, no como asesoría de inversión personalizada.',
   'briefings.watchlist.label': 'Lista de seguimiento',
@@ -441,7 +454,8 @@ export const ES_TRANSLATIONS = {
   'telegram.title': 'Alertas Telegram',
   'telegram.linked': 'Vinculado',
   'telegram.notLinked': 'Sin vincular',
-  'telegram.intro': 'Recibí alertas en Telegram cuando un escenario monitoreado empiece a cumplirse.',
+  'telegram.intro':
+    'Recibí alertas en Telegram cuando un escenario monitoreado empiece a cumplirse.',
   'telegram.connectAction': 'Conectar Telegram',
   'telegram.connect': 'Conectar Telegram',
   'telegram.unlink': 'Desvincular',

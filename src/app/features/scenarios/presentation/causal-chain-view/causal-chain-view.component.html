@@ -43,7 +43,9 @@
               (click)="onToggleEdge(i)"
             >
               <span class="causal-chain__mechanism-text">{{ edge.mechanism }}</span>
-              <span class="causal-chain__mechanism-confidence">{{ edge.confidence | percent: '1.0-0' }}</span>
+              <span class="causal-chain__mechanism-confidence">{{
+                edge.confidence | percent: '1.0-0'
+              }}</span>
             </button>
           </div>
         </li>

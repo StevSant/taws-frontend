@@ -140,7 +140,13 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
   }
 
   private applyThemePalette(theme: Theme): void {
-    if (!this.material || !this.ambientLight || !this.keyLight || !this.fillLight || !this.rimLight) {
+    if (
+      !this.material ||
+      !this.ambientLight ||
+      !this.keyLight ||
+      !this.fillLight ||
+      !this.rimLight
+    ) {
       return;
     }
 

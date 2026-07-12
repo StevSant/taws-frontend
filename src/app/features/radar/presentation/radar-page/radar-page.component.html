@@ -59,7 +59,9 @@
     </div>
 
     @if (store.isEnriching()) {
-      <p class="radar-page__enriching" aria-live="polite">{{ i18n.t('radar.landscape.enriching') }}</p>
+      <p class="radar-page__enriching" aria-live="polite">
+        {{ i18n.t('radar.landscape.enriching') }}
+      </p>
     }
 
     <div class="radar-page__split">
@@ -69,7 +71,9 @@
         <header class="radar-page__instruments-header">
           <div class="radar-page__instruments-copy">
             <h2 class="radar-page__instruments-title">{{ i18n.t('radar.instruments.title') }}</h2>
-            <p class="radar-page__instruments-subtitle">{{ i18n.t('radar.instruments.subtitle') }}</p>
+            <p class="radar-page__instruments-subtitle">
+              {{ i18n.t('radar.instruments.subtitle') }}
+            </p>
           </div>
           @if (store.unclassifiedCount() > 0) {
             <div class="radar-page__instruments-action">

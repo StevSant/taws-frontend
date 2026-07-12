@@ -14,9 +14,7 @@
   box-sizing: border-box;
   height: 100%;
   max-height: 100%;
-  padding:
-    clamp(3.25rem, 9vh, 3.75rem) clamp(0.75rem, 3vw, 1.25rem)
-    clamp(0.75rem, 2vh, 1.25rem);
+  padding: clamp(3.25rem, 9vh, 3.75rem) clamp(0.75rem, 3vw, 1.25rem) clamp(0.75rem, 2vh, 1.25rem);
   background: var(--color-background);
   overflow: hidden;
 
@@ -103,9 +101,7 @@
     padding: clamp(0.9rem, 2.4vh, 1.5rem);
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-gold-border);
-    box-shadow:
-      var(--elevation-3),
-      var(--card-outline-shadow);
+    box-shadow: var(--elevation-3), var(--card-outline-shadow);
     overflow: hidden;
     flex-shrink: 1;
     min-height: 0;

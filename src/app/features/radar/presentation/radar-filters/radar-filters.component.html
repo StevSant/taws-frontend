@@ -1,7 +1,9 @@
 <form class="radar-filters" [class.radar-filters--compact]="compact">
   @if (!compact) {
     <div class="radar-filters__group feature-field">
-      <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.type.label') }}</span>
+      <span class="radar-filters__label feature-label">{{
+        i18n.t('radar.filters.type.label')
+      }}</span>
       <div
         class="radar-filters__pills"
         role="group"
@@ -29,7 +31,9 @@
     </div>
 
     <label class="radar-filters__field feature-field">
-      <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.asset.label') }}</span>
+      <span class="radar-filters__label feature-label">{{
+        i18n.t('radar.filters.asset.label')
+      }}</span>
       <select
         class="radar-filters__select feature-select"
         name="symbol"
@@ -48,7 +52,9 @@
 
   <div class="radar-filters__group feature-field">
     @if (!compact) {
-      <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.recency.label') }}</span>
+      <span class="radar-filters__label feature-label">{{
+        i18n.t('radar.filters.recency.label')
+      }}</span>
     }
     <div
       class="radar-filters__pills"
