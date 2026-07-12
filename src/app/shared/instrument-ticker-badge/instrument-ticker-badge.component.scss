@@ -18,8 +18,10 @@
   }
 
   &--logo {
-    background: var(--color-surface);
-    box-shadow: inset 0 0 0 1px var(--color-border);
+    background: var(--ticker-logo-bg, var(--color-surface));
+    box-shadow:
+      inset 0 0 0 1px var(--ticker-logo-border, var(--color-border)),
+      var(--ticker-logo-elevation, none);
     overflow: hidden;
   }
 

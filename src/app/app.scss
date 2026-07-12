@@ -1,0 +1,8 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+:host > :not(router-outlet) {
+  animation: routeEnterFade 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

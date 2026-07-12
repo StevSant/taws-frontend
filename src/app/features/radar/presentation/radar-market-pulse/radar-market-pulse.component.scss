@@ -1,8 +1,12 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
 .radar-market-pulse {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  min-height: 100%;
 
   &__header {
     display: flex;

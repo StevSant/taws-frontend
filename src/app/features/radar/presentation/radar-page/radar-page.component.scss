@@ -1,14 +1,14 @@
 :host {
   display: flex;
   flex: 1;
+  min-width: 0;
 }
 
 .radar-page {
-  gap: var(--space-4);
-  padding: var(--space-5);
-  max-width: 90rem;
-  width: 100%;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-bottom: var(--space-8);
 
   &__hero {
     display: flex;
@@ -16,6 +16,7 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-4);
+    padding-bottom: var(--space-2);
   }
 
   &__title {
@@ -44,17 +45,24 @@
 
   &__kpis {
     display: block;
+    width: 100%;
   }
 
   &__overview {
     display: grid;
-    grid-template-columns: 1.4fr 0.9fr 1.2fr;
-    gap: var(--space-3);
-    align-items: stretch;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+
+    > * {
+      min-width: 0;
+    }
   }
 
   &__enriching {
-    margin: 0;
+    margin: calc(var(--space-2) * -1) 0 0;
     font-family: var(--font-family-mono);
     font-size: 0.72rem;
     color: var(--color-gold-bright);
@@ -63,18 +71,55 @@
 
   &__split {
     display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    gap: var(--space-4);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-5);
     align-items: start;
+    width: 100%;
+    min-width: 0;
+    margin-top: var(--space-2);
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  &__timeline {
+    min-width: 0;
+  }
+
+  &__instruments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+    min-height: 0;
   }
 
   &__instruments-header {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-3);
-    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  }
+
+  &__instruments-copy {
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+
+  &__instruments-action {
+    flex: 0 1 auto;
+    max-width: 100%;
+
+    ::ng-deep .app-button {
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   &__instruments-title {
@@ -84,37 +129,63 @@
   }
 
   &__instruments-subtitle {
-    margin: 0.2rem 0 0;
+    margin: 0.35rem 0 0;
     font-size: 0.78rem;
+    line-height: 1.45;
     color: var(--color-text-muted);
   }
 
   &__instrument-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
   &__skeletons {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-3);
+    gap: var(--space-4);
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1320px) {
   .radar-page__overview {
     grid-template-columns: 1fr;
+    gap: var(--space-4);
   }
 
   .radar-page__split {
     grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (max-width: 1100px) {
+  .radar-page__instrument-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 720px) {
   .radar-page {
-    padding: var(--space-3);
+    gap: var(--space-5);
+  }
+
+  .radar-page__hero {
+    align-items: flex-start;
+  }
+
+  .radar-page__instruments-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .radar-page__instruments-action {
+    width: 100%;
+
+    ::ng-deep .app-button {
+      width: 100%;
+    }
   }
 
   .radar-page__instrument-grid {
@@ -123,11 +194,5 @@
 
   .radar-page__skeletons {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (min-width: 721px) and (max-width: 1100px) {
-  .radar-page__instrument-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

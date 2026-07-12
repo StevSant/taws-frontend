@@ -1,28 +1,21 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   input,
   OnDestroy,
   output,
 } from '@angular/core';
 import { TranslationService } from '../../../../core';
-import { PlanUsageWidgetComponent, UserProfileChipComponent } from '../../../../shared';
-import { AuthStore } from '../../../auth/application';
 import { ChatSessionsStore } from '../../application/chat-sessions-store';
 import { truncateSessionTitle } from '../../application/truncate-session-title';
 
 const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
 
-/** Matches the "78%" embedded in the `chat.plan.usage` copy string (both locales). */
-const PLAN_USAGE_PERCENT = 78;
-const GUEST_INITIAL = 'T';
-
 @Component({
   selector: 'app-chat-sessions-panel',
   standalone: true,
-  imports: [PlanUsageWidgetComponent, UserProfileChipComponent],
+  imports: [],
   templateUrl: './chat-sessions-panel.component.html',
   styleUrl: './chat-sessions-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,19 +23,9 @@ const GUEST_INITIAL = 'T';
 export class ChatSessionsPanelComponent implements OnDestroy {
   readonly sessionsStore = inject(ChatSessionsStore);
   readonly i18n = inject(TranslationService);
-  readonly auth = inject(AuthStore);
 
   readonly mobileOpen = input(false);
   readonly closePanel = output<void>();
-
-  readonly planUsagePercent = PLAN_USAGE_PERCENT;
-
-  readonly userEmail = computed(() => this.auth.user()?.email ?? '');
-
-  readonly userInitial = computed(() => {
-    const email = this.auth.user()?.email;
-    return email ? email.charAt(0).toUpperCase() : GUEST_INITIAL;
-  });
 
   private mobileMediaQuery =
     typeof window !== 'undefined' ? window.matchMedia(SESSIONS_MOBILE_BREAKPOINT) : null;

@@ -1,0 +1,29 @@
+// Full-viewport ambient background for shell routes (Radar, Scenarios, Briefings, etc.)
+
+@mixin page-atmosphere {
+  background:
+    radial-gradient(
+      ellipse 120% 70% at 50% -12%,
+      color-mix(in srgb, var(--color-gold) 14%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 0% 100%,
+      color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 100% 100%,
+      color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 40% 35% at 100% 0%,
+      color-mix(in srgb, var(--color-gold) 4%, transparent) 0%,
+      transparent 70%
+    );
+}
+
+.page-atmosphere {
+  @include page-atmosphere;
+}

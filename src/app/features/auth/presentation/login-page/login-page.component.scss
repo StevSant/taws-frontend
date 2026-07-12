@@ -3,6 +3,7 @@
   height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
+  animation: authPageIn 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .login-page {
@@ -78,14 +79,15 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: min(92vw, 640px);
-    height: min(92vw, 640px);
+    width: 100vw;
+    max-width: 100vw;
+    height: min(100vh, 900px);
     transform: translate(-50%, -50%);
     background: radial-gradient(
-      circle,
+      circle at 50% 45%,
       var(--color-gold-dim-bg) 0%,
-      rgba(212, 160, 23, 0.03) 45%,
-      transparent 70%
+      rgba(212, 160, 23, 0.04) 42%,
+      transparent 72%
     );
     pointer-events: none;
   }

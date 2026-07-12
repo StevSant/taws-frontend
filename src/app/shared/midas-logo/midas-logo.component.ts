@@ -1,17 +1,14 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { NeuralOrbComponent } from '../neural-orb/neural-orb.component';
+import { MidasGlyphComponent } from '../midas-glyph/midas-glyph.component';
+import { MIDAS_BRAND_GLYPH } from '../midas-glyph/midas-glyph-selection';
 
-/**
- * Midas brand mark — the neural-mesh orb (pentagon nodes + pulsing core).
- * Shared between header, login, and the static favicon export.
- */
 @Component({
   selector: 'app-midas-logo',
   standalone: true,
-  imports: [NeuralOrbComponent],
+  imports: [MidasGlyphComponent],
   template: `
     <span class="midas-logo" role="img" aria-label="Midas">
-      <app-neural-orb [size]="size()" />
+      <app-midas-glyph [glyph]="brandGlyph" [size]="size()" [animated]="animated()" />
     </span>
   `,
   styleUrl: './midas-logo.component.scss',
@@ -19,4 +16,7 @@ import { NeuralOrbComponent } from '../neural-orb/neural-orb.component';
 })
 export class MidasLogoComponent {
   readonly size = input(32);
+  readonly animated = input(true);
+
+  protected readonly brandGlyph = MIDAS_BRAND_GLYPH;
 }

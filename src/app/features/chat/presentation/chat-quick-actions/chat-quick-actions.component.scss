@@ -71,6 +71,29 @@
   }
 }
 
+@media (max-height: 780px) {
+  .chat-quick-actions {
+    gap: var(--space-1);
+
+    &__card {
+      padding: var(--space-2);
+    }
+
+    &__icon {
+      width: 1.65rem;
+      height: 1.65rem;
+    }
+
+    &__title {
+      font-size: 0.8rem;
+    }
+
+    &__desc {
+      display: none;
+    }
+  }
+}
+
 @media (max-width: 560px) {
   .chat-quick-actions {
     grid-template-columns: 1fr;

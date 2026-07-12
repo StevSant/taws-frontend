@@ -18,52 +18,52 @@
       </button>
     </div>
     <button type="button" class="chat-sessions__new" (click)="onCreate()">
-      {{ i18n.t('chat.sessions.newChat') }}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      <span>{{ i18n.t('chat.sessions.newChat') }}</span>
     </button>
   </div>
 
   <ul class="chat-sessions__list">
+    @if (sessionsStore.sessions().length === 0) {
+      <li class="chat-sessions__empty">
+        <p>{{ i18n.t('chat.sessions.empty') }}</p>
+      </li>
+    }
     @for (session of sessionsStore.sessions(); track session.id) {
       <li class="chat-sessions__row">
-        <div class="chat-sessions__item-wrap">
-          <button
-            type="button"
-            class="chat-sessions__item"
-            [class.chat-sessions__item--active]="sessionsStore.activeSessionId() === session.id"
-            (click)="onSelect(session.id)"
-          >
+        <button
+          type="button"
+          class="chat-sessions__item"
+          [class.chat-sessions__item--active]="sessionsStore.activeSessionId() === session.id"
+          (click)="onSelect(session.id)"
+        >
+          <span class="chat-sessions__item-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </span>
+          <span class="chat-sessions__item-body">
             <span class="chat-sessions__item-title" [attr.title]="sessionTitle(session.title)">{{
               sessionTitle(session.title)
             }}</span>
             <span class="chat-sessions__item-meta">
               {{ session.messages.length }} {{ i18n.t('chat.sessions.messages') }}
             </span>
-          </button>
-        </div>
+          </span>
+        </button>
         <button
           type="button"
           class="chat-sessions__delete"
           [attr.aria-label]="i18n.t('chat.sessions.delete')"
           (click)="onDelete($event, session.id)"
         >
-          ×
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+          </svg>
         </button>
       </li>
     }
   </ul>
-
-  <footer class="chat-sessions__footer">
-    <app-plan-usage-widget
-      [planName]="i18n.t('chat.plan.name')"
-      [planStatusLabel]="i18n.t('chat.plan.status')"
-      [usageLabel]="i18n.t('chat.plan.usage')"
-      [usagePercent]="planUsagePercent"
-      [resetHint]="i18n.t('chat.plan.resetHint')"
-    />
-    <app-user-profile-chip
-      [initial]="userInitial()"
-      [email]="userEmail()"
-      [roleLabel]="i18n.t('chat.profile.guest')"
-    />
-  </footer>
 </aside>

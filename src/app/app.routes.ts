@@ -35,6 +35,11 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/briefings/briefings.routes').then((m) => m.BRIEFINGS_ROUTES),
       },
+      {
+        path: 'brand-lab',
+        loadChildren: () =>
+          import('./features/brand-lab/brand-lab.routes').then((m) => m.BRAND_LAB_ROUTES),
+      },
     ],
   },
 ];

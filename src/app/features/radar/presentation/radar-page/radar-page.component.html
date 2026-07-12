@@ -65,22 +65,24 @@
     <div class="radar-page__split">
       <app-news-timeline class="radar-page__timeline" [entries]="store.newsTimeline()" />
 
-      <section class="radar-page__instruments">
+      <section class="radar-page__instruments feature-panel">
         <header class="radar-page__instruments-header">
-          <div>
+          <div class="radar-page__instruments-copy">
             <h2 class="radar-page__instruments-title">{{ i18n.t('radar.instruments.title') }}</h2>
             <p class="radar-page__instruments-subtitle">{{ i18n.t('radar.instruments.subtitle') }}</p>
           </div>
           @if (store.unclassifiedCount() > 0) {
-            <app-button
-              [label]="
-                store.isGeneratingAny()
-                  ? i18n.t('radar.generate.allRunning')
-                  : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
-              "
-              [disabled]="store.isGeneratingAny()"
-              (pressed)="onAnalyzeAll()"
-            />
+            <div class="radar-page__instruments-action">
+              <app-button
+                [label]="
+                  store.isGeneratingAny()
+                    ? i18n.t('radar.generate.allRunning')
+                    : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
+                "
+                [disabled]="store.isGeneratingAny()"
+                (pressed)="onAnalyzeAll()"
+              />
+            </div>
           }
         </header>
 

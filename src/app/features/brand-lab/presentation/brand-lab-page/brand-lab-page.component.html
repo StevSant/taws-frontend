@@ -1,0 +1,217 @@
+<div class="feature-page brand-lab">
+  <header class="brand-lab__hero">
+    <div>
+      <p class="brand-lab__eyebrow">Midas · Brand Lab</p>
+      <h1 class="brand-lab__title">{{ i18n.t('brandLab.title') }}</h1>
+      <p class="brand-lab__subtitle">{{ i18n.t('brandLab.subtitle') }}</p>
+    </div>
+    <div class="brand-lab__hero-mark">
+      <app-golden-polyhedron [size]="88" activity="idle" />
+    </div>
+  </header>
+
+  <section class="brand-lab__section" aria-labelledby="brand-lab-finalists">
+    <div class="brand-lab__section-head">
+      <h2 id="brand-lab-finalists" class="brand-lab__section-title">
+        {{ i18n.t('brandLab.finalists.title') }}
+        <span class="brand-lab__count">({{ finalistGlyphs().length }})</span>
+      </h2>
+      @if (finalistGlyphs().length > 0) {
+        <button type="button" class="brand-lab__clear" (click)="clearFinalists()">
+          {{ i18n.t('brandLab.finalists.clear') }}
+        </button>
+      }
+    </div>
+
+    @if (finalistGlyphs().length === 0) {
+      <p class="brand-lab__empty">{{ i18n.t('brandLab.finalists.empty') }}</p>
+    } @else {
+      <ul class="brand-lab__finalist-list">
+        @for (meta of finalistGlyphs(); track meta.id) {
+          <li class="brand-lab__finalist">
+            <app-midas-glyph [glyph]="meta.id" [size]="40" [animated]="false" />
+            <div>
+              <span class="brand-lab__card-title">{{ glyphTitle(meta) }}</span>
+              <span class="brand-lab__card-symbolism">{{ glyphSymbolism(meta) }}</span>
+            </div>
+            <button
+              type="button"
+              class="brand-lab__star brand-lab__star--active"
+              [attr.aria-label]="i18n.t('brandLab.removeFinalist')"
+              (click)="toggleFinalist(meta.id)"
+            >
+              ★
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="brand-lab__section" aria-labelledby="brand-lab-master">
+    <h2 id="brand-lab-master" class="brand-lab__section-title">{{ i18n.t('brandLab.brand.title') }}</h2>
+    <p class="brand-lab__section-desc">{{ i18n.t('brandLab.brand.desc') }}</p>
+
+    <div class="brand-lab__grid">
+      <article class="brand-lab__card brand-lab__card--featured brand-lab__card--recommended">
+        <span class="brand-lab__badge">{{ i18n.t('brandLab.brand.recommended') }}</span>
+        <div class="brand-lab__preview">
+          <app-midas-glyph glyph="brand-midas-sigil" [size]="96" />
+        </div>
+        <div class="brand-lab__sizes">
+          <app-midas-glyph glyph="brand-midas-sigil" [size]="20" [animated]="false" />
+          <app-midas-glyph glyph="brand-midas-sigil" [size]="24" [animated]="false" />
+          <app-midas-glyph glyph="brand-midas-sigil" [size]="32" [animated]="false" />
+        </div>
+        <div class="brand-lab__mock-header">
+          <app-midas-glyph glyph="brand-midas-sigil" [size]="24" [animated]="false" />
+          <span>Midas</span>
+        </div>
+        <h3 class="brand-lab__card-title">{{ glyphTitle(recommendedSigil) }}</h3>
+        <p class="brand-lab__card-symbolism">{{ glyphSymbolism(recommendedSigil) }}</p>
+        <p class="brand-lab__card-note">{{ i18n.t('brandLab.brand.sigilNote') }}</p>
+        <button
+          type="button"
+          class="brand-lab__star"
+          [class.brand-lab__star--active]="isFinalist('brand-midas-sigil')"
+          (click)="toggleFinalist('brand-midas-sigil')"
+        >
+          {{ isFinalist('brand-midas-sigil') ? '★' : '☆' }}
+          {{ i18n.t('brandLab.markFinalist') }}
+        </button>
+      </article>
+
+      <article class="brand-lab__card brand-lab__card--featured brand-lab__card--hero3d">
+        <div class="brand-lab__preview brand-lab__preview--3d">
+          <app-golden-polyhedron [size]="120" activity="idle" />
+        </div>
+        <div class="brand-lab__sizes">
+          <app-golden-polyhedron [size]="32" activity="frozen" />
+          <app-golden-polyhedron [size]="48" activity="frozen" />
+          <app-golden-polyhedron [size]="64" activity="frozen" />
+        </div>
+        <h3 class="brand-lab__card-title">{{ i18n.t('brandLab.brand.poly3d') }}</h3>
+        <p class="brand-lab__card-symbolism">{{ i18n.t('brandLab.brand.poly3dDesc') }}</p>
+        <button
+          type="button"
+          class="brand-lab__star"
+          [class.brand-lab__star--active]="isFinalist('brand-icosahedron')"
+          (click)="toggleFinalist('brand-icosahedron')"
+        >
+          {{ isFinalist('brand-icosahedron') ? '★' : '☆' }}
+          {{ i18n.t('brandLab.markFinalist') }}
+        </button>
+      </article>
+
+      @for (meta of brandGlyphs; track meta.id) {
+        <article class="brand-lab__card" [class.brand-lab__card--icosa]="meta.id === 'brand-icosahedron'">
+          <div
+            class="brand-lab__preview"
+            [class.brand-lab__preview--3d]="meta.id === 'brand-icosahedron'"
+          >
+            @if (meta.id === 'brand-icosahedron') {
+              <app-golden-polyhedron [size]="96" activity="idle" />
+            } @else {
+              <app-midas-glyph [glyph]="meta.id" [size]="72" />
+            }
+          </div>
+          <div class="brand-lab__sizes">
+            <app-midas-glyph [glyph]="meta.id" [size]="24" [animated]="false" />
+            <app-midas-glyph [glyph]="meta.id" [size]="32" [animated]="false" />
+            <app-midas-glyph [glyph]="meta.id" [size]="40" [animated]="false" />
+          </div>
+          <div class="brand-lab__mock-header">
+            <app-midas-glyph [glyph]="meta.id" [size]="24" [animated]="false" />
+            <span>Midas</span>
+          </div>
+          <h3 class="brand-lab__card-title">{{ glyphTitle(meta) }}</h3>
+          <p class="brand-lab__card-symbolism">{{ glyphSymbolism(meta) }}</p>
+          <button
+            type="button"
+            class="brand-lab__star"
+            [class.brand-lab__star--active]="isFinalist(meta.id)"
+            (click)="toggleFinalist(meta.id)"
+          >
+            {{ isFinalist(meta.id) ? '★' : '☆' }}
+            {{ i18n.t('brandLab.markFinalist') }}
+          </button>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="brand-lab__section brand-lab__section--myth" aria-labelledby="brand-lab-myth">
+    <h2 id="brand-lab-myth" class="brand-lab__section-title">{{ i18n.t('brandLab.myth.title') }}</h2>
+    <p class="brand-lab__section-desc">{{ i18n.t('brandLab.myth.desc') }}</p>
+
+    <div class="brand-lab__grid">
+      @for (meta of mythGlyphs; track meta.id) {
+        <article class="brand-lab__card brand-lab__card--myth">
+          <div class="brand-lab__preview">
+            <app-midas-glyph [glyph]="meta.id" [size]="72" />
+          </div>
+          <div class="brand-lab__sizes">
+            <app-midas-glyph [glyph]="meta.id" [size]="24" [animated]="false" />
+            <app-midas-glyph [glyph]="meta.id" [size]="32" [animated]="false" />
+            <app-midas-glyph [glyph]="meta.id" [size]="40" [animated]="false" />
+          </div>
+          <div class="brand-lab__mock-header">
+            <app-midas-glyph [glyph]="meta.id" [size]="24" [animated]="false" />
+            <span>Midas</span>
+          </div>
+          <h3 class="brand-lab__card-title">{{ glyphTitle(meta) }}</h3>
+          <p class="brand-lab__card-symbolism">{{ glyphSymbolism(meta) }}</p>
+          <button
+            type="button"
+            class="brand-lab__star"
+            [class.brand-lab__star--active]="isFinalist(meta.id)"
+            (click)="toggleFinalist(meta.id)"
+          >
+            {{ isFinalist(meta.id) ? '★' : '☆' }}
+            {{ i18n.t('brandLab.markFinalist') }}
+          </button>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="brand-lab__section" aria-labelledby="brand-lab-agents">
+    <h2 id="brand-lab-agents" class="brand-lab__section-title">{{ i18n.t('brandLab.agents.title') }}</h2>
+    <p class="brand-lab__section-desc">{{ i18n.t('brandLab.agents.desc') }}</p>
+
+    @for (agent of agentOrder; track agent) {
+      <div class="brand-lab__agent-block">
+        <h3 class="brand-lab__agent-name">{{ agentLabel(agent) }}</h3>
+        <div class="brand-lab__grid brand-lab__grid--agents">
+          @for (meta of glyphsForAgent(agent); track meta.id) {
+            <article class="brand-lab__card brand-lab__card--agent">
+              <div class="brand-lab__preview">
+                <app-midas-glyph [glyph]="meta.id" [size]="64" />
+              </div>
+              <div class="brand-lab__sizes">
+                <app-midas-glyph [glyph]="meta.id" [size]="20" [animated]="false" />
+                <app-midas-glyph [glyph]="meta.id" [size]="28" [animated]="false" />
+                <app-midas-glyph [glyph]="meta.id" [size]="36" [animated]="false" />
+              </div>
+              <h4 class="brand-lab__card-title">{{ glyphTitle(meta) }}</h4>
+              <p class="brand-lab__card-symbolism">{{ glyphSymbolism(meta) }}</p>
+              <button
+                type="button"
+                class="brand-lab__star"
+                [class.brand-lab__star--active]="isFinalist(meta.id)"
+                (click)="toggleFinalist(meta.id)"
+              >
+                {{ isFinalist(meta.id) ? '★' : '☆' }}
+                {{ i18n.t('brandLab.markFinalist') }}
+              </button>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
+  <footer class="brand-lab__note">
+    <p>{{ i18n.t('brandLab.note') }}</p>
+  </footer>
+</div>

@@ -42,6 +42,7 @@ export interface TranslationDict {
   'shell.theme.toggleLabel': string;
   'shell.auth.login': string;
   'shell.auth.logout': string;
+  'shell.user.menuLabel': string;
   'shell.status.active': string;
   'auth.login.title': string;
   'auth.login.eyebrow': string;
@@ -106,6 +107,7 @@ export interface TranslationDict {
   'chat.sessions.new': string;
   'chat.sessions.newChat': string;
   'chat.sessions.messages': string;
+  'chat.sessions.empty': string;
   'chat.sessions.delete': string;
   'chat.sessions.toggle': string;
   'chat.sessions.hide': string;
@@ -429,6 +431,24 @@ export interface TranslationDict {
   'notifications.radar.signalGenerated': string;
   'notifications.briefing.generated': string;
   'placeholder.badge': string;
+  'brandLab.title': string;
+  'brandLab.subtitle': string;
+  'brandLab.finalists.title': string;
+  'brandLab.finalists.empty': string;
+  'brandLab.finalists.clear': string;
+  'brandLab.markFinalist': string;
+  'brandLab.removeFinalist': string;
+  'brandLab.brand.title': string;
+  'brandLab.brand.desc': string;
+  'brandLab.brand.recommended': string;
+  'brandLab.brand.sigilNote': string;
+  'brandLab.brand.poly3d': string;
+  'brandLab.brand.poly3dDesc': string;
+  'brandLab.myth.title': string;
+  'brandLab.myth.desc': string;
+  'brandLab.agents.title': string;
+  'brandLab.agents.desc': string;
+  'brandLab.note': string;
 }
 
 /** Union of every valid translation key — used for typed `t()` lookups. */

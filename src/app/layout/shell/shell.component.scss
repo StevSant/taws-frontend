@@ -1,3 +1,5 @@
+@use '../../../styles/page-atmosphere';
+
 .app-shell {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -51,7 +53,7 @@
 
     border-bottom: 1px solid var(--color-border);
 
-    background: var(--shell-header-bg);
+    background: var(--color-surface);
 
     backdrop-filter: blur(var(--glass-blur));
 
@@ -85,10 +87,41 @@
 
     white-space: nowrap;
 
-    transition: color 0.15s ease;
+    transition:
+      color 0.22s ease,
+      transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 
     &:hover {
       color: var(--color-text-primary);
+      transform: translateY(-1px);
+    }
+
+    &::after {
+      content: '';
+
+      position: absolute;
+
+      left: 0.75rem;
+
+      right: 0.75rem;
+
+      bottom: 0.2rem;
+
+      height: 2px;
+
+      border-radius: 1px;
+
+      background: var(--color-gold);
+
+      transform: scaleX(0);
+
+      transform-origin: center;
+
+      opacity: 0;
+
+      transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.22s ease;
     }
 
     &--active {
@@ -97,21 +130,8 @@
       font-weight: 600;
 
       &::after {
-        content: '';
-
-        position: absolute;
-
-        left: 0.75rem;
-
-        right: 0.75rem;
-
-        bottom: 0.2rem;
-
-        height: 2px;
-
-        border-radius: 1px;
-
-        background: var(--color-gold);
+        transform: scaleX(1);
+        opacity: 1;
       }
     }
   }
@@ -240,6 +260,39 @@
     overflow: auto;
 
     background: var(--color-background);
+
+    &::before {
+      content: '';
+      position: fixed;
+      top: var(--shell-header-height);
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+      @include page-atmosphere.page-atmosphere;
+    }
+
+    > :not(router-outlet) {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    &--forward > :not(router-outlet) {
+      animation: routeEnterForward 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    &--back > :not(router-outlet) {
+      animation: routeEnterBack 0.44s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    &--neutral > :not(router-outlet) {
+      animation: routeEnterFade 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
   }
 
   &__footer {

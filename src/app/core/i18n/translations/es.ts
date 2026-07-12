@@ -6,8 +6,8 @@ export const ES_TRANSLATIONS = {
   'shell.brand': 'Midas',
   'shell.tagline': 'Radar de mercado',
   'shell.nav.label': 'Navegación principal',
-  'shell.nav.radar': 'Radar',
-  'shell.nav.radar.hint': 'Noticias y señales por activo',
+  'shell.nav.radar': 'Inicio',
+  'shell.nav.radar.hint': 'Radar de mercado, noticias y señales',
   'shell.nav.chat': 'Chat',
   'shell.nav.chat.hint': 'Preguntas en lenguaje natural a la IA',
   'shell.nav.scenarios': 'Escenarios',
@@ -40,6 +40,7 @@ export const ES_TRANSLATIONS = {
   'shell.theme.toggleLabel': 'Cambiar tema',
   'shell.auth.login': 'Iniciar sesión',
   'shell.auth.logout': 'Cerrar sesión',
+  'shell.user.menuLabel': 'Menú de usuario',
   'shell.status.active': 'Sistema activo',
   'auth.login.title': 'Iniciar sesión',
   'auth.login.eyebrow': 'Iniciar sesión',
@@ -131,8 +132,9 @@ export const ES_TRANSLATIONS = {
   'chat.oracle.status.streaming': 'La flota responde',
   'chat.sessions.title': 'Conversaciones',
   'chat.sessions.new': 'Nueva conversación',
-  'chat.sessions.newChat': '+ Nueva',
+  'chat.sessions.newChat': 'Nueva conversación',
   'chat.sessions.messages': 'mensajes',
+  'chat.sessions.empty': 'Sin conversaciones aún. Crea una para empezar.',
   'chat.sessions.delete': 'Eliminar conversación',
   'chat.sessions.toggle': 'Ver historial',
   'chat.sessions.hide': 'Ocultar historial',
@@ -450,4 +452,28 @@ export const ES_TRANSLATIONS = {
   'telegram.expires': 'El enlace expira',
   'telegram.loginRequired': 'Iniciá sesión para conectar Telegram',
   'placeholder.badge': 'Próximamente',
+  'brandLab.title': 'Laboratorio de marca',
+  'brandLab.subtitle':
+    'Explorá glifos geométricos para Midas y cada agente de IA. Marcá finalistas con la estrella — se guardan en tu navegador.',
+  'brandLab.finalists.title': 'Tus finalistas',
+  'brandLab.finalists.empty': 'Todavía no marcaste finalistas. Usá ☆ en cualquier variante.',
+  'brandLab.finalists.clear': 'Limpiar selección',
+  'brandLab.markFinalist': 'Finalista',
+  'brandLab.removeFinalist': 'Quitar de finalistas',
+  'brandLab.brand.title': 'Logo principal Midas',
+  'brandLab.brand.desc':
+    'La insignia SVG para header y favicon; el icosaedro 3D sigue siendo el hero vivo del chat.',
+  'brandLab.brand.recommended': 'Recomendada',
+  'brandLab.brand.sigilNote':
+    'Mejor que solo el 3D: cuenta el mito, escala a 20px y convive con el poliedro animado del chat.',
+  'brandLab.brand.poly3d': 'Icosaedro 3D (hero del chat)',
+  'brandLab.brand.poly3dDesc': 'Versión animada actual — máximo impacto en pantalla de bienvenida.',
+  'brandLab.myth.title': 'Mito del toque de Midas',
+  'brandLab.myth.desc':
+    'Referencias al rey Midas: la mano que transmuta, la corona y el río Pactolo. Narrativa de oro con significado — no solo decoración.',
+  'brandLab.agents.title': 'Iconografía por agente',
+  'brandLab.agents.desc':
+    'Cada especialista del enjambre tiene dos propuestas. Elegí una por rol para routing, avatares y trazas.',
+  'brandLab.note':
+    'Tip: un logo maestro (marca) + un glifo por agente mantiene coherencia sin repetir el mismo poliedro en todos lados.',
 } satisfies TranslationDict;

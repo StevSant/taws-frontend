@@ -1,12 +1,10 @@
 <div class="app-shell">
   <div class="app-shell__main">
     <header class="app-shell__topbar">
-      @if (usesCustomLayout()) {
-        <a class="app-shell__brand" routerLink="/radar">
-          <app-midas-logo class="app-shell__brand-mark" [size]="24" />
-          <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
-        </a>
-      }
+      <a class="app-shell__brand" routerLink="/radar">
+        <app-midas-logo class="app-shell__brand-mark" [size]="24" />
+        <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
+      </a>
 
       <nav class="app-shell__tabs" [attr.aria-label]="i18n.t('shell.nav.label')">
         <a
@@ -61,9 +59,12 @@
         <app-language-toggle />
 
         @if (auth.isAuthenticated()) {
-          <button type="button" class="app-shell__auth-btn" (click)="logout()">
-            {{ i18n.t('shell.auth.logout') }}
-          </button>
+          <app-user-menu
+            [initial]="userInitial()"
+            [email]="userEmail()"
+            [displayName]="i18n.t('chat.profile.guest')"
+            (logout)="logout()"
+          />
         } @else {
           <a class="app-shell__auth-btn app-shell__auth-btn--primary" routerLink="/login">{{
             i18n.t('shell.auth.login')
@@ -72,7 +73,12 @@
       </div>
     </header>
 
-    <main class="app-shell__content">
+    <main
+      class="app-shell__content"
+      [class.app-shell__content--forward]="routeTransition() === 'forward'"
+      [class.app-shell__content--back]="routeTransition() === 'back'"
+      [class.app-shell__content--neutral]="routeTransition() === 'neutral'"
+    >
       <router-outlet></router-outlet>
     </main>
 

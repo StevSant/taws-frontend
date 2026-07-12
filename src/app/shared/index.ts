@@ -6,6 +6,15 @@ export { SpinnerComponent } from './spinner/spinner.component';
 export { PlaceholderPageComponent } from './placeholder-page/placeholder-page.component';
 export { NeuralOrbComponent } from './neural-orb/neural-orb.component';
 export { GoldenPolyhedronComponent } from './golden-polyhedron/golden-polyhedron.component';
+export { MidasGlyphComponent } from './midas-glyph/midas-glyph.component';
+export type { MidasGlyphId, MidasAgentId } from './midas-glyph/midas-glyph.model';
+export { MIDAS_GLYPH_CATALOG, glyphsForAgent, MYTH_GLYPHS } from './midas-glyph/midas-glyph.model';
+export {
+  MIDAS_BRAND_GLYPH,
+  MIDAS_AGENT_GLYPHS,
+  MIDAS_GLYPH_SELECTION,
+  midasAgentGlyph,
+} from './midas-glyph/midas-glyph-selection';
 export { ConfidenceGaugeComponent } from './confidence-gauge/confidence-gauge.component';
 export { ImpactCompassComponent } from './impact-compass/impact-compass.component';
 export { ReturnSparklineComponent } from './return-sparkline/return-sparkline.component';
@@ -25,6 +34,7 @@ export { EmptyStateComponent } from './empty-state/empty-state.component';
 export { FeatureGuideComponent } from './feature-guide/feature-guide.component';
 export { PlanUsageWidgetComponent } from './plan-usage-widget/plan-usage-widget.component';
 export { UserProfileChipComponent } from './user-profile-chip/user-profile-chip.component';
+export { UserMenuComponent } from './user-menu/user-menu.component';
 export { GuideNotesTabsComponent } from './guide-notes-tabs/guide-notes-tabs.component';
 export { ActivityFeedComponent } from './activity-feed/activity-feed.component';
 export type { ActivityFeedItem } from './activity-feed/activity-feed.component';

@@ -39,7 +39,7 @@ import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-acti
 
 import { CHAT_VOICE_DUMMY_LISTEN_MS } from './chat-voice-dummy';
 
-const HERO_SIZE_IDLE = 168;
+const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
@@ -149,16 +149,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     const hop = [...hops].reverse().find((h) => h.status === 'active' || h.status === 'done');
 
     return hop ? this.agentLabel(hop.agent) : this.i18n.t('chat.role.assistant');
-  });
-
-  readonly userInitial = computed(() => {
-    const email = this.auth.user()?.email;
-
-    if (!email) {
-      return 'T';
-    }
-
-    return email.charAt(0).toUpperCase();
   });
 
   private readonly composerInput = viewChild<ElementRef<HTMLInputElement>>('composerInput');

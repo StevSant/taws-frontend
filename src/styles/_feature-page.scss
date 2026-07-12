@@ -1,4 +1,5 @@
 // Shared layout + surfaces for Radar, Scenarios, Briefings (premium feature pages)
+@use './route-transitions';
 
 .feature-page {
   position: relative;
@@ -12,24 +13,9 @@
   gap: var(--space-5);
   isolation: isolate;
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(
-        ellipse 90% 55% at 50% -8%,
-        color-mix(in srgb, var(--color-gold) 14%, transparent) 0%,
-        transparent 68%
-      ),
-      radial-gradient(
-        ellipse 50% 40% at 100% 100%,
-        color-mix(in srgb, var(--color-gold) 6%, transparent) 0%,
-        transparent 70%
-      );
-  }
+  @include route-transitions.stagger-children('& > *');
+
+  // Ambient glow lives on .app-shell__content (full viewport) — see shell.component.scss
 
   &--narrow {
     max-width: 1080px;
@@ -37,7 +23,11 @@
 }
 
 .feature-panel {
-  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   background: var(--color-surface);

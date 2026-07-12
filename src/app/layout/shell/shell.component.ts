@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  computed,
   inject,
   signal,
   viewChild,
@@ -12,12 +13,19 @@ import { filter } from 'rxjs/operators';
 import { LucideSearch } from '@lucide/angular';
 import { NotificationBellComponent, NotificationsStore, TranslationService } from '../../core';
 import { AuthStore } from '../../features/auth/application';
-import { LanguageToggleComponent, MidasLogoComponent, ThemeToggleComponent } from '../../shared';
+import {
+  LanguageToggleComponent,
+  MidasLogoComponent,
+  ThemeToggleComponent,
+  UserMenuComponent,
+} from '../../shared';
+import {
+  ShellRouteTransition,
+  getShellRouteTransition,
+} from './shell-tab-order';
 
-// Routes that render their own full-width page content (brand mark moves into
-// the topbar, and the shell's demo-disclaimer footer is hidden). No route
-// renders a left sidebar/nav anymore — this only gates topbar/footer chrome.
-const CUSTOM_LAYOUT_ROUTE_PREFIXES = ['/chat', '/scenarios', '/briefings'];
+// Routes that hide the shell's demo-disclaimer footer (full-width app views).
+const CUSTOM_LAYOUT_ROUTE_PREFIXES = ['/radar', '/chat', '/scenarios', '/briefings', '/brand-lab'];
 
 @Component({
   selector: 'app-shell',
@@ -30,6 +38,7 @@ const CUSTOM_LAYOUT_ROUTE_PREFIXES = ['/chat', '/scenarios', '/briefings'];
     MidasLogoComponent,
     ThemeToggleComponent,
     LanguageToggleComponent,
+    UserMenuComponent,
     LucideSearch,
   ],
   templateUrl: './shell.component.html',
@@ -43,12 +52,26 @@ export class ShellComponent {
   private readonly router = inject(Router);
 
   readonly usesCustomLayout = signal(this.hasFeatureOwnedSidebar(this.router.url));
+  readonly routeTransition = signal<ShellRouteTransition>('neutral');
+
+  readonly userEmail = computed(() => this.auth.user()?.email ?? '');
+
+  readonly userInitial = computed(() => {
+    const email = this.auth.user()?.email;
+    return email ? email.charAt(0).toUpperCase() : '?';
+  });
 
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+  private previousShellUrl = this.router.url;
 
   constructor() {
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.usesCustomLayout.set(this.hasFeatureOwnedSidebar(this.router.url));
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event) => {
+      const navigation = event as NavigationEnd;
+      this.routeTransition.set(
+        getShellRouteTransition(this.previousShellUrl, navigation.urlAfterRedirects),
+      );
+      this.previousShellUrl = navigation.urlAfterRedirects;
+      this.usesCustomLayout.set(this.hasFeatureOwnedSidebar(navigation.urlAfterRedirects));
     });
   }
 

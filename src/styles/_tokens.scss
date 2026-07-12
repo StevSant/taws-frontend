@@ -92,6 +92,11 @@ html:not([data-theme]) {
   --shell-sidebar-hover: rgba(255, 255, 255, 0.05);
   --shell-sidebar-active: rgba(212, 160, 23, 0.12);
   --card-outline-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+
+  /* Monochrome SVG logos (Simple Icons) need a light tile in dark UI */
+  --ticker-logo-bg: #f4f4f5;
+  --ticker-logo-border: rgba(255, 255, 255, 0.38);
+  --ticker-logo-elevation: 0 1px 4px rgba(0, 0, 0, 0.32);
 }
 
 // --- Light theme ------------------------------------------------------------
@@ -160,4 +165,8 @@ html[data-theme='light'] {
   --shell-sidebar-hover: rgba(28, 25, 23, 0.05);
   --shell-sidebar-active: rgba(200, 146, 14, 0.14);
   --card-outline-shadow: 0 0 0 1px rgba(28, 25, 23, 0.06);
+
+  --ticker-logo-bg: #ffffff;
+  --ticker-logo-border: rgba(28, 25, 23, 0.1);
+  --ticker-logo-elevation: 0 1px 2px rgba(28, 25, 23, 0.06);
 }

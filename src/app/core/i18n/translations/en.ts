@@ -6,8 +6,8 @@ export const EN_TRANSLATIONS = {
   'shell.brand': 'Midas',
   'shell.tagline': 'Market radar',
   'shell.nav.label': 'Main navigation',
-  'shell.nav.radar': 'Radar',
-  'shell.nav.radar.hint': 'News and signals per asset',
+  'shell.nav.radar': 'Home',
+  'shell.nav.radar.hint': 'Market radar, news, and signals',
   'shell.nav.chat': 'Chat',
   'shell.nav.chat.hint': 'Natural-language questions to the AI',
   'shell.nav.scenarios': 'Scenarios',
@@ -40,6 +40,7 @@ export const EN_TRANSLATIONS = {
   'shell.theme.toggleLabel': 'Switch theme',
   'shell.auth.login': 'Log in',
   'shell.auth.logout': 'Log out',
+  'shell.user.menuLabel': 'User menu',
   'shell.status.active': 'System active',
   'auth.login.title': 'Log in',
   'auth.login.eyebrow': 'Log in',
@@ -128,8 +129,9 @@ export const EN_TRANSLATIONS = {
   'chat.oracle.status.streaming': 'Fleet responding',
   'chat.sessions.title': 'Conversations',
   'chat.sessions.new': 'New conversation',
-  'chat.sessions.newChat': '+ New',
+  'chat.sessions.newChat': 'New conversation',
   'chat.sessions.messages': 'messages',
+  'chat.sessions.empty': 'No conversations yet. Start a new one.',
   'chat.sessions.delete': 'Delete conversation',
   'chat.sessions.toggle': 'View history',
   'chat.sessions.hide': 'Hide history',
@@ -446,4 +448,28 @@ export const EN_TRANSLATIONS = {
   'telegram.expires': 'Link expires',
   'telegram.loginRequired': 'Sign in to connect Telegram',
   'placeholder.badge': 'Coming soon',
+  'brandLab.title': 'Brand laboratory',
+  'brandLab.subtitle':
+    'Explore geometric glyphs for Midas and each AI agent. Star your finalists — saved in your browser.',
+  'brandLab.finalists.title': 'Your finalists',
+  'brandLab.finalists.empty': 'No finalists yet. Tap ☆ on any variant.',
+  'brandLab.finalists.clear': 'Clear selection',
+  'brandLab.markFinalist': 'Finalist',
+  'brandLab.removeFinalist': 'Remove from finalists',
+  'brandLab.brand.title': 'Midas master logo',
+  'brandLab.brand.desc':
+    'The SVG sigil for header and favicon; the 3D icosahedron remains the chat’s living hero.',
+  'brandLab.brand.recommended': 'Recommended',
+  'brandLab.brand.sigilNote':
+    'Better than 3D alone: tells the myth, scales to 20px, and pairs with the chat’s animated polyhedron.',
+  'brandLab.brand.poly3d': '3D icosahedron (chat hero)',
+  'brandLab.brand.poly3dDesc': 'Current animated version — maximum impact on the welcome screen.',
+  'brandLab.myth.title': 'Midas touch myth',
+  'brandLab.myth.desc':
+    'References to King Midas: the transmuting hand, the crown, and the river Pactolus. Gold with meaning — not just decoration.',
+  'brandLab.agents.title': 'Per-agent iconography',
+  'brandLab.agents.desc':
+    'Each swarm specialist has two proposals. Pick one per role for routing, avatars, and traces.',
+  'brandLab.note':
+    'Tip: one master logo (brand) + one glyph per agent keeps cohesion without repeating the same polyhedron everywhere.',
 } satisfies TranslationDict;
