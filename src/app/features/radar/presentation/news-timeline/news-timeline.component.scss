@@ -88,6 +88,17 @@
     }
   }
 
+  &__summary {
+    margin: 0.35rem 0 0;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
   &__external {
     flex-shrink: 0;
     font-size: 0.82rem;

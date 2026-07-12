@@ -1,8 +1,16 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnChanges,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent } from '../../../../shared';
+import { NewsBlurbService } from '../../application/news-blurb.service';
 import { RadarStore, NewsTimelineEntry } from '../../application/radar-store';
 import { ImpactClass } from '../../domain';
 import { providerLabel } from './provider-label';
@@ -22,12 +30,17 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   styleUrl: './news-timeline.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NewsTimelineComponent {
+export class NewsTimelineComponent implements OnChanges {
   @Input({ required: true }) entries: NewsTimelineEntry[] = [];
 
   readonly store = inject(RadarStore);
   readonly i18n = inject(TranslationService);
+  readonly blurbs = inject(NewsBlurbService);
   readonly visibleCount = signal(8);
+
+  ngOnChanges(): void {
+    this.requestBlurbs();
+  }
 
   impactLabel(impact?: ImpactClass): string {
     if (!impact) {
@@ -64,11 +77,20 @@ export class NewsTimelineComponent {
     return this.entries.slice(0, this.visibleCount());
   }
 
+  summaryFor(entry: NewsTimelineEntry): string | null {
+    return this.blurbs.blurbFor(entry.news);
+  }
+
   showMore(): void {
     this.visibleCount.update((count) => count + 8);
+    this.requestBlurbs();
   }
 
   onAnalyze(symbol: string): void {
     void this.store.generateSignal(symbol);
+  }
+
+  private requestBlurbs(): void {
+    this.blurbs.ensureBlurbs(this.visibleEntries().map((entry) => entry.news));
   }
 }

@@ -297,6 +297,7 @@ export const EN_TRANSLATIONS = {
   'radar.landscape.regime.elevated': 'Elevated vol',
   'radar.landscape.regime.high': 'High vol',
   'radar.card.newsCount': 'headlines',
+  'radar.card.openDetail': 'View detail →',
   'radar.card.priceMoves': 'Unusual moves',
   'radar.card.chartPending': 'Loading price moves…',
   'radar.card.status.label': 'Estimated impact',
@@ -333,23 +334,59 @@ export const EN_TRANSLATIONS = {
   'radar.segments.tabsLabel': 'Segment by asset class',
   'radar.composition.title': 'Market composition',
   'radar.composition.subtitle':
-    "Each asset class's contribution, with its own score — not a global average that blends crypto, stocks and fixed income.",
+    'Weight and score per asset class. Tap a row to filter the radar.',
   'radar.composition.unclassified': 'not classified by asset class',
   'radar.composition.empty': 'No instruments classified by asset class yet.',
   'radar.macro.title': 'Market context',
   'radar.macro.ratesHint': 'No recent change',
   'radar.macro.cpiHint': 'Year-over-year inflation',
   'radar.macro.dxy': 'Dollar (DXY)',
+  'radar.macro.fearGreed.title': 'Fear & Greed (stocks)',
+  'radar.macro.fearGreed.hint':
+    '0 = extreme fear, 100 = extreme greed. CNN stock-market sentiment index.',
+  'radar.macro.fearGreed.disclaimer':
+    'For information only — not financial advice or a buy/sell signal.',
+  'radar.macro.fearGreed.points': 'points',
+  'radar.macro.fearGreed.source': 'Source: alternative.me',
+  'radar.macro.fearGreed.sourceStock': 'Source: CNN Fear & Greed Index',
+  'radar.macro.fearGreed.extremeFear': 'Extreme fear',
+  'radar.macro.fearGreed.fear': 'Fear',
+  'radar.macro.fearGreed.neutral': 'Neutral',
+  'radar.macro.fearGreed.greed': 'Greed',
+  'radar.macro.fearGreed.extremeGreed': 'Extreme greed',
+  'radar.macro.insight.fear.opportunity':
+    'Fear readings often flag contrarian value zones for medium-term investors.',
+  'radar.macro.insight.fear.volatility':
+    'Geopolitical or macro shocks can lift volatility before sentiment stabilizes.',
+  'radar.macro.insight.fear.contrarian':
+    'Cross-check the index with VIX and recent headlines before sizing a trade.',
+  'radar.macro.insight.neutral.balance':
+    'Markets are balanced: neither panic nor euphoria is driving the tape.',
+  'radar.macro.insight.neutral.watch':
+    'Watch macro catalysts (rates, inflation, earnings) for the next sentiment shift.',
+  'radar.macro.insight.neutral.selective':
+    'In neutral regimes, asset selection matters more than broad directional bets.',
+  'radar.macro.insight.greed.resilience':
+    'Equity markets remain resilient despite external tensions and elevated rates.',
+  'radar.macro.insight.greed.risk':
+    'Elevated greed can precede pullbacks if macro catalysts turn negative.',
+  'radar.macro.insight.greed.discipline':
+    'Review position sizing and profit-taking before chasing late momentum.',
   'radar.timeline.title': 'News timeline',
   'radar.timeline.analyze': 'Analyze',
   'radar.timeline.loadMore': 'Load more news',
   'radar.timeline.ago': 'Ago',
   'radar.timeline.confidence': 'Confidence',
   'radar.instruments.title': 'Tracked instruments',
-  'radar.instruments.subtitle': 'Price, trend, and sentiment per asset.',
+  'radar.instruments.subtitle': 'Quick list: price, move, and AI signal. Open an asset for full detail.',
   'radar.instruments.explainer':
     'The badges are AI signal classifications (positive / negative / neutral) inferred from each asset’s recent news, with a confidence score. Unclassified assets have no signal yet — "Analyze" runs the AI on that asset’s news to produce one. Tap any card for the full detail view.',
   'radar.instruments.add': 'Add instrument',
+  'radar.instruments.col.asset': 'Asset',
+  'radar.instruments.col.trend': 'Trend',
+  'radar.instruments.col.price': 'Price',
+  'radar.instruments.col.signal': 'Signal',
+  'radar.instruments.col.news': 'News',
   'scenarios.title': 'Scenario Lab',
   'scenarios.description':
     'Simulate "what if…?" and the AI shows impact per asset class, a step-by-step causal chain, and suggested actions.',

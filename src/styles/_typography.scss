@@ -5,6 +5,10 @@ body {
   color: var(--color-text-primary);
   background: var(--color-background);
   margin: 0;
+  // Dashboard chrome: avoid the blinking text caret when clicking labels/titles.
+  -webkit-user-select: none;
+  user-select: none;
+  caret-color: transparent;
 }
 
 h1,
@@ -26,4 +30,19 @@ p {
 code,
 pre {
   font-family: var(--font-family-mono);
+}
+
+// Re-enable selection where copy/paste is expected.
+input,
+textarea,
+select,
+[contenteditable='true'],
+.taws-markdown,
+.taws-selectable,
+.news-timeline__headline,
+.news-detail__title,
+.news-detail__summary {
+  -webkit-user-select: text;
+  user-select: text;
+  caret-color: auto;
 }

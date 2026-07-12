@@ -1,90 +1,80 @@
 <article
-  class="instrument-card-compact instrument-card-compact--clickable"
-  [class.instrument-card-compact--positive]="signal.impactClass === 'positive'"
-  [class.instrument-card-compact--negative]="signal.impactClass === 'negative'"
+  class="instrument-row"
+  [class.instrument-row--positive]="signal.impactClass === 'positive'"
+  [class.instrument-row--negative]="signal.impactClass === 'negative'"
+  [class.instrument-row--pending]="!signal.impactClass"
   role="link"
   tabindex="0"
   [attr.aria-label]="signal.symbol"
   (click)="onCardActivate($event)"
   (keydown.enter)="onCardActivate($event)"
 >
-  <header class="instrument-card-compact__header">
-    <div class="instrument-card-compact__identity">
-      <app-instrument-ticker-badge [symbol]="signal.symbol" size="sm" />
-      <div>
-        <span class="instrument-card-compact__ticker">{{ signal.symbol }}</span>
-        @if (signal.instrument) {
-          <span class="instrument-card-compact__name">{{ signal.instrument.name }}</span>
-        }
-      </div>
-    </div>
-    <div class="instrument-card-compact__price-block">
-      @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {
-        <span class="instrument-card-compact__price">{{
-          signal.marketStats!.lastPrice | number: '1.2-2'
-        }}</span>
+  <div class="instrument-row__identity">
+    <app-instrument-ticker-badge [symbol]="signal.symbol" size="sm" />
+    <div class="instrument-row__meta">
+      <span class="instrument-row__ticker">{{ signal.symbol }}</span>
+      @if (signal.instrument) {
+        <span class="instrument-row__name">{{ signal.instrument.name }}</span>
       }
-      <span class="instrument-card-compact__delta" [class]="priceDeltaClass()">{{
-        formatDelta()
-      }}</span>
     </div>
-  </header>
+  </div>
 
-  <div class="instrument-card-compact__chart">
-    @if (signal.marketStats?.unusualMoves?.length) {
-      <app-return-sparkline [moves]="signal.marketStats!.unusualMoves" />
+  <div class="instrument-row__chart" aria-hidden="true">
+    @if (signal.marketStats?.candles?.length) {
+      <app-return-sparkline
+        [candles]="signal.marketStats!.candles"
+        [width]="160"
+        [height]="40"
+        variant="line"
+      />
+    } @else if (signal.marketStats?.unusualMoves?.length) {
+      <app-return-sparkline
+        [moves]="signal.marketStats!.unusualMoves"
+        [width]="160"
+        [height]="40"
+        variant="bars"
+      />
     } @else {
-      <span class="instrument-card-compact__chart-placeholder">—</span>
+      <span class="instrument-row__chart-empty">—</span>
     }
   </div>
 
-  <footer class="instrument-card-compact__footer">
-    <span class="instrument-card-compact__news"
-      >{{ signal.news.length }} {{ i18n.t('radar.card.newsCount') }}</span
-    >
+  <div class="instrument-row__quote">
+    @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {
+      <span class="instrument-row__price">{{ signal.marketStats!.lastPrice | number: '1.2-2' }}</span>
+    } @else {
+      <span class="instrument-row__price">—</span>
+    }
+    <span class="instrument-row__delta" [class]="priceDeltaClass()">{{ formatDelta() }}</span>
+  </div>
+
+  <div class="instrument-row__signal">
     <span
-      class="instrument-card-compact__badge"
-      [class.instrument-card-compact__badge--positive]="signal.impactClass === 'positive'"
-      [class.instrument-card-compact__badge--negative]="signal.impactClass === 'negative'"
-      [class.instrument-card-compact__badge--pending]="!signal.impactClass"
+      class="instrument-row__badge"
+      [class.instrument-row__badge--positive]="signal.impactClass === 'positive'"
+      [class.instrument-row__badge--negative]="signal.impactClass === 'negative'"
+      [class.instrument-row__badge--pending]="!signal.impactClass"
     >
       {{ impactLabel() }}
-      @if (confidencePct(); as pct) {
-        <span>{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span>
-      }
     </span>
-  </footer>
-
-  @if (isUnclassified()) {
-    <button
-      type="button"
-      class="instrument-card-compact__analysis-toggle"
-      [disabled]="isGenerating()"
-      (click)="onAnalyze($event)"
-    >
-      {{ isGenerating() ? i18n.t('radar.generate.generating') : i18n.t('radar.timeline.analyze') }}
-    </button>
-  }
-
-  @if (hasSignal()) {
-    <button
-      type="button"
-      class="instrument-card-compact__analysis-toggle"
-      [attr.aria-expanded]="showAnalysis()"
-      (click)="toggleAnalysis(); $event.stopPropagation()"
-    >
-      {{
-        showAnalysis() ? i18n.t('radar.analysis.collapse') : i18n.t('radar.analysis.expand')
-      }}
-    </button>
-
-    @if (showAnalysis()) {
-      <app-signal-analysis
-        [thesis]="signal.thesis"
-        [keyDrivers]="signal.keyDrivers ?? []"
-        [riskFactors]="signal.riskFactors ?? []"
-        [analysisAvailable]="signal.analysisAvailable ?? false"
-      />
+    @if (confidenceValue() !== null) {
+      <span class="instrument-row__confidence">{{ confidenceValue() }}%</span>
     }
-  }
+  </div>
+
+  <div class="instrument-row__aside">
+    <span class="instrument-row__news"
+      >{{ signal.news.length }} {{ i18n.t('radar.card.newsCount') }}</span
+    >
+    @if (isUnclassified()) {
+      <button
+        type="button"
+        class="instrument-row__cta"
+        [disabled]="isGenerating()"
+        (click)="onAnalyze($event)"
+      >
+        {{ isGenerating() ? i18n.t('radar.generate.generating') : i18n.t('radar.timeline.analyze') }}
+      </button>
+    }
+  </div>
 </article>

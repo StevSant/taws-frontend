@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.fear-greed-arc-gauge {
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+  overflow: visible;
+
+  &__track {
+    fill: none;
+    stroke: color-mix(in srgb, var(--color-border) 80%, transparent);
+    stroke-width: 10;
+    stroke-linecap: round;
+  }
+
+  &__fill {
+    fill: none;
+    stroke: url(#fg-arc-gradient);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.45s ease-out;
+  }
+
+  &__score {
+    fill: var(--color-gold-bright, var(--color-gold));
+    font-family: var(--font-family-mono);
+    font-size: 28px;
+    font-weight: 800;
+  }
+
+  &__label {
+    fill: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: capitalize;
+  }
+}

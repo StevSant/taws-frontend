@@ -1,0 +1,36 @@
+<svg
+  class="fear-greed-arc-gauge"
+  viewBox="0 0 180 110"
+  role="img"
+  [attr.aria-label]="value() + ' ' + label()"
+  [class.fear-greed-arc-gauge--fear]="tone() === 'fear' || tone() === 'fear-soft'"
+  [class.fear-greed-arc-gauge--greed]="tone() === 'greed' || tone() === 'greed-soft'"
+>
+  <defs>
+    <linearGradient id="fg-arc-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="var(--color-loss)" />
+      <stop offset="45%" stop-color="var(--color-warn)" />
+      <stop offset="100%" stop-color="var(--color-gain)" />
+    </linearGradient>
+  </defs>
+
+  <path
+    class="fear-greed-arc-gauge__track"
+    d="M 18 92 A 72 72 0 0 1 162 92"
+    pathLength="226"
+  />
+  <path
+    class="fear-greed-arc-gauge__fill"
+    d="M 18 92 A 72 72 0 0 1 162 92"
+    pathLength="226"
+    [attr.stroke-dasharray]="arcLength"
+    [attr.stroke-dashoffset]="needleOffset()"
+  />
+
+  <text class="fear-greed-arc-gauge__score" x="90" y="72" text-anchor="middle">
+    {{ clampedValue() }}
+  </text>
+  <text class="fear-greed-arc-gauge__label" x="90" y="88" text-anchor="middle">
+    {{ label() }}
+  </text>
+</svg>

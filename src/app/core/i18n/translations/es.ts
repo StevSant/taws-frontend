@@ -261,12 +261,13 @@ export const ES_TRANSLATIONS = {
   'radar.landscape.macroUnavailable': 'Datos macro no disponibles en este momento.',
   'radar.landscape.vix': 'VIX',
   'radar.landscape.rates': 'Tasa Fed',
-  'radar.landscape.cpi': 'IPC interanual',
+  'radar.landscape.cpi': 'IPC YoY',
   'radar.landscape.regime.low': 'Vol. baja',
   'radar.landscape.regime.normal': 'Vol. normal',
   'radar.landscape.regime.elevated': 'Vol. elevada',
   'radar.landscape.regime.high': 'Vol. alta',
   'radar.card.newsCount': 'titulares',
+  'radar.card.openDetail': 'Ver detalle →',
   'radar.card.priceMoves': 'Movimientos inusuales',
   'radar.card.chartPending': 'Cargando movimientos de precio…',
   'radar.card.status.label': 'Impacto estimado',
@@ -305,23 +306,59 @@ export const ES_TRANSLATIONS = {
   'radar.segments.tabsLabel': 'Segmentar por clase de activo',
   'radar.composition.title': 'Composición del mercado',
   'radar.composition.subtitle':
-    'Contribución de cada clase de activo, con su propia puntuación — no un promedio global que mezcla cripto, acciones y renta fija.',
+    'Peso y score propios por clase. Pulsa una fila para filtrar el radar.',
   'radar.composition.unclassified': 'sin clasificar por clase de activo',
   'radar.composition.empty': 'Aún no hay instrumentos clasificados por clase de activo.',
   'radar.macro.title': 'Contexto de mercado',
   'radar.macro.ratesHint': 'Sin cambios recientes',
   'radar.macro.cpiHint': 'Inflación interanual',
   'radar.macro.dxy': 'Dólar (DXY)',
+  'radar.macro.fearGreed.title': 'Fear & Greed (acciones)',
+  'radar.macro.fearGreed.hint':
+    '0 = miedo extremo, 100 = codicia extrema. Índice CNN del mercado de acciones.',
+  'radar.macro.fearGreed.disclaimer':
+    'Solo informativo — no es asesoría financiera ni señal de compra/venta.',
+  'radar.macro.fearGreed.points': 'puntos',
+  'radar.macro.fearGreed.source': 'Fuente: alternative.me',
+  'radar.macro.fearGreed.sourceStock': 'Fuente: CNN Fear & Greed Index',
+  'radar.macro.fearGreed.extremeFear': 'Miedo extremo',
+  'radar.macro.fearGreed.fear': 'Miedo',
+  'radar.macro.fearGreed.neutral': 'Neutral',
+  'radar.macro.fearGreed.greed': 'Codicia',
+  'radar.macro.fearGreed.extremeGreed': 'Codicia extrema',
+  'radar.macro.insight.fear.opportunity':
+    'Lecturas de miedo suelen marcar zonas de valor para estrategias contrarian de mediano plazo.',
+  'radar.macro.insight.fear.volatility':
+    'El riesgo geopolítico o macro puede elevar la volatilidad antes de que el sentimiento se estabilice.',
+  'radar.macro.insight.fear.contrarian':
+    'Conviene cruzar el índice con VIX y noticias recientes antes de tomar posición.',
+  'radar.macro.insight.neutral.balance':
+    'El mercado está en equilibrio: ni pánico ni euforia dominan el corto plazo.',
+  'radar.macro.insight.neutral.watch':
+    'Monitorea catalizadores macro (tasas, inflación, earnings) para detectar el próximo giro.',
+  'radar.macro.insight.neutral.selective':
+    'En neutralidad, la selección por activo importa más que la direccionalidad del índice.',
+  'radar.macro.insight.greed.resilience':
+    'Los mercados mantienen confianza pese a tensiones externas y tasas elevadas.',
+  'radar.macro.insight.greed.risk':
+    'La codicia elevada puede anticipar correcciones si los catalizadores macro empeoran.',
+  'radar.macro.insight.greed.discipline':
+    'Conviene revisar tamaño de posición y take-profit antes de perseguir momentum.',
   'radar.timeline.title': 'Timeline de noticias',
   'radar.timeline.analyze': 'Analizar',
   'radar.timeline.loadMore': 'Cargar más noticias',
   'radar.timeline.ago': 'Hace',
   'radar.timeline.confidence': 'Confianza',
   'radar.instruments.title': 'Instrumentos en seguimiento',
-  'radar.instruments.subtitle': 'Precio, tendencia y sentimiento por activo.',
+  'radar.instruments.subtitle': 'Lista rápida: precio, movimiento y señal IA. Abre un activo para el detalle.',
   'radar.instruments.explainer':
     'Las etiquetas son clasificaciones de señal generadas por IA (positiva / negativa / neutral) inferidas de las noticias recientes de cada activo, con un nivel de confianza. Los activos sin clasificar aún no tienen señal — "Analizar" ejecuta la IA sobre sus noticias para generarla. Toca cualquier tarjeta para ver el detalle completo.',
   'radar.instruments.add': 'Agregar instrumento',
+  'radar.instruments.col.asset': 'Activo',
+  'radar.instruments.col.trend': 'Tendencia',
+  'radar.instruments.col.price': 'Precio',
+  'radar.instruments.col.signal': 'Señal',
+  'radar.instruments.col.news': 'Noticias',
   'radar.review.title': 'Tu revisión',
   'radar.review.subtitle': 'Registro humano de tu decisión — no es recomendación de inversión.',
   'radar.detail.back': 'Volver al radar',

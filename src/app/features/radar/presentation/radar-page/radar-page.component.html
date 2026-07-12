@@ -67,7 +67,11 @@
           (selectClass)="onSelectClass($event)"
         />
       }
-      <app-radar-macro-cards [macro]="store.macroState()" />
+      <app-radar-macro-cards
+        [macro]="store.macroState()"
+        [marketPulse]="store.marketPulse()"
+        [headlineInsight]="headlineInsight()"
+      />
     </div>
 
     @if (store.isEnriching()) {
@@ -76,47 +80,47 @@
       </p>
     }
 
-    <div class="radar-page__split">
-      <app-news-timeline class="radar-page__timeline" [entries]="store.newsTimeline()" />
-
-      <section class="radar-page__instruments feature-panel">
-        <header class="radar-page__instruments-header">
-          <div class="radar-page__instruments-copy">
-            <h2
-              class="radar-page__instruments-title"
-              [attr.title]="i18n.t('radar.instruments.explainer')"
-            >
-              {{ i18n.t('radar.instruments.title') }}
-            </h2>
-            <p class="radar-page__instruments-subtitle">
-              {{ i18n.t('radar.instruments.subtitle') }}
-            </p>
-            <p class="radar-page__instruments-explainer">
-              {{ i18n.t('radar.instruments.explainer') }}
-            </p>
-          </div>
-          @if (store.unclassifiedCount() > 0) {
-            <div class="radar-page__instruments-action">
-              <app-button
-                [label]="
-                  store.isGeneratingAny()
-                    ? i18n.t('radar.generate.allRunning')
-                    : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
-                "
-                [disabled]="store.isGeneratingAny()"
-                (pressed)="onAnalyzeAll()"
-              />
-            </div>
-          }
-        </header>
-
-        <div class="radar-page__instrument-grid">
-          @for (signal of visibleSignals(); track signal.symbol) {
-            <app-instrument-card-compact [signal]="signal" />
-          }
-          <app-radar-add-instrument-card />
+    <section id="instruments" class="radar-page__instruments feature-panel">
+      <header class="radar-page__instruments-header">
+        <div class="radar-page__instruments-copy">
+          <h2 class="radar-page__instruments-title">
+            {{ i18n.t('radar.instruments.title') }}
+          </h2>
+          <p class="radar-page__instruments-subtitle">
+            {{ i18n.t('radar.instruments.subtitle') }}
+          </p>
         </div>
-      </section>
-    </div>
+        @if (store.unclassifiedCount() > 0) {
+          <div class="radar-page__instruments-action">
+            <app-button
+              [label]="
+                store.isGeneratingAny()
+                  ? i18n.t('radar.generate.allRunning')
+                  : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
+              "
+              [disabled]="store.isGeneratingAny()"
+              (pressed)="onAnalyzeAll()"
+            />
+          </div>
+        }
+      </header>
+
+      <div class="radar-page__list-head" aria-hidden="true">
+        <span>{{ i18n.t('radar.instruments.col.asset') }}</span>
+        <span>{{ i18n.t('radar.instruments.col.trend') }}</span>
+        <span>{{ i18n.t('radar.instruments.col.price') }}</span>
+        <span>{{ i18n.t('radar.instruments.col.signal') }}</span>
+        <span>{{ i18n.t('radar.instruments.col.news') }}</span>
+      </div>
+
+      <div class="radar-page__instrument-list" role="list">
+        @for (signal of visibleSignals(); track signal.symbol) {
+          <app-instrument-card-compact role="listitem" [signal]="signal" />
+        }
+        <app-radar-add-instrument-card />
+      </div>
+    </section>
+
+    <app-news-timeline class="radar-page__timeline" [entries]="store.newsTimeline()" />
   }
 </div>

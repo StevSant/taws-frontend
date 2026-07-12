@@ -5,36 +5,32 @@
   </header>
 
   @if (rows.length > 0) {
-    <div
-      class="composition__bar"
-      role="img"
-      [attr.aria-label]="i18n.t('radar.composition.title')"
-    >
+    <ul class="composition__ladder" role="list">
       @for (row of rows; track row.assetClass) {
-        <span
-          class="composition__bar-segment"
-          [style.flex-grow]="row.instrumentCount"
-          [style.background]="row.scoreColor"
-          [attr.title]="i18n.t(row.labelKey) + ': ' + formatPct(row.sharePct)"
-        ></span>
-      }
-    </div>
-
-    <ul class="composition__rows">
-      @for (row of rows; track row.assetClass) {
-        <li class="composition__row">
-          <button type="button" class="composition__row-btn" (click)="select(row.assetClass)">
-            <span class="composition__row-label">
-              <span class="composition__dot" [style.background]="row.scoreColor"></span>
-              {{ i18n.t(row.labelKey) }}
-            </span>
-            <span class="composition__row-meta">
-              <span class="composition__share">{{ formatPct(row.sharePct) }}</span>
-              <span class="composition__count">
-                {{ row.instrumentCount }} {{ i18n.t('radar.landscape.instruments') }}
+        <li>
+          <button
+            type="button"
+            class="composition__lane"
+            [style.--lane-share]="row.sharePct"
+            [style.--lane-color]="row.scoreColor"
+            (click)="select(row.assetClass)"
+          >
+            <span class="composition__lane-fill" aria-hidden="true"></span>
+            <span class="composition__lane-body">
+              <span class="composition__lane-lead">
+                <span class="composition__dot" [style.background]="row.scoreColor"></span>
+                <span class="composition__lane-label">{{ i18n.t(row.labelKey) }}</span>
+                <span class="composition__lane-count">
+                  {{ row.instrumentCount }} {{ i18n.t('radar.landscape.instruments') }}
+                </span>
               </span>
-              <span class="composition__score" [style.color]="row.scoreColor">
-                {{ row.marketScore.score }} · {{ i18n.t(row.scoreLabelKey) }}
+
+              <span class="composition__lane-metrics">
+                <span class="composition__lane-share">{{ formatPct(row.sharePct) }}</span>
+                <span class="composition__lane-score" [style.color]="row.scoreColor">
+                  {{ row.marketScore.score }}
+                </span>
+                <span class="composition__lane-sentiment">{{ i18n.t(row.scoreLabelKey) }}</span>
               </span>
             </span>
           </button>

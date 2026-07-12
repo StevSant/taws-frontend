@@ -23,6 +23,11 @@
               >&#8599;</a
             >
           </div>
+          @if (blurbs.blurbs(); as _cache) {
+            @if (summaryFor(entry); as summary) {
+              <p class="news-timeline__summary">{{ summary }}</p>
+            }
+          }
           <span class="news-timeline__meta">
             @if (providerLabel(entry.news.provider); as provider) {
               <span class="news-timeline__provider">{{ provider }}</span> ·

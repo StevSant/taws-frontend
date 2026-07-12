@@ -3,40 +3,68 @@
     <h2 class="radar-macro-cards__title">{{ i18n.t('radar.macro.title') }}</h2>
   </header>
 
-  @if (macro) {
-    <div class="radar-macro-cards__grid">
-      <article class="radar-macro-cards__card">
-        <span class="radar-macro-cards__label">{{ i18n.t('radar.landscape.vix') }}</span>
-        <span class="radar-macro-cards__value">{{
-          macro.volatility.vixLevel | number: '1.1-1'
+  @if (marketPulse || macro) {
+    @if (marketPulse) {
+      <article class="radar-macro-cards__sentiment">
+        <div class="radar-macro-cards__gauge-wrap">
+          <span class="radar-macro-cards__sentiment-kicker">{{
+            i18n.t('radar.macro.fearGreed.title')
+          }}</span>
+          <app-fear-greed-arc-gauge
+            [value]="marketPulse.value"
+            [label]="classificationLabel(marketPulse.classification)"
+          />
+          <p
+            class="radar-macro-cards__delta"
+            [class.radar-macro-cards__delta--up]="marketPulse.deltaPoints > 0"
+            [class.radar-macro-cards__delta--down]="marketPulse.deltaPoints < 0"
+          >
+            {{ deltaLabel(marketPulse.deltaPoints) }}
+          </p>
+        </div>
+
+        @if (marketPulse.indices.length > 0) {
+          <div class="radar-macro-cards__indices">
+            @for (index of marketPulse.indices; track index.symbol) {
+              <article class="radar-macro-cards__index">
+                <span class="radar-macro-cards__index-label">{{ index.label }}</span>
+                <span class="radar-macro-cards__index-value">{{
+                  index.price | number: '1.2-2'
+                }}</span>
+                <span
+                  class="radar-macro-cards__index-change"
+                  [class.radar-macro-cards__index-change--up]="index.changePct >= 0"
+                  [class.radar-macro-cards__index-change--down]="index.changePct < 0"
+                >
+                  {{ index.changePct >= 0 ? '+' : '' }}{{ index.changePct | number: '1.2-2' }}%
+                </span>
+              </article>
+            }
+          </div>
+        }
+
+        @if (insights().length > 0) {
+          <ul class="radar-macro-cards__insights">
+            @for (insight of insights(); track $index) {
+              <li class="radar-macro-cards__insight">
+                <span class="radar-macro-cards__insight-icon" aria-hidden="true">{{
+                  insight.icon
+                }}</span>
+                <span class="radar-macro-cards__insight-text">{{ insight.text }}</span>
+              </li>
+            }
+          </ul>
+        }
+
+        <span class="radar-macro-cards__sentiment-source">{{
+          i18n.t('radar.macro.fearGreed.sourceStock')
         }}</span>
-        <span class="radar-macro-cards__hint">{{ regimeLabel(macro.volatility.regime) }}</span>
-        <app-macro-mini-sparkline trend="up" />
       </article>
+    }
 
-      <article class="radar-macro-cards__card">
-        <span class="radar-macro-cards__label">{{ i18n.t('radar.landscape.rates') }}</span>
-        <span class="radar-macro-cards__value">{{ macro.rates.value | number: '1.2-2' }}%</span>
-        <span class="radar-macro-cards__hint">{{ i18n.t('radar.macro.ratesHint') }}</span>
-        <app-macro-mini-sparkline trend="flat" />
-      </article>
-
-      <article class="radar-macro-cards__card">
-        <span class="radar-macro-cards__label">{{ i18n.t('radar.landscape.cpi') }}</span>
-        <span class="radar-macro-cards__value">{{ macro.cpi.value | number: '1.1-1' }}%</span>
-        <span class="radar-macro-cards__hint">{{ i18n.t('radar.macro.cpiHint') }}</span>
-        <app-macro-mini-sparkline trend="down" />
-      </article>
-
-      <article class="radar-macro-cards__card">
-        <span class="radar-macro-cards__label">{{ i18n.t('radar.macro.dxy') }}</span>
-        <span class="radar-macro-cards__value">{{ dxyValue | number: '1.2-2' }}</span>
-        <span class="radar-macro-cards__hint radar-macro-cards__hint--up"
-          >+{{ dxyDelta | number: '1.2-2' }}%</span
-        >
-        <app-macro-mini-sparkline trend="up" />
-      </article>
-    </div>
+    @if (macro) {
+      <app-radar-macro-strip class="radar-macro-cards__strip" [macro]="macro" />
+    }
   } @else {
     <p class="radar-macro-cards__empty">{{ i18n.t('radar.landscape.macroUnavailable') }}</p>
   }

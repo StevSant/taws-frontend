@@ -69,10 +69,11 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     return this.store.assetClassSegments().find((segment) => segment.assetClass === selected) ?? null;
   });
 
-  /** Signals shown in the instrument grid: all, or scoped to the active class. */
+  /** Signals shown in the watchlist: all or scoped to the active class, sorted by urgency. */
   readonly visibleSignals = computed(() => {
     const segment = this.activeSegment();
-    return segment ? segment.signals : this.store.signals();
+    const signals = segment ? segment.signals : this.store.signals();
+    return [...signals].sort((a, b) => this.signalPriority(b) - this.signalPriority(a));
   });
 
   readonly summaryText = computed(() => {
@@ -81,6 +82,8 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     const windowLabel = this.recencyLabel(hours);
     return `${this.i18n.t('radar.summary.prefix')} ${kpis.newsDetected} ${this.i18n.t('radar.summary.events')} ${windowLabel}. ${kpis.pendingReview} ${this.i18n.t('radar.summary.pending')}`;
   });
+
+  readonly headlineInsight = computed(() => this.store.newsTimeline()[0]?.news.title ?? null);
 
   constructor(
     readonly store: RadarStore,
@@ -116,6 +119,22 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   onAnalyzeAll(): void {
     void this.store.generateAllUnclassified();
+  }
+
+  private signalPriority(signal: {
+    impactClass?: string;
+    confidence?: number;
+    news: unknown[];
+  }): number {
+    const impactWeight: Record<string, number> = {
+      negative: 4,
+      positive: 3,
+      uncertain: 2,
+      neutral: 1,
+    };
+    const impact = signal.impactClass ? (impactWeight[signal.impactClass] ?? 0) : 5;
+    const confidence = signal.confidence ?? 0;
+    return impact * 100 + confidence * 10 + signal.news.length;
   }
 
   private recencyLabel(hours: number): string {

@@ -10,11 +10,13 @@ import {
   InstrumentRepository,
   MacroRepository,
   MacroState,
+  MarketPulse,
   MarketStats,
   NewsItem,
   NewsRepository,
   QuantRepository,
   RadarFilters,
+  SentimentRepository,
   Signal,
   SignalRepository,
   SignalReviewRepository,
@@ -82,6 +84,7 @@ export class RadarStore {
   private readonly signalsBySymbolSignal = signal<Map<string, Signal>>(new Map());
   private readonly marketStatsBySymbolSignal = signal<Map<string, MarketStats>>(new Map());
   private readonly macroStateSignal = signal<MacroState | null>(null);
+  private readonly marketPulseSignal = signal<MarketPulse | null>(null);
   private readonly loadingSignal = signal(false);
   private readonly isEnrichingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
@@ -96,6 +99,7 @@ export class RadarStore {
   readonly isLoading = this.loadingSignal.asReadonly();
   readonly isEnriching = this.isEnrichingSignal.asReadonly();
   readonly macroState = this.macroStateSignal.asReadonly();
+  readonly marketPulse = this.marketPulseSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
 
   /** Instrument options for the "asset" filter, scoped to the selected instrument type. */
@@ -219,6 +223,7 @@ export class RadarStore {
     private readonly signalReviewRepository: SignalReviewRepository,
     private readonly quantRepository: QuantRepository,
     private readonly macroRepository: MacroRepository,
+    private readonly sentimentRepository: SentimentRepository,
     private readonly config: AppConfigService,
     private readonly notifications: NotificationsStore,
     private readonly authTokenService: AuthTokenService,
@@ -235,7 +240,7 @@ export class RadarStore {
     }
 
     void this.loadInstruments();
-    void this.loadMacroState();
+    void this.loadMarketContext();
     await this.loadNews();
     this.sessionReady = true;
   }
@@ -453,12 +458,25 @@ export class RadarStore {
     }
   }
 
+  private async loadMarketContext(): Promise<void> {
+    await Promise.all([this.loadMacroState(), this.loadMarketPulse()]);
+  }
+
   private async loadMacroState(): Promise<void> {
     try {
       const macro = await this.macroRepository.fetchMacroState();
       this.macroStateSignal.set(macro);
     } catch {
       this.macroStateSignal.set(null);
+    }
+  }
+
+  private async loadMarketPulse(): Promise<void> {
+    try {
+      const pulse = await this.sentimentRepository.fetchMarketPulse();
+      this.marketPulseSignal.set(pulse);
+    } catch {
+      this.marketPulseSignal.set(null);
     }
   }
 
