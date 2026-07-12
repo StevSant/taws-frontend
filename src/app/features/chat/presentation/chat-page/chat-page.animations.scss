@@ -1,0 +1,159 @@
+// Keyframes and reduced-motion overrides for the chat page.
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hexDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-26px, -45px, 0);
+  }
+}
+
+@keyframes hexActivate {
+  0%,
+  100% {
+    opacity: var(--texture-energy);
+  }
+  50% {
+    opacity: calc(var(--texture-energy) + 0.14);
+  }
+}
+
+@keyframes energyBreathe {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: calc(0.35 + var(--texture-glow) * 0.55);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.04);
+    opacity: calc(0.5 + var(--texture-glow) * 0.75);
+  }
+}
+
+@keyframes orbFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) scale(1.06);
+  }
+}
+
+@keyframes heroCollapseFly {
+  0% {
+    left: var(--collapse-start-x);
+    top: var(--collapse-start-y);
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    left: var(--collapse-end-x);
+    top: var(--collapse-end-y);
+    transform: translate(-50%, -50%) scale(0.353);
+    opacity: 0;
+  }
+}
+
+@keyframes avatarSettleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes avatarRespond {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-5px) scale(1.04);
+  }
+  70% {
+    transform: translateY(2px) scale(0.98);
+  }
+}
+
+@keyframes scanPulse {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.45;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes voicePulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes ttsPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(212, 160, 23, 0.32);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(212, 160, 23, 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-page__hex-field,
+  .chat-page__orb,
+  .chat-page__scanline,
+  .chat-page__corona-glow,
+  .chat-page__corona-ring-track,
+  .chat-page__typing-dot,
+  .chat-page__message-row,
+  .chat-page__hex-field,
+  .chat-page__energy-pulse,
+  .chat-page__voice-btn--active,
+  .chat-page__tts-btn--active,
+  .chat-page__oracle-status-dot,
+  .chat-page__hero-collapse,
+  .chat-page__avatar--live {
+    animation: none;
+  }
+
+  .chat-page__hero--compact {
+    transform: none;
+  }
+}
+
+@keyframes chat-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

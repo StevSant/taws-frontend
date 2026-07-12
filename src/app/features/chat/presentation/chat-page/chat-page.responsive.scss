@@ -1,0 +1,191 @@
+// Responsive breakpoints for the chat page.
+@media (max-width: 1180px) {
+  .chat-page--sessions {
+    --chat-context-width: 0px;
+  }
+
+  .chat-page--sessions .chat-page__viewport {
+    grid-template-columns: var(--chat-sessions-width) minmax(0, 1fr);
+
+    > app-chat-context-rail {
+      display: none;
+    }
+  }
+
+  .chat-page__rail-toggle {
+    display: none;
+  }
+}
+
+@media (max-height: 780px) {
+  .chat-page:not(.chat-page--conversation) {
+    .chat-page__frame {
+      justify-content: center;
+      gap: var(--space-3);
+      padding-block: var(--space-2);
+    }
+
+    .chat-page__hero {
+      --hero-diameter: 104;
+      min-height: calc(var(--hero-diameter) * 1px + var(--space-2));
+    }
+
+    .chat-page__oracle {
+      gap: var(--space-1);
+    }
+
+    .chat-page__welcome {
+      gap: var(--space-2);
+    }
+
+    .chat-page__welcome-title {
+      font-size: 1.15rem;
+    }
+
+    .chat-page__welcome-subtitle {
+      font-size: 0.82rem;
+    }
+
+    .chat-page__voice-hint {
+      display: none;
+    }
+
+    .chat-page__footer-inner {
+      padding-top: var(--space-2);
+      padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .chat-page--sessions {
+    --chat-sessions-width: 0px;
+  }
+
+  .chat-page--sessions .chat-page__viewport {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .chat-page--sessions > .chat-page__viewport > app-chat-sessions-panel {
+    grid-column: 1;
+  }
+
+  .chat-page--sessions-open .chat-page__sessions-backdrop {
+    display: block;
+    position: fixed;
+    top: var(--shell-header-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 350;
+    border: none;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    opacity: 1;
+    animation: chat-backdrop-in 0.28s ease;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-page {
+    &--sessions:not(.chat-page--sessions-open) .chat-page__frame {
+      padding-top: 2.65rem;
+    }
+
+    &--sessions:not(.chat-page--sessions-open) .chat-page__workspace {
+      padding-left: calc(var(--chat-thread-gutter, 1rem) + 1.35rem);
+    }
+
+    &:not(&--conversation) &__frame {
+      padding-inline: var(--space-3);
+    }
+
+    &--conversation &__frame,
+    &--conversation &__footer-inner {
+      padding-inline: 0;
+    }
+
+    &--conversation &__messages {
+      padding-inline: var(--space-1);
+    }
+
+    &__message-row {
+      gap: var(--space-2);
+
+      &--assistant,
+      &--user {
+        max-width: 100%;
+      }
+    }
+
+    &__avatar {
+      width: 2.25rem;
+      height: 2.25rem;
+      font-size: 0.72rem;
+    }
+
+    &__messages {
+      gap: var(--space-3);
+    }
+
+    &__bubble {
+      max-width: 100%;
+      padding: var(--space-2) var(--space-3);
+      font-size: 0.88rem;
+    }
+
+    &__footer-inner {
+      max-width: 100%;
+      padding-inline: var(--space-2);
+    }
+
+    &__composer {
+      padding: 0.4rem;
+      border-radius: var(--radius-md);
+    }
+
+    &__input {
+      font-size: 0.88rem;
+      padding: var(--space-2);
+    }
+
+    &__voice-btn {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    &__send ::ng-deep .app-button {
+      min-width: auto;
+      padding-inline: 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    &__sessions-toggle {
+      top: var(--space-1);
+      left: var(--space-2);
+      width: 1.85rem;
+      height: 1.85rem;
+    }
+
+    &__welcome-title {
+      font-size: 1.2rem;
+    }
+
+    &__welcome-subtitle {
+      font-size: 0.82rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-page {
+    &--conversation &__messages {
+      padding-inline: 0.35rem;
+    }
+
+    &__voice-hint {
+      font-size: 0.68rem;
+    }
+  }
+}

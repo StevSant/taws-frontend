@@ -1,0 +1,104 @@
+// Light-theme overrides for the chat page.
+html[data-theme='light'] .chat-page {
+  &__hero > app-golden-polyhedron {
+    filter: drop-shadow(0 6px 14px rgba(140, 95, 0, 0.45))
+      drop-shadow(0 0 20px rgba(212, 160, 23, 0.28));
+  }
+
+  &__corona-glow {
+    background: radial-gradient(
+      circle,
+      rgba(230, 180, 34, 0.38) 0%,
+      rgba(212, 160, 23, 0.16) 42%,
+      transparent 72%
+    );
+  }
+
+  &__oracle-chip {
+    background: color-mix(in srgb, var(--color-surface) 94%, var(--color-gold) 6%);
+    box-shadow:
+      0 6px 20px rgba(180, 120, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  &__oracle-chip-icon {
+    background: radial-gradient(circle at 35% 30%, #f5d04a 0%, #d4a017 48%, #a67c00 100%);
+    box-shadow:
+      inset 0 -4px 10px rgba(120, 80, 0, 0.4),
+      inset 0 2px 8px rgba(255, 248, 210, 0.7),
+      0 6px 16px rgba(160, 110, 0, 0.42);
+
+    > app-golden-polyhedron {
+      filter: drop-shadow(0 3px 6px rgba(120, 80, 0, 0.5))
+        drop-shadow(0 0 10px rgba(212, 160, 23, 0.35));
+    }
+  }
+
+  &__mesh {
+    background:
+      radial-gradient(ellipse 120% 85% at 50% 42%, rgba(230, 180, 34, 0.2) 0%, transparent 72%),
+      radial-gradient(ellipse 80% 55% at 0% 100%, rgba(212, 160, 23, 0.1) 0%, transparent 75%),
+      radial-gradient(ellipse 80% 55% at 100% 100%, rgba(245, 200, 66, 0.08) 0%, transparent 75%);
+  }
+
+  &__hex-field {
+    opacity: var(--texture-energy);
+    filter: brightness(calc(0.92 + var(--texture-glow) * 0.45));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='90' viewBox='0 0 52 90'%3E%3Cg fill='none' stroke='%23c8920e' stroke-width='0.8' opacity='0.34'%3E%3Cpath d='M26 1 51 15v30L26 59 1 45V15Z'/%3E%3Cpath d='M26 31 51 45v30L26 89 1 75V45Z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  &__corona-ring-track {
+    background:
+      linear-gradient(var(--color-background), var(--color-background)) padding-box,
+      conic-gradient(
+          from 0deg,
+          transparent 0deg,
+          rgba(200, 146, 14, 0.35) 55deg,
+          rgba(200, 146, 14, 0.75) 120deg,
+          rgba(230, 180, 34, 0.9) 180deg,
+          rgba(200, 146, 14, 0.75) 240deg,
+          transparent 300deg
+        )
+        border-box;
+    opacity: 1;
+  }
+
+  &__message--assistant {
+    background: color-mix(in srgb, var(--color-surface) 90%, var(--color-gold) 10%);
+    box-shadow: var(--elevation-1);
+  }
+
+  &__bubble--assistant {
+    background: color-mix(in srgb, var(--color-surface) 98%, var(--color-gold) 2%);
+    box-shadow: var(--elevation-1);
+  }
+
+  &__bubble--user {
+    background: linear-gradient(
+      145deg,
+      color-mix(in srgb, #2563eb 16%, var(--color-surface-raised)),
+      color-mix(in srgb, #1d4ed8 10%, var(--color-surface))
+    );
+    color: var(--color-text-primary);
+  }
+
+  &__composer {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    box-shadow: var(--elevation-1);
+  }
+
+  &__footer {
+    background: transparent;
+    border-top: none;
+
+    &::before {
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        color-mix(in srgb, var(--color-background) 12%, transparent) 55%,
+        color-mix(in srgb, var(--color-background) 40%, transparent) 100%
+      );
+    }
+  }
+}

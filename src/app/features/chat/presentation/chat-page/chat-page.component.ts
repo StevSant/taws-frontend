@@ -144,7 +144,15 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
 
   templateUrl: './chat-page.component.html',
 
-  styleUrl: './chat-page.component.scss',
+  styleUrls: [
+    './chat-page.component.scss',
+    './chat-page.hero.scss',
+    './chat-page.messages.scss',
+    './chat-page.composer.scss',
+    './chat-page.theme.scss',
+    './chat-page.animations.scss',
+    './chat-page.responsive.scss',
+  ],
 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

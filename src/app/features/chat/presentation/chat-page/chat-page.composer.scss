@@ -1,0 +1,269 @@
+// Footer composer: input, send, voice, TTS, and auth prompt.
+.chat-page {
+  &__footer {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    width: 100%;
+    border-top: none;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: -2.5rem 0 0;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        color-mix(in srgb, var(--color-background) 18%, transparent) 55%,
+        color-mix(in srgb, var(--color-background) 55%, transparent) 100%
+      );
+    }
+  }
+
+  &__footer-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: var(--space-2) var(--space-5) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+    transition: max-width var(--chat-layout-duration) var(--chat-layout-ease);
+  }
+
+  &:not(&--conversation) &__footer-inner {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  &--conversation &__footer-inner {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  &--conversation:not(.chat-page--sessions) &__footer-inner {
+    padding-inline: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  &__voice-hint {
+    margin: 0;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+
+    &--error {
+      color: var(--color-danger, #d14343);
+    }
+  }
+
+  &__voice-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-full);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold);
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease,
+      border-color 0.2s ease;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-gold-border-hi);
+      box-shadow: 0 0 0 3px var(--color-gold-dim-bg);
+    }
+
+    &--active {
+      background: var(--color-gold);
+      color: var(--color-text-on-primary);
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 0 18px rgba(212, 160, 23, 0.45);
+      animation: voicePulse 1.1s ease-in-out infinite;
+
+      // The recording cue is visual only; suppress it for reduced motion.
+      &.chat-page__voice-btn--reduced-motion {
+        animation: none;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  &__bubble-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  &__tts-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-full);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold);
+    font-size: 0.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
+
+    svg {
+      width: 0.95rem;
+      height: 0.95rem;
+    }
+
+    &:hover {
+      border-color: var(--color-gold-border-hi);
+      box-shadow: 0 0 0 3px var(--color-gold-dim-bg);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-gold-bright);
+      outline-offset: 2px;
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    &--active {
+      background: var(--color-gold);
+      color: var(--color-text-on-primary);
+      border-color: var(--color-gold-bright);
+      box-shadow: 0 0 14px rgba(212, 160, 23, 0.4);
+      animation: ttsPulse 1.1s ease-in-out infinite;
+
+      // Audio is exempt; the VISUAL pulse is suppressed for reduced motion.
+      &.chat-page__tts-btn--reduced-motion {
+        animation: none;
+      }
+    }
+  }
+
+  &__tts-label {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__tts-error {
+    font-size: 0.75rem;
+    color: var(--color-danger, #d14343);
+  }
+
+  &__auth-prompt {
+    margin: 0;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+
+    a {
+      color: var(--color-gold);
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__composer {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    padding: 0.45rem 0.45rem 0.45rem 0.65rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--elevation-1);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:focus-within {
+      border-color: var(--color-gold-border);
+      box-shadow:
+        0 0 0 3px var(--color-gold-dim-bg),
+        var(--elevation-1);
+    }
+  }
+
+  &__input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.65rem 0.75rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 0.92rem;
+    font-family: var(--font-family-base);
+    background: color-mix(in srgb, var(--color-background) 70%, var(--color-surface));
+    color: var(--color-text-primary);
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+  }
+
+  &__send {
+    flex-shrink: 0;
+    --color-primary: linear-gradient(135deg, var(--color-gold), var(--color-gold-bright));
+    --color-primary-hover: linear-gradient(135deg, var(--color-gold-bright), #f5c842);
+
+    ::ng-deep .app-button {
+      border-radius: var(--radius-full);
+      padding-inline: var(--space-4);
+      min-width: 5.5rem;
+    }
+
+    ::ng-deep .app-button:not(:disabled) {
+      box-shadow: 0 2px 12px rgba(200, 146, 14, 0.32);
+    }
+
+    ::ng-deep .app-button:disabled {
+      background: var(--color-gold-dim-bg);
+      color: var(--color-gold);
+      border: 1px solid var(--color-gold-border);
+      opacity: 1;
+    }
+  }
+}
