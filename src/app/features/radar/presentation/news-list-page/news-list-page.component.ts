@@ -13,7 +13,13 @@ import { RadarFiltersComponent } from '../radar-filters/radar-filters.component'
 @Component({
   selector: 'app-news-list-page',
   standalone: true,
-  imports: [RadarFiltersComponent, NewsCardComponent, ButtonComponent, EmptyStateComponent, SkeletonCardComponent],
+  imports: [
+    RadarFiltersComponent,
+    NewsCardComponent,
+    ButtonComponent,
+    EmptyStateComponent,
+    SkeletonCardComponent,
+  ],
   templateUrl: './news-list-page.component.html',
   styleUrl: './news-list-page.component.scss',
   providers: [NewsListStore],
