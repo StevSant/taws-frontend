@@ -13,6 +13,18 @@ import { DEMO_AUTH_PERSPECTIVES } from './demo-auth-perspectives';
 export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:8000',
+  /**
+   * Whether server-side TTS (`POST /api/v1/chat/speak`) is available. When
+   * false, message playback uses the browser Web Speech fallback directly
+   * instead of calling the endpoint just to receive a 503.
+   */
+  ttsEnabled: true,
+  /**
+   * Whether server-side STT (`POST /api/v1/chat/transcribe`) is available. When
+   * false, voice dictation uses the browser Web Speech fallback directly
+   * instead of POSTing audio to the endpoint just to receive a 503.
+   */
+  sttEnabled: true,
   supabaseUrl: 'https://jtvaogvsjjpspypmnwgm.supabase.co',
   supabaseAnonKey:
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dmFvZ3Zzampwc3B5cG1ud2dtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDE1NjgsImV4cCI6MjA5OTMxNzU2OH0.NYiyrK0kzxfb5S4YBCCJUVYjOsNLyjCSYYPaP4acS3E',

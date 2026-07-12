@@ -31,6 +31,23 @@ import { ChatRepository } from '../../domain';
 
 import { SseChatRepository } from '../../infrastructure';
 
+import {
+  AudioPlaybackStore,
+  DictationStore,
+  prefersReducedMotion,
+  SpeechToTextProvider,
+  TextToSpeechProvider,
+} from '../../../audio';
+
+import {
+  HttpSttProvider,
+  HttpTtsProvider,
+  HybridSpeechToTextProvider,
+  HybridTextToSpeechProvider,
+  WebSpeechSttProvider,
+  WebSpeechTtsProvider,
+} from '../../../audio/infrastructure';
+
 import { ChartComponent } from '../../../../shared/charts';
 
 import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions-panel.component';
@@ -38,8 +55,6 @@ import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions
 import { ChatContextRailComponent } from '../chat-context-rail/chat-context-rail.component';
 
 import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
-
-import { CHAT_VOICE_DUMMY_LISTEN_MS } from './chat-voice-dummy';
 
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
@@ -99,6 +114,22 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ChatStore,
 
     { provide: ChatRepository, useClass: SseChatRepository },
+
+    // Hybrid TTS: HTTP server voice with a transparent Web Speech fallback.
+    // The store depends only on the TextToSpeechProvider port; the composite
+    // decides HTTP-first vs Web-Speech-only based on `ttsEnabled`.
+    HttpTtsProvider,
+    WebSpeechTtsProvider,
+    { provide: TextToSpeechProvider, useClass: HybridTextToSpeechProvider },
+    AudioPlaybackStore,
+
+    // Hybrid STT: server voice dictation with a Web Speech fallback. The store
+    // depends only on the SpeechToTextProvider port; the composite decides
+    // HTTP-first vs Web-Speech-only based on `sttEnabled`.
+    HttpSttProvider,
+    WebSpeechSttProvider,
+    { provide: SpeechToTextProvider, useClass: HybridSpeechToTextProvider },
+    DictationStore,
   ],
 
   templateUrl: './chat-page.component.html',
@@ -112,15 +143,26 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   readonly sessionsStore = inject(ChatSessionsStore);
 
+  readonly audio = inject(AudioPlaybackStore);
+
+  readonly dictation = inject(DictationStore);
+
   readonly i18n = inject(TranslationService);
 
   readonly auth = inject(AuthStore);
 
   private readonly shellSearch = inject(ShellSearchService);
 
+  /** Suppresses the animated playback indicator when the user prefers reduced motion. */
+  readonly reducedMotion = prefersReducedMotion();
+
   readonly draft = signal('');
 
-  readonly isListening = signal(false);
+  /** True while voice dictation is capturing — drives the mic/oracle UI. */
+  readonly isListening = computed(() => this.dictation.isRecording());
+
+  /** Whether any dictation path works; hides the mic button otherwise. */
+  readonly micAvailable = this.dictation.isSupported();
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
 
@@ -156,7 +198,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   });
 
   private readonly composerInput = viewChild<ElementRef<HTMLInputElement>>('composerInput');
-  private voiceDummyTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -224,7 +265,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     document.body.classList.remove('route-chat');
 
-    this.clearVoiceDummyTimer();
+    this.dictation.cancelDictation();
   }
 
   onSend(): void {
@@ -232,13 +273,22 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.stopListening();
+    this.dictation.cancelDictation();
 
     const message = this.draft();
 
     this.draft.set('');
 
     void this.store.send(message);
+  }
+
+  /**
+   * Click-only playback for a completed assistant message (never auto-speak on
+   * stream completion — browser autoplay policy). Clicking the message that is
+   * already playing toggles it off; the store handles the hybrid fallback.
+   */
+  speakMessage(messageId: string, content: string): void {
+    void this.audio.play(messageId, content);
   }
 
   useSuggestion(key: TranslationKey): void {
@@ -253,42 +303,34 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.useSuggestion(suggestionKey as TranslationKey);
   }
 
-  toggleVoiceDummy(): void {
-    if (!this.canCompose()) {
+  /**
+   * Toggles voice dictation. Requires a user gesture (this click) — capture is
+   * never auto-started. On stop, the transcribed text is appended to the
+   * current draft so the user can review/edit it before sending. The hybrid
+   * fallback is handled inside DictationStore's provider.
+   */
+  async toggleDictation(): Promise<void> {
+    if (!this.canCompose() || !this.micAvailable) {
       return;
     }
 
-    if (this.isListening()) {
-      this.stopListening();
-
+    if (this.dictation.isRecording()) {
+      const transcript = await this.dictation.stopDictation();
+      this.appendTranscript(transcript);
       return;
     }
 
-    this.isListening.set(true);
-
-    this.clearVoiceDummyTimer();
-
-    this.voiceDummyTimer = setTimeout(() => {
-      this.draft.set(this.i18n.t('chat.voice.dummyTranscript'));
-
-      this.isListening.set(false);
-
-      this.voiceDummyTimer = null;
-    }, CHAT_VOICE_DUMMY_LISTEN_MS);
+    await this.dictation.startDictation();
   }
 
-  private stopListening(): void {
-    this.isListening.set(false);
-
-    this.clearVoiceDummyTimer();
-  }
-
-  private clearVoiceDummyTimer(): void {
-    if (this.voiceDummyTimer !== null) {
-      clearTimeout(this.voiceDummyTimer);
-
-      this.voiceDummyTimer = null;
+  private appendTranscript(transcript: string): void {
+    const clean = transcript.trim();
+    if (!clean) {
+      return;
     }
+
+    const current = this.draft().trim();
+    this.draft.set(current ? `${current} ${clean}` : clean);
   }
 
   private readSessionsPanelOpen(): boolean {

@@ -11,6 +11,10 @@ import { DemoAuthPerspective } from '../../features/auth/domain/models/demo-auth
 export class AppConfigService {
   readonly apiBaseUrl: string = environment.apiBaseUrl;
   readonly production: boolean = environment.production;
+  /** Whether server-side TTS is available; gates the primary TTS provider. */
+  readonly ttsEnabled: boolean = environment.ttsEnabled;
+  /** Whether server-side STT is available; gates the primary STT provider. */
+  readonly sttEnabled: boolean = environment.sttEnabled;
   readonly supabaseUrl: string = environment.supabaseUrl;
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */

@@ -176,6 +176,53 @@
                           </div>
                         }
 
+                        @if (!message.pending && message.content) {
+                          <footer class="chat-page__bubble-actions">
+                            <button
+                              type="button"
+                              class="chat-page__tts-btn"
+                              [class.chat-page__tts-btn--active]="
+                                audio.isPlaying() && audio.activeMessageId() === message.id
+                              "
+                              [class.chat-page__tts-btn--reduced-motion]="reducedMotion"
+                              [attr.aria-label]="
+                                audio.isPlaying() && audio.activeMessageId() === message.id
+                                  ? i18n.t('chat.tts.stop')
+                                  : i18n.t('chat.tts.play')
+                              "
+                              [attr.aria-pressed]="
+                                audio.isPlaying() && audio.activeMessageId() === message.id
+                              "
+                              (click)="speakMessage(message.id, message.content)"
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                              >
+                                @if (audio.isPlaying() && audio.activeMessageId() === message.id) {
+                                  <rect x="7" y="7" width="10" height="10" rx="1.5" />
+                                } @else {
+                                  <path d="M8 5v14l11-7z" />
+                                }
+                              </svg>
+                              @if (audio.isPlaying() && audio.activeMessageId() === message.id) {
+                                <span class="chat-page__tts-label" role="status">
+                                  {{ i18n.t('chat.tts.speaking') }}
+                                </span>
+                              }
+                            </button>
+
+                            @if (audio.error() && audio.erroredMessageId() === message.id) {
+                              <span class="chat-page__tts-error" role="alert">
+                                {{ i18n.t('chat.tts.error') }}
+                              </span>
+                            }
+                          </footer>
+                        }
+
                         @if (message.pending && !message.content) {
                           <span
                             class="chat-page__typing"
@@ -216,37 +263,46 @@
               {{ i18n.t('chat.auth.signInPrompt') }}
               <a routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
             </p>
-          } @else {
+          } @else if (dictation.error()) {
+            <p class="chat-page__voice-hint chat-page__voice-hint--error" role="alert">
+              {{ i18n.t('chat.stt.error') }}
+            </p>
+          } @else if (micAvailable) {
             <p class="chat-page__voice-hint">{{ i18n.t('chat.voice.hint') }}</p>
+          } @else {
+            <p class="chat-page__voice-hint">{{ i18n.t('chat.stt.unavailable') }}</p>
           }
 
           <form class="chat-page__composer glass" (ngSubmit)="onSend()">
-            <button
-              type="button"
-              class="chat-page__voice-btn"
-              [class.chat-page__voice-btn--active]="isListening()"
-              [attr.aria-label]="
-                isListening() ? i18n.t('chat.voice.stop') : i18n.t('chat.voice.listen')
-              "
-              [attr.aria-pressed]="isListening()"
-              [disabled]="!canCompose()"
-              (click)="toggleVoiceDummy()"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.8"
-                aria-hidden="true"
+            @if (micAvailable) {
+              <button
+                type="button"
+                class="chat-page__voice-btn"
+                [class.chat-page__voice-btn--active]="isListening()"
+                [class.chat-page__voice-btn--reduced-motion]="reducedMotion"
+                [attr.aria-label]="
+                  isListening() ? i18n.t('chat.stt.stop') : i18n.t('chat.stt.start')
+                "
+                [attr.aria-pressed]="isListening()"
+                [disabled]="!canCompose() && !isListening()"
+                (click)="toggleDictation()"
               >
-                @if (isListening()) {
-                  <rect x="7" y="7" width="10" height="10" rx="1.5" />
-                } @else {
-                  <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z" />
-                  <path d="M19 11a7 7 0 0 1-14 0M12 18v3" />
-                }
-              </svg>
-            </button>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  aria-hidden="true"
+                >
+                  @if (isListening()) {
+                    <rect x="7" y="7" width="10" height="10" rx="1.5" />
+                  } @else {
+                    <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z" />
+                    <path d="M19 11a7 7 0 0 1-14 0M12 18v3" />
+                  }
+                </svg>
+              </button>
+            }
 
             <input
               #composerInput
@@ -254,7 +310,7 @@
               type="text"
               name="draft"
               [placeholder]="
-                isListening() ? i18n.t('chat.voice.listening') : i18n.t('chat.placeholder')
+                isListening() ? i18n.t('chat.stt.listening') : i18n.t('chat.placeholder')
               "
               [ngModel]="draft()"
               (ngModelChange)="draft.set($event)"
