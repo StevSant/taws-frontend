@@ -8,15 +8,8 @@
       <li class="news-timeline__item">
         <time class="news-timeline__time">{{ entry.news.publishedAt | date: 'HH:mm' }}</time>
 
-        <app-instrument-ticker-badge
-          class="news-timeline__badge-icon"
-          [symbol]="entry.symbol"
-          size="sm"
-        />
-
         <div class="news-timeline__copy">
           <div class="news-timeline__headline-row">
-            <span class="news-timeline__ticker">{{ entry.symbol }}</span>
             <a
               class="news-timeline__headline"
               [href]="entry.news.url"
@@ -31,40 +24,49 @@
             }
             {{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}
           </span>
-        </div>
 
-        <div class="news-timeline__actions">
-          <div class="news-timeline__sentiment">
-            <span
-              class="news-timeline__pill"
-              [class.news-timeline__pill--positive]="entry.impactClass === 'positive'"
-              [class.news-timeline__pill--negative]="entry.impactClass === 'negative'"
-              [class.news-timeline__pill--neutral]="entry.impactClass === 'neutral'"
-              [class.news-timeline__pill--pending]="!entry.impactClass"
-            >
-              {{ impactLabel(entry.impactClass) }}
-            </span>
-            @if (confidenceLabel(entry.confidence); as pct) {
-              <span class="news-timeline__confidence"
-                >{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span
-              >
+          <ul class="news-timeline__symbols">
+            @for (related of entry.symbols; track related.symbol) {
+              <li class="news-timeline__symbol">
+                <app-instrument-ticker-badge
+                  class="news-timeline__badge-icon"
+                  [symbol]="related.symbol"
+                  size="sm"
+                />
+                <span class="news-timeline__ticker">{{ related.symbol }}</span>
+
+                <span
+                  class="news-timeline__pill"
+                  [class.news-timeline__pill--positive]="related.impactClass === 'positive'"
+                  [class.news-timeline__pill--negative]="related.impactClass === 'negative'"
+                  [class.news-timeline__pill--neutral]="related.impactClass === 'neutral'"
+                  [class.news-timeline__pill--pending]="!related.impactClass"
+                >
+                  {{ impactLabel(related.impactClass) }}
+                </span>
+                @if (confidenceLabel(related.confidence); as pct) {
+                  <span class="news-timeline__confidence"
+                    >{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span
+                  >
+                }
+
+                @if (!related.impactClass) {
+                  <button
+                    type="button"
+                    class="news-timeline__analyze"
+                    [disabled]="store.isGeneratingFor(related.symbol)"
+                    (click)="onAnalyze(related.symbol)"
+                  >
+                    {{
+                      store.isGeneratingFor(related.symbol)
+                        ? i18n.t('radar.generate.generating')
+                        : i18n.t('radar.timeline.analyze')
+                    }}
+                  </button>
+                }
+              </li>
             }
-          </div>
-
-          @if (!entry.impactClass) {
-            <button
-              type="button"
-              class="news-timeline__analyze"
-              [disabled]="store.isGeneratingFor(entry.symbol)"
-              (click)="onAnalyze(entry.symbol)"
-            >
-              {{
-                store.isGeneratingFor(entry.symbol)
-                  ? i18n.t('radar.generate.generating')
-                  : i18n.t('radar.timeline.analyze')
-              }}
-            </button>
-          }
+          </ul>
         </div>
       </li>
     }

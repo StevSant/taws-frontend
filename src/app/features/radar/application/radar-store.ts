@@ -26,11 +26,22 @@ import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
 
-export interface NewsTimelineEntry {
-  news: NewsItem;
+/** One instrument tied to a timeline article, with its own AI verdict. */
+export interface NewsTimelineSymbol {
   symbol: string;
   impactClass?: ImpactClass;
   confidence?: number;
+}
+
+/**
+ * A single news article on the radar timeline. An article can reference
+ * several instruments at once, so it carries the full list of related
+ * symbols (each with its own signal verdict) rather than being duplicated
+ * once per instrument — see `newsTimeline`.
+ */
+export interface NewsTimelineEntry {
+  news: NewsItem;
+  symbols: NewsTimelineSymbol[];
 }
 
 export interface RadarKpiSummary {
@@ -132,18 +143,30 @@ export class RadarStore {
     return computeMarketScore(landscape.distribution, landscape.totalInstruments);
   });
   readonly newsTimeline = computed((): NewsTimelineEntry[] => {
-    const entries: NewsTimelineEntry[] = [];
+    // A multi-symbol article surfaces under every instrument it references,
+    // so dedupe by `news.id`: each article appears once, accumulating the
+    // full list of related symbols (with each symbol's own verdict). This
+    // keeps the timeline's `track news.id` keys unique (NG0955) and shows
+    // one card per story instead of N near-identical rows.
+    const byNewsId = new Map<string, NewsTimelineEntry>();
     for (const signal of this.signals()) {
       for (const news of signal.news) {
-        entries.push({
-          news,
+        const related: NewsTimelineSymbol = {
           symbol: signal.symbol,
           impactClass: signal.impactClass,
           confidence: signal.confidence,
-        });
+        };
+        const existing = byNewsId.get(news.id);
+        if (existing) {
+          if (!existing.symbols.some((entry) => entry.symbol === related.symbol)) {
+            existing.symbols.push(related);
+          }
+        } else {
+          byNewsId.set(news.id, { news, symbols: [related] });
+        }
       }
     }
-    return entries.sort(
+    return Array.from(byNewsId.values()).sort(
       (left, right) =>
         new Date(right.news.publishedAt).getTime() - new Date(left.news.publishedAt).getTime(),
     );
