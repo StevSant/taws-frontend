@@ -15,12 +15,10 @@ export class GuideNotesTabsComponent {
   readonly guideTitle = input.required<string>();
   readonly guideSteps = input.required<readonly string[]>();
   readonly notesTitle = input.required<string>();
-  readonly notes = input.required<readonly string[]>();
 
   /** Tab-header labels. Optional so callers can inject fully resolved i18n strings later. */
   readonly guideTabLabel = input('Guía');
   readonly notesTabLabel = input('Notas');
-  readonly notesEmptyLabel = input('Todavía no hay notas.');
 
   readonly activeTab = signal<GuideNotesTab>('guide');
 

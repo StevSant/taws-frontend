@@ -29,6 +29,14 @@
     color: var(--color-text-secondary);
     font-size: 0.9rem;
   }
+
+  &__prep {
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
 }
 
 @media (max-width: 768px) {

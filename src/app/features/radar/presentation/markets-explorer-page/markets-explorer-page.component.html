@@ -1,0 +1,186 @@
+<div class="feature-page markets-explorer">
+  <header class="markets-explorer__hero">
+    <div>
+      <h1 class="markets-explorer__title">{{ i18n.t('markets.title') }}</h1>
+      <p class="markets-explorer__subtitle">{{ i18n.t('markets.subtitle') }}</p>
+    </div>
+    <div class="markets-explorer__search">
+      <input
+        type="search"
+        class="markets-explorer__search-input"
+        [placeholder]="i18n.t('markets.search.placeholder')"
+        [value]="store.search()"
+        (input)="onSearch($any($event.target).value)"
+        [attr.aria-label]="i18n.t('markets.search.placeholder')"
+      />
+    </div>
+  </header>
+
+  <div class="markets-explorer__filters" role="group" [attr.aria-label]="i18n.t('markets.title')">
+    @for (option of filterOptions; track option ?? 'all') {
+      <button
+        type="button"
+        class="markets-explorer__pill"
+        [class.markets-explorer__pill--active]="store.assetClass() === option"
+        (click)="onFilter(option)"
+      >
+        {{ option ? i18n.t(labelKeys[option]) : i18n.t('markets.filter.all') }}
+      </button>
+    }
+  </div>
+
+  <!-- Highlight leaderboards -->
+  @if (!store.error()) {
+    <div class="markets-explorer__highlights">
+      @for (group of [
+        { key: 'gainers', title: i18n.t('markets.highlights.gainers'), rows: store.highlights().topGainers },
+        { key: 'losers', title: i18n.t('markets.highlights.losers'), rows: store.highlights().topLosers },
+        { key: 'volatile', title: i18n.t('markets.highlights.volatile'), rows: store.highlights().mostVolatile },
+        { key: 'trending', title: i18n.t('markets.highlights.trending'), rows: store.highlights().trending }
+      ]; track group.key) {
+        <section class="markets-explorer__highlight feature-panel">
+          <h2 class="markets-explorer__highlight-title">{{ group.title }}</h2>
+          @if (group.rows.length === 0) {
+            <p class="markets-explorer__highlight-empty">{{ i18n.t('markets.highlights.empty') }}</p>
+          } @else {
+            <ul class="markets-explorer__highlight-list">
+              @for (row of group.rows; track row.symbol) {
+                <li class="markets-explorer__highlight-row" (click)="openDetail(row.symbol)">
+                  <span class="markets-explorer__highlight-symbol">{{ row.symbol }}</span>
+                  <span
+                    class="markets-explorer__delta"
+                    [class.markets-explorer__delta--up]="isPositive(row) === true"
+                    [class.markets-explorer__delta--down]="isPositive(row) === false"
+                  >
+                    @if (group.key === 'volatile') {
+                      {{ row.volatilityPct !== null ? row.volatilityPct.toFixed(1) + '%' : '—' }}
+                    } @else {
+                      {{ formatPct(row.priceDeltaPct) }}
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </section>
+      }
+    </div>
+  }
+
+  @if (store.error(); as error) {
+    <div class="feature-error" role="alert">
+      <span>{{ i18n.t('markets.error') }}{{ error }}</span>
+      <app-button [label]="i18n.t('radar.error.retry')" (pressed)="onRetry()" />
+    </div>
+  }
+
+  <section class="markets-explorer__table feature-panel">
+    <div class="markets-explorer__row markets-explorer__row--head" aria-hidden="true">
+      <button type="button" class="markets-explorer__col-btn" (click)="onSort('name')">
+        {{ i18n.t('markets.col.asset') }} {{ sortIndicator('name') }}
+      </button>
+      <button type="button" class="markets-explorer__col-btn" (click)="onSort('price')">
+        {{ i18n.t('markets.col.price') }} {{ sortIndicator('price') }}
+      </button>
+      <button type="button" class="markets-explorer__col-btn" (click)="onSort('change')">
+        {{ i18n.t('markets.col.change') }} {{ sortIndicator('change') }}
+      </button>
+      <span>{{ i18n.t('markets.col.volatility') }}</span>
+      <span>{{ i18n.t('markets.col.trend') }}</span>
+      <span>{{ i18n.t('markets.col.signal') }}</span>
+      <span>{{ i18n.t('markets.col.follow') }}</span>
+    </div>
+
+    @if (store.isLoading()) {
+      <div class="markets-explorer__skeletons" aria-busy="true">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <app-skeleton-card />
+        }
+      </div>
+    } @else if (store.isEmpty()) {
+      <app-empty-state
+        [title]="i18n.t('markets.empty.title')"
+        [description]="i18n.t('markets.empty.description')"
+      />
+    } @else {
+      <div class="markets-explorer__body" role="list">
+        @for (row of store.items(); track row.symbol) {
+          <div
+            class="markets-explorer__row"
+            role="listitem"
+            tabindex="0"
+            (click)="openDetail(row.symbol)"
+            (keydown.enter)="openDetail(row.symbol)"
+          >
+            <div class="markets-explorer__asset">
+              <app-instrument-ticker-badge [symbol]="row.symbol" size="sm" />
+              <div class="markets-explorer__asset-copy">
+                <span class="markets-explorer__symbol">{{ row.symbol }}</span>
+                <span class="markets-explorer__name">{{ row.name }}</span>
+              </div>
+            </div>
+
+            <span class="markets-explorer__price">{{ formatPrice(row.lastPrice, row.currency) }}</span>
+
+            <span
+              class="markets-explorer__delta"
+              [class.markets-explorer__delta--up]="isPositive(row) === true"
+              [class.markets-explorer__delta--down]="isPositive(row) === false"
+            >
+              {{ formatPct(row.priceDeltaPct) }}
+            </span>
+
+            <span class="markets-explorer__volatility">
+              {{ row.volatilityPct !== null ? row.volatilityPct.toFixed(1) + '%' : '—' }}
+            </span>
+
+            <div class="markets-explorer__trend">
+              <app-markets-sparkline [points]="row.sparkline" [positive]="isPositive(row)" />
+            </div>
+
+            <span
+              class="markets-explorer__signal"
+              [class.markets-explorer__signal--positive]="row.latestSignal?.impactClass === 'positive'"
+              [class.markets-explorer__signal--negative]="row.latestSignal?.impactClass === 'negative'"
+            >
+              {{ signalLabel(row) }}
+            </span>
+
+            <button
+              type="button"
+              class="markets-explorer__follow"
+              [class.markets-explorer__follow--active]="store.isFollowed(row.symbol)"
+              [disabled]="!store.watchlistAvailable() || store.followBusySymbol() === row.symbol"
+              [title]="
+                store.watchlistAvailable()
+                  ? (store.isFollowed(row.symbol) ? i18n.t('markets.following') : i18n.t('markets.follow'))
+                  : i18n.t('markets.follow.auth')
+              "
+              (click)="onFollow(row, $event)"
+            >
+              {{ store.isFollowed(row.symbol) ? '★' : '☆' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (store.watchlistError(); as followError) {
+        <p class="markets-explorer__follow-error" role="alert">{{ followError }}</p>
+      }
+
+      <footer class="markets-explorer__pagination">
+        <app-button
+          [label]="i18n.t('markets.pagination.prev')"
+          [disabled]="store.page() <= 1"
+          (pressed)="goToPage(store.page() - 1)"
+        />
+        <span class="markets-explorer__page-label">{{ pageLabel() }}</span>
+        <app-button
+          [label]="i18n.t('markets.pagination.next')"
+          [disabled]="store.page() >= store.totalPages()"
+          (pressed)="goToPage(store.page() + 1)"
+        />
+      </footer>
+    }
+  </section>
+</div>

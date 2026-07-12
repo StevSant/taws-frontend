@@ -20,6 +20,15 @@
     color: var(--color-text-muted);
   }
 
+  &__legend {
+    margin: 0.4rem 0 0;
+    max-width: 46ch;
+    font-size: 0.68rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    opacity: 0.85;
+  }
+
   &__ladder {
     list-style: none;
     margin: 0;

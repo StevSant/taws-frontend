@@ -8,11 +8,11 @@
     [guideTitle]="i18n.t('scenarios.guide.title')"
     [guideSteps]="guideSteps()"
     [notesTitle]="i18n.t('scenarios.notes.title')"
-    [notes]="scenarioNotes"
     [guideTabLabel]="i18n.t('scenarios.guide.tabLabel')"
     [notesTabLabel]="i18n.t('scenarios.notes.tabLabel')"
-    [notesEmptyLabel]="i18n.t('scenarios.notes.empty')"
-  />
+  >
+    <app-notes-panel notesPanel />
+  </app-guide-notes-tabs>
 
   <div class="scenarios-page__layout">
     <div class="scenarios-page__main">
@@ -94,7 +94,11 @@
           </label>
         }
 
-        <div class="scenarios-page__actions">
+        <div
+          #executeAction
+          class="scenarios-page__actions"
+          [class.scenarios-page__actions--ready]="store.canGenerate()"
+        >
           <app-button
             [label]="
               store.isGenerating() ? i18n.t('scenarios.generating') : i18n.t('scenarios.generate')

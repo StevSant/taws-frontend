@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, ElementRef, OnInit, computed, effect, inject, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslationService } from '../../../../core';
@@ -12,13 +12,11 @@ import {
   GuideNotesTabsComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
+import { NotesPanelComponent } from '../../../notes/presentation';
 import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
 import { PresetPickerComponent } from '../preset-picker/preset-picker.component';
 
 const FREE_TEXT_MAX_LENGTH = 1000;
-
-/** Placeholder — no notes feature exists yet; keeps `app-guide-notes-tabs`'s Notes tab wired but empty. */
-const EMPTY_SCENARIO_NOTES: readonly string[] = [];
 
 /**
  * Scenario Lab page (issue #13, extended by #20, plus #34's "arm monitor"
@@ -55,6 +53,7 @@ const EMPTY_SCENARIO_NOTES: readonly string[] = [];
     SkeletonCardComponent,
     EmptyStateComponent,
     PresetPickerComponent,
+    NotesPanelComponent,
   ],
   providers: [DatePipe],
   templateUrl: './scenarios-page.component.html',
@@ -62,7 +61,6 @@ const EMPTY_SCENARIO_NOTES: readonly string[] = [];
 })
 export class ScenariosPageComponent implements OnInit {
   readonly freeTextMaxLength = FREE_TEXT_MAX_LENGTH;
-  readonly scenarioNotes = EMPTY_SCENARIO_NOTES;
 
   readonly guideSteps = computed(() => [
     this.i18n.t('scenarios.guide.step1'),
@@ -79,13 +77,44 @@ export class ScenariosPageComponent implements OnInit {
     })),
   );
 
+  /** The execute-action block; scrolled into view + emphasized when a scenario becomes
+   * runnable (issue #63) so the primary CTA is never left below the fold at the moment of
+   * decision. */
+  readonly executeAction = viewChild<ElementRef<HTMLElement>>('executeAction');
+
   private readonly router = inject(Router);
+  /** Tracks the previous `canGenerate` value so we only reveal on the false->true edge,
+   * not on every recompute (e.g. typing more free-text keeps it true). */
+  private wasReady = false;
 
   constructor(
     readonly store: ScenarioLabStore,
     readonly i18n: TranslationService,
     private readonly datePipe: DatePipe,
-  ) {}
+  ) {
+    effect(() => {
+      const ready = this.store.canGenerate();
+      if (ready && !this.wasReady) {
+        this.revealExecuteAction();
+      }
+      this.wasReady = ready;
+    });
+  }
+
+  /** Smooth-scroll the execute affordance into view; honors `prefers-reduced-motion` by
+   * falling back to an instant jump so users who opt out get no animated scroll. */
+  private revealExecuteAction(): void {
+    const element = this.executeAction()?.nativeElement;
+    if (!element) {
+      return;
+    }
+    const prefersReducedMotion =
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    element.scrollIntoView({
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      block: 'center',
+    });
+  }
 
   ngOnInit(): void {
     void this.store.init();
