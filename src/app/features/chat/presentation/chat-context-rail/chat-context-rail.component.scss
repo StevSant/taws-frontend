@@ -193,16 +193,6 @@
 
   &__watch-delta {
     font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-
-    &--up {
-      color: var(--color-gain);
-    }
-
-    &--down {
-      color: var(--color-loss);
-    }
   }
 
   &__add {

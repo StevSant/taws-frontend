@@ -93,16 +93,14 @@
               signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined
             ) {
               <span class="chat-context-rail__watch-price">{{
-                signal.marketStats!.lastPrice | number: '1.2-2'
+                formatPrice(signal.marketStats!.lastPrice)
               }}</span>
             }
           </div>
-          <span
+          <app-price-delta-chip
             class="chat-context-rail__watch-delta"
-            [class.chat-context-rail__watch-delta--up]="(signal.priceDelta ?? 0) > 0"
-            [class.chat-context-rail__watch-delta--down]="(signal.priceDelta ?? 0) < 0"
-            >{{ formatDelta(signal.priceDelta) }}</span
-          >
+            [value]="signal.priceDelta"
+          />
         </li>
       }
     </ul>
