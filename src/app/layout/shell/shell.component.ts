@@ -8,7 +8,6 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { LucideSearch } from '@lucide/angular';
@@ -31,7 +30,6 @@ const CUSTOM_LAYOUT_ROUTE_PREFIXES = ['/radar', '/chat', '/scenarios', '/briefin
   selector: 'app-shell',
   standalone: true,
   imports: [
-    FormsModule,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
@@ -63,17 +61,13 @@ export class ShellComponent {
     return email ? email.charAt(0).toUpperCase() : '?';
   });
 
-  readonly searchQuery = computed(() => this.search.query());
-  readonly searchResults = computed(() => this.search.visibleResults());
-  readonly searchOpen = computed(() => this.search.isOpen());
-  readonly searchLoading = computed(() => this.search.isLoading());
-  readonly searchActiveIndex = computed(() => this.search.activeIndex());
-
   private readonly searchHost = viewChild<ElementRef<HTMLElement>>('searchHost');
   private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   private previousShellUrl = this.router.url;
 
   constructor() {
+    void this.search.ensureInstrumentsLoaded();
+
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event) => {
@@ -90,7 +84,8 @@ export class ShellComponent {
     void this.auth.logout().then(() => this.router.navigateByUrl('/login'));
   }
 
-  onSearchQueryChange(value: string): void {
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
     this.search.setQuery(value);
   }
 
@@ -159,7 +154,7 @@ export class ShellComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.searchOpen()) {
+    if (!this.search.isOpen()) {
       return;
     }
     const host = this.searchHost()?.nativeElement;

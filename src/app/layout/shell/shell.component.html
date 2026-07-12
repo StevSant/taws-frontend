@@ -40,7 +40,7 @@
       <form
         #searchHost
         class="app-shell__search"
-        [class.app-shell__search--open]="searchOpen()"
+        [class.app-shell__search--open]="search.isOpen()"
         (submit)="onSearchSubmit($event)"
       >
         <svg lucideSearch class="app-shell__search-icon" [size]="16" aria-hidden="true"></svg>
@@ -50,34 +50,34 @@
           type="search"
           role="combobox"
           aria-autocomplete="list"
-          [attr.aria-expanded]="searchOpen()"
+          [attr.aria-expanded]="search.isOpen()"
           aria-controls="shell-search-results"
           [placeholder]="i18n.t('shell.search.placeholder')"
           [attr.aria-label]="i18n.t('shell.search.label')"
-          [ngModel]="searchQuery()"
-          (ngModelChange)="onSearchQueryChange($event)"
+          [value]="search.query()"
+          (input)="onSearchInput($event)"
           (focus)="onSearchFocus()"
           (keydown)="onSearchKeydown($event)"
         />
 
-        @if (searchOpen()) {
+        @if (search.isOpen()) {
           <div
             id="shell-search-results"
             class="app-shell__search-panel"
             role="listbox"
             [attr.aria-label]="i18n.t('shell.search.label')"
           >
-            @if (searchLoading()) {
+            @if (search.isLoading()) {
               <p class="app-shell__search-empty">{{ i18n.t('shell.search.loading') }}</p>
-            } @else if (searchResults().length === 0) {
+            } @else if (search.visibleResults().length === 0) {
               <p class="app-shell__search-empty">{{ i18n.t('shell.search.noResults') }}</p>
             } @else {
               <ul class="app-shell__search-list">
-                @for (result of searchResults(); track resultKey(result); let index = $index) {
+                @for (result of search.visibleResults(); track resultKey(result); let index = $index) {
                   <li
                     role="option"
-                    [attr.aria-selected]="index === searchActiveIndex()"
-                    [class.app-shell__search-item--active]="index === searchActiveIndex()"
+                    [attr.aria-selected]="index === search.activeIndex()"
+                    [class.app-shell__search-item--active]="index === search.activeIndex()"
                   >
                     <button
                       type="button"
