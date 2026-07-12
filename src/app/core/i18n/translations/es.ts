@@ -270,6 +270,18 @@ export const ES_TRANSLATIONS = {
   'radar.instruments.add': 'Agregar instrumento',
   'radar.review.title': 'Tu revisión',
   'radar.review.subtitle': 'Registro humano de tu decisión — no es recomendación de inversión.',
+  'radar.detail.back': 'Volver al radar',
+  'radar.detail.loading': 'Cargando noticia…',
+  'radar.detail.notFound.title': 'Noticia no encontrada',
+  'radar.detail.notFound.description':
+    'Este artículo ya no está disponible o el enlace no es válido. Vuelve al radar para ver las últimas noticias.',
+  'radar.detail.summary': 'Resumen',
+  'radar.detail.sentiment': 'Sentimiento',
+  'radar.detail.relatedInstruments': 'Instrumentos relacionados',
+  'radar.detail.entities': 'Entidades detectadas',
+  'radar.detail.signalSection': 'Señal IA',
+  'radar.detail.noSignal': 'Este artículo aún no ha sido analizado.',
+  'radar.detail.openOriginal': 'Ver artículo original',
   'scenarios.title': 'Laboratorio de Escenarios',
   'scenarios.description':
     'Simulá "¿qué pasa si…?" y la IA te muestra impacto por activo, la cadena causal paso a paso y acciones sugeridas.',

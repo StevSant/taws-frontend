@@ -211,6 +211,18 @@ export const EN_TRANSLATIONS = {
   'radar.card.status.pending': 'Pending — analyze with AI',
   'radar.review.title': 'Your review',
   'radar.review.subtitle': 'Human record of your decision — not investment advice.',
+  'radar.detail.back': 'Back to radar',
+  'radar.detail.loading': 'Loading news item…',
+  'radar.detail.notFound.title': 'News item not found',
+  'radar.detail.notFound.description':
+    'This article is no longer available or the link is invalid. Go back to the radar to browse the latest news.',
+  'radar.detail.summary': 'Summary',
+  'radar.detail.sentiment': 'Sentiment',
+  'radar.detail.relatedInstruments': 'Related instruments',
+  'radar.detail.entities': 'Detected entities',
+  'radar.detail.signalSection': 'AI signal',
+  'radar.detail.noSignal': 'This article has not been analyzed yet.',
+  'radar.detail.openOriginal': 'Open original article',
   'radar.landscape.unclassifiedHint':
     'Most items have not been analyzed yet. Use "Analyze all pending" or the button on each card.',
   'radar.landscape.filterHint': 'Tap to filter cards',

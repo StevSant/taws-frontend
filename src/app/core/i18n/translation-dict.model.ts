@@ -257,6 +257,17 @@ export interface TranslationDict {
   'radar.instruments.add': string;
   'radar.review.title': string;
   'radar.review.subtitle': string;
+  'radar.detail.back': string;
+  'radar.detail.loading': string;
+  'radar.detail.notFound.title': string;
+  'radar.detail.notFound.description': string;
+  'radar.detail.summary': string;
+  'radar.detail.sentiment': string;
+  'radar.detail.relatedInstruments': string;
+  'radar.detail.entities': string;
+  'radar.detail.signalSection': string;
+  'radar.detail.noSignal': string;
+  'radar.detail.openOriginal': string;
   'scenarios.title': string;
   'scenarios.guide.title': string;
   'scenarios.guide.step1': string;

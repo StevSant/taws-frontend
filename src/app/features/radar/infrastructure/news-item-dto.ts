@@ -1,4 +1,7 @@
-/** Wire shape of `NewsItemResponse` as returned inside `GET /api/v1/news`'s `items` array. */
+import { AnalysisStatus } from '../domain';
+import { NewsEntityDto } from './news-entity-dto';
+
+/** Wire shape of `NewsItemResponse` (both the list `items` array and `GET /api/v1/news/{id}`). */
 export interface NewsItemDto {
   id: string;
   title: string;
@@ -13,4 +16,9 @@ export interface NewsItemDto {
    * a backend that predates this field.
    */
   provider?: string;
+  /** Enrichment fields — `null` for non-enriching sources. */
+  entities?: NewsEntityDto[] | null;
+  sentiment_score?: number | null;
+  analysis_status?: AnalysisStatus;
+  signal_id?: string | null;
 }

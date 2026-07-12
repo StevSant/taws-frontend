@@ -10,12 +10,17 @@
 
         <div class="news-timeline__copy">
           <div class="news-timeline__headline-row">
+            <a class="news-timeline__headline" [routerLink]="['/radar/news', entry.news.id]">{{
+              entry.news.title
+            }}</a>
             <a
-              class="news-timeline__headline"
+              class="news-timeline__external"
               [href]="entry.news.url"
               target="_blank"
               rel="noopener noreferrer"
-              >{{ entry.news.title }}</a
+              [attr.aria-label]="i18n.t('radar.detail.openOriginal')"
+              [attr.title]="i18n.t('radar.detail.openOriginal')"
+              >&#8599;</a
             >
           </div>
           <span class="news-timeline__meta">

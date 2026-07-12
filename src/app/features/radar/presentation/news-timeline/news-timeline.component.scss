@@ -88,6 +88,18 @@
     }
   }
 
+  &__external {
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-gold-bright);
+    }
+  }
+
   &__meta {
     display: block;
     margin-top: 0.15rem;
