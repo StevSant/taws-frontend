@@ -1,4 +1,4 @@
-/** Wire shape of `NewsItemResponse` as returned by `GET /api/v1/news`. */
+/** Wire shape of `NewsItemResponse` as returned inside `GET /api/v1/news`'s `items` array. */
 export interface NewsItemDto {
   id: string;
   title: string;

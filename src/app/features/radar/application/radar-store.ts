@@ -334,6 +334,25 @@ export class RadarStore {
     }
   }
 
+  /**
+   * News-derived symbols scoped to the curated instrument universe. News
+   * entity extraction (marketaux/newsapi) surfaces plenty of tickers the
+   * backend's `quant/stats`/`signals` endpoints never onboarded (foreign
+   * exchanges, OTC tickers, etc.), which otherwise 404s `quant/stats` on
+   * every poll tick for no actionable data. Fails open (returns every
+   * symbol unfiltered) while `instrumentsSignal` hasn't loaded yet, so a
+   * slow/failed instruments fetch never blanks out enrichment.
+   */
+  private trackedSymbols(news: NewsItem[]): string[] {
+    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
+    const instruments = this.instrumentsSignal();
+    if (instruments.length === 0) {
+      return symbols;
+    }
+    const known = new Set(instruments.map((instrument) => instrument.symbol.toUpperCase()));
+    return symbols.filter((symbol) => known.has(symbol.toUpperCase()));
+  }
+
   private async loadInstruments(): Promise<void> {
     try {
       const instruments = await this.instrumentRepository.fetchInstruments();
@@ -396,7 +415,7 @@ export class RadarStore {
   }
 
   private async loadMarketStats(news: NewsItem[]): Promise<void> {
-    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
+    const symbols = this.trackedSymbols(news);
     const fetched = await mapInBatches(
       symbols,
       this.config.radarSignalFetchBatchSize,
@@ -427,7 +446,7 @@ export class RadarStore {
    * page itself (same posture as `loadInstruments`).
    */
   private async loadSignals(news: NewsItem[]): Promise<void> {
-    const symbols = Array.from(new Set(news.flatMap((item) => item.relatedSymbols)));
+    const symbols = this.trackedSymbols(news);
     const fetched = await mapInBatches(
       symbols,
       this.config.radarSignalFetchBatchSize,
