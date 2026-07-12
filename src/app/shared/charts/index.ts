@@ -9,6 +9,7 @@ export type {
 } from './domain/chart-spec.model';
 export type { ChartRequest, ChartRequestKind } from './domain/chart-request.model';
 export { mapChartSpecToOption } from './infrastructure/map-chart-spec-to-option';
+export { createTimeAxisFormatter } from './infrastructure/create-time-axis-formatter';
 export { buildCandlestickSpec } from './infrastructure/build-candlestick-spec';
 export { readChartTheme } from './infrastructure/read-chart-theme';
 export type { ChartTheme } from './infrastructure/read-chart-theme';
