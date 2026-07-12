@@ -115,6 +115,61 @@
     color: var(--color-text-primary);
   }
 
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-raised);
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+      border-color: var(--color-gold-border);
+    }
+  }
+
+  &__chip-ticker {
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__chip-price {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__chip-delta {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+
+    &--up {
+      color: var(--color-gain);
+    }
+
+    &--down {
+      color: var(--color-loss);
+    }
+  }
+
+  &__related-news {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__related-news-item {
+    min-width: 0;
+  }
+
   &__entities {
     flex-direction: column;
   }

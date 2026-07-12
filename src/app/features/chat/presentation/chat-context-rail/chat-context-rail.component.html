@@ -50,9 +50,7 @@
             <div class="chat-context-rail__news-copy">
               <a
                 class="chat-context-rail__news-headline"
-                [href]="entry.news.url"
-                target="_blank"
-                rel="noopener noreferrer"
+                [routerLink]="['/radar/news', entry.news.id]"
                 >{{ entry.news.title }}</a
               >
               <span class="chat-context-rail__news-meta"
