@@ -3,3 +3,5 @@ export { RadarNewsNotificationPoller } from './radar-news-notification-poller.se
 export { NewsDetailStore } from './news-detail-store';
 export { AssetDetailStore } from './asset-detail-store';
 export { latestSignalBySymbol } from './latest-signal-by-symbol';
+export { MarketsExplorerStore } from './markets-explorer-store';
+export { AddInstrumentStore } from './add-instrument-store';

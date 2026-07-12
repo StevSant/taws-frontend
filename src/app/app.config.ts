@@ -26,6 +26,7 @@ import {
 import {
   InstrumentRepository,
   MacroRepository,
+  MarketsRepository,
   SentimentRepository,
   NewsRepository,
   QuantRepository,
@@ -35,6 +36,7 @@ import {
 import {
   HttpInstrumentRepository,
   HttpMacroRepository,
+  HttpMarketsRepository,
   HttpSentimentRepository,
   HttpNewsRepository,
   HttpQuantRepository,
@@ -62,6 +64,7 @@ export const appConfig: ApplicationConfig = {
     { provide: SignalReviewRepository, useClass: HttpSignalReviewRepository },
     { provide: QuantRepository, useClass: HttpQuantRepository },
     { provide: MacroRepository, useClass: HttpMacroRepository },
+    { provide: MarketsRepository, useClass: HttpMarketsRepository },
     { provide: SentimentRepository, useClass: HttpSentimentRepository },
     { provide: WatchlistRepository, useClass: HttpWatchlistRepository },
     { provide: BriefingRepository, useClass: HttpBriefingRepository },

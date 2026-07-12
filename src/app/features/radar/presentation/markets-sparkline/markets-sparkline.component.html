@@ -1,0 +1,12 @@
+@if (path(); as d) {
+  <svg
+    class="markets-sparkline markets-sparkline--{{ tone() }}"
+    [attr.viewBox]="viewBox"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <path [attr.d]="d" fill="none" stroke="currentColor" stroke-width="1.5" />
+  </svg>
+} @else {
+  <span class="markets-sparkline markets-sparkline--empty" aria-hidden="true">—</span>
+}

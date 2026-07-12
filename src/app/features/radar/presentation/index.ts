@@ -5,4 +5,5 @@ export { SignalAnalysisComponent } from './signal-analysis/signal-analysis.compo
 export { AssetPriceChartComponent } from './asset-price-chart/asset-price-chart.component';
 export { NewsDetailPageComponent } from './news-detail-page/news-detail-page.component';
 export { AssetDetailPageComponent } from './asset-detail-page/asset-detail-page.component';
+export { MarketsExplorerPageComponent } from './markets-explorer-page/markets-explorer-page.component';
 export { NewsCardComponent } from './news-card/news-card.component';
