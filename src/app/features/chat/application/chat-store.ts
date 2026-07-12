@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AgentTrace, ChartSpec, ChatMessage, ChatRepository, ChatStreamEvent, ToolCall, buildRoutingHops, buildToolHops, resolveRespondingAgent, snapshotToolHops } from '../domain';
+import { AgentTrace, ChartSpec, ChatMessage, ChatRepository, ChatStreamEvent, ToolCall, buildRoutingHops, buildToolHops, resolveRespondingAgent, snapshotRoutingHops, snapshotToolHops } from '../domain';
 import { ChatSessionsStore } from './chat-sessions-store';
 
 const ASSISTANT_ROLE = 'assistant';
@@ -105,6 +105,7 @@ export class ChatStore {
 
   private markSettled(messageId: string): void {
     const agent = resolveRespondingAgent(this.routingHops());
+    const routingHops = snapshotRoutingHops(this.routingHops());
     const tools = snapshotToolHops(this.toolHops());
 
     this.sessionsStore.syncActiveMessages(
@@ -114,6 +115,7 @@ export class ChatStore {
               ...message,
               pending: false,
               ...(agent ? { agent } : {}),
+              ...(routingHops.length > 0 ? { routingHops } : {}),
               ...(tools.length > 0 ? { tools } : {}),
             }
           : message,

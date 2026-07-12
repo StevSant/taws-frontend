@@ -200,8 +200,8 @@ export const ES_TRANSLATIONS = {
   'chat.realtime.end': 'Finalizar llamada',
   'chat.realtime.close': 'Cerrar',
   'chat.realtime.connecting': 'Conectando…',
-  'chat.realtime.live': 'Escuchando — hablá ahora',
-  'chat.realtime.listening': 'Escuchando — hablá ahora',
+  'chat.realtime.live': 'Escuchando',
+  'chat.realtime.listening': 'Escuchando',
   'chat.realtime.speaking': 'Midas está hablando…',
   'chat.realtime.error': 'La sesión de voz falló. Intentá de nuevo.',
   'chat.realtime.permissionDenied':
@@ -216,6 +216,7 @@ export const ES_TRANSLATIONS = {
     'Hablá con naturalidad — Midas responde con inteligencia de mercado.',
   'chat.realtime.transcriptLabel': 'Transcripción en vivo',
   'chat.realtime.transcriptEmpty': 'Tu conversación en vivo aparecerá aquí mientras hablás.',
+  'chat.realtime.chartKicker': 'Visualización de Midas',
   'chat.oracle.status.idle': 'Listo para consultas',
   'chat.oracle.status.listening': 'Escuchando',
   'chat.oracle.status.composing': 'Recibiendo tu consulta',

@@ -1,14 +1,16 @@
-<div
+<dialog
+  #dialog
   class="voice-mode"
   [class.voice-mode--reduced-motion]="reducedMotion()"
   [class.voice-mode--connecting]="isConnecting()"
   [class.voice-mode--live]="isLive()"
   [class.voice-mode--speaking]="isModelSpeaking()"
   [class.voice-mode--offline]="isNotAvailable() || isError()"
-  role="dialog"
+  [class.voice-mode--closing]="closing()"
   aria-modal="true"
   [attr.aria-label]="i18n.t('chat.realtime.overlayLabel')"
   (keydown)="onKeydown($event)"
+  (cancel)="onCancel($event)"
 >
   <button
     type="button"
@@ -18,7 +20,7 @@
     (click)="requestClose()"
   ></button>
 
-  <div class="voice-mode__shell glass">
+  <div class="voice-mode__shell" [class.voice-mode__shell--chart-open]="activeChart()">
     <header class="voice-mode__header">
       <div class="voice-mode__brand">
         <app-midas-glyph
@@ -44,76 +46,112 @@
       </button>
     </header>
 
-    @if (isNotAvailable()) {
-      <div class="voice-mode__notice" role="status">
-        <span class="voice-mode__notice-glyph" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-            <path d="M12 8v5M12 16.5h.01" />
-          </svg>
-        </span>
-        <h2 class="voice-mode__notice-title">{{ i18n.t('chat.realtime.notAvailableTitle') }}</h2>
-        <p class="voice-mode__notice-text">{{ i18n.t('chat.realtime.notAvailable') }}</p>
-      </div>
-    } @else {
-      <div class="voice-mode__stage">
-        <div class="voice-mode__orb" aria-hidden="true">
-          <span class="voice-mode__corona-glow"></span>
-          <span class="voice-mode__corona-ring">
-            <span class="voice-mode__corona-ring-track"></span>
-          </span>
-          <app-golden-polyhedron [size]="orbSize" [activity]="orbActivity()" />
-        </div>
+    <div class="voice-mode__workspace">
+      <section class="voice-mode__voice-pane">
+        @if (isNotAvailable()) {
+          <div class="voice-mode__notice" role="status">
+            <span class="voice-mode__notice-glyph" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
+                <path d="M12 8v5M12 16.5h.01" />
+              </svg>
+            </span>
+            <h2 class="voice-mode__notice-title">{{ i18n.t('chat.realtime.notAvailableTitle') }}</h2>
+            <p class="voice-mode__notice-text">{{ i18n.t('chat.realtime.notAvailable') }}</p>
+          </div>
+        } @else {
+          <div class="voice-mode__stage">
+            <div class="voice-mode__orb" aria-hidden="true">
+              <span class="voice-mode__corona-glow"></span>
+              <span class="voice-mode__corona-ring">
+                <span class="voice-mode__corona-ring-track"></span>
+              </span>
+              <app-golden-polyhedron
+                [size]="orbSize"
+                [activity]="orbActivity()"
+                [emissiveIntensityScale]="0"
+              />
+            </div>
 
-        @if (isLive() || isConnecting()) {
-          <div class="voice-mode__waveform" aria-hidden="true">
-            @for (bar of waveformBars; track bar) {
-              <span class="voice-mode__wave-bar"></span>
+            @if (isLive() || isConnecting()) {
+              <div class="voice-mode__waveform" aria-hidden="true">
+                @for (bar of waveformBars; track bar) {
+                  <span class="voice-mode__wave-bar"></span>
+                }
+              </div>
             }
           </div>
+
+          <div class="voice-mode__status-row" role="status" aria-live="polite">
+            <span class="voice-mode__status-pill">
+              <span class="voice-mode__status-dot" aria-hidden="true"></span>
+              {{ statusLabel() }}
+            </span>
+          </div>
+
+          @if (activeToolCall(); as toolName) {
+            <p class="voice-mode__tool-chip">
+              <span class="voice-mode__tool-chip-icon" aria-hidden="true">⚙</span>
+              {{ toolName }}
+            </p>
+          }
+
+          <div
+            #transcriptViewport
+            class="voice-mode__transcript-wrap"
+            [class.voice-mode__transcript-wrap--history]="liveTranscript().length > 180"
+          >
+            <p
+              class="voice-mode__transcript"
+              [class.voice-mode__transcript--empty]="!liveTranscript()"
+              [attr.aria-label]="i18n.t('chat.realtime.transcriptLabel')"
+              aria-live="polite"
+              aria-atomic="false"
+            >
+              {{ liveTranscript() || i18n.t('chat.realtime.transcriptEmpty') }}
+            </p>
+          </div>
         }
-      </div>
 
-      <div class="voice-mode__status-row" role="status" aria-live="polite">
-        <span class="voice-mode__status-pill">
-          <span class="voice-mode__status-dot" aria-hidden="true"></span>
-          {{ statusLabel() }}
-        </span>
-      </div>
+        <footer class="voice-mode__actions">
+          <button #endButton type="button" class="voice-mode__end" (click)="requestClose()">
+            @if (isNotAvailable() || isError()) {
+              {{ i18n.t('chat.realtime.close') }}
+            } @else {
+              <span class="voice-mode__end-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+              </span>
+              {{ i18n.t('chat.realtime.end') }}
+            }
+          </button>
+        </footer>
+      </section>
 
-      @if (activeToolCall(); as toolName) {
-        <p class="voice-mode__tool-chip">
-          <span class="voice-mode__tool-chip-icon" aria-hidden="true">⚙</span>
-          {{ toolName }}
-        </p>
-      }
-
-      <div class="voice-mode__transcript-wrap">
-        <p
-          class="voice-mode__transcript"
-          [class.voice-mode__transcript--empty]="!liveTranscript()"
-          [attr.aria-label]="i18n.t('chat.realtime.transcriptLabel')"
-          aria-live="polite"
-          aria-atomic="false"
-        >
-          {{ liveTranscript() || i18n.t('chat.realtime.transcriptEmpty') }}
-        </p>
-      </div>
-    }
-
-    <footer class="voice-mode__actions">
-      <button #endButton type="button" class="voice-mode__end" (click)="requestClose()">
-        @if (isNotAvailable() || isError()) {
-          {{ i18n.t('chat.realtime.close') }}
-        } @else {
-          <span class="voice-mode__end-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="6" width="12" height="12" rx="2" />
-            </svg>
-          </span>
-          {{ i18n.t('chat.realtime.end') }}
+      <aside class="voice-mode__chart-pane" [attr.aria-hidden]="activeChart() ? null : true">
+        @if (activeChart(); as chart) {
+          <header class="voice-mode__chart-header">
+            <div class="voice-mode__chart-heading">
+              <span class="voice-mode__chart-kicker">{{ i18n.t('chat.realtime.chartKicker') }}</span>
+              <h2 class="voice-mode__chart-title">{{ chart.meta.title }}</h2>
+            </div>
+            <button
+              type="button"
+              class="voice-mode__chart-close"
+              [attr.aria-label]="i18n.t('chat.realtime.close')"
+              (click)="dismissChart()"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+          </header>
+          <div class="voice-mode__chart-body">
+            <taws-chart [spec]="chart" />
+          </div>
         }
-      </button>
-    </footer>
+      </aside>
+    </div>
   </div>
-</div>
+</dialog>

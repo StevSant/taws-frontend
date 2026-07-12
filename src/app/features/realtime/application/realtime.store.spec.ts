@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ChartSpec } from '../../../shared/charts';
 import {
   NOT_AVAILABLE_MESSAGE,
   PERMISSION_DENIED_MESSAGE,
@@ -9,6 +10,20 @@ import {
   RealtimeSessionProvider,
 } from '../domain';
 import { RealtimeStore } from './realtime.store';
+
+const TEST_CHART: ChartSpec = {
+  type: 'line',
+  series: [{ name: 'AAPL', points: [{ x: '2026-01-01', y: 190 }], bars: [] }],
+  xAxis: { label: 'Date', type: 'time' },
+  yAxis: { label: 'Price', type: 'value', format: 'currency' },
+  meta: {
+    title: 'AAPL price',
+    source: 'test',
+    timeframe: '1m',
+    timeframes: [],
+    request: { kind: 'price_line', symbols: ['AAPL'], timeframe: '1m' },
+  },
+};
 
 /**
  * Controllable fake transport. `start` resolves/rejects on demand and captures
@@ -145,6 +160,46 @@ describe('RealtimeStore', () => {
     expect(store.activeToolCall()).toBeNull();
   });
 
+  it('keeps showing tool activity until every parallel call finishes', () => {
+    provider.emit({ kind: 'tool-call-started', name: 'get_market_data' });
+    provider.emit({ kind: 'tool-call-started', name: 'list_signals' });
+    expect(store.activeToolCall()).toBe('list_signals');
+
+    provider.emit({ kind: 'tool-call-finished', name: 'get_market_data' });
+    expect(store.activeToolCall()).toBe('list_signals');
+
+    provider.emit({ kind: 'tool-call-finished', name: 'list_signals' });
+    expect(store.activeToolCall()).toBeNull();
+  });
+
+  it('shows the latest realtime chart and allows dismissing it', () => {
+    provider.emit({ kind: 'chart', chart: TEST_CHART });
+    expect(store.activeChart()).toEqual(TEST_CHART);
+
+    store.dismissChart();
+    expect(store.activeChart()).toBeNull();
+  });
+
+  it('returns completed turns in order on stop and attaches charts to the assistant turn', () => {
+    provider.emit({
+      kind: 'turn-completed',
+      turn: { role: 'user', content: '  Show me Apple.  ' },
+    });
+    provider.emit({ kind: 'chart', chart: TEST_CHART });
+    provider.emit({
+      kind: 'turn-completed',
+      turn: { role: 'assistant', content: '  Here is Apple.  ' },
+    });
+
+    const turns = store.stop();
+
+    expect(turns).toEqual([
+      { role: 'user', content: 'Show me Apple.' },
+      { role: 'assistant', content: 'Here is Apple.', charts: [TEST_CHART] },
+    ]);
+    expect(store.stop()).toEqual([]);
+  });
+
   it('surfaces error events into the error signal without dropping the session', async () => {
     const started = store.start();
     provider.resolveStart?.();
@@ -163,6 +218,7 @@ describe('RealtimeStore', () => {
     provider.emit({ kind: 'transcript-delta', delta: 'partial' });
     provider.emit({ kind: 'speaking-changed', speaking: true });
     provider.emit({ kind: 'tool-call-started', name: 'get_news' });
+    provider.emit({ kind: 'chart', chart: TEST_CHART });
 
     store.stop();
 
@@ -171,6 +227,7 @@ describe('RealtimeStore', () => {
     expect(store.liveTranscript()).toBe('');
     expect(store.isModelSpeaking()).toBe(false);
     expect(store.activeToolCall()).toBeNull();
+    expect(store.activeChart()).toBeNull();
   });
 
   it('flags permission-denied distinctly when start rejects with a mic-permission error', async () => {

@@ -1,7 +1,9 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  OnDestroy,
   computed,
   effect,
   inject,
@@ -10,11 +12,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslationService } from '../../../core';
+import { ChartComponent, ChartSpec } from '../../../shared/charts';
 import { GoldenPolyhedronComponent, MidasGlyphComponent } from '../../../shared';
 import { PolyhedronActivity } from '../../../shared/golden-polyhedron/polyhedron-activity.model';
 import { RealtimeConnectionState } from '../domain';
 
-const ORB_SIZE = 200;
+const ORB_SIZE = 240;
 
 /**
  * Immersive, full-screen voice-mode takeover — the ChatGPT-voice-mode UX for
@@ -35,12 +38,12 @@ const ORB_SIZE = 200;
 @Component({
   selector: 'app-voice-mode-overlay',
   standalone: true,
-  imports: [GoldenPolyhedronComponent, MidasGlyphComponent],
+  imports: [GoldenPolyhedronComponent, MidasGlyphComponent, ChartComponent],
   templateUrl: './voice-mode-overlay.component.html',
   styleUrl: './voice-mode-overlay.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VoiceModeOverlayComponent {
+export class VoiceModeOverlayComponent implements AfterViewInit, OnDestroy {
   readonly i18n = inject(TranslationService);
   private readonly host = inject(ElementRef);
 
@@ -48,17 +51,23 @@ export class VoiceModeOverlayComponent {
   readonly liveTranscript = input('');
   readonly isModelSpeaking = input(false);
   readonly activeToolCall = input<string | null>(null);
+  readonly activeChart = input<ChartSpec | null>(null);
   readonly permissionDenied = input(false);
   readonly reducedMotion = input(false);
+  readonly closing = input(false);
 
   /** Fired when the user ends the session (End button / Esc / backdrop). */
   readonly close = output<void>();
+  readonly chartDismissed = output<void>();
 
   readonly orbSize = ORB_SIZE;
 
   readonly waveformBars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] as const;
 
+  private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
   private readonly endButton = viewChild.required<ElementRef<HTMLButtonElement>>('endButton');
+  private readonly transcriptViewport =
+    viewChild<ElementRef<HTMLDivElement>>('transcriptViewport');
 
   readonly isNotAvailable = computed(() => this.connectionState() === 'not-available');
   readonly isError = computed(() => this.connectionState() === 'error' && !this.isNotAvailable());
@@ -115,10 +124,45 @@ export class VoiceModeOverlayComponent {
       const button = this.endButton();
       queueMicrotask(() => button.nativeElement.focus());
     });
+
+    effect(() => {
+      const transcript = this.liveTranscript();
+      const viewport = this.transcriptViewport();
+      if (!transcript || !viewport) {
+        return;
+      }
+
+      queueMicrotask(() => {
+        viewport.nativeElement.scrollTop = viewport.nativeElement.scrollHeight;
+      });
+    });
+  }
+
+  ngAfterViewInit(): void {
+    const dialog = this.dialog().nativeElement;
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+  }
+
+  ngOnDestroy(): void {
+    const dialog = this.dialog().nativeElement;
+    if (dialog.open) {
+      dialog.close();
+    }
   }
 
   requestClose(): void {
     this.close.emit();
+  }
+
+  dismissChart(): void {
+    this.chartDismissed.emit();
+  }
+
+  onCancel(event: Event): void {
+    event.preventDefault();
+    this.requestClose();
   }
 
   /** Esc closes the overlay; Tab is trapped so focus can't escape the dialog. */

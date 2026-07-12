@@ -1,10 +1,12 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { ChartSpec } from '../../../shared/charts';
 import {
   RealtimeConnectionState,
   RealtimeEvent,
   RealtimeNotAvailableError,
   RealtimePermissionDeniedError,
   RealtimeSessionProvider,
+  RealtimeTurn,
 } from '../domain';
 
 /**
@@ -25,15 +27,19 @@ export class RealtimeStore {
 
   private readonly connectionStateSignal = signal<RealtimeConnectionState>('idle');
   private readonly liveTranscriptSignal = signal('');
-  private readonly activeToolCallSignal = signal<string | null>(null);
+  private readonly activeToolCallsSignal = signal<string[]>([]);
+  private readonly activeChartSignal = signal<ChartSpec | null>(null);
   private readonly isModelSpeakingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private readonly permissionDeniedSignal = signal(false);
   private readonly notAvailableSignal = signal(false);
+  private completedTurns: RealtimeTurn[] = [];
+  private pendingCharts: ChartSpec[] = [];
 
   readonly connectionState = this.connectionStateSignal.asReadonly();
   readonly liveTranscript = this.liveTranscriptSignal.asReadonly();
-  readonly activeToolCall = this.activeToolCallSignal.asReadonly();
+  readonly activeToolCall = computed(() => this.activeToolCallsSignal().at(-1) ?? null);
+  readonly activeChart = this.activeChartSignal.asReadonly();
   readonly isModelSpeaking = this.isModelSpeakingSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
   /** True when the last start failed because the browser blocked mic access — lets the UI prompt to allow the mic. */
@@ -84,11 +90,20 @@ export class RealtimeStore {
     }
   }
 
-  /** Ends the session, releases the mic, and resets all session state to idle. */
-  stop(): void {
+  /** Ends the session and returns a snapshot of its completed turns before resetting. */
+  stop(): RealtimeTurn[] {
     this.provider.stop();
+    const completedTurns = this.completedTurns.map((turn) => ({
+      ...turn,
+      ...(turn.charts ? { charts: [...turn.charts] } : {}),
+    }));
     this.resetSessionState();
     this.connectionStateSignal.set('idle');
+    return completedTurns;
+  }
+
+  dismissChart(): void {
+    this.activeChartSignal.set(null);
   }
 
   private handleEvent(event: RealtimeEvent): void {
@@ -96,14 +111,43 @@ export class RealtimeStore {
       case 'transcript-delta':
         this.liveTranscriptSignal.update((current) => current + event.delta);
         return;
+      case 'turn-completed': {
+        const content = event.turn.content.trim();
+        if (!content) {
+          return;
+        }
+        const charts =
+          event.turn.role === 'assistant' && this.pendingCharts.length > 0
+            ? [...this.pendingCharts]
+            : undefined;
+        this.completedTurns = [
+          ...this.completedTurns,
+          {
+            role: event.turn.role,
+            content,
+            ...(charts ? { charts } : {}),
+          },
+        ];
+        if (event.turn.role === 'assistant') {
+          this.pendingCharts = [];
+        }
+        return;
+      }
       case 'speaking-changed':
         this.isModelSpeakingSignal.set(event.speaking);
         return;
       case 'tool-call-started':
-        this.activeToolCallSignal.set(event.name);
+        this.activeToolCallsSignal.update((calls) => [...calls, event.name]);
         return;
       case 'tool-call-finished':
-        this.activeToolCallSignal.set(null);
+        this.activeToolCallsSignal.update((calls) => {
+          const index = calls.indexOf(event.name);
+          return index < 0 ? calls : calls.filter((_, callIndex) => callIndex !== index);
+        });
+        return;
+      case 'chart':
+        this.activeChartSignal.set(event.chart);
+        this.pendingCharts = [...this.pendingCharts, event.chart];
         return;
       case 'error':
         this.errorSignal.set(event.message);
@@ -112,7 +156,7 @@ export class RealtimeStore {
         // A live connection dropped (ICE failed): end the session with a
         // retryable error rather than dying silently.
         this.isModelSpeakingSignal.set(false);
-        this.activeToolCallSignal.set(null);
+        this.activeToolCallsSignal.set([]);
         this.errorSignal.set('Realtime connection lost');
         this.connectionStateSignal.set('error');
         return;
@@ -121,11 +165,14 @@ export class RealtimeStore {
 
   private resetSessionState(): void {
     this.liveTranscriptSignal.set('');
-    this.activeToolCallSignal.set(null);
+    this.activeToolCallsSignal.set([]);
+    this.activeChartSignal.set(null);
     this.isModelSpeakingSignal.set(false);
     this.errorSignal.set(null);
     this.permissionDeniedSignal.set(false);
     this.notAvailableSignal.set(false);
+    this.completedTurns = [];
+    this.pendingCharts = [];
   }
 
   private toErrorMessage(error: unknown): string {

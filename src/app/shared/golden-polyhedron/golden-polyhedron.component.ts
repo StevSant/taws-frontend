@@ -33,6 +33,8 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
   readonly size = input(300);
   /** Drives motion/glow — listening, composing, streaming, or idle. */
   readonly activity = input<PolyhedronActivity>('idle');
+  /** Allows consumers to keep motion while reducing or disabling emissive glow. */
+  readonly emissiveIntensityScale = input(1);
 
   private readonly container = viewChild.required<ElementRef<HTMLDivElement>>('container');
   private readonly ngZone = inject(NgZone);
@@ -154,7 +156,7 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
       this.material.color.setHex(0xc8920e);
       this.material.shininess = 82;
       this.material.emissive.setHex(0xe6b422);
-      this.material.emissiveIntensity = 0.12;
+      this.material.emissiveIntensity = 0.12 * this.emissiveIntensityScale();
       this.ambientLight.color.setHex(0xfff3d4);
       this.ambientLight.intensity = 0.55;
       this.keyLight.color.setHex(0xffd966);
@@ -224,7 +226,8 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
         }
 
         this.material.emissive.setHex(profile.emissive);
-        this.material.emissiveIntensity = profile.emissiveIntensity;
+        this.material.emissiveIntensity =
+          profile.emissiveIntensity * this.emissiveIntensityScale();
       }
 
       if (this.renderer && this.scene && this.camera) {

@@ -12,7 +12,7 @@ import { DEMO_AUTH_PERSPECTIVES } from './demo-auth-perspectives';
  */
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8000',
+  apiBaseUrl: 'http://localhost:8001',
   /**
    * Whether server-side TTS (`POST /api/v1/chat/speak`) is available. When
    * false, message playback uses the browser Web Speech fallback directly

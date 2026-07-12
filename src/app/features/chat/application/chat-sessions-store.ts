@@ -135,6 +135,32 @@ export class ChatSessionsStore {
     this.persist();
   }
 
+  appendActiveMessages(messages: readonly ChatMessage[]): void {
+    if (messages.length === 0) {
+      return;
+    }
+
+    const activeId = this.ensureActiveSession();
+    const appended = messages.map((message) => ({ ...message, pending: false }));
+    const now = new Date().toISOString();
+
+    this.sessionsSignal.update((sessions) =>
+      sessions.map((session) => {
+        if (session.id !== activeId) {
+          return session;
+        }
+        const merged = [...session.messages, ...appended];
+        return {
+          ...session,
+          messages: merged,
+          title: this.deriveTitle(session.title, merged),
+          updatedAt: now,
+        };
+      }),
+    );
+    this.persist();
+  }
+
   syncActiveMessages(messages: ChatMessage[]): void {
     const activeId = this.ensureActiveSession();
     const now = new Date().toISOString();

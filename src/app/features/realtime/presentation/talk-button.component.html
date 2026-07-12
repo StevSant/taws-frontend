@@ -24,9 +24,12 @@
       [liveTranscript]="liveTranscript()"
       [isModelSpeaking]="isModelSpeaking()"
       [activeToolCall]="activeToolCall()"
+      [activeChart]="activeChart()"
       [permissionDenied]="permissionDenied()"
       [reducedMotion]="reducedMotion()"
+      [closing]="overlayClosing()"
       (close)="close()"
+      (chartDismissed)="dismissChart()"
     />
   }
 }

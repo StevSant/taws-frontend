@@ -38,3 +38,16 @@ export function formatToolName(name: string): string {
     .replace(/_/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
+
+/** Specialist hops shown as tags under the Midas identity (supervisor is implicit). */
+export function specialistRoutingHops(hops: readonly RoutingHop[]): RoutingHop[] {
+  return hops.filter((hop) => hop.agent !== 'supervisor');
+}
+
+export function snapshotRoutingHops(hops: readonly RoutingHop[]): RoutingHop[] {
+  return specialistRoutingHops(hops).map(({ agent, status, detail }) => ({
+    agent,
+    status: status === 'routing' ? 'done' : status,
+    ...(detail ? { detail } : {}),
+  }));
+}

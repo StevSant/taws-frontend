@@ -12,5 +12,7 @@ export {
   isKnownAgent,
   resolveAgentGlyph,
   resolveRespondingAgent,
+  snapshotRoutingHops,
+  specialistRoutingHops,
 } from './agent-display';
 export type { ChartSpec } from '../../../shared/charts';
