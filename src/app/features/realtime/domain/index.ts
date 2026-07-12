@@ -5,3 +5,4 @@ export {
   PERMISSION_DENIED_MESSAGE,
   RealtimePermissionDeniedError,
 } from './realtime-permission-denied.error';
+export { NOT_AVAILABLE_MESSAGE, RealtimeNotAvailableError } from './realtime-not-available.error';

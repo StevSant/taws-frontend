@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppConfigService, AuthTokenService } from '../../../core';
-import { PERMISSION_DENIED_MESSAGE, RealtimeEvent } from '../domain';
+import { PERMISSION_DENIED_MESSAGE, RealtimeEvent, RealtimeNotAvailableError } from '../domain';
 import { OAI_DATA_CHANNEL, OPENAI_REALTIME_CALLS_URL } from './realtime-openai-events';
 import { RealtimeWebrtcService } from './realtime-webrtc.service';
 
@@ -143,10 +143,19 @@ describe('RealtimeWebrtcService', () => {
     expect(sdpInit.headers['Authorization']).not.toContain('jwt-abc');
   });
 
-  it('throws when the session mint returns 503 so the caller can fall back', async () => {
+  it('throws a distinct RealtimeNotAvailableError when the session mint returns 503', async () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 503 });
 
-    await expect(service.start()).rejects.toThrow(/503/);
+    await expect(service.start()).rejects.toBeInstanceOf(RealtimeNotAvailableError);
+    expect(getUserMock).not.toHaveBeenCalled();
+  });
+
+  it('throws a generic error (not not-available) for a non-503 mint failure', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 500 });
+
+    await expect(service.start()).rejects.toSatisfy(
+      (error: unknown) => error instanceof Error && !(error instanceof RealtimeNotAvailableError),
+    );
     expect(getUserMock).not.toHaveBeenCalled();
   });
 

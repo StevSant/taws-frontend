@@ -1,25 +1,32 @@
 @if (available()) {
-  <div
-    class="talk"
-    [class.talk--live]="isLive()"
-    [class.talk--error]="connectionState() === 'error'"
+  <button
+    #trigger
+    type="button"
+    class="talk-trigger"
+    [attr.aria-haspopup]="'dialog'"
+    [attr.aria-expanded]="overlayOpen()"
+    [attr.aria-label]="i18n.t('chat.realtime.talkCta')"
+    (click)="open()"
   >
-    <button
-      type="button"
-      class="talk__button"
-      [attr.aria-pressed]="isPressed()"
-      [attr.aria-label]="ariaLabel()"
-      [disabled]="isConnecting()"
-      (click)="toggle()"
-    >
-      <span class="talk__orb" aria-hidden="true">
-        <app-golden-polyhedron [size]="orbSize" [activity]="orbActivity()" />
-      </span>
-      <span class="talk__status">{{ statusLabel() }}</span>
-    </button>
+    <span class="talk-trigger__wave" aria-hidden="true">
+      <span class="talk-trigger__bar"></span>
+      <span class="talk-trigger__bar"></span>
+      <span class="talk-trigger__bar"></span>
+      <span class="talk-trigger__bar"></span>
+      <span class="talk-trigger__bar"></span>
+    </span>
+    <span class="talk-trigger__label">{{ i18n.t('chat.realtime.talkCta') }}</span>
+  </button>
 
-    <p class="talk__transcript" aria-live="polite" aria-atomic="false">{{ liveTranscript() }}</p>
-  </div>
-} @else if (unavailable()) {
-  <p class="talk__unavailable" role="note">{{ i18n.t('chat.realtime.unavailable') }}</p>
+  @if (overlayOpen()) {
+    <app-voice-mode-overlay
+      [connectionState]="connectionState()"
+      [liveTranscript]="liveTranscript()"
+      [isModelSpeaking]="isModelSpeaking()"
+      [activeToolCall]="activeToolCall()"
+      [permissionDenied]="permissionDenied()"
+      [reducedMotion]="reducedMotion()"
+      (close)="close()"
+    />
+  }
 }

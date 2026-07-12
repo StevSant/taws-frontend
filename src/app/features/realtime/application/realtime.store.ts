@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import {
   RealtimeConnectionState,
   RealtimeEvent,
+  RealtimeNotAvailableError,
   RealtimePermissionDeniedError,
   RealtimeSessionProvider,
 } from '../domain';
@@ -28,6 +29,7 @@ export class RealtimeStore {
   private readonly isModelSpeakingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private readonly permissionDeniedSignal = signal(false);
+  private readonly notAvailableSignal = signal(false);
 
   readonly connectionState = this.connectionStateSignal.asReadonly();
   readonly liveTranscript = this.liveTranscriptSignal.asReadonly();
@@ -36,6 +38,12 @@ export class RealtimeStore {
   readonly error = this.errorSignal.asReadonly();
   /** True when the last start failed because the browser blocked mic access — lets the UI prompt to allow the mic. */
   readonly permissionDenied = this.permissionDeniedSignal.asReadonly();
+  /**
+   * True when the last start failed because the backend has realtime voice
+   * turned off (503). Lets the UI show a calm "not available right now" message
+   * with just a close button — no red retry alarm.
+   */
+  readonly notAvailable = this.notAvailableSignal.asReadonly();
 
   constructor() {
     this.provider.onEvent((event) => this.handleEvent(event));
@@ -61,8 +69,17 @@ export class RealtimeStore {
       this.connectionStateSignal.set('live');
     } catch (error: unknown) {
       this.provider.stop();
-      this.permissionDeniedSignal.set(error instanceof RealtimePermissionDeniedError);
       this.errorSignal.set(this.toErrorMessage(error));
+
+      if (error instanceof RealtimeNotAvailableError) {
+        // Feature is turned off server-side — a calm, terminal state, not a
+        // transient failure the user should retry.
+        this.notAvailableSignal.set(true);
+        this.connectionStateSignal.set('not-available');
+        return;
+      }
+
+      this.permissionDeniedSignal.set(error instanceof RealtimePermissionDeniedError);
       this.connectionStateSignal.set('error');
     }
   }
@@ -100,6 +117,7 @@ export class RealtimeStore {
     this.isModelSpeakingSignal.set(false);
     this.errorSignal.set(null);
     this.permissionDeniedSignal.set(false);
+    this.notAvailableSignal.set(false);
   }
 
   private toErrorMessage(error: unknown): string {

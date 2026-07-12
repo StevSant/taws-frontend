@@ -1,8 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  NOT_AVAILABLE_MESSAGE,
   PERMISSION_DENIED_MESSAGE,
   RealtimeEvent,
+  RealtimeNotAvailableError,
   RealtimePermissionDeniedError,
   RealtimeSessionProvider,
 } from '../domain';
@@ -175,6 +177,48 @@ describe('RealtimeStore', () => {
 
     expect(store.connectionState()).toBe('error');
     expect(store.permissionDenied()).toBe(false);
+  });
+
+  it('maps a not-available failure to the distinct not-available state (never generic error)', async () => {
+    const started = store.start();
+    provider.rejectStart?.(new RealtimeNotAvailableError());
+    await started;
+
+    expect(store.connectionState()).toBe('not-available');
+    expect(store.notAvailable()).toBe(true);
+    expect(store.error()).toBe(NOT_AVAILABLE_MESSAGE);
+    expect(store.permissionDenied()).toBe(false);
+    expect(provider.stop).toHaveBeenCalled();
+  });
+
+  it('does not flag not-available for a generic start failure', async () => {
+    const started = store.start();
+    provider.rejectStart?.(new Error('boom'));
+    await started;
+
+    expect(store.connectionState()).toBe('error');
+    expect(store.notAvailable()).toBe(false);
+  });
+
+  it('does not flag not-available for a permission-denied failure', async () => {
+    const started = store.start();
+    provider.rejectStart?.(new RealtimePermissionDeniedError());
+    await started;
+
+    expect(store.connectionState()).toBe('error');
+    expect(store.notAvailable()).toBe(false);
+    expect(store.permissionDenied()).toBe(true);
+  });
+
+  it('clears the not-available flag when a new session starts', async () => {
+    const failed = store.start();
+    provider.rejectStart?.(new RealtimeNotAvailableError());
+    await failed;
+    expect(store.notAvailable()).toBe(true);
+
+    store.start();
+    expect(store.notAvailable()).toBe(false);
+    expect(store.connectionState()).toBe('connecting');
   });
 
   it('clears the permission-denied flag when a new session starts', async () => {

@@ -1,6 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { AppConfigService, AuthTokenService } from '../../../core';
-import { RealtimeEvent, RealtimePermissionDeniedError, RealtimeSessionProvider } from '../domain';
+import {
+  RealtimeEvent,
+  RealtimeNotAvailableError,
+  RealtimePermissionDeniedError,
+  RealtimeSessionProvider,
+} from '../domain';
 import {
   OAI_CLIENT_EVENT,
   OAI_DATA_CHANNEL,
@@ -183,12 +188,23 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     }
   }
 
-  /** Mints the ephemeral session from the backend using the Supabase JWT. Throws on 503/!ok. */
+  /**
+   * Mints the ephemeral session from the backend using the Supabase JWT.
+   *
+   * A `503` means the deployment has realtime voice turned off — a distinct,
+   * non-transient condition, so it throws the typed `RealtimeNotAvailableError`
+   * the store maps to a calm "not available" state (not a red retry alarm). Any
+   * other non-2xx is a generic transient failure the user can retry.
+   */
   private async mintSession(): Promise<RealtimeSessionResponse> {
     const response = await fetch(`${this.config.apiBaseUrl}${SESSION_PATH}`, {
       method: 'POST',
       headers: this.backendHeaders(),
     });
+
+    if (response.status === 503) {
+      throw new RealtimeNotAvailableError();
+    }
 
     if (!response.ok) {
       throw new Error(`Realtime session request failed with status ${response.status}`);

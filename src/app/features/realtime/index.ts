@@ -1,4 +1,4 @@
-export { RealtimeSessionProvider } from './domain';
+export { RealtimeSessionProvider, RealtimeNotAvailableError } from './domain';
 export type { RealtimeConnectionState, RealtimeEvent } from './domain';
 export { RealtimeStore } from './application';
 export { RealtimeWebrtcService } from './infrastructure';
