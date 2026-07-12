@@ -1,0 +1,66 @@
+.chat-citations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+
+  &__title {
+    color: var(--color-text-muted);
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    max-width: 100%;
+    padding: 0.35rem 0.55rem;
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-md);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-text-primary);
+    font-size: 0.68rem;
+    text-decoration: none;
+
+    &:hover {
+      border-color: var(--color-gold);
+      color: var(--color-gold);
+    }
+  }
+
+  &__index {
+    display: grid;
+    flex: 0 0 auto;
+    width: 1.15rem;
+    height: 1.15rem;
+    place-items: center;
+    border-radius: var(--radius-full);
+    background: var(--color-gold);
+    color: var(--color-background);
+    font-size: 0.6rem;
+    font-weight: 800;
+  }
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__external {
+    flex: 0 0 auto;
+    color: var(--color-gold);
+  }
+}

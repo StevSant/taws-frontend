@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
@@ -37,6 +37,7 @@ import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/ra
 })
 export class RadarPageComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   /**
    * Client-side dashboard segmentation (issue #41). `null` = the "Todos"
@@ -99,6 +100,14 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   onSelectClass(assetClass: AssetClass | null): void {
     this.selectedClassSignal.set(assetClass);
+  }
+
+  /**
+   * Composition class rows open the markets explorer pre-filtered by that class (issue #58),
+   * rather than only re-scoping the dashboard in-page (that's what the asset-class tabs do).
+   */
+  navigateToExplorer(assetClass: AssetClass): void {
+    void this.router.navigate(['/radar/explore'], { queryParams: { assetClass } });
   }
 
   ngOnInit(): void {

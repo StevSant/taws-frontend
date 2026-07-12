@@ -1,0 +1,25 @@
+<a class="news-card" [routerLink]="['/radar/news', news.id]">
+  <div class="news-card__head">
+    <span
+      class="news-card__badge"
+      [class.news-card__badge--positive]="sentiment() === 'positive'"
+      [class.news-card__badge--negative]="sentiment() === 'negative'"
+      [class.news-card__badge--neutral]="sentiment() === 'neutral'"
+      [class.news-card__badge--pending]="sentiment() === null"
+    >
+      {{ sentimentLabel() }}
+    </span>
+    @if (confidenceLabel(); as pct) {
+      <span class="news-card__confidence">{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span>
+    }
+  </div>
+
+  <h3 class="news-card__title">{{ news.title }}</h3>
+
+  <span class="news-card__meta">
+    @if (providerLabel(); as provider) {
+      <span class="news-card__provider">{{ provider }}</span> ·
+    }
+    {{ news.source }} · {{ relativeTime() }}
+  </span>
+</a>

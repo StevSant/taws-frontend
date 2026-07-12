@@ -496,15 +496,28 @@
     align-items: flex-start;
     padding-inline: var(--space-3);
   }
+
+  .app-shell__disclaimer {
+    line-height: 1.45;
+  }
 }
 
 @media (max-width: 480px) {
   .app-shell__topbar {
     padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .app-shell__cluster {
+    gap: 0.35rem;
   }
 
   .app-shell__tab {
     font-size: 0.72rem;
     padding: 0.4rem 0.5rem;
+  }
+
+  .app-shell__content {
+    overflow-x: hidden;
   }
 }

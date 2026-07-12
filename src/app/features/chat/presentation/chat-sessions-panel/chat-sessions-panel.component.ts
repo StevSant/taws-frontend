@@ -20,6 +20,10 @@ const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
   templateUrl: './chat-sessions-panel.component.html',
   styleUrl: './chat-sessions-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'chat-sessions-host',
+    '[class.chat-sessions-host--open]': 'mobileOpen()',
+  },
 })
 export class ChatSessionsPanelComponent implements OnDestroy {
   readonly sessionsStore = inject(ChatSessionsStore);
@@ -66,6 +70,9 @@ export class ChatSessionsPanelComponent implements OnDestroy {
   onCreate(): void {
     const sessionId = this.sessionsStore.createSession();
     void this.router.navigate(['/chat', sessionId]);
+    if (this.isMobileViewport) {
+      this.closePanel.emit();
+    }
   }
 
   onDelete(event: MouseEvent, sessionId: string): void {

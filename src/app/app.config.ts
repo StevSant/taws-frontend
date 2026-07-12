@@ -26,6 +26,7 @@ import {
 import {
   InstrumentRepository,
   MacroRepository,
+  MarketsRepository,
   SentimentRepository,
   NewsRepository,
   QuantRepository,
@@ -35,12 +36,15 @@ import {
 import {
   HttpInstrumentRepository,
   HttpMacroRepository,
+  HttpMarketsRepository,
   HttpSentimentRepository,
   HttpNewsRepository,
   HttpQuantRepository,
   HttpSignalRepository,
   HttpSignalReviewRepository,
 } from './features/radar/infrastructure';
+import { NoteRepository } from './features/notes/domain';
+import { HttpNoteRepository } from './features/notes/infrastructure';
 import { ScenarioRepository } from './features/scenarios/domain';
 import { HttpScenarioRepository } from './features/scenarios/infrastructure';
 import { ChartRepository, HttpChartRepository } from './shared/charts';
@@ -60,11 +64,13 @@ export const appConfig: ApplicationConfig = {
     { provide: SignalReviewRepository, useClass: HttpSignalReviewRepository },
     { provide: QuantRepository, useClass: HttpQuantRepository },
     { provide: MacroRepository, useClass: HttpMacroRepository },
+    { provide: MarketsRepository, useClass: HttpMarketsRepository },
     { provide: SentimentRepository, useClass: HttpSentimentRepository },
     { provide: WatchlistRepository, useClass: HttpWatchlistRepository },
     { provide: BriefingRepository, useClass: HttpBriefingRepository },
     { provide: ReviewRepository, useClass: HttpReviewRepository },
     { provide: ScenarioRepository, useClass: HttpScenarioRepository },
+    { provide: NoteRepository, useClass: HttpNoteRepository },
     { provide: ChartRepository, useClass: HttpChartRepository },
     // Restores Supabase session in the background so the shell + Radar can
     // paint immediately. `authGuard` waits for `AuthStore.ready` on guarded

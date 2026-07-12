@@ -26,7 +26,7 @@
           @if (providerLabel(news.provider); as provider) {
             <span class="news-detail__provider">{{ provider }}</span> ·
           }
-          {{ news.source }} · <time>{{ news.publishedAt | date: 'medium' }}</time>
+          {{ news.source }} · <time>{{ formatPublishedAt(news.publishedAt) }}</time>
         </span>
         <h1 class="news-detail__title">{{ news.title }}</h1>
         @if (news.sentimentScore !== undefined) {
@@ -50,9 +50,19 @@
           </h2>
           <ul class="news-detail__symbols">
             @for (symbol of news.relatedSymbols; track symbol) {
-              <li class="news-detail__symbol">
-                <app-instrument-ticker-badge [symbol]="symbol" size="sm" />
-                <span class="news-detail__symbol-ticker">{{ symbol }}</span>
+              <li>
+                <a class="news-detail__chip" [routerLink]="['/radar', symbol]">
+                  <app-instrument-ticker-badge [symbol]="symbol" size="sm" />
+                  <span class="news-detail__chip-ticker">{{ symbol }}</span>
+                  @if (statFor(symbol); as stat) {
+                    @if (stat.lastPrice !== null) {
+                      <span class="news-detail__chip-price">{{ stat.lastPrice | number: '1.2-2' }}</span>
+                    }
+                    <span class="news-detail__chip-delta" [class]="deltaClass(stat.priceDeltaPct)">{{
+                      formatDelta(stat.priceDeltaPct)
+                    }}</span>
+                  }
+                </a>
               </li>
             }
           </ul>
@@ -122,6 +132,19 @@
           </div>
         }
       </section>
+
+      @if (store.relatedNews().length > 0) {
+        <section class="news-detail__section">
+          <h2 class="news-detail__section-title">{{ i18n.t('radar.detail.relatedNews') }}</h2>
+          <ul class="news-detail__related-news">
+            @for (item of store.relatedNews(); track item.id) {
+              <li class="news-detail__related-news-item">
+                <app-news-card [news]="item" />
+              </li>
+            }
+          </ul>
+        </section>
+      }
 
       <footer class="news-detail__footer">
         <a

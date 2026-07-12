@@ -390,7 +390,7 @@
     }
 
     @if (auth.isAuthenticated()) {
-      <app-chat-context-rail />
+      <app-chat-context-rail (askNews)="onNewsQuestion($event)" />
     }
   </div>
 </div>

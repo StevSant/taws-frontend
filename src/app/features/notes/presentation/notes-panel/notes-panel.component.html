@@ -1,0 +1,78 @@
+<div class="notes-panel">
+  @if (!auth.isAuthenticated()) {
+    <p class="notes-panel__signin">{{ i18n.t('notes.panel.signIn') }}</p>
+  } @else {
+    <form class="notes-panel__composer" (ngSubmit)="onAdd()">
+      <textarea
+        class="feature-textarea notes-panel__input"
+        rows="2"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+        [ngModelOptions]="{ standalone: true }"
+        [maxlength]="maxLength"
+        [placeholder]="i18n.t('notes.panel.addPlaceholder')"
+      ></textarea>
+      <button
+        type="submit"
+        class="notes-panel__btn notes-panel__btn--primary"
+        [disabled]="store.isSaving() || draft().trim().length === 0"
+      >
+        {{ i18n.t('notes.panel.add') }}
+      </button>
+    </form>
+
+    @if (store.error()) {
+      <p class="notes-panel__error" role="alert">{{ i18n.t('notes.panel.error') }}</p>
+    }
+
+    @if (store.isLoading()) {
+      <p class="notes-panel__status" role="status">{{ i18n.t('notes.panel.loading') }}</p>
+    } @else if (store.isEmpty()) {
+      <p class="notes-panel__empty">{{ i18n.t('notes.panel.empty') }}</p>
+    } @else {
+      <ul class="notes-panel__list">
+        @for (note of store.notes(); track note.id) {
+          <li class="notes-panel__item">
+            @if (editingId() === note.id) {
+              <textarea
+                class="feature-textarea"
+                rows="3"
+                [ngModel]="editDraft()"
+                (ngModelChange)="editDraft.set($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [maxlength]="maxLength"
+              ></textarea>
+              <div class="notes-panel__item-actions">
+                <button
+                  type="button"
+                  class="notes-panel__btn notes-panel__btn--primary"
+                  [disabled]="store.isSaving() || editDraft().trim().length === 0"
+                  (click)="saveEdit(note.id)"
+                >
+                  {{ i18n.t('notes.panel.save') }}
+                </button>
+                <button type="button" class="notes-panel__btn" (click)="cancelEdit()">
+                  {{ i18n.t('notes.panel.cancel') }}
+                </button>
+              </div>
+            } @else {
+              <p class="notes-panel__body">{{ note.body }}</p>
+              <div class="notes-panel__item-actions">
+                <button type="button" class="notes-panel__btn" (click)="startEdit(note)">
+                  {{ i18n.t('notes.panel.edit') }}
+                </button>
+                <button
+                  type="button"
+                  class="notes-panel__btn notes-panel__btn--danger"
+                  (click)="onDelete(note.id)"
+                >
+                  {{ i18n.t('notes.panel.delete') }}
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

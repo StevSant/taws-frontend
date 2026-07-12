@@ -37,10 +37,18 @@
           class="feature-input"
           type="text"
           name="symbol"
+          list="watchlist-instrument-options"
+          autocomplete="off"
+          [attr.aria-invalid]="store.addSymbolError() !== null"
           [placeholder]="i18n.t('watchlist.manager.symbolPlaceholder')"
           [ngModel]="newSymbol()"
-          (ngModelChange)="newSymbol.set($event)"
+          (ngModelChange)="onSymbolChange($event)"
         />
+        <datalist id="watchlist-instrument-options">
+          @for (instrument of store.instruments(); track instrument.symbol) {
+            <option [value]="instrument.symbol">{{ instrument.name }}</option>
+          }
+        </datalist>
         <app-button
           [label]="i18n.t('watchlist.manager.addSymbol')"
           [disabled]="!newSymbol().trim() || store.isManagingWatchlist()"
@@ -48,15 +56,33 @@
         />
       </form>
 
+      @if (store.addSymbolError(); as symbolError) {
+        <p class="watchlist-manager__error" role="alert">
+          @switch (symbolError) {
+            @case ('unknown') {
+              {{ i18n.t('watchlist.manager.symbolUnknown') }}
+            }
+            @case ('duplicate') {
+              {{ i18n.t('watchlist.manager.symbolDuplicate') }}
+            }
+          }
+        </p>
+      }
+
       @if (store.isLoadingItems()) {
         <p class="watchlist-manager__hint">…</p>
-      } @else if (store.watchlistItems().length === 0) {
+      } @else if (store.watchlistItemViews().length === 0) {
         <p class="watchlist-manager__hint">{{ i18n.t('watchlist.manager.emptyItems') }}</p>
       } @else {
         <ul class="watchlist-manager__items">
-          @for (item of store.watchlistItems(); track item.id) {
+          @for (item of store.watchlistItemViews(); track item.id) {
             <li>
-              <span class="watchlist-manager__symbol">{{ item.symbol }}</span>
+              <span class="watchlist-manager__item-text">
+                <span class="watchlist-manager__symbol">{{ item.symbol }}</span>
+                @if (item.name !== item.symbol) {
+                  <span class="watchlist-manager__name">{{ item.name }}</span>
+                }
+              </span>
               <button
                 type="button"
                 class="watchlist-manager__remove"

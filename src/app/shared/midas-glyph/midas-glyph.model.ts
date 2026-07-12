@@ -1,4 +1,11 @@
-export type MidasAgentId = 'supervisor' | 'analyst' | 'quant' | 'advisor' | 'consequence';
+export type MidasAgentId =
+  | 'supervisor'
+  | 'analyst'
+  | 'quant'
+  | 'advisor'
+  | 'consequence'
+  | 'macro'
+  | 'sentiment';
 
 export type MidasGlyphId =
   | 'brand-midas-sigil'
