@@ -1,4 +1,4 @@
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { AssetDetailStore } from '../../application';
 import { AssetClass, ImpactClass } from '../../domain';
 import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
 import { AssetPriceChartComponent } from '../asset-price-chart/asset-price-chart.component';
+import { NewsCardComponent } from '../news-card/news-card.component';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
@@ -49,7 +50,6 @@ const PERCENT_MULTIPLIER = 100;
   selector: 'app-asset-detail-page',
   standalone: true,
   imports: [
-    DatePipe,
     DecimalPipe,
     RouterLink,
     ButtonComponent,
@@ -58,6 +58,7 @@ const PERCENT_MULTIPLIER = 100;
     InstrumentTickerBadgeComponent,
     AssetPriceChartComponent,
     SignalAnalysisComponent,
+    NewsCardComponent,
   ],
   templateUrl: './asset-detail-page.component.html',
   styleUrl: './asset-detail-page.component.scss',
