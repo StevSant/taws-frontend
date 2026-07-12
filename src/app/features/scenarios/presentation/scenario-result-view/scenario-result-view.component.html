@@ -8,6 +8,11 @@
       </div>
     </div>
     <h2 class="scenario-result__title">{{ result.title }}</h2>
+    @if (isFallbackResult()) {
+      <p class="scenario-result__fallback" role="note">
+        {{ i18n.t('scenarios.result.fallbackWarning') }}
+      </p>
+    }
     <blockquote class="scenario-result__narrative">{{ result.narrative }}</blockquote>
   </header>
 
@@ -17,7 +22,25 @@
       <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.heatmap.title') }}</h3>
     </header>
     <app-impact-heatmap [impactMap]="result.impactMap" />
+    <div class="scenario-result__charts">
+      <taws-chart [spec]="impactChartSpec" />
+    </div>
   </section>
+
+  @if (marketSymbols.length) {
+    <section class="scenario-result__section">
+      <header class="scenario-result__section-header">
+        <span class="scenario-result__section-num">·</span>
+        <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.charts.market.title') }}</h3>
+      </header>
+      <p class="scenario-result__charts-hint">{{ i18n.t('scenarios.result.charts.market.hint') }}</p>
+      <div class="scenario-result__market-charts">
+        @for (symbol of marketSymbols; track symbol) {
+          <app-scenario-symbol-chart [symbol]="symbol" />
+        }
+      </div>
+    </section>
+  }
 
   <section class="scenario-result__section">
     <header class="scenario-result__section-header">
@@ -25,6 +48,11 @@
       <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.chain.title') }}</h3>
     </header>
     <app-causal-chain-view [chain]="result.consequenceChain" />
+    @if (causalChartSpec; as causalSpec) {
+      <div class="scenario-result__charts">
+        <taws-chart [spec]="causalSpec" />
+      </div>
+    }
   </section>
 
   <section class="scenario-result__section">
@@ -42,7 +70,7 @@
     </ol>
   </section>
 
-  <details class="scenario-result__details">
+  <details class="scenario-result__details" [open]="detailsOpen">
     <summary class="scenario-result__details-summary">
       {{ i18n.t('scenarios.result.details.toggle') }}
     </summary>

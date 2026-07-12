@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -23,6 +23,7 @@ import { ScenarioPresetDto } from './scenario-preset-dto';
 import { ScenarioResultDto } from './scenario-result-dto';
 
 const SCENARIOS_PATH = '/api/v1/scenarios';
+const HTTP_NOT_FOUND = 404;
 
 /**
  * Infrastructure adapter for `ScenarioRepository`. Calls the real
@@ -100,11 +101,20 @@ export class HttpScenarioRepository extends ScenarioRepository {
     return dtos.map(mapScenarioResultDto);
   }
 
-  async getScenario(scenarioId: string): Promise<ScenarioResult> {
-    const dto = await firstValueFrom(
-      this.http.get<ScenarioResultDto>(`${this.config.apiBaseUrl}${SCENARIOS_PATH}/${scenarioId}`),
-    );
-    return mapScenarioResultDto(dto);
+  async getScenario(scenarioId: string): Promise<ScenarioResult | null> {
+    try {
+      const dto = await firstValueFrom(
+        this.http.get<ScenarioResultDto>(
+          `${this.config.apiBaseUrl}${SCENARIOS_PATH}/${scenarioId}`,
+        ),
+      );
+      return mapScenarioResultDto(dto);
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse && error.status === HTTP_NOT_FOUND) {
+        return null;
+      }
+      throw error;
+    }
   }
 
   private armPath(scenarioId: string): string {

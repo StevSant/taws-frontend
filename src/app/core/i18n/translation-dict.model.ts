@@ -348,6 +348,12 @@ export interface TranslationDict {
   'scenarios.history.hint': string;
   'scenarios.history.empty': string;
   'scenarios.history.load': string;
+  'scenarios.detail.back': string;
+  'scenarios.detail.loading': string;
+  'scenarios.detail.error.banner': string;
+  'scenarios.detail.error.retry': string;
+  'scenarios.detail.notFound.title': string;
+  'scenarios.detail.notFound.description': string;
   'watchlist.manager.title': string;
   'watchlist.manager.subtitle': string;
   'watchlist.manager.create': string;
@@ -392,6 +398,7 @@ export interface TranslationDict {
   'scenarios.assetClass.commodity': string;
   'scenarios.assetClass.forex': string;
   'scenarios.result.title': string;
+  'scenarios.result.fallbackWarning': string;
   'scenarios.result.impact.title': string;
   'scenarios.result.impact.direction.positive': string;
   'scenarios.result.impact.direction.negative': string;
@@ -406,6 +413,12 @@ export interface TranslationDict {
   'scenarios.result.heatmap.title': string;
   'scenarios.result.heatmap.hint': string;
   'scenarios.result.heatmap.notAssessed': string;
+  'scenarios.result.charts.impact.title': string;
+  'scenarios.result.charts.impact.subtitle': string;
+  'scenarios.result.charts.causal.title': string;
+  'scenarios.result.charts.causal.subtitle': string;
+  'scenarios.result.charts.market.title': string;
+  'scenarios.result.charts.market.hint': string;
   'scenarios.result.details.toggle': string;
   'scenarios.result.chain.title': string;
   'scenarios.result.chain.nodes.title': string;

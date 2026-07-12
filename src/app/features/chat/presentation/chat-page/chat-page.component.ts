@@ -13,7 +13,9 @@ import {
 
 import { FormsModule } from '@angular/forms';
 
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { TranslationKey, TranslationService } from '../../../../core';
 
@@ -60,6 +62,7 @@ import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-acti
 
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
+const HERO_COLLAPSE_MS = 720;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
@@ -160,6 +163,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   /** Suppresses the animated playback indicator when the user prefers reduced motion. */
   readonly reducedMotion = prefersReducedMotion();
 
+  private readonly route = inject(ActivatedRoute);
+
+  private readonly router = inject(Router);
+
   readonly draft = signal('');
 
   /** True while voice dictation is capturing — drives the mic/oracle UI. */
@@ -167,6 +174,9 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   /** Whether any dictation path works; hides the mic button otherwise. */
   readonly micAvailable = this.dictation.isSupported();
+
+  /** True while the hero orb animates down to avatar size on the first send. */
+  readonly heroCollapsing = signal(false);
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
 
@@ -186,6 +196,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return 'streaming';
     }
 
+    if (this.heroCollapsing()) {
+      return 'composing';
+    }
+
     return 'idle';
   });
 
@@ -202,6 +216,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   });
 
   private readonly composerInput = viewChild<ElementRef<HTMLInputElement>>('composerInput');
+  private heroCollapseTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -209,11 +224,19 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
       if (userId) {
         this.sessionsStore.bootstrap(userId);
+        void this.syncSessionRoute(this.route.snapshot.paramMap.get('sessionId'));
 
         return;
       }
 
       this.sessionsStore.clear();
+    });
+
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      if (!this.auth.user()?.id) {
+        return;
+      }
+      void this.syncSessionRoute(params.get('sessionId'));
     });
   }
 
@@ -270,6 +293,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     document.body.classList.remove('route-chat');
 
     this.dictation.cancelDictation();
+
+    this.clearHeroCollapseTimer();
   }
 
   onSend(): void {
@@ -282,6 +307,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     const message = this.draft();
 
     this.draft.set('');
+
+    const isFirstMessage = !this.hasMessages();
+    if (isFirstMessage) {
+      this.startHeroCollapse();
+    }
 
     void this.store.send(message);
   }
@@ -337,6 +367,22 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.draft.set(current ? `${current} ${clean}` : clean);
   }
 
+  private startHeroCollapse(): void {
+    this.heroCollapsing.set(true);
+    this.clearHeroCollapseTimer();
+    this.heroCollapseTimer = setTimeout(() => {
+      this.heroCollapsing.set(false);
+      this.heroCollapseTimer = null;
+    }, HERO_COLLAPSE_MS);
+  }
+
+  private clearHeroCollapseTimer(): void {
+    if (this.heroCollapseTimer !== null) {
+      clearTimeout(this.heroCollapseTimer);
+      this.heroCollapseTimer = null;
+    }
+  }
+
   private readSessionsPanelOpen(): boolean {
     if (typeof localStorage === 'undefined') {
       return true;
@@ -350,6 +396,15 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(SESSIONS_PANEL_STORAGE_KEY, String(open));
+    }
+  }
+
+  private async syncSessionRoute(sessionId: string | null): Promise<void> {
+    const resolvedId = this.sessionsStore.resolveSessionRoute(sessionId);
+    if (sessionId !== resolvedId) {
+      await this.router.navigate(['/chat', resolvedId], {
+        replaceUrl: sessionId === null,
+      });
     }
   }
 }

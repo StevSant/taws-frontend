@@ -4,6 +4,7 @@
   [class.chat-page--listening]="oracleActivity() === 'listening'"
   [class.chat-page--streaming]="oracleActivity() === 'streaming'"
   [class.chat-page--conversation]="hasMessages()"
+  [class.chat-page--hero-collapsing]="heroCollapsing()"
   [class.chat-page--sessions]="auth.isAuthenticated()"
   [class.chat-page--sessions-open]="auth.isAuthenticated() && sessionsOpen()"
 >
@@ -116,6 +117,7 @@
                         [class.chat-page__avatar--live]="
                           message.pending && isLatestAssistant(message.id)
                         "
+                        [class.chat-page__avatar--hidden]="heroCollapsing()"
                       >
                         @if (message.pending && isLatestAssistant(message.id)) {
                           <div class="chat-page__avatar-corona" aria-hidden="true">
@@ -258,6 +260,16 @@
             </div>
           }
         </section>
+
+        @if (heroCollapsing()) {
+          <div class="chat-page__hero-collapse" aria-hidden="true">
+            <div class="chat-page__hero-collapse-corona">
+              <span class="chat-page__hero-collapse-glow"></span>
+              <span class="chat-page__hero-collapse-ring"></span>
+            </div>
+            <app-golden-polyhedron [size]="heroSize()" [activity]="oracleActivity()" />
+          </div>
+        }
       </div>
 
       <footer class="chat-page__footer">

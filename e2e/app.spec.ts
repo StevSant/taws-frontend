@@ -88,6 +88,43 @@ test.describe('Midas E2E smoke', () => {
     });
   });
 
+  test('chat session updates URL when switching conversations', async ({ page }) => {
+    await loginDemo(page);
+    await page.goto('/chat');
+    await expect(page).toHaveURL(/\/chat\/[0-9a-f-]{36}/i, { timeout: 15_000 });
+
+    const firstUrl = page.url();
+    const sessionButtons = page.locator('.chat-sessions__item');
+    await expect(sessionButtons.first()).toBeVisible({ timeout: 10_000 });
+
+    const count = await sessionButtons.count();
+    if (count < 2) {
+      await page.getByRole('button', { name: /nueva conversación|new chat/i }).click();
+      await expect(sessionButtons).toHaveCount(count + 1, { timeout: 5_000 });
+    }
+
+    await sessionButtons.nth(1).click();
+    await expect(page).toHaveURL(/\/chat\/[0-9a-f-]{36}/i);
+    expect(page.url()).not.toBe(firstUrl);
+
+    await page.getByRole('button', { name: /nueva conversación|new chat/i }).click();
+    await expect(page).toHaveURL(/\/chat\/[0-9a-f-]{36}/i);
+    const newChatUrl = page.url();
+    expect(newChatUrl).not.toBe(firstUrl);
+  });
+
+  test('scenarios recent item navigates to result page', async ({ page }) => {
+    await page.goto('/scenarios');
+    const preset = page.locator('.scenario-preset-card, [class*="preset"]').first();
+    await expect(preset).toBeVisible({ timeout: 20_000 });
+    await preset.click();
+    await page.getByRole('button', { name: /ejecutar escenario|run scenario/i }).click();
+    await expect(page).toHaveURL(/\/scenarios\/[0-9a-f-]{36}/i, { timeout: 120_000 });
+    await expect(page.locator('app-scenario-result-view, .scenario-result').first()).toBeVisible({
+      timeout: 15_000,
+    });
+  });
+
   test('user profile page after login', async ({ page }) => {
     await loginDemo(page);
     await page.goto('/user');

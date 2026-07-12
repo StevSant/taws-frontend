@@ -116,7 +116,7 @@
         </div>
       }
 
-      @if (!store.result() && !store.isGenerating()) {
+      @if (!store.isGenerating()) {
         <section class="scenarios-page__preview feature-panel">
           <h3 class="scenarios-page__preview-title">{{ i18n.t('scenarios.preview.title') }}</h3>
           <p class="scenarios-page__preview-text">{{ i18n.t('scenarios.preview.description') }}</p>
@@ -126,21 +126,6 @@
             <li>{{ i18n.t('scenarios.preview.item3') }}</li>
           </ul>
         </section>
-      }
-
-      @if (store.result(); as result) {
-        <app-scenario-result-view
-          class="feature-stagger"
-          [result]="result"
-          [briefingActionStatus]="store.briefingActionStatus()"
-          [isAuthenticated]="auth.isAuthenticated()"
-          [monitor]="store.monitor()"
-          [isArmingMonitor]="store.isArmingMonitor()"
-          [monitorError]="store.monitorError()"
-          (addToBriefing)="onAddToBriefing()"
-          (armMonitor)="onArmMonitor()"
-          (disarmMonitor)="onDisarmMonitor()"
-        />
       }
     </div>
 

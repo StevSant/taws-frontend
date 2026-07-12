@@ -54,6 +54,35 @@ function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
     return {};
   }
   const categories = series.bars.map((bar) => bar.t);
+  const flatCandles = series.bars.every(
+    (bar) => bar.o === bar.c && bar.h === bar.l && bar.o === bar.h,
+  );
+  if (flatCandles && series.bars.length > 0) {
+    return {
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLine: { lineStyle: { color: theme.grid } },
+        axisLabel: { color: theme.textSecondary },
+      },
+      yAxis: {
+        type: 'value',
+        scale: true,
+        splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+        axisLabel: { color: theme.textSecondary },
+      },
+      series: [
+        {
+          type: 'line',
+          name: series.name,
+          showSymbol: false,
+          lineStyle: { color: theme.gold, width: 2 },
+          itemStyle: { color: theme.gold },
+          data: series.bars.map((bar) => bar.c),
+        },
+      ],
+    };
+  }
   const values = series.bars.map((bar) => [bar.o, bar.c, bar.l, bar.h]);
   const hasVolume = series.bars.some((bar) => bar.v !== null && bar.v !== undefined);
 
@@ -171,19 +200,33 @@ function distributionOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   if (!series) {
     return {};
   }
+  const percentAxis =
+    spec.yAxis.format === 'percent'
+      ? { formatter: (value: number) => `${Math.round(value * 100)}%` }
+      : undefined;
   return {
     xAxis: {
       type: 'category',
       data: series.points.map((point) => point.x),
       axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary, interval: 0, rotate: series.points.length > 4 ? 24 : 0 },
     },
-    yAxis: { type: 'value', splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } } },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+      axisLabel: { color: theme.textSecondary, ...percentAxis },
+    },
     series: [
       {
         type: 'bar',
         name: series.name,
-        itemStyle: { color: theme.gold },
-        data: series.points.map((point) => point.y),
+        data: series.points.map((point) => ({
+          value: point.y,
+          itemStyle: {
+            color:
+              point.y > 0 ? theme.gain : point.y < 0 ? theme.loss : theme.textSecondary,
+          },
+        })),
       },
     ],
   };

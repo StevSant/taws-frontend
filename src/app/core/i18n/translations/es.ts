@@ -380,9 +380,18 @@ export const ES_TRANSLATIONS = {
   'scenarios.presets.error.retry': 'Reintentar',
   'scenarios.presets.empty': 'No hay escenarios preconfigurados disponibles por ahora.',
   'scenarios.history.title': 'Escenarios recientes',
-  'scenarios.history.hint': 'Tocá uno para volver a ver su resultado sin regenerar.',
+  'scenarios.history.hint': 'Tocá uno para abrir su página de resultados.',
   'scenarios.history.empty': 'Aún no hay escenarios guardados — ejecutá uno a la izquierda.',
   'scenarios.history.load': 'Cargar',
+  'scenarios.detail.back': 'Volver al laboratorio',
+  'scenarios.detail.loading': 'Cargando resultado…',
+  'scenarios.detail.error.banner': 'No se pudo cargar el escenario: ',
+  'scenarios.detail.error.retry': 'Reintentar',
+  'scenarios.detail.notFound.title': 'Escenario no encontrado',
+  'scenarios.detail.notFound.description':
+    'Este escenario ya no existe o el enlace expiró. Volvé al laboratorio y ejecutá uno nuevo.',
+  'scenarios.result.fallbackWarning':
+    'Resultado simplificado: el motor de IA no pudo generar el análisis estructurado completo. El mapa de calor y la cadena causal pueden estar incompletos.',
   'scenarios.freeform.label': 'Describí un escenario',
   'scenarios.freeform.placeholder':
     'ej. "La OPEP anuncia un recorte sorpresa de producción de 1M de barriles/día"',
@@ -418,6 +427,13 @@ export const ES_TRANSLATIONS = {
   'scenarios.result.heatmap.hint':
     'Cada celda = una clase de activo. Color y símbolo indican dirección del impacto; el % es la confianza de la IA.',
   'scenarios.result.heatmap.notAssessed': 'Sin evaluar',
+  'scenarios.result.charts.impact.title': 'Confianza de impacto por clase',
+  'scenarios.result.charts.impact.subtitle': 'Barras verdes = impacto positivo; rojas = negativo',
+  'scenarios.result.charts.causal.title': 'Confianza por enlace causal',
+  'scenarios.result.charts.causal.subtitle': 'Probabilidad asignada a cada paso de la cadena',
+  'scenarios.result.charts.market.title': 'Contexto de precios',
+  'scenarios.result.charts.market.hint':
+    'Precio reciente de los símbolos afectados por el escenario (hasta 3).',
   'scenarios.result.details.toggle': 'Ver detalle y evidencia por clase de activo',
   'scenarios.result.chain.title': 'Cadena causal',
   'scenarios.result.chain.nodes.title': 'Pasos',

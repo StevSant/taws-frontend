@@ -1,0 +1,64 @@
+<div class="feature-page scenario-result-page">
+  <a class="scenario-result-page__back" routerLink="/scenarios">
+    &larr; {{ i18n.t('scenarios.detail.back') }}
+  </a>
+
+  <div class="scenario-result-page__layout">
+    <div class="scenario-result-page__main">
+      @if (
+        store.isLoadingResult() ||
+        (!store.result() && !store.isResultNotFound() && !store.resultLoadError())
+      ) {
+        <app-spinner [label]="i18n.t('scenarios.detail.loading')" />
+      }
+
+      @if (store.resultLoadError(); as error) {
+        <div class="feature-error" role="alert">
+          <span>{{ i18n.t('scenarios.detail.error.banner') }}{{ error }}</span>
+          <app-button [label]="i18n.t('scenarios.detail.error.retry')" (pressed)="onRetry()" />
+        </div>
+      }
+
+      @if (store.isResultNotFound()) {
+        <app-empty-state
+          [title]="i18n.t('scenarios.detail.notFound.title')"
+          [description]="i18n.t('scenarios.detail.notFound.description')"
+        />
+      }
+
+      @if (store.result(); as result) {
+        <app-scenario-result-view
+          class="feature-stagger"
+          [result]="result"
+          [detailsOpen]="true"
+          [briefingActionStatus]="store.briefingActionStatus()"
+          [isAuthenticated]="auth.isAuthenticated()"
+          [monitor]="store.monitor()"
+          [isArmingMonitor]="store.isArmingMonitor()"
+          [monitorError]="store.monitorError()"
+          (addToBriefing)="onAddToBriefing()"
+          (armMonitor)="onArmMonitor()"
+          (disarmMonitor)="onDisarmMonitor()"
+        />
+      }
+    </div>
+
+    <aside class="scenario-result-page__sidebar feature-panel">
+      <p class="scenario-result-page__history-hint">{{ i18n.t('scenarios.history.hint') }}</p>
+      @if (store.isLoadingRecent()) {
+        <div class="scenario-result-page__skeletons" aria-busy="true">
+          @for (item of [1, 2]; track item) {
+            <app-skeleton-card [lines]="1" />
+          }
+        </div>
+      } @else {
+        <app-activity-feed
+          [title]="i18n.t('scenarios.history.title')"
+          [items]="recentScenarioItems()"
+          [emptyLabel]="i18n.t('scenarios.history.empty')"
+          (select)="onLoadScenario($event)"
+        />
+      }
+    </aside>
+  </div>
+</div>

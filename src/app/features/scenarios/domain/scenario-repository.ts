@@ -40,6 +40,6 @@ export abstract class ScenarioRepository {
   /** Lists recently persisted scenario results (newest first). */
   abstract listRecentScenarios(limit?: number): Promise<ScenarioResult[]>;
 
-  /** Loads one persisted scenario by id. */
-  abstract getScenario(scenarioId: string): Promise<ScenarioResult>;
+  /** Loads one persisted scenario by id, or `null` when it no longer exists. */
+  abstract getScenario(scenarioId: string): Promise<ScenarioResult | null>;
 }

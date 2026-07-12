@@ -1,6 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { BriefingActionStatus } from '../../application';
+import {
+  BriefingActionStatus,
+  buildScenarioCausalChartSpec,
+  buildScenarioImpactChartSpec,
+} from '../../application';
 import {
   AssetClass,
   ImpactDirection,
@@ -12,6 +16,8 @@ import {
 } from '../../domain';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { ConfidenceGaugeComponent } from '../../../../shared';
+import { ChartComponent, ChartSpec } from '../../../../shared/charts';
+import { ScenarioSymbolChartComponent } from '../scenario-symbol-chart/scenario-symbol-chart.component';
 import { CausalChainViewComponent } from '../causal-chain-view/causal-chain-view.component';
 import { EvidencePanelComponent } from '../evidence-panel/evidence-panel.component';
 import { ImpactHeatmapComponent } from '../impact-heatmap/impact-heatmap.component';
@@ -70,12 +76,15 @@ const MONITOR_STATUS_LABELS: Record<ScenarioMonitorStatus, TranslationKey> = {
     EvidencePanelComponent,
     CausalChainViewComponent,
     ConfidenceGaugeComponent,
+    ChartComponent,
+    ScenarioSymbolChartComponent,
   ],
   templateUrl: './scenario-result-view.component.html',
   styleUrl: './scenario-result-view.component.scss',
 })
 export class ScenarioResultViewComponent {
   @Input({ required: true }) result!: ScenarioResult;
+  @Input() detailsOpen = false;
   @Input() briefingActionStatus: BriefingActionStatus = 'idle';
   @Input() isAuthenticated = false;
   @Input() monitor: ScenarioMonitor | null = null;
@@ -117,5 +126,34 @@ export class ScenarioResultViewComponent {
 
   onDisarmMonitor(): void {
     this.disarmMonitor.emit();
+  }
+
+  isFallbackResult(): boolean {
+    const marker = 'fallback synthesis';
+    return (
+      this.result.title.toLowerCase().includes(marker) ||
+      this.result.narrative.toLowerCase().includes(marker)
+    );
+  }
+
+  get impactChartSpec(): ChartSpec {
+    return buildScenarioImpactChartSpec(
+      this.result,
+      (assetClass) => this.assetClassLabel(assetClass),
+      this.i18n.t('scenarios.result.charts.impact.title'),
+      this.i18n.t('scenarios.result.charts.impact.subtitle'),
+    );
+  }
+
+  get causalChartSpec(): ChartSpec | null {
+    return buildScenarioCausalChartSpec(
+      this.result.consequenceChain,
+      this.i18n.t('scenarios.result.charts.causal.title'),
+      this.i18n.t('scenarios.result.charts.causal.subtitle'),
+    );
+  }
+
+  get marketSymbols(): string[] {
+    return this.result.spec.affectedSymbols.slice(0, 3);
   }
 }

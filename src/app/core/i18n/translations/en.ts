@@ -373,9 +373,18 @@ export const EN_TRANSLATIONS = {
   'scenarios.presets.error.retry': 'Retry',
   'scenarios.presets.empty': 'No curated presets are available right now.',
   'scenarios.history.title': 'Recent scenarios',
-  'scenarios.history.hint': 'Tap one to reload its result without regenerating.',
+  'scenarios.history.hint': 'Tap one to open its results page.',
   'scenarios.history.empty': 'No saved scenarios yet — run one on the left.',
   'scenarios.history.load': 'Load',
+  'scenarios.detail.back': 'Back to lab',
+  'scenarios.detail.loading': 'Loading result…',
+  'scenarios.detail.error.banner': 'Could not load scenario: ',
+  'scenarios.detail.error.retry': 'Retry',
+  'scenarios.detail.notFound.title': 'Scenario not found',
+  'scenarios.detail.notFound.description':
+    'This scenario no longer exists or the link expired. Go back to the lab and run a new one.',
+  'scenarios.result.fallbackWarning':
+    'Simplified result: the AI engine could not produce the full structured analysis. The heatmap and causal chain may be incomplete.',
   'scenarios.freeform.label': 'Describe a scenario',
   'scenarios.freeform.placeholder':
     'e.g. "OPEC announces a surprise production cut of 1M barrels/day"',
@@ -411,6 +420,13 @@ export const EN_TRANSLATIONS = {
   'scenarios.result.heatmap.hint':
     'Each cell = one asset class. Color and symbol show impact direction; % is AI confidence.',
   'scenarios.result.heatmap.notAssessed': 'Not assessed',
+  'scenarios.result.charts.impact.title': 'Impact confidence by asset class',
+  'scenarios.result.charts.impact.subtitle': 'Green bars = positive impact; red = negative',
+  'scenarios.result.charts.causal.title': 'Confidence per causal link',
+  'scenarios.result.charts.causal.subtitle': 'Probability assigned to each chain step',
+  'scenarios.result.charts.market.title': 'Price context',
+  'scenarios.result.charts.market.hint':
+    'Recent price for symbols affected by this scenario (up to 3).',
   'scenarios.result.details.toggle': 'Show detail and evidence by asset class',
   'scenarios.result.chain.title': 'Causal chain',
   'scenarios.result.chain.nodes.title': 'Steps',
