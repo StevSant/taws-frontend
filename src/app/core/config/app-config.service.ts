@@ -21,6 +21,8 @@ export class AppConfigService {
   readonly watchlistsCacheTtlMs: number = environment.watchlistsCacheTtlMs;
   readonly scenarioPresetsCacheTtlMs: number = environment.scenarioPresetsCacheTtlMs;
   readonly radarSignalFetchBatchSize: number = environment.radarSignalFetchBatchSize;
+  /** Initial timeframe requested when rendering an instrument price chart (see asset-price-chart). */
+  readonly chartDefaultTimeframe: string = environment.chartDefaultTimeframe;
   /** Dev-only demo personas for role-based one-click login. */
   readonly demoAuthPerspectives: DemoAuthPerspective[] = environment.demoAuthPerspectives;
 }

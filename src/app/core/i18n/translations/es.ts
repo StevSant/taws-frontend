@@ -287,6 +287,8 @@ export const ES_TRANSLATIONS = {
   'radar.detail.signalSection': 'Señal IA',
   'radar.detail.noSignal': 'Este artículo aún no ha sido analizado.',
   'radar.detail.openOriginal': 'Ver artículo original',
+  'radar.chart.loading': 'Cargando gráfico de precios…',
+  'radar.chart.unavailable': 'Gráfico de precios no disponible para este instrumento.',
   'scenarios.title': 'Laboratorio de Escenarios',
   'scenarios.description':
     'Simulá "¿qué pasa si…?" y la IA te muestra impacto por activo, la cadena causal paso a paso y acciones sugeridas.',

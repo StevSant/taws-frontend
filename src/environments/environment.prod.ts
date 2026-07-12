@@ -23,6 +23,12 @@ export const environment = {
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   radarSignalFetchBatchSize: 6,
   /**
+   * Initial timeframe requested when rendering an instrument's price chart via
+   * `POST /api/v1/charts/render` — one of the backend's timeframe tokens
+   * (1m/3m/6m/1y/max); the chart's timeframe buttons re-request the others.
+   */
+  chartDefaultTimeframe: '1y',
+  /**
    * Demo perspective accounts are intentionally shipped in production so
    * hackathon reviewers can one-click sign in. These are throwaway @midas.demo
    * accounts with no real data — clear this list to hide the demo picker.

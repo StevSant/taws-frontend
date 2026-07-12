@@ -1,0 +1,14 @@
+<div class="asset-price-chart">
+  @if (loading() && displaySpec() === null) {
+    <div class="asset-price-chart__state" aria-busy="true">
+      <app-spinner />
+      <span class="asset-price-chart__state-label">{{ i18n.t('radar.chart.loading') }}</span>
+    </div>
+  } @else if (displaySpec(); as spec) {
+    <taws-chart [spec]="spec" />
+  } @else if (isUnavailable()) {
+    <div class="asset-price-chart__state">
+      <span class="asset-price-chart__state-label">{{ i18n.t('radar.chart.unavailable') }}</span>
+    </div>
+  }
+</div>

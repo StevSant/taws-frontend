@@ -11,8 +11,7 @@ import {
   ImpactCompassComponent,
   ReturnSparklineComponent,
 } from '../../../../shared';
-import { ChartComponent, ChartSpec, OhlcBar } from '../../../../shared/charts';
-import { buildCandlestickSpec } from './build-candlestick-spec';
+import { buildCandlestickSpec, ChartComponent, ChartSpec, OhlcBar } from '../../../../shared/charts';
 import {
   ReviewDecisionSubmitted,
   ReviewPanelComponent,

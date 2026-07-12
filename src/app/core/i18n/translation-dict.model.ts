@@ -273,6 +273,8 @@ export interface TranslationDict {
   'radar.detail.signalSection': string;
   'radar.detail.noSignal': string;
   'radar.detail.openOriginal': string;
+  'radar.chart.loading': string;
+  'radar.chart.unavailable': string;
   'scenarios.title': string;
   'scenarios.guide.title': string;
   'scenarios.guide.step1': string;

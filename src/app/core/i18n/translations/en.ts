@@ -228,6 +228,8 @@ export const EN_TRANSLATIONS = {
   'radar.detail.signalSection': 'AI signal',
   'radar.detail.noSignal': 'This article has not been analyzed yet.',
   'radar.detail.openOriginal': 'Open original article',
+  'radar.chart.loading': 'Loading price chart…',
+  'radar.chart.unavailable': 'Price chart unavailable for this instrument.',
   'radar.landscape.unclassifiedHint':
     'Most items have not been analyzed yet. Use "Analyze all pending" or the button on each card.',
   'radar.landscape.filterHint': 'Tap to filter cards',

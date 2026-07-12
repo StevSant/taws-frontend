@@ -32,6 +32,13 @@ export const environment = {
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   /** Max parallel `/api/v1/signals` lookups while enriching the radar feed. */
   radarSignalFetchBatchSize: 6,
+  /**
+   * Initial timeframe requested when rendering an instrument's price chart via
+   * `POST /api/v1/charts/render`. Must be one of the backend's
+   * `chart_available_timeframes` tokens (1m/3m/6m/1y/max) — the chart's own
+   * timeframe buttons re-request the others.
+   */
+  chartDefaultTimeframe: '1y',
   /** One-click demo logins — empty in production builds. */
   demoAuthPerspectives: DEMO_AUTH_PERSPECTIVES,
 };
