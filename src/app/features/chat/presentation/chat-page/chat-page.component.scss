@@ -422,6 +422,12 @@
     flex-shrink: 0;
   }
 
+  &__talk {
+    display: block;
+    width: min(100%, 20rem);
+    margin-top: var(--space-1);
+  }
+
   &__oracle-status {
     display: inline-flex;
     align-items: center;

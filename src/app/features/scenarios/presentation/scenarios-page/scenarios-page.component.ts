@@ -67,6 +67,11 @@ export class ScenariosPageComponent implements OnInit {
     this.i18n.t('scenarios.guide.step2'),
     this.i18n.t('scenarios.guide.step3'),
   ]);
+  readonly scenarioExamples = computed(() => [
+    this.i18n.t('scenarios.freeform.example.btc'),
+    this.i18n.t('scenarios.freeform.example.nvda'),
+    this.i18n.t('scenarios.freeform.example.rates'),
+  ]);
 
   readonly recentScenarioItems = computed<ActivityFeedItem[]>(() =>
     this.store.recentScenarios().map((scenario) => ({
@@ -134,6 +139,11 @@ export class ScenariosPageComponent implements OnInit {
 
   onFreeTextChange(text: string): void {
     this.store.setFreeText(text);
+  }
+
+  onUseExample(example: string): void {
+    this.store.setMode('freeform');
+    this.store.setFreeText(example);
   }
 
   onGenerate(): void {

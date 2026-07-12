@@ -8,7 +8,24 @@
       <li class="news-timeline__item">
         <time class="news-timeline__time">{{ entry.news.publishedAt | date: 'HH:mm' }}</time>
 
-        <div class="news-timeline__copy">
+        <div class="news-timeline__body">
+          @if (entry.news.imageUrl) {
+            <a
+              class="news-timeline__thumb"
+              [routerLink]="['/radar/news', entry.news.id]"
+              [attr.aria-label]="entry.news.title"
+            >
+              <img
+                [src]="entry.news.imageUrl"
+                [alt]="entry.news.title"
+                loading="lazy"
+                decoding="async"
+                (error)="onImageError($event)"
+              />
+            </a>
+          }
+
+          <div class="news-timeline__copy">
           <div class="news-timeline__headline-row">
             <a class="news-timeline__headline" [routerLink]="['/radar/news', entry.news.id]">{{
               entry.news.title
@@ -77,6 +94,7 @@
               </li>
             }
           </ul>
+        </div>
         </div>
       </li>
     }

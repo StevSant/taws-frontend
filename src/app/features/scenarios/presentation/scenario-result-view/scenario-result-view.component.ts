@@ -156,4 +156,60 @@ export class ScenarioResultViewComponent {
   get marketSymbols(): string[] {
     return this.result.spec.affectedSymbols.slice(0, 3);
   }
+
+  get primarySymbol(): string | null {
+    return this.result.spec.affectedSymbols[0] ?? null;
+  }
+
+  get primaryConfidence(): number {
+    return (this.result.impactMap[0]?.confidence ?? 0) * 100;
+  }
+
+  formatTargetPrice(value: number): string {
+    return new Intl.NumberFormat(this.i18n.locale(), {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(value);
+  }
+
+  directionLabel(): string {
+    const direction = this.result.spec.direction;
+    if (direction === 'down') {
+      return this.i18n.t('scenarios.result.target.direction.down');
+    }
+    if (direction === 'up') {
+      return this.i18n.t('scenarios.result.target.direction.up');
+    }
+    return this.i18n.t('scenarios.result.target.direction.unchanged');
+  }
+
+  formatLikelihood(): string {
+    const probability = this.result.spec.likelihoodPct;
+    const sampleSize = this.result.spec.likelihoodSampleSize;
+    if (probability === null || sampleSize === 0) {
+      return this.i18n.t('scenarios.result.likelihood.unavailable');
+    }
+    if (probability === 0) {
+      return `<${(100 / sampleSize).toFixed(2)}%`;
+    }
+    return `${probability.toFixed(2)}%`;
+  }
+
+  likelihoodLabel(): string {
+    const probability = this.result.spec.likelihoodPct;
+    if (probability === null) {
+      return this.i18n.t('scenarios.result.likelihood.unavailable');
+    }
+    if (probability < 1) {
+      return this.i18n.t('scenarios.result.likelihood.veryLow');
+    }
+    if (probability < 5) {
+      return this.i18n.t('scenarios.result.likelihood.low');
+    }
+    if (probability < 20) {
+      return this.i18n.t('scenarios.result.likelihood.moderate');
+    }
+    return this.i18n.t('scenarios.result.likelihood.high');
+  }
 }

@@ -3,50 +3,67 @@
 }
 
 .talk-trigger {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 1.15rem 0.55rem 0.9rem;
-  font-size: 0.9rem;
-  font-weight: 650;
-  letter-spacing: 0.01em;
-  color: var(--color-gold-bright);
-  background: color-mix(in srgb, var(--color-gold) 12%, transparent);
-  border: 1px solid var(--color-gold-border-hi, rgba(212, 160, 23, 0.32));
-  border-radius: var(--radius-full, 999px);
-  cursor: pointer;
-  transition:
-    color 200ms ease,
-    background 200ms ease,
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    transform 200ms ease;
-}
-
-.talk-trigger:hover {
+  gap: 0.65rem;
+  padding: 0.62rem 1.25rem 0.62rem 1rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.015em;
   color: var(--color-background-deep);
-  background: linear-gradient(135deg, var(--color-gold-bright), var(--color-gold));
-  border-color: transparent;
-  box-shadow: 0 8px 22px -8px var(--color-gold);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--color-gold-bright) 0%, var(--color-gold) 100%);
+  border: 1px solid color-mix(in srgb, var(--color-gold-bright) 65%, white);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow:
+    0 10px 28px -10px rgba(212, 160, 23, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    filter 200ms ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.04);
+    box-shadow:
+      0 14px 34px -8px rgba(212, 160, 23, 0.62),
+      inset 0 1px 0 rgba(255, 255, 255, 0.42);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-gold-bright);
+    outline-offset: 3px;
+  }
 }
 
-.talk-trigger:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.talk-trigger:focus-visible {
-  outline: 2px solid var(--color-gold-bright);
-  outline-offset: 3px;
-}
-
-/* Animated soundwave glyph — the signature that distinguishes this from the
-   composer's static dictation mic. */
 .talk-trigger__wave {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  height: 1.1rem;
+  height: 1.15rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--color-background-deep) 12%, transparent);
 }
 
 .talk-trigger__bar {
@@ -82,6 +99,7 @@
   100% {
     height: 35%;
   }
+
   50% {
     height: 100%;
   }
@@ -91,5 +109,13 @@
   .talk-trigger__bar {
     animation: none;
     height: 65%;
+  }
+}
+
+@media (max-width: 768px) {
+  .talk-trigger {
+    width: 100%;
+    justify-content: center;
+    padding-block: 0.72rem;
   }
 }

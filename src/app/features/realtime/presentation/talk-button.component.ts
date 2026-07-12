@@ -15,6 +15,8 @@ import { RealtimeSessionProvider } from '../domain';
 import { RealtimeWebrtcService, isRealtimeSupported } from '../infrastructure';
 import { VoiceModeOverlayComponent } from './voice-mode-overlay.component';
 
+const VOICE_MODE_BODY_CLASS = 'voice-mode-open';
+
 /**
  * Compact "Talk to Midas" trigger for the realtime voice agent — DISTINCT from
  * the dictation mic (that appends text to the composer; this opens a live spoken
@@ -72,6 +74,7 @@ export class TalkButtonComponent implements OnDestroy {
   readonly available = computed(() => this.enabled && this.browserSupported);
 
   ngOnDestroy(): void {
+    this.unlockBody();
     this.store.stop();
   }
 
@@ -81,6 +84,7 @@ export class TalkButtonComponent implements OnDestroy {
       return;
     }
     this.overlayOpen.set(true);
+    this.lockBody();
     void this.store.start();
   }
 
@@ -88,6 +92,15 @@ export class TalkButtonComponent implements OnDestroy {
   close(): void {
     this.store.stop();
     this.overlayOpen.set(false);
+    this.unlockBody();
     queueMicrotask(() => this.trigger()?.nativeElement.focus());
+  }
+
+  private lockBody(): void {
+    document.body.classList.add(VOICE_MODE_BODY_CLASS);
+  }
+
+  private unlockBody(): void {
+    document.body.classList.remove(VOICE_MODE_BODY_CLASS);
   }
 }

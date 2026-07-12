@@ -92,6 +92,22 @@
               i18n.t('scenarios.freeform.maxLengthHint')
             }}</span>
           </label>
+          <div class="scenarios-page__examples">
+            <span class="scenarios-page__examples-label">{{
+              i18n.t('scenarios.freeform.examples.title')
+            }}</span>
+            <div class="scenarios-page__example-list">
+              @for (example of scenarioExamples(); track example) {
+                <button
+                  type="button"
+                  class="scenarios-page__example"
+                  (click)="onUseExample(example)"
+                >
+                  {{ example }}
+                </button>
+              }
+            </div>
+          </div>
         }
 
         <div
@@ -120,7 +136,19 @@
         </div>
       }
 
-      @if (!store.isGenerating()) {
+      @if (store.isGenerating()) {
+        <section class="scenarios-page__progress feature-panel" aria-live="polite">
+          <h3 class="scenarios-page__preview-title">
+            {{ i18n.t('scenarios.progress.title') }}
+          </h3>
+          <ol class="scenarios-page__progress-list">
+            <li>{{ i18n.t('scenarios.progress.intake') }}</li>
+            <li>{{ i18n.t('scenarios.progress.data') }}</li>
+            <li>{{ i18n.t('scenarios.progress.quant') }}</li>
+            <li>{{ i18n.t('scenarios.progress.synthesis') }}</li>
+          </ol>
+        </section>
+      } @else {
         <section class="scenarios-page__preview feature-panel">
           <h3 class="scenarios-page__preview-title">{{ i18n.t('scenarios.preview.title') }}</h3>
           <p class="scenarios-page__preview-text">{{ i18n.t('scenarios.preview.description') }}</p>

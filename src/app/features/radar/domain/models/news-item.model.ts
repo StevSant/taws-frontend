@@ -32,4 +32,6 @@ export interface NewsItem {
   analysisStatus?: AnalysisStatus;
   /** Id of the Signal produced for this item, when `analysisStatus === 'analyzed'`. */
   signalId?: string;
+  /** Hero/thumbnail image when the upstream provider supplies one. */
+  imageUrl?: string;
 }

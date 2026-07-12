@@ -90,6 +90,14 @@ export class NewsTimelineComponent implements OnChanges {
     void this.store.generateSignal(symbol);
   }
 
+  onImageError(event: Event): void {
+    const img = event.target;
+    if (img instanceof HTMLImageElement) {
+      img.style.display = 'none';
+      img.closest('.news-timeline__thumb, .news-detail__hero')?.remove();
+    }
+  }
+
   private requestBlurbs(): void {
     this.blurbs.ensureBlurbs(this.visibleEntries().map((entry) => entry.news));
   }

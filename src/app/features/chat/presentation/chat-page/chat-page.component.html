@@ -125,6 +125,7 @@
                         [class.chat-page__avatar--settling]="
                           avatarSettling() && isLatestAssistant(message.id)
                         "
+                        [class.chat-page__avatar--agent]="!!agentGlyph(messageAgent(message))"
                       >
                         @if (message.pending && isLatestAssistant(message.id)) {
                           <div class="chat-page__avatar-corona" aria-hidden="true">
@@ -132,10 +133,18 @@
                             <span class="chat-page__avatar-corona-ring"></span>
                           </div>
                         }
-                        <app-golden-polyhedron
-                          [size]="avatarSize"
-                          [activity]="avatarActivity(message.id, !!message.pending)"
-                        />
+                        @if (agentGlyph(messageAgent(message)); as glyph) {
+                          <app-midas-glyph
+                            [glyph]="glyph"
+                            [size]="avatarSize"
+                            [animated]="!!(message.pending && isLatestAssistant(message.id))"
+                          />
+                        } @else {
+                          <app-golden-polyhedron
+                            [size]="avatarSize"
+                            [activity]="avatarActivity(message.id, !!message.pending)"
+                          />
+                        }
                       </div>
 
                       <article
@@ -143,13 +152,23 @@
                         [class.chat-page__bubble--streaming]="message.pending"
                       >
                         <header class="chat-page__bubble-header">
-                          <span class="chat-page__agent-name">
-                            {{
-                              message.pending && isLatestAssistant(message.id)
-                                ? respondingAgentLabel()
-                                : i18n.t('chat.role.assistant')
-                            }}
-                          </span>
+                          @if (messageAgent(message); as agent) {
+                            <div class="chat-page__agent-identity">
+                              @if (agentGlyph(agent); as glyph) {
+                                <app-midas-glyph
+                                  class="chat-page__agent-glyph"
+                                  [glyph]="glyph"
+                                  [size]="20"
+                                  [animated]="!!(message.pending && isLatestAssistant(message.id))"
+                                />
+                              }
+                              <span class="chat-page__agent-name">{{ agentLabel(agent) }}</span>
+                            </div>
+                          } @else {
+                            <span class="chat-page__agent-name">{{
+                              i18n.t('chat.role.assistant')
+                            }}</span>
+                          }
                           @if (
                             message.pending &&
                             isLatestAssistant(message.id) &&
@@ -164,13 +183,40 @@
                                   class="chat-page__route-pill"
                                   [class.chat-page__route-pill--active]="hop.status === 'active'"
                                   [class.chat-page__route-pill--done]="hop.status === 'done'"
+                                  [attr.title]="hop.detail ?? null"
                                 >
+                                  @if (agentGlyph(hop.agent); as glyph) {
+                                    <app-midas-glyph
+                                      class="chat-page__route-pill-glyph"
+                                      [glyph]="glyph"
+                                      [size]="14"
+                                      [animated]="hop.status === 'active'"
+                                    />
+                                  }
                                   {{ agentLabel(hop.agent) }}
                                 </span>
                               }
                             </div>
                           }
                         </header>
+
+                        @if (messageTools(message).length > 0) {
+                          <div
+                            class="chat-page__tool-pills"
+                            [attr.aria-label]="i18n.t('chat.tools.title')"
+                          >
+                            @for (tool of messageTools(message); track $index) {
+                              <span
+                                class="chat-page__tool-pill"
+                                [class.chat-page__tool-pill--active]="tool.status === 'active'"
+                                [class.chat-page__tool-pill--done]="tool.status === 'done'"
+                              >
+                                <span class="chat-page__tool-pill-icon" aria-hidden="true">⚙</span>
+                                {{ toolLabel(tool.name) }}
+                              </span>
+                            }
+                          </div>
+                        }
 
                         @if (message.content) {
                           <div
@@ -301,9 +347,9 @@
             <p class="chat-page__voice-hint chat-page__voice-hint--error" role="alert">
               {{ i18n.t('chat.stt.error') }}
             </p>
-          } @else if (micAvailable) {
+          } @else if (micAvailable && !hasMessages()) {
             <p class="chat-page__voice-hint">{{ i18n.t('chat.voice.hint') }}</p>
-          } @else {
+          } @else if (!micAvailable && !hasMessages()) {
             <p class="chat-page__voice-hint">{{ i18n.t('chat.stt.unavailable') }}</p>
           }
 
@@ -351,13 +397,24 @@
               [disabled]="!canCompose() || isListening()"
             />
 
-            <div class="chat-page__send">
-              <app-button
-                [label]="i18n.t('chat.send')"
-                [disabled]="!canCompose() || isListening() || !draft().trim()"
-                (pressed)="onSend()"
-              />
-            </div>
+            <button
+              type="submit"
+              class="chat-page__send-btn"
+              [attr.aria-label]="i18n.t('chat.send')"
+              [disabled]="!canCompose() || isListening() || !draft().trim()"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+            </button>
           </form>
         </div>
       </footer>
