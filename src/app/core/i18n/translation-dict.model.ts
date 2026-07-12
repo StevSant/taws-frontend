@@ -722,6 +722,8 @@ export interface TranslationDict {
   'notifications.radar.signalGenerated': string;
   'notifications.auth.sessionExpired': string;
   'notifications.briefing.generated': string;
+  'errors.network': string;
+  'errors.unknown': string;
   'placeholder.badge': string;
   'brandLab.title': string;
   'brandLab.subtitle': string;

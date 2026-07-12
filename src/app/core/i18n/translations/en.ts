@@ -510,7 +510,7 @@ export const EN_TRANSLATIONS = {
   'radar.detail.watchlist.remove': 'Remove from watchlist',
   'radar.detail.watchlist.busy': 'Updating…',
   'radar.detail.watchlist.signInHint': 'Sign in to create and manage watchlists',
-  'radar.detail.watchlist.error': 'Could not update watchlist.',
+  'radar.detail.watchlist.error': 'Could not update watchlist:',
   'radar.detail.watchlist.defaultName': 'My watchlist',
   'scenarios.title': 'Scenarios',
   'scenarios.guide.title': 'How scenarios work',
@@ -768,6 +768,8 @@ export const EN_TRANSLATIONS = {
   'notifications.radar.signalGenerated': 'AI analysis completed',
   'notifications.auth.sessionExpired': 'Your session expired — please log in again',
   'notifications.briefing.generated': 'New report generated',
+  'errors.network': 'Could not reach the server. Check your connection and try again.',
+  'errors.unknown': 'An unexpected error occurred.',
   'placeholder.badge': 'Coming soon',
   'brandLab.title': 'Brand laboratory',
   'brandLab.subtitle':

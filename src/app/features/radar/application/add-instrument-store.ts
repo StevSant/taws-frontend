@@ -1,7 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AuthTokenService } from '../../../core';
+import { AuthTokenService, TranslationService } from '../../../core';
 import { WatchlistItem, WatchlistRepository } from '../../briefings/domain';
 import { Instrument, InstrumentRepository } from '../domain';
+import { httpErrorDetail } from './http-error-detail';
 
 /** Max autocomplete results shown at once. */
 const MAX_RESULTS = 8;
@@ -62,6 +63,7 @@ export class AddInstrumentStore {
     private readonly instrumentRepository: InstrumentRepository,
     private readonly watchlistRepository: WatchlistRepository,
     private readonly authTokenService: AuthTokenService,
+    private readonly i18n: TranslationService,
   ) {}
 
   isFollowed(symbol: string): boolean {
@@ -166,7 +168,12 @@ export class AddInstrumentStore {
     }
   }
 
+  /**
+   * Builds the full, translated message shown raw in the widget: the watchlist error prefix plus
+   * the HTTP status + server detail (or a network-level message). Full error kept in the console.
+   */
   private toErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : 'Unknown error while updating the watchlist';
+    console.error('Watchlist update failed', error);
+    return `${this.i18n.t('radar.detail.watchlist.error')} ${httpErrorDetail(error, this.i18n)}`;
   }
 }

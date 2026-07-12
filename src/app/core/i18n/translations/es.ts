@@ -523,7 +523,7 @@ export const ES_TRANSLATIONS = {
   'radar.detail.watchlist.remove': 'Quitar de lista de seguimiento',
   'radar.detail.watchlist.busy': 'Actualizando…',
   'radar.detail.watchlist.signInHint': 'Inicia sesión para crear y gestionar listas de seguimiento',
-  'radar.detail.watchlist.error': 'No se pudo actualizar la lista de seguimiento.',
+  'radar.detail.watchlist.error': 'No se pudo actualizar la lista de seguimiento:',
   'radar.detail.watchlist.defaultName': 'Mi lista de seguimiento',
   'scenarios.title': 'Escenarios',
   'scenarios.guide.title': 'Cómo funcionan los escenarios',
@@ -788,6 +788,8 @@ export const ES_TRANSLATIONS = {
   'notifications.radar.signalGenerated': 'Análisis de IA completado',
   'notifications.auth.sessionExpired': 'Tu sesión expiró — inicia sesión de nuevo',
   'notifications.briefing.generated': 'Nuevo informe generado',
+  'errors.network': 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
+  'errors.unknown': 'Ocurrió un error inesperado.',
   'placeholder.badge': 'Próximamente',
   'brandLab.title': 'Laboratorio de marca',
   'brandLab.subtitle':
