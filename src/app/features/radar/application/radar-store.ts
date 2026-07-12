@@ -510,22 +510,34 @@ export class RadarStore {
     try {
       const news = await this.newsRepository.fetchNews(this.filtersSignal());
       const currentIds = new Set(news.map((item) => item.id));
+      const isFirstFetch = this.lastSeenNewsIds === null;
+      const newItems = isFirstFetch
+        ? []
+        : news.filter((item) => !this.lastSeenNewsIds!.has(item.id));
 
-      if (this.lastSeenNewsIds) {
-        const newItems = news.filter((item) => !this.lastSeenNewsIds!.has(item.id));
-        if (newItems.length > 0) {
-          this.notifications.notify(
-            'radar',
-            'notifications.radar.newSignals',
-            newItems.length,
-            formatNewNewsNotificationDetail(newItems),
-          );
-        }
+      if (newItems.length > 0) {
+        this.notifications.notify(
+          'radar',
+          'notifications.radar.newSignals',
+          newItems.length,
+          formatNewNewsNotificationDetail(newItems),
+        );
       }
 
       this.lastSeenNewsIds = currentIds;
       this.newsSignal.set(news);
-      await this.enrichFeed(news);
+
+      // Only re-run the 2×N signal/quant fan-out when the feed actually
+      // changed. Between ticks the news set is usually identical, so a
+      // re-enrichment would produce byte-for-byte the same maps — skipping it
+      // (rather than firing 2×N lookups every tick and leaning on the HTTP
+      // cache to swallow them) keeps a steady-state poll loop from doing
+      // needless work. A tick that brings new items enriches just like a
+      // foreground load does; `isFirstFetch` covers a poll that runs before
+      // any successful foreground load (e.g. the initial load failed).
+      if (isFirstFetch || newItems.length > 0) {
+        await this.enrichFeed(news);
+      }
     } catch {
       // Silent by design (see class doc) — a background poll failure
       // shouldn't surface a page-level error banner over otherwise-good data.

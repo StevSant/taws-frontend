@@ -21,7 +21,13 @@ export const environment = {
   /** In-memory GET cache TTLs (ms) — avoids refetching on every route revisit. */
   instrumentsCacheTtlMs: 5 * 60_000,
   newsCacheTtlMs: 30_000,
-  signalsCacheTtlMs: 60_000,
+  /**
+   * Signal + quant-stats cache TTL. Kept comfortably larger than
+   * `radarPollIntervalMs` so the cache actually absorbs the radar's 2×N
+   * per-tick lookups — if this equals the poll interval it expires exactly as
+   * the next tick fires and the cache never helps (see issue #44).
+   */
+  signalsCacheTtlMs: 5 * 60_000,
   watchlistsCacheTtlMs: 60_000,
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   /** Max parallel `/api/v1/signals` lookups while enriching the radar feed. */

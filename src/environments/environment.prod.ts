@@ -17,7 +17,8 @@ export const environment = {
   radarPollIntervalMs: 60_000,
   instrumentsCacheTtlMs: 5 * 60_000,
   newsCacheTtlMs: 30_000,
-  signalsCacheTtlMs: 60_000,
+  /** Kept > radarPollIntervalMs so the cache absorbs the 2×N per-tick lookups (issue #44). */
+  signalsCacheTtlMs: 5 * 60_000,
   watchlistsCacheTtlMs: 60_000,
   scenarioPresetsCacheTtlMs: 5 * 60_000,
   radarSignalFetchBatchSize: 6,
