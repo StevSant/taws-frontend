@@ -11,7 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import type { ECharts } from 'echarts';
-import { ThemeService } from '../../../core';
+import { ThemeService, TranslationService } from '../../../core';
 import { ChartRepository } from '../domain/chart-repository';
 import { ChartSpec } from '../domain/chart-spec.model';
 import { mapChartSpecToOption } from '../infrastructure/map-chart-spec-to-option';
@@ -34,6 +34,7 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
 
   private readonly host = viewChild.required<ElementRef<HTMLDivElement>>('chartHost');
   private readonly themes = inject(ThemeService);
+  private readonly i18n = inject(TranslationService);
   private readonly charts = inject(ChartRepository);
 
   /** Live spec: starts as the input, replaced when a timeframe button re-requests. */
@@ -47,12 +48,13 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     // Seed/reset the live spec whenever a new input spec arrives.
     effect(() => this.current.set(this.spec()));
 
-    // Re-render on live-spec or theme change.
+    // Re-render on live-spec, theme, or locale change (locale re-formats the date axis).
     effect(() => {
       const spec = this.current();
       this.themes.theme();
-      if (this.chart && spec) {
-        this.chart.setOption(mapChartSpecToOption(spec, readChartTheme()), true);
+      this.i18n.locale();
+      if (spec) {
+        this.render(spec);
       }
     });
   }
@@ -62,10 +64,24 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.chart = echarts.init(this.host().nativeElement, undefined, { renderer: 'canvas' });
     const spec = this.current();
     if (spec) {
-      this.chart.setOption(mapChartSpecToOption(spec, readChartTheme()), true);
+      this.render(spec);
     }
     this.resizeObserver = new ResizeObserver(() => this.chart?.resize());
     this.resizeObserver.observe(this.host().nativeElement);
+  }
+
+  /**
+   * Push a spec into the live ECharts instance. Guards against blanking a good chart: a spec
+   * with no plottable series (a stray/empty re-render on a follow-up chat message or a failed
+   * timeframe swap) is skipped rather than replacing the existing option with an empty one, so
+   * a previously drawn chart never re-renders empty. `notMerge` is used so a genuine spec swap
+   * (e.g. candlestick → line, or a new timeframe) fully replaces the prior axes and series.
+   */
+  private render(spec: ChartSpec): void {
+    if (!this.chart || !hasPlottableSeries(spec)) {
+      return;
+    }
+    this.chart.setOption(mapChartSpecToOption(spec, readChartTheme(), this.i18n.locale()), true);
   }
 
   async selectTimeframe(timeframe: string): Promise<void> {
@@ -86,4 +102,9 @@ export class ChartComponent implements AfterViewInit, OnDestroy {
     this.resizeObserver?.disconnect();
     this.chart?.dispose();
   }
+}
+
+/** True when the spec carries at least one series with data (line points or OHLC bars). */
+function hasPlottableSeries(spec: ChartSpec): boolean {
+  return spec.series.some((series) => series.points.length > 0 || series.bars.length > 0);
 }

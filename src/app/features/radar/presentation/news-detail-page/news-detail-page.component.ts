@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -10,7 +10,8 @@ import {
   SpinnerComponent,
 } from '../../../../shared';
 import { NewsDetailStore } from '../../application';
-import { ImpactClass } from '../../domain';
+import { ImpactClass, MarketStats } from '../../domain';
+import { NewsCardComponent } from '../news-card/news-card.component';
 import { providerLabel } from '../news-timeline/provider-label';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
 
@@ -22,6 +23,7 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 };
 
 const PERCENT_MULTIPLIER = 100;
+const LOCALE_TAGS: Record<string, string> = { es: 'es-ES', en: 'en-US' };
 
 /**
  * Per-news detail page (issue #38), routed at `radar/news/:id`. Fetches the
@@ -33,13 +35,14 @@ const PERCENT_MULTIPLIER = 100;
   selector: 'app-news-detail-page',
   standalone: true,
   imports: [
-    DatePipe,
+    DecimalPipe,
     RouterLink,
     ButtonComponent,
     EmptyStateComponent,
     SpinnerComponent,
     InstrumentTickerBadgeComponent,
     SignalAnalysisComponent,
+    NewsCardComponent,
   ],
   templateUrl: './news-detail-page.component.html',
   styleUrl: './news-detail-page.component.scss',
@@ -87,6 +90,36 @@ export class NewsDetailPageComponent {
 
   providerLabel(provider?: string): string | null {
     return providerLabel(provider);
+  }
+
+  /** Live quant stats for an affected symbol, or `null` when the lookup hasn't resolved. */
+  statFor(symbol: string): MarketStats | null {
+    return (
+      this.store.affectedInstruments().find((stat) => stat.instrumentSymbol === symbol) ?? null
+    );
+  }
+
+  /** Locale-format the published date (aligns the metadata date with the rest of the app). */
+  formatPublishedAt(iso: string): string {
+    const tag = LOCALE_TAGS[this.i18n.locale()] ?? this.i18n.locale();
+    return new Intl.DateTimeFormat(tag, { dateStyle: 'medium', timeStyle: 'short' }).format(
+      new Date(iso),
+    );
+  }
+
+  formatDelta(delta: number | null): string {
+    if (delta === null) {
+      return '—';
+    }
+    const sign = delta > 0 ? '+' : '';
+    return `${sign}${delta.toFixed(2)}%`;
+  }
+
+  deltaClass(delta: number | null): string {
+    if (delta === null || delta === 0) {
+      return '';
+    }
+    return delta > 0 ? 'news-detail__chip-delta--up' : 'news-detail__chip-delta--down';
   }
 
   onAnalyze(): void {
