@@ -40,14 +40,13 @@ export const environment = {
    * `openrelay` TURN below is a FREE public demo relay (fine for hackathon /
    * testing — rate-limited and NOT for production). Swap in your own
    * (Cloudflare TURN or self-hosted coturn) for a reliable deployment.
+   *
+   * Kept to <=5 servers: browsers warn "Using five or more STUN/TURN servers
+   * slows down discovery". One STUN plus the TURN :443 (UDP) and :443?transport=tcp
+   * (TCP fallback for firewalled networks) cover the useful relay paths.
    */
   realtimeIceServers: [
-    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-    {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
-    },
+    { urls: 'stun:stun.l.google.com:19302' },
     {
       urls: 'turn:openrelay.metered.ca:443',
       username: 'openrelayproject',

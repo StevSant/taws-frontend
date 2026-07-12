@@ -35,14 +35,13 @@ export const environment = {
    * restrictive NAT blocks a direct path (browser: "ICE failed, add a TURN
    * server"). The `openrelay` TURN is a free public demo relay — replace with
    * your own (Cloudflare TURN / self-hosted coturn) for production reliability.
+   *
+   * Kept to <=5 servers: browsers warn "Using five or more STUN/TURN servers
+   * slows down discovery". One STUN plus the TURN :443 (UDP) and :443?transport=tcp
+   * (TCP fallback for firewalled networks) cover the useful relay paths.
    */
   realtimeIceServers: [
-    { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] },
-    {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject',
-    },
+    { urls: 'stun:stun.l.google.com:19302' },
     {
       urls: 'turn:openrelay.metered.ca:443',
       username: 'openrelayproject',
