@@ -25,6 +25,8 @@ import { PolyhedronActivity } from '../../../../shared/golden-polyhedron/polyhed
 
 import { ChatSessionsStore, ChatStore } from '../../application';
 
+import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
+
 import { ChatRepository } from '../../domain';
 
 import { SseChatRepository } from '../../infrastructure';
@@ -113,6 +115,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   readonly i18n = inject(TranslationService);
 
   readonly auth = inject(AuthStore);
+
+  private readonly shellSearch = inject(ShellSearchService);
 
   readonly draft = signal('');
 
@@ -208,6 +212,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     document.documentElement.classList.add('route-chat');
 
     document.body.classList.add('route-chat');
+
+    const pendingQuery = this.shellSearch.consumeChatDraftIntent();
+    if (pendingQuery) {
+      this.draft.set(pendingQuery);
+    }
   }
 
   ngOnDestroy(): void {

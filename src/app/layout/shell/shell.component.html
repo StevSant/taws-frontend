@@ -37,16 +37,79 @@
         >
       </nav>
 
-      <div class="app-shell__search">
+      <form
+        #searchHost
+        class="app-shell__search"
+        [class.app-shell__search--open]="searchOpen()"
+        (submit)="onSearchSubmit($event)"
+      >
         <svg lucideSearch class="app-shell__search-icon" [size]="16" aria-hidden="true"></svg>
         <input
           #searchInput
           class="app-shell__search-input"
           type="search"
+          role="combobox"
+          aria-autocomplete="list"
+          [attr.aria-expanded]="searchOpen()"
+          aria-controls="shell-search-results"
           [placeholder]="i18n.t('shell.search.placeholder')"
           [attr.aria-label]="i18n.t('shell.search.label')"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchQueryChange($event)"
+          (focus)="onSearchFocus()"
+          (keydown)="onSearchKeydown($event)"
         />
-      </div>
+
+        @if (searchOpen()) {
+          <div
+            id="shell-search-results"
+            class="app-shell__search-panel"
+            role="listbox"
+            [attr.aria-label]="i18n.t('shell.search.label')"
+          >
+            @if (searchLoading()) {
+              <p class="app-shell__search-empty">{{ i18n.t('shell.search.loading') }}</p>
+            } @else if (searchResults().length === 0) {
+              <p class="app-shell__search-empty">{{ i18n.t('shell.search.noResults') }}</p>
+            } @else {
+              <ul class="app-shell__search-list">
+                @for (result of searchResults(); track resultKey(result); let index = $index) {
+                  <li
+                    role="option"
+                    [attr.aria-selected]="index === searchActiveIndex()"
+                    [class.app-shell__search-item--active]="index === searchActiveIndex()"
+                  >
+                    <button
+                      type="button"
+                      class="app-shell__search-item"
+                      (mousedown)="onSelectResult(result, $event)"
+                    >
+                      @if (result.kind === 'instrument') {
+                        <span class="app-shell__search-item-main">
+                          <span class="app-shell__search-symbol">{{ result.symbol }}</span>
+                          <span class="app-shell__search-name">{{ result.name }}</span>
+                        </span>
+                        <span class="app-shell__search-meta">{{
+                          search.assetClassLabel(result.assetClass)
+                        }}</span>
+                      } @else if (result.kind === 'assetClass') {
+                        <span class="app-shell__search-item-main">
+                          <span class="app-shell__search-name">{{ result.label }}</span>
+                        </span>
+                      } @else {
+                        <span class="app-shell__search-item-main">
+                          <span class="app-shell__search-name">{{ result.query }}</span>
+                        </span>
+                      }
+                      <span class="app-shell__search-hint">{{ resultHint(result) }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </form>
 
       <div class="app-shell__cluster">
         <app-notification-bell

@@ -28,6 +28,11 @@ export interface TranslationDict {
   'shell.sidebar.settings': string;
   'shell.search.label': string;
   'shell.search.placeholder': string;
+  'shell.search.loading': string;
+  'shell.search.noResults': string;
+  'shell.search.instrumentHint': string;
+  'shell.search.assetClassHint': string;
+  'shell.search.topicHint': string;
   'shell.footer.disclaimer': string;
   'shell.footer.demoStatus': string;
   'shell.language.es': string;

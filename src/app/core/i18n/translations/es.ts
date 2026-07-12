@@ -25,6 +25,11 @@ export const ES_TRANSLATIONS = {
   'shell.sidebar.settings': 'Configuración',
   'shell.search.label': 'Buscar',
   'shell.search.placeholder': 'Buscar activo, sector o tema…',
+  'shell.search.loading': 'Cargando instrumentos…',
+  'shell.search.noResults': 'Sin coincidencias — Enter para preguntar en Chat',
+  'shell.search.instrumentHint': 'Ver en Radar',
+  'shell.search.assetClassHint': 'Filtrar Radar',
+  'shell.search.topicHint': 'Preguntar en Chat',
   'shell.footer.disclaimer':
     'Solo informativo — no es asesoría financiera personalizada. Nunca ejecutamos operaciones.',
   'shell.footer.demoStatus': 'Datos de prueba · Actualizado hace unos minutos',

@@ -25,6 +25,11 @@ export const EN_TRANSLATIONS = {
   'shell.sidebar.settings': 'Settings',
   'shell.search.label': 'Search',
   'shell.search.placeholder': 'Search asset, sector, or topic…',
+  'shell.search.loading': 'Loading instruments…',
+  'shell.search.noResults': 'No matches — press Enter to ask in Chat',
+  'shell.search.instrumentHint': 'View on Radar',
+  'shell.search.assetClassHint': 'Filter Radar',
+  'shell.search.topicHint': 'Ask in Chat',
   'shell.footer.disclaimer':
     'Informational only — not personalized financial advice. We never execute trades.',
   'shell.footer.demoStatus': 'Demo data · Updated a few minutes ago',
