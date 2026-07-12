@@ -1,7 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AuthTokenService, TranslationService } from '../../../core';
+import { AuthTokenService, httpErrorDetail, TranslationService } from '../../../core';
 import { WatchlistItem, WatchlistRepository } from '../../briefings/domain';
-import { httpErrorDetail } from './http-error-detail';
 import {
   AssetClass,
   EnrichedInstrument,

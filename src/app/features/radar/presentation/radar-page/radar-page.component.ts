@@ -73,10 +73,20 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     );
   });
 
-  /** Signals shown in the watchlist: all or scoped to the active class, sorted by urgency. */
+  /**
+   * Instruments shown in the "en seguimiento" section, sorted by urgency:
+   * - an active asset-class tab → that segment (explicit drill into the market universe);
+   * - otherwise the user's watchlist when it is non-empty (issue #16);
+   * - else the default news-driven universe.
+   */
   readonly visibleSignals = computed(() => {
     const segment = this.activeSegment();
-    const signals = segment ? segment.signals : this.store.signals();
+    const watchlist = this.store.watchlistSignals();
+    const signals = segment
+      ? segment.signals
+      : watchlist.length > 0
+        ? watchlist
+        : this.store.signals();
     return [...signals].sort((a, b) => this.signalPriority(b) - this.signalPriority(a));
   });
 

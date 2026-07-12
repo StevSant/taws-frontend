@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { TranslationService } from '../../../core';
+import { TranslationService } from '../i18n';
 
 /**
  * Turns any thrown value into a short, user-facing **detail** string, translated to the active

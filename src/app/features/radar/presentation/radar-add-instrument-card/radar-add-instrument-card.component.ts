@@ -39,7 +39,7 @@ export class RadarAddInstrumentCardComponent implements OnInit {
   }
 
   onAdd(instrument: Instrument): void {
-    void this.store.add(instrument.symbol, instrument.name);
+    void this.store.add(instrument.symbol);
   }
 
   onRemove(item: WatchlistItem): void {
