@@ -21,7 +21,7 @@ import {
 } from '../domain';
 import { computeRadarLandscape } from './compute-radar-landscape';
 import { computeMarketScore, MarketScore } from './compute-market-score';
-import { formatNewSignalsDetail } from './format-new-signals-detail';
+import { formatNewNewsNotificationDetail } from './format-new-signals-detail';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
@@ -282,7 +282,7 @@ export class RadarStore {
         next.set(symbol, signal);
         return next;
       });
-      this.notifications.notify('radar', 'notifications.radar.signalGenerated');
+      this.notifications.notify('radar', 'notifications.radar.signalGenerated', 1, symbol);
       await this.ensureSignalReviews(signal.id);
     } catch (error: unknown) {
       this.errorSignal.set(this.toErrorMessage(error));
@@ -491,12 +491,11 @@ export class RadarStore {
       if (this.lastSeenNewsIds) {
         const newItems = news.filter((item) => !this.lastSeenNewsIds!.has(item.id));
         if (newItems.length > 0) {
-          const symbols = Array.from(new Set(newItems.flatMap((item) => item.relatedSymbols)));
           this.notifications.notify(
             'radar',
             'notifications.radar.newSignals',
             newItems.length,
-            formatNewSignalsDetail(symbols),
+            formatNewNewsNotificationDetail(newItems),
           );
         }
       }

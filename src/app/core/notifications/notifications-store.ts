@@ -25,6 +25,30 @@ export class NotificationsStore {
 
   /** Pushes a new notification onto the top of the list. */
   notify(source: NotificationSource, messageKey: TranslationKey, count = 1, detail?: string): void {
+    const current = this.notificationsSignal();
+
+    if (source === 'radar' && messageKey === 'notifications.radar.newSignals') {
+      const existingIndex = current.findIndex(
+        (item) => item.source === source && item.messageKey === messageKey,
+      );
+
+      if (existingIndex !== -1) {
+        const existing = current[existingIndex];
+        const updated: Notification = {
+          ...existing,
+          count: existing.count + count,
+          detail: detail ?? existing.detail,
+          createdAt: new Date().toISOString(),
+        };
+
+        this.notificationsSignal.set([
+          updated,
+          ...current.filter((_, index) => index !== existingIndex),
+        ]);
+        return;
+      }
+    }
+
     const notification: Notification = {
       id: this.generateId(),
       source,

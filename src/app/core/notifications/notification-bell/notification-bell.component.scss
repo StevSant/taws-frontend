@@ -123,16 +123,28 @@
     gap: 0.15rem;
   }
 
-  &__item-message {
+  &__item-title {
     color: var(--color-text-primary);
     font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  &__item-count {
+    font-weight: 500;
+    color: var(--color-text-muted);
   }
 
   &__item-detail {
-    display: block;
+    margin: 0;
     color: var(--color-text-secondary);
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   &__item-time {

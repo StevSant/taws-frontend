@@ -32,15 +32,15 @@
           @for (notification of notifications; track notification.id) {
             <li class="notification-bell__item">
               <div class="notification-bell__item-body">
-                <span class="notification-bell__item-message">
+                <span class="notification-bell__item-title">
                   {{ i18n.t(notification.messageKey) }}
-                  @if (notification.detail) {
-                    <span class="notification-bell__item-detail">{{ notification.detail }}</span>
-                  }
                   @if (notification.count > 1) {
-                    ({{ notification.count }})
+                    <span class="notification-bell__item-count">({{ notification.count }})</span>
                   }
                 </span>
+                @if (notification.detail) {
+                  <p class="notification-bell__item-detail">{{ notification.detail }}</p>
+                }
                 <span class="notification-bell__item-time">
                   {{ notification.createdAt | date: 'short' }}
                 </span>
