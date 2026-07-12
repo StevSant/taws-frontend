@@ -392,6 +392,9 @@ export interface TranslationDict {
   'watchlist.manager.symbolPlaceholder': string;
   'watchlist.manager.delete': string;
   'watchlist.manager.emptyItems': string;
+  'watchlist.manager.symbolUnknown': string;
+  'watchlist.manager.symbolDuplicate': string;
+  'briefings.prep.progress': string;
   'telegram.title': string;
   'telegram.linked': string;
   'telegram.notLinked': string;

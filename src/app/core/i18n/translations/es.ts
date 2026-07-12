@@ -553,6 +553,10 @@ export const ES_TRANSLATIONS = {
   'watchlist.manager.symbolPlaceholder': 'ej. AAPL',
   'watchlist.manager.delete': 'Eliminar',
   'watchlist.manager.emptyItems': 'Sin símbolos — agregá tickers a esta lista.',
+  'watchlist.manager.symbolUnknown':
+    'Ese símbolo no está en el universo de instrumentos. Elegí uno de las sugerencias.',
+  'watchlist.manager.symbolDuplicate': 'Ese símbolo ya está en esta lista.',
+  'briefings.prep.progress': 'Preparando análisis',
   'briefings.stats.watchlists': 'Listas',
   'briefings.stats.briefings': 'Informes',
   'briefings.generate': 'Generar informe',

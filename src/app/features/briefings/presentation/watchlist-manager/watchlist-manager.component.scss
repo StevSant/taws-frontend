@@ -109,11 +109,32 @@
     background: var(--color-gold-dim-bg);
   }
 
+  &__item-text {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
   &__symbol {
     font-family: var(--font-family-mono);
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--color-gold);
+  }
+
+  &__name {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__error {
+    margin: calc(-1 * var(--space-2)) 0 0;
+    font-size: 0.8rem;
+    color: var(--color-loss, #e5484d);
   }
 }
 

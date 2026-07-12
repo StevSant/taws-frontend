@@ -45,6 +45,12 @@
         [disabled]="!store.selectedWatchlistId() || store.isGenerating()"
         (pressed)="onGenerate()"
       />
+
+      @if (store.signalPrepProgress(); as prep) {
+        <span class="briefings-page__prep" role="status">
+          {{ i18n.t('briefings.prep.progress') }} ({{ prep.current }}/{{ prep.total }})
+        </span>
+      }
     </form>
 
     @if (store.isLoadingWatchlists() || store.isLoadingBriefings()) {
