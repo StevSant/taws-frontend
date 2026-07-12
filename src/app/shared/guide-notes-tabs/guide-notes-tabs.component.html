@@ -27,15 +27,7 @@
       <app-feature-guide [title]="guideTitle()" [steps]="guideSteps()" />
     } @else {
       <h2 class="guide-notes-tabs__notes-title">{{ notesTitle() }}</h2>
-      @if (notes().length === 0) {
-        <p class="guide-notes-tabs__empty">{{ notesEmptyLabel() }}</p>
-      } @else {
-        <ul class="guide-notes-tabs__notes">
-          @for (note of notes(); track $index) {
-            <li class="guide-notes-tabs__note">{{ note }}</li>
-          }
-        </ul>
-      }
+      <ng-content select="[notesPanel]" />
     }
   </div>
 </div>

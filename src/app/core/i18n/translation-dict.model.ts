@@ -482,6 +482,16 @@ export interface TranslationDict {
   'scenarios.notes.tabLabel': string;
   'scenarios.notes.title': string;
   'scenarios.notes.empty': string;
+  'notes.panel.addPlaceholder': string;
+  'notes.panel.add': string;
+  'notes.panel.save': string;
+  'notes.panel.cancel': string;
+  'notes.panel.edit': string;
+  'notes.panel.delete': string;
+  'notes.panel.empty': string;
+  'notes.panel.loading': string;
+  'notes.panel.signIn': string;
+  'notes.panel.error': string;
   'scenarios.plan.name': string;
   'scenarios.plan.status': string;
   'scenarios.plan.usageLabel': string;

@@ -10,11 +10,11 @@
       [guideTitle]="i18n.t('briefings.guide.title')"
       [guideSteps]="guideSteps()"
       [notesTitle]="i18n.t('briefings.notes.title')"
-      [notes]="notes"
       [guideTabLabel]="i18n.t('briefings.guide.tab.guide')"
       [notesTabLabel]="i18n.t('briefings.guide.tab.notes')"
-      [notesEmptyLabel]="i18n.t('briefings.notes.empty')"
-    />
+    >
+      <app-notes-panel notesPanel />
+    </app-guide-notes-tabs>
 
     <p class="feature-disclaimer" role="note">
       {{ i18n.t('briefings.disclaimer.static') }}
