@@ -334,6 +334,12 @@ export interface TranslationDict {
   'radar.instruments.col.signal': string;
   'radar.instruments.col.news': string;
   'radar.instruments.viewAll': string;
+  'radar.addInstrument.search': string;
+  'radar.addInstrument.empty': string;
+  'radar.addInstrument.authRequired': string;
+  'radar.addInstrument.added': string;
+  'radar.addInstrument.tracked': string;
+  'radar.addInstrument.remove': string;
   'markets.title': string;
   'markets.subtitle': string;
   'markets.search.placeholder': string;

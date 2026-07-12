@@ -1,4 +1,84 @@
-<a class="radar-add-instrument" routerLink="/briefings">
-  <span class="radar-add-instrument__icon" aria-hidden="true">+</span>
-  <span class="radar-add-instrument__label">{{ i18n.t('radar.instruments.add') }}</span>
-</a>
+<div class="radar-add-instrument">
+  <div class="radar-add-instrument__bar">
+    <button
+      type="button"
+      class="radar-add-instrument__toggle"
+      [attr.aria-expanded]="store.isOpen()"
+      (click)="onToggle()"
+    >
+      <span class="radar-add-instrument__icon" aria-hidden="true">+</span>
+      <span class="radar-add-instrument__label">{{ i18n.t('radar.instruments.add') }}</span>
+    </button>
+    <a class="radar-add-instrument__view-all" routerLink="/radar/explore">
+      {{ i18n.t('radar.instruments.viewAll') }}
+    </a>
+  </div>
+
+  @if (store.followedItems().length > 0) {
+    <ul
+      class="radar-add-instrument__chips"
+      [attr.aria-label]="i18n.t('radar.addInstrument.tracked')"
+    >
+      @for (item of store.followedItems(); track item.id) {
+        <li class="radar-add-instrument__chip">
+          <span>{{ item.symbol }}</span>
+          <button
+            type="button"
+            class="radar-add-instrument__chip-remove"
+            [disabled]="store.busySymbol() === item.symbol"
+            [attr.aria-label]="i18n.t('radar.addInstrument.remove') + ' ' + item.symbol"
+            (click)="onRemove(item)"
+          >
+            ×
+          </button>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (store.isOpen()) {
+    @if (!store.available()) {
+      <p class="radar-add-instrument__auth">{{ i18n.t('radar.addInstrument.authRequired') }}</p>
+    } @else {
+      <div class="radar-add-instrument__picker">
+        <input
+          type="search"
+          class="radar-add-instrument__search"
+          [placeholder]="i18n.t('radar.addInstrument.search')"
+          [value]="store.query()"
+          (input)="onSearch($any($event.target).value)"
+          [attr.aria-label]="i18n.t('radar.addInstrument.search')"
+        />
+        @if (store.results().length === 0) {
+          <p class="radar-add-instrument__empty">{{ i18n.t('radar.addInstrument.empty') }}</p>
+        } @else {
+          <ul class="radar-add-instrument__results" role="listbox">
+            @for (result of store.results(); track result.instrument.symbol) {
+              <li class="radar-add-instrument__result">
+                <button
+                  type="button"
+                  class="radar-add-instrument__result-btn"
+                  [disabled]="result.followed || store.busySymbol() === result.instrument.symbol"
+                  (click)="onAdd(result.instrument)"
+                >
+                  <span class="radar-add-instrument__result-symbol">{{
+                    result.instrument.symbol
+                  }}</span>
+                  <span class="radar-add-instrument__result-name">{{
+                    result.instrument.name
+                  }}</span>
+                  <span class="radar-add-instrument__result-state">
+                    {{ result.followed ? i18n.t('radar.addInstrument.added') : '+' }}
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+        @if (store.error(); as error) {
+          <p class="radar-add-instrument__error" role="alert">{{ error }}</p>
+        }
+      </div>
+    }
+  }
+</div>

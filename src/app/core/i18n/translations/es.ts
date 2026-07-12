@@ -362,6 +362,12 @@ export const ES_TRANSLATIONS = {
   'radar.instruments.col.signal': 'Señal',
   'radar.instruments.col.news': 'Noticias',
   'radar.instruments.viewAll': 'Ver todas',
+  'radar.addInstrument.search': 'Buscar símbolo o nombre',
+  'radar.addInstrument.empty': 'Sin resultados',
+  'radar.addInstrument.authRequired': 'Inicia sesión para seguir instrumentos',
+  'radar.addInstrument.added': 'Agregado',
+  'radar.addInstrument.tracked': 'Instrumentos en seguimiento',
+  'radar.addInstrument.remove': 'Quitar',
   'markets.title': 'Explorador de mercados',
   'markets.subtitle':
     'Explora todos los activos: precio, cambio 24h, volatilidad, tendencia y señal IA.',
