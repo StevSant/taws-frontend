@@ -36,78 +36,78 @@
           }
 
           <div class="news-timeline__copy">
-          <div class="news-timeline__headline-row">
-            <a class="news-timeline__headline" [routerLink]="['/radar/news', entry.news.id]">{{
-              entry.news.title
-            }}</a>
-            <a
-              class="news-timeline__external"
-              [href]="entry.news.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              [attr.aria-label]="i18n.t('radar.detail.openOriginal')"
-              [attr.title]="i18n.t('radar.detail.openOriginal')"
-              >&#8599;</a
-            >
+            <div class="news-timeline__headline-row">
+              <a class="news-timeline__headline" [routerLink]="['/radar/news', entry.news.id]">{{
+                entry.news.title
+              }}</a>
+              <a
+                class="news-timeline__external"
+                [href]="entry.news.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                [attr.aria-label]="i18n.t('radar.detail.openOriginal')"
+                [attr.title]="i18n.t('radar.detail.openOriginal')"
+                >&#8599;</a
+              >
+            </div>
+            @if (blurbs.blurbs(); as _cache) {
+              @if (summaryFor(entry); as summary) {
+                <p class="news-timeline__summary">{{ summary }}</p>
+              }
+            }
+            <span class="news-timeline__meta">
+              @if (providerLabel(entry.news.provider); as provider) {
+                <span class="news-timeline__provider">{{ provider }}</span> ·
+              }
+              {{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}
+              <span class="news-timeline__open" aria-hidden="true"
+                >{{ i18n.t('radar.card.openDetail') }} →</span
+              >
+            </span>
+
+            <ul class="news-timeline__symbols">
+              @for (related of entry.symbols; track related.symbol) {
+                <li class="news-timeline__symbol">
+                  <app-instrument-ticker-badge
+                    class="news-timeline__badge-icon"
+                    [symbol]="related.symbol"
+                    size="sm"
+                  />
+                  <span class="news-timeline__ticker">{{ related.symbol }}</span>
+
+                  <span
+                    class="news-timeline__pill"
+                    [class.news-timeline__pill--positive]="related.impactClass === 'positive'"
+                    [class.news-timeline__pill--negative]="related.impactClass === 'negative'"
+                    [class.news-timeline__pill--neutral]="related.impactClass === 'neutral'"
+                    [class.news-timeline__pill--pending]="!related.impactClass"
+                  >
+                    {{ impactLabel(related.impactClass) }}
+                  </span>
+                  @if (confidenceLabel(related.confidence); as pct) {
+                    <span class="news-timeline__confidence"
+                      >{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span
+                    >
+                  }
+
+                  @if (!related.impactClass) {
+                    <button
+                      type="button"
+                      class="news-timeline__analyze"
+                      [disabled]="store.isGeneratingFor(related.symbol)"
+                      (click)="onAnalyze(related.symbol)"
+                    >
+                      {{
+                        store.isGeneratingFor(related.symbol)
+                          ? i18n.t('radar.generate.generating')
+                          : i18n.t('radar.timeline.analyze')
+                      }}
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
           </div>
-          @if (blurbs.blurbs(); as _cache) {
-            @if (summaryFor(entry); as summary) {
-              <p class="news-timeline__summary">{{ summary }}</p>
-            }
-          }
-          <span class="news-timeline__meta">
-            @if (providerLabel(entry.news.provider); as provider) {
-              <span class="news-timeline__provider">{{ provider }}</span> ·
-            }
-            {{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}
-            <span class="news-timeline__open" aria-hidden="true"
-              >{{ i18n.t('radar.card.openDetail') }} →</span
-            >
-          </span>
-
-          <ul class="news-timeline__symbols">
-            @for (related of entry.symbols; track related.symbol) {
-              <li class="news-timeline__symbol">
-                <app-instrument-ticker-badge
-                  class="news-timeline__badge-icon"
-                  [symbol]="related.symbol"
-                  size="sm"
-                />
-                <span class="news-timeline__ticker">{{ related.symbol }}</span>
-
-                <span
-                  class="news-timeline__pill"
-                  [class.news-timeline__pill--positive]="related.impactClass === 'positive'"
-                  [class.news-timeline__pill--negative]="related.impactClass === 'negative'"
-                  [class.news-timeline__pill--neutral]="related.impactClass === 'neutral'"
-                  [class.news-timeline__pill--pending]="!related.impactClass"
-                >
-                  {{ impactLabel(related.impactClass) }}
-                </span>
-                @if (confidenceLabel(related.confidence); as pct) {
-                  <span class="news-timeline__confidence"
-                    >{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span
-                  >
-                }
-
-                @if (!related.impactClass) {
-                  <button
-                    type="button"
-                    class="news-timeline__analyze"
-                    [disabled]="store.isGeneratingFor(related.symbol)"
-                    (click)="onAnalyze(related.symbol)"
-                  >
-                    {{
-                      store.isGeneratingFor(related.symbol)
-                        ? i18n.t('radar.generate.generating')
-                        : i18n.t('radar.timeline.analyze')
-                    }}
-                  </button>
-                }
-              </li>
-            }
-          </ul>
-        </div>
         </div>
       </li>
     }

@@ -263,9 +263,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return this.i18n.t('chat.thinking.writing');
     }
 
-    const activeTool = [...this.store.toolHops()]
-      .reverse()
-      .find((hop) => hop.status === 'active');
+    const activeTool = [...this.store.toolHops()].reverse().find((hop) => hop.status === 'active');
 
     if (activeTool) {
       return `${this.i18n.t('chat.thinking.tool')} ${this.toolLabel(activeTool.name)}…`;

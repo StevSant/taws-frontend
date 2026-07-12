@@ -311,7 +311,9 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         const delta = parsed['delta'];
         if (typeof delta === 'string') {
           this.emit({ kind: 'transcript-delta', delta });
-          this.assistantTranscriptBuffer = `${this.assistantTranscriptBuffer}${delta}`.slice(-2_000);
+          this.assistantTranscriptBuffer = `${this.assistantTranscriptBuffer}${delta}`.slice(
+            -2_000,
+          );
           void this.handleInputTranscript(this.assistantTranscriptBuffer);
         }
         return;
@@ -410,10 +412,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     const toolName = symbols.length > 1 ? 'render_comparison_chart' : 'render_price_chart';
     const key = `${toolName}:${symbols.join(',')}`;
     const now = Date.now();
-    if (
-      this.lastDirectChartRequest?.key === key &&
-      now - this.lastDirectChartRequest.at < 10_000
-    ) {
+    if (this.lastDirectChartRequest?.key === key && now - this.lastDirectChartRequest.at < 10_000) {
       return;
     }
     this.lastDirectChartRequest = { key, at: now };
@@ -568,9 +567,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
   }
 
   private asRecord(value: unknown): Record<string, unknown> | null {
-    return typeof value === 'object' && value !== null
-      ? (value as Record<string, unknown>)
-      : null;
+    return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null;
   }
 
   private isChartSpec(value: unknown): value is ChartSpec {

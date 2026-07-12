@@ -226,8 +226,7 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
         }
 
         this.material.emissive.setHex(profile.emissive);
-        this.material.emissiveIntensity =
-          profile.emissiveIntensity * this.emissiveIntensityScale();
+        this.material.emissiveIntensity = profile.emissiveIntensity * this.emissiveIntensityScale();
       }
 
       if (this.renderer && this.scene && this.camera) {
