@@ -7,7 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent } from '../../../../shared';
 import { NewsBlurbService } from '../../application/news-blurb.service';
@@ -37,6 +37,7 @@ export class NewsTimelineComponent implements OnChanges {
   readonly i18n = inject(TranslationService);
   readonly blurbs = inject(NewsBlurbService);
   readonly visibleCount = signal(8);
+  private readonly router = inject(Router);
 
   ngOnChanges(): void {
     this.requestBlurbs();
@@ -88,6 +89,18 @@ export class NewsTimelineComponent implements OnChanges {
 
   onAnalyze(symbol: string): void {
     void this.store.generateSignal(symbol);
+  }
+
+  /**
+   * Whole-row navigation to the news detail. Inner interactive elements
+   * (headline link, external ↗, Analizar button) keep their own behavior —
+   * same guarded-activation pattern as `instrument-card-compact`.
+   */
+  onOpenEntry(event: Event, entry: NewsTimelineEntry): void {
+    if (event.target instanceof HTMLElement && event.target.closest('a, button')) {
+      return;
+    }
+    void this.router.navigate(['/radar/news', entry.news.id]);
   }
 
   onImageError(event: Event): void {

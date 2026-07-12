@@ -8,7 +8,14 @@
 
   <ul class="news-timeline__list">
     @for (entry of visibleEntries(); track entry.news.id) {
-      <li class="news-timeline__item">
+      <li
+        class="news-timeline__item"
+        role="link"
+        tabindex="0"
+        [attr.aria-label]="entry.news.title"
+        (click)="onOpenEntry($event, entry)"
+        (keydown.enter)="onOpenEntry($event, entry)"
+      >
         <time class="news-timeline__time">{{ entry.news.publishedAt | date: 'HH:mm' }}</time>
 
         <div class="news-timeline__body">
@@ -53,6 +60,9 @@
               <span class="news-timeline__provider">{{ provider }}</span> ·
             }
             {{ entry.news.source }} · {{ relativeTime(entry.news.publishedAt) }}
+            <span class="news-timeline__open" aria-hidden="true"
+              >{{ i18n.t('radar.card.openDetail') }} →</span
+            >
           </span>
 
           <ul class="news-timeline__symbols">
