@@ -1,0 +1,49 @@
+<section class="composition feature-panel">
+  <header class="composition__header">
+    <h2 class="composition__title">{{ i18n.t('radar.composition.title') }}</h2>
+    <p class="composition__subtitle">{{ i18n.t('radar.composition.subtitle') }}</p>
+  </header>
+
+  @if (rows.length > 0) {
+    <ul class="composition__ladder" role="list">
+      @for (row of rows; track row.assetClass) {
+        <li>
+          <button
+            type="button"
+            class="composition__lane"
+            [style.--lane-share]="row.sharePct"
+            [style.--lane-color]="row.scoreColor"
+            (click)="select(row.assetClass)"
+          >
+            <span class="composition__lane-fill" aria-hidden="true"></span>
+            <span class="composition__lane-body">
+              <span class="composition__lane-lead">
+                <span class="composition__dot" [style.background]="row.scoreColor"></span>
+                <span class="composition__lane-label">{{ i18n.t(row.labelKey) }}</span>
+                <span class="composition__lane-count">
+                  {{ row.instrumentCount }} {{ i18n.t('radar.landscape.instruments') }}
+                </span>
+              </span>
+
+              <span class="composition__lane-metrics">
+                <span class="composition__lane-share">{{ formatPct(row.sharePct) }}</span>
+                <span class="composition__lane-score" [style.color]="row.scoreColor">
+                  {{ row.marketScore.score }}
+                </span>
+                <span class="composition__lane-sentiment">{{ i18n.t(row.scoreLabelKey) }}</span>
+              </span>
+            </span>
+          </button>
+        </li>
+      }
+    </ul>
+
+    @if (composition.unclassifiedInstruments > 0) {
+      <p class="composition__residual">
+        {{ composition.unclassifiedInstruments }} {{ i18n.t('radar.composition.unclassified') }}
+      </p>
+    }
+  } @else {
+    <p class="composition__empty">{{ i18n.t('radar.composition.empty') }}</p>
+  }
+</section>

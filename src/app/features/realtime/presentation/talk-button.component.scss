@@ -1,0 +1,95 @@
+:host {
+  display: block;
+}
+
+.talk-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.15rem 0.55rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--color-gold-bright);
+  background: color-mix(in srgb, var(--color-gold) 12%, transparent);
+  border: 1px solid var(--color-gold-border-hi, rgba(212, 160, 23, 0.32));
+  border-radius: var(--radius-full, 999px);
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+.talk-trigger:hover {
+  color: var(--color-background-deep);
+  background: linear-gradient(135deg, var(--color-gold-bright), var(--color-gold));
+  border-color: transparent;
+  box-shadow: 0 8px 22px -8px var(--color-gold);
+  transform: translateY(-1px);
+}
+
+.talk-trigger:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.talk-trigger:focus-visible {
+  outline: 2px solid var(--color-gold-bright);
+  outline-offset: 3px;
+}
+
+/* Animated soundwave glyph — the signature that distinguishes this from the
+   composer's static dictation mic. */
+.talk-trigger__wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 1.1rem;
+}
+
+.talk-trigger__bar {
+  width: 2.5px;
+  height: 40%;
+  border-radius: 2px;
+  background: currentColor;
+  animation: talkWave 1.1s ease-in-out infinite;
+}
+
+.talk-trigger__bar:nth-child(1) {
+  animation-delay: 0ms;
+}
+.talk-trigger__bar:nth-child(2) {
+  animation-delay: 140ms;
+}
+.talk-trigger__bar:nth-child(3) {
+  animation-delay: 280ms;
+}
+.talk-trigger__bar:nth-child(4) {
+  animation-delay: 200ms;
+}
+.talk-trigger__bar:nth-child(5) {
+  animation-delay: 80ms;
+}
+
+.talk-trigger__label {
+  line-height: 1;
+}
+
+@keyframes talkWave {
+  0%,
+  100% {
+    height: 35%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talk-trigger__bar {
+    animation: none;
+    height: 65%;
+  }
+}

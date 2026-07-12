@@ -6,6 +6,7 @@ import {
   OnDestroy,
   output,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import { ChatSessionsStore } from '../../application/chat-sessions-store';
 import { truncateSessionTitle } from '../../application/truncate-session-title';
@@ -19,10 +20,15 @@ const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
   templateUrl: './chat-sessions-panel.component.html',
   styleUrl: './chat-sessions-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'chat-sessions-host',
+    '[class.chat-sessions-host--open]': 'mobileOpen()',
+  },
 })
 export class ChatSessionsPanelComponent implements OnDestroy {
   readonly sessionsStore = inject(ChatSessionsStore);
   readonly i18n = inject(TranslationService);
+  private readonly router = inject(Router);
 
   readonly mobileOpen = input(false);
   readonly closePanel = output<void>();
@@ -55,18 +61,26 @@ export class ChatSessionsPanelComponent implements OnDestroy {
   }
 
   onSelect(sessionId: string): void {
-    this.sessionsStore.selectSession(sessionId);
+    void this.router.navigate(['/chat', sessionId]);
     if (this.isMobileViewport) {
       this.closePanel.emit();
     }
   }
 
   onCreate(): void {
-    this.sessionsStore.createSession();
+    const sessionId = this.sessionsStore.createSession();
+    void this.router.navigate(['/chat', sessionId]);
+    if (this.isMobileViewport) {
+      this.closePanel.emit();
+    }
   }
 
   onDelete(event: MouseEvent, sessionId: string): void {
     event.stopPropagation();
     this.sessionsStore.deleteSession(sessionId);
+    const activeId = this.sessionsStore.activeSessionId();
+    if (activeId) {
+      void this.router.navigate(['/chat', activeId]);
+    }
   }
 }

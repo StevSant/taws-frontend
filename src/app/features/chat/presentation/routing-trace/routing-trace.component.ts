@@ -9,6 +9,8 @@ const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   quant: 'chat.agent.quant',
   advisor: 'chat.agent.advisor',
   consequence: 'chat.agent.consequence',
+  macro: 'chat.agent.macro',
+  sentiment: 'chat.agent.sentiment',
 };
 
 const STATUS_LABEL_KEYS: Record<RoutingHopStatus, TranslationKey> = {

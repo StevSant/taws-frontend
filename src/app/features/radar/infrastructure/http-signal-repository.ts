@@ -38,7 +38,7 @@ export class HttpSignalRepository extends SignalRepository {
         const dtos = await firstValueFrom(
           this.http.get<SignalDto[]>(`${this.config.apiBaseUrl}${SIGNALS_PATH}`, { params }),
         );
-        return dtos.map(mapSignalDto);
+        return (Array.isArray(dtos) ? dtos : []).map(mapSignalDto);
       },
     );
   }

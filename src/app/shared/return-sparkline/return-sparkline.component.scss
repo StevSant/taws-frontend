@@ -26,4 +26,44 @@
       opacity: 0.9;
     }
   }
+
+  &__area {
+    opacity: 0.18;
+  }
+
+  &__line {
+    fill: none;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__dot {
+    stroke: var(--color-surface);
+    stroke-width: 1.25;
+  }
+
+  &--up {
+    .return-sparkline__line {
+      stroke: var(--color-gain);
+    }
+    .return-sparkline__area {
+      fill: var(--color-gain);
+    }
+    .return-sparkline__dot {
+      fill: var(--color-gain);
+    }
+  }
+
+  &--down {
+    .return-sparkline__line {
+      stroke: var(--color-loss);
+    }
+    .return-sparkline__area {
+      fill: var(--color-loss);
+    }
+    .return-sparkline__dot {
+      fill: var(--color-loss);
+    }
+  }
 }

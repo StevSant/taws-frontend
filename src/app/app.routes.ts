@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadChildren: () => import('./features/chat/chat.routes').then((m) => m.CHAT_ROUTES),
       },
       {
+        path: 'agents',
+        loadChildren: () => import('./features/agents/agents.routes').then((m) => m.AGENTS_ROUTES),
+      },
+      {
         path: 'scenarios',
         loadChildren: () =>
           import('./features/scenarios/scenarios.routes').then((m) => m.SCENARIOS_ROUTES),
@@ -39,6 +43,11 @@ export const routes: Routes = [
         path: 'brand-lab',
         loadChildren: () =>
           import('./features/brand-lab/brand-lab.routes').then((m) => m.BRAND_LAB_ROUTES),
+      },
+      {
+        path: 'user',
+        canActivate: [authGuard],
+        loadChildren: () => import('./features/user/user.routes').then((m) => m.USER_ROUTES),
       },
     ],
   },

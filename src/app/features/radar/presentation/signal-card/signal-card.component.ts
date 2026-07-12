@@ -11,6 +11,7 @@ import {
   ImpactCompassComponent,
   ReturnSparklineComponent,
 } from '../../../../shared';
+import { buildCandlestickSpec, ChartComponent, ChartSpec, OhlcBar } from '../../../../shared/charts';
 import {
   ReviewDecisionSubmitted,
   ReviewPanelComponent,
@@ -40,6 +41,9 @@ const VOLATILITY_LABELS: Record<VolatilityRegimeLevel, TranslationKey> = {
 
 const PERCENT_MULTIPLIER = 100;
 
+/** A candlestick needs at least this many candles to be worth rendering over the sparkline. */
+const MIN_CANDLES_FOR_CHART = 2;
+
 @Component({
   selector: 'app-signal-card',
   standalone: true,
@@ -49,6 +53,7 @@ const PERCENT_MULTIPLIER = 100;
     ConfidenceGaugeComponent,
     ImpactCompassComponent,
     ReturnSparklineComponent,
+    ChartComponent,
     ButtonComponent,
     ReviewPanelComponent,
   ],
@@ -63,6 +68,10 @@ export class SignalCardComponent implements OnInit {
   readonly auth = inject(AuthStore);
   readonly i18n = inject(TranslationService);
   readonly showAllNews = signal(false);
+
+  /** Cached candlestick spec, rebuilt only when the underlying candles array changes. */
+  private cachedCandles: OhlcBar[] | null = null;
+  private cachedSpec: ChartSpec | null = null;
 
   ngOnInit(): void {
     if (this.signal.signalId) {
@@ -80,6 +89,21 @@ export class SignalCardComponent implements OnInit {
 
   volatilityLabel(regime: VolatilityRegimeLevel): string {
     return this.i18n.t(VOLATILITY_LABELS[regime]);
+  }
+
+  /** Candlestick spec for the shared chart, memoized by candles-array reference. */
+  candlestickSpec(): ChartSpec | null {
+    const candles = this.signal.marketStats?.candles ?? null;
+    if (!candles || candles.length < MIN_CANDLES_FOR_CHART) {
+      this.cachedCandles = null;
+      this.cachedSpec = null;
+      return null;
+    }
+    if (candles !== this.cachedCandles) {
+      this.cachedCandles = candles;
+      this.cachedSpec = buildCandlestickSpec(this.signal.symbol, candles);
+    }
+    return this.cachedSpec;
   }
 
   statusLabel(): string {

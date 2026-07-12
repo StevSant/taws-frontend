@@ -10,5 +10,10 @@ export function mapSignalDto(dto: SignalDto): Signal {
     confidence: dto.confidence,
     priceDelta: dto.price_delta ?? undefined,
     createdAt: dto.created_at,
+    thesis: dto.thesis?.trim() || undefined,
+    keyDrivers: dto.key_drivers ?? [],
+    riskFactors: dto.risk_factors ?? [],
+    analysisAvailable: dto.analysis_available ?? true,
+    disclaimer: dto.disclaimer,
   };
 }

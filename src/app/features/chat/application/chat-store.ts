@@ -44,12 +44,12 @@ export class ChatStore {
     const threadId = this.sessionsStore.ensureActiveSession();
     const userMessage: ChatMessage = { id: this.nextId(), role: USER_ROLE, content: trimmed };
     this.appendMessage(userMessage);
+    this.errorSignal.set(null);
+    this.streamingSignal.set(true);
 
     const assistantId = this.nextId();
     this.appendMessage({ id: assistantId, role: ASSISTANT_ROLE, content: '', pending: true });
     this.tracesSignal.set([]);
-    this.errorSignal.set(null);
-    this.streamingSignal.set(true);
 
     try {
       for await (const event of this.chatRepository.streamReply(trimmed, threadId)) {

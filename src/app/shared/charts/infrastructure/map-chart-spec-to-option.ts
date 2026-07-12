@@ -15,7 +15,8 @@ export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChart
       text: spec.meta.title,
       textStyle: { color: theme.textPrimary, fontSize: 14 },
     },
-    tooltip: { trigger: 'axis' },
+    // `cross` gives an interactive crosshair with both axis pointers + value labels.
+    tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
     grid: { left: 56, right: 20, top: 44, bottom: 40 },
     textStyle: { color: theme.textSecondary },
   };
@@ -40,31 +41,111 @@ export function mapChartSpecToOption(spec: ChartSpec, theme: ChartTheme): EChart
   }
 }
 
+/**
+ * Fraction of the plot height the volume bars occupy at the bottom. The volume value axis is
+ * given a `max` of `peakVolume / VOLUME_PLOT_FRACTION`, so the tallest bar fills this fraction
+ * and the rest sits above, keeping the candles readable.
+ */
+const VOLUME_PLOT_FRACTION = 0.28;
+
 function candlestickOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   const series = spec.series[0];
   if (!series) {
     return {};
   }
   const categories = series.bars.map((bar) => bar.t);
+  const flatCandles = series.bars.every(
+    (bar) => bar.o === bar.c && bar.h === bar.l && bar.o === bar.h,
+  );
+  if (flatCandles && series.bars.length > 0) {
+    return {
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLine: { lineStyle: { color: theme.grid } },
+        axisLabel: { color: theme.textSecondary },
+      },
+      yAxis: {
+        type: 'value',
+        scale: true,
+        splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+        axisLabel: { color: theme.textSecondary },
+      },
+      series: [
+        {
+          type: 'line',
+          name: series.name,
+          showSymbol: false,
+          lineStyle: { color: theme.gold, width: 2 },
+          itemStyle: { color: theme.gold },
+          data: series.bars.map((bar) => bar.c),
+        },
+      ],
+    };
+  }
   const values = series.bars.map((bar) => [bar.o, bar.c, bar.l, bar.h]);
+  const hasVolume = series.bars.some((bar) => bar.v !== null && bar.v !== undefined);
+
+  const candlestickSeries = {
+    type: 'candlestick' as const,
+    name: series.name,
+    data: values,
+    itemStyle: {
+      color: theme.gain,
+      color0: theme.loss,
+      borderColor: theme.gain,
+      borderColor0: theme.loss,
+    },
+  };
+
+  if (!hasVolume) {
+    return {
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLine: { lineStyle: { color: theme.grid } },
+      },
+      yAxis: {
+        type: 'value',
+        scale: true,
+        splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+      },
+      series: [candlestickSeries],
+    };
+  }
+
+  // Overlay volume as faint bars on a hidden secondary value axis, colored per candle
+  // direction (close ≥ open ⇒ gain). Kept on the same grid as the price candles so no
+  // extra layout math is needed; the axis `max` pins the bars to the bottom band.
+  const peakVolume = Math.max(...series.bars.map((bar) => bar.v ?? 0), 0);
+  const volumeData = series.bars.map((bar) => ({
+    value: bar.v ?? 0,
+    itemStyle: { color: bar.c >= bar.o ? theme.gain : theme.loss, opacity: 0.28 },
+  }));
+
   return {
     xAxis: { type: 'category', data: categories, axisLine: { lineStyle: { color: theme.grid } } },
-    yAxis: {
-      type: 'value',
-      scale: true,
-      splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
-    },
-    series: [
+    yAxis: [
       {
-        type: 'candlestick',
-        name: series.name,
-        data: values,
-        itemStyle: {
-          color: theme.gain,
-          color0: theme.loss,
-          borderColor: theme.gain,
-          borderColor0: theme.loss,
-        },
+        type: 'value',
+        scale: true,
+        splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+      },
+      {
+        type: 'value',
+        show: false,
+        max: peakVolume > 0 ? peakVolume / VOLUME_PLOT_FRACTION : undefined,
+      },
+    ],
+    series: [
+      candlestickSeries,
+      {
+        type: 'bar',
+        name: `${series.name} vol`,
+        yAxisIndex: 1,
+        data: volumeData,
+        barWidth: '60%',
+        tooltip: { show: false },
       },
     ],
   };
@@ -119,19 +200,33 @@ function distributionOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
   if (!series) {
     return {};
   }
+  const percentAxis =
+    spec.yAxis.format === 'percent'
+      ? { formatter: (value: number) => `${Math.round(value * 100)}%` }
+      : undefined;
   return {
     xAxis: {
       type: 'category',
       data: series.points.map((point) => point.x),
       axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary, interval: 0, rotate: series.points.length > 4 ? 24 : 0 },
     },
-    yAxis: { type: 'value', splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } } },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+      axisLabel: { color: theme.textSecondary, ...percentAxis },
+    },
     series: [
       {
         type: 'bar',
         name: series.name,
-        itemStyle: { color: theme.gold },
-        data: series.points.map((point) => point.y),
+        data: series.points.map((point) => ({
+          value: point.y,
+          itemStyle: {
+            color:
+              point.y > 0 ? theme.gain : point.y < 0 ? theme.loss : theme.textSecondary,
+          },
+        })),
       },
     ],
   };

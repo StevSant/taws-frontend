@@ -7,7 +7,7 @@
 .radar-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
   padding-bottom: var(--space-8);
 
   &__hero {
@@ -16,7 +16,7 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-4);
-    padding-bottom: var(--space-2);
+    padding-bottom: var(--space-1);
   }
 
   &__title {
@@ -43,14 +43,15 @@
     backdrop-filter: none;
   }
 
-  &__kpis {
+  &__kpis,
+  &__tabs {
     display: block;
     width: 100%;
   }
 
   &__overview {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
     gap: var(--space-4);
     align-items: start;
     width: 100%;
@@ -61,38 +62,24 @@
     }
   }
 
+  &__overview-main {
+    display: block;
+    min-width: 0;
+  }
+
   &__enriching {
-    margin: calc(var(--space-2) * -1) 0 0;
+    margin: 0;
     font-family: var(--font-family-mono);
     font-size: 0.72rem;
     color: var(--color-gold-bright);
     text-align: center;
   }
 
-  &__split {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: var(--space-5);
-    align-items: start;
-    width: 100%;
-    min-width: 0;
-    margin-top: var(--space-2);
-
-    > * {
-      min-width: 0;
-    }
-  }
-
-  &__timeline {
-    min-width: 0;
-  }
-
   &__instruments {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
     min-width: 0;
-    min-height: 0;
   }
 
   &__instruments-header {
@@ -101,8 +88,6 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-3);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
   }
 
   &__instruments-copy {
@@ -124,21 +109,49 @@
 
   &__instruments-title {
     margin: 0;
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
   }
 
   &__instruments-subtitle {
-    margin: 0.35rem 0 0;
-    font-size: 0.78rem;
+    margin: 0.3rem 0 0;
+    font-size: 0.76rem;
     line-height: 1.45;
     color: var(--color-text-muted);
   }
 
-  &__instrument-grid {
+  &__list-head {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
+    grid-template-columns:
+      minmax(9rem, 1.2fr)
+      minmax(5.5rem, 0.9fr)
+      minmax(4.5rem, 0.7fr)
+      minmax(6.5rem, 0.9fr)
+      minmax(5rem, 0.7fr);
+    gap: var(--space-3);
+    padding: 0 0.9rem 0.35rem;
+    font-size: 0.62rem;
+    font-weight: 650;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+
+    span:nth-child(3),
+    span:nth-child(5) {
+      text-align: right;
+    }
+  }
+
+  &__instrument-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  &__timeline {
+    display: block;
+    min-width: 0;
   }
 
   &__skeletons {
@@ -153,26 +166,23 @@
     grid-template-columns: 1fr;
     gap: var(--space-4);
   }
-
-  .radar-page__split {
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
-  }
 }
 
 @media (max-width: 1100px) {
-  .radar-page__instrument-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .radar-page__skeletons {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
+@media (max-width: 900px) {
+  .radar-page__list-head {
+    display: none;
+  }
+}
+
 @media (max-width: 720px) {
   .radar-page {
-    gap: var(--space-5);
+    gap: var(--space-4);
   }
 
   .radar-page__hero {
@@ -197,8 +207,8 @@
     }
   }
 
-  .radar-page__instrument-grid {
-    grid-template-columns: 1fr;
+  .radar-page__list-head {
+    display: none;
   }
 
   .radar-page__skeletons {

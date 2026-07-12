@@ -9,8 +9,8 @@ import {
   output,
   signal,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslationService } from '../../core';
-import { DropdownAnchor, syncDropdownAnchor } from '../sync-dropdown-anchor';
 import { UserProfileChipComponent } from '../user-profile-chip/user-profile-chip.component';
 
 @Component({
@@ -26,6 +26,7 @@ import { UserProfileChipComponent } from '../user-profile-chip/user-profile-chip
 })
 export class UserMenuComponent {
   readonly i18n = inject(TranslationService);
+  private readonly router = inject(Router);
 
   readonly initial = input.required<string>();
   readonly email = input('');
@@ -34,18 +35,13 @@ export class UserMenuComponent {
   readonly logout = output<void>();
 
   readonly isOpen = signal(false);
-  readonly menuAnchor = signal<DropdownAnchor>({ top: 0, left: 0 });
 
   readonly triggerLabel = computed(() => this.displayName() || this.email() || this.initial());
 
   constructor(private readonly host: ElementRef<HTMLElement>) {}
 
   toggle(): void {
-    const opening = !this.isOpen();
-    if (opening) {
-      this.syncMenuAnchor();
-    }
-    this.isOpen.set(opening);
+    this.isOpen.update((open) => !open);
   }
 
   onLogout(): void {
@@ -53,12 +49,9 @@ export class UserMenuComponent {
     this.logout.emit();
   }
 
-  @HostListener('window:resize')
-  @HostListener('window:scroll')
-  onViewportChange(): void {
-    if (this.isOpen()) {
-      this.syncMenuAnchor();
-    }
+  onOpenProfile(): void {
+    this.isOpen.set(false);
+    void this.router.navigate(['/user']);
   }
 
   @HostListener('document:click', ['$event'])
@@ -75,9 +68,5 @@ export class UserMenuComponent {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.isOpen.set(false);
-  }
-
-  private syncMenuAnchor(): void {
-    this.menuAnchor.set(syncDropdownAnchor(this.host.nativeElement));
   }
 }

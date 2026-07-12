@@ -30,21 +30,46 @@
       } @else {
         <ul class="notification-bell__list">
           @for (notification of notifications; track notification.id) {
-            <li class="notification-bell__item">
-              <div class="notification-bell__item-body">
-                <span class="notification-bell__item-message">
-                  {{ i18n.t(notification.messageKey) }}
+            <li
+              class="notification-bell__item"
+              [class.notification-bell__item--clickable]="linkFor(notification)"
+            >
+              @if (linkFor(notification)) {
+                <button
+                  type="button"
+                  class="notification-bell__item-open"
+                  [attr.aria-label]="i18n.t('notifications.open')"
+                  (click)="onOpen(notification)"
+                >
+                  <span class="notification-bell__item-title">
+                    {{ i18n.t(notification.messageKey) }}
+                    @if (notification.count > 1) {
+                      <span class="notification-bell__item-count">({{ notification.count }})</span>
+                    }
+                  </span>
                   @if (notification.detail) {
-                    <span class="notification-bell__item-detail">{{ notification.detail }}</span>
+                    <p class="notification-bell__item-detail">{{ notification.detail }}</p>
                   }
-                  @if (notification.count > 1) {
-                    ({{ notification.count }})
+                  <span class="notification-bell__item-time">
+                    {{ notification.createdAt | date: 'short' }}
+                  </span>
+                </button>
+              } @else {
+                <div class="notification-bell__item-body">
+                  <span class="notification-bell__item-title">
+                    {{ i18n.t(notification.messageKey) }}
+                    @if (notification.count > 1) {
+                      <span class="notification-bell__item-count">({{ notification.count }})</span>
+                    }
+                  </span>
+                  @if (notification.detail) {
+                    <p class="notification-bell__item-detail">{{ notification.detail }}</p>
                   }
-                </span>
-                <span class="notification-bell__item-time">
-                  {{ notification.createdAt | date: 'short' }}
-                </span>
-              </div>
+                  <span class="notification-bell__item-time">
+                    {{ notification.createdAt | date: 'short' }}
+                  </span>
+                </div>
+              }
               <button
                 type="button"
                 class="notification-bell__dismiss"

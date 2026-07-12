@@ -22,19 +22,23 @@
   </button>
 
   @if (isOpen()) {
-    <div
-      class="user-menu__panel"
-      role="menu"
-      [style.top.px]="menuAnchor().top"
-      [style.left.px]="menuAnchor().left"
-    >
-      <div class="user-menu__profile">
+    <div class="user-menu__panel" role="menu">
+      <div class="user-menu__profile-card">
         <app-user-profile-chip
           [initial]="initial()"
           [email]="email()"
           [roleLabel]="displayName()"
         />
       </div>
+
+      <button
+        type="button"
+        class="user-menu__profile-link"
+        role="menuitem"
+        (click)="onOpenProfile()"
+      >
+        {{ i18n.t('user.menu.profile') }}
+      </button>
 
       <button type="button" class="user-menu__logout" role="menuitem" (click)="onLogout()">
         {{ i18n.t('shell.auth.logout') }}

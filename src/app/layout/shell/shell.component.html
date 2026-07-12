@@ -23,6 +23,13 @@
         >
         <a
           class="app-shell__tab"
+          routerLink="/agents"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.agents.hint')"
+          >{{ i18n.t('shell.nav.agents') }}</a
+        >
+        <a
+          class="app-shell__tab"
           routerLink="/scenarios"
           routerLinkActive="app-shell__tab--active"
           [attr.title]="i18n.t('shell.nav.scenarios.hint')"
@@ -37,22 +44,86 @@
         >
       </nav>
 
-      <div class="app-shell__search">
+      <form
+        #searchHost
+        class="app-shell__search"
+        [class.app-shell__search--open]="search.isOpen()"
+        (submit)="onSearchSubmit($event)"
+      >
         <svg lucideSearch class="app-shell__search-icon" [size]="16" aria-hidden="true"></svg>
         <input
           #searchInput
           class="app-shell__search-input"
           type="search"
+          role="combobox"
+          aria-autocomplete="list"
+          [attr.aria-expanded]="search.isOpen()"
+          aria-controls="shell-search-results"
           [placeholder]="i18n.t('shell.search.placeholder')"
           [attr.aria-label]="i18n.t('shell.search.label')"
+          [value]="search.query()"
+          (input)="onSearchInput($event)"
+          (focus)="onSearchFocus()"
+          (keydown)="onSearchKeydown($event)"
         />
-      </div>
+
+        @if (search.isOpen()) {
+          <div
+            id="shell-search-results"
+            class="app-shell__search-panel"
+            role="listbox"
+            [attr.aria-label]="i18n.t('shell.search.label')"
+          >
+            @if (search.isLoading()) {
+              <p class="app-shell__search-empty">{{ i18n.t('shell.search.loading') }}</p>
+            } @else if (search.visibleResults().length === 0) {
+              <p class="app-shell__search-empty">{{ i18n.t('shell.search.noResults') }}</p>
+            } @else {
+              <ul class="app-shell__search-list">
+                @for (result of search.visibleResults(); track resultKey(result); let index = $index) {
+                  <li
+                    role="option"
+                    [attr.aria-selected]="index === search.activeIndex()"
+                    [class.app-shell__search-item--active]="index === search.activeIndex()"
+                  >
+                    <button
+                      type="button"
+                      class="app-shell__search-item"
+                      (mousedown)="onSelectResult(result, $event)"
+                    >
+                      @if (result.kind === 'instrument') {
+                        <span class="app-shell__search-item-main">
+                          <span class="app-shell__search-symbol">{{ result.symbol }}</span>
+                          <span class="app-shell__search-name">{{ result.name }}</span>
+                        </span>
+                        <span class="app-shell__search-meta">{{
+                          search.assetClassLabel(result.assetClass)
+                        }}</span>
+                      } @else if (result.kind === 'assetClass') {
+                        <span class="app-shell__search-item-main">
+                          <span class="app-shell__search-name">{{ result.label }}</span>
+                        </span>
+                      } @else {
+                        <span class="app-shell__search-item-main">
+                          <span class="app-shell__search-name">{{ result.query }}</span>
+                        </span>
+                      }
+                      <span class="app-shell__search-hint">{{ resultHint(result) }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </form>
 
       <div class="app-shell__cluster">
         <app-notification-bell
           [notifications]="notifications.notifications()"
           (dismiss)="notifications.dismiss($event)"
           (clearAll)="notifications.clearAll()"
+          (openNotification)="onOpenNotification($event)"
         />
 
         <app-theme-toggle />

@@ -30,7 +30,7 @@
   }
 
   &__vix-gauge {
-    height: 2rem;
+    height: 2.35rem;
     margin-bottom: 0.15rem;
 
     svg {
@@ -95,7 +95,7 @@
 
   &__bar {
     display: block;
-    height: 0.35rem;
+    height: 0.45rem;
     margin-top: 0.25rem;
     border-radius: var(--radius-full);
     background: color-mix(in srgb, var(--color-border) 70%, transparent);

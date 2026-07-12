@@ -13,21 +13,44 @@ import {
 
 import { FormsModule } from '@angular/forms';
 
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { TranslationKey, TranslationService } from '../../../../core';
 
 import { AuthStore } from '../../../auth/application';
 
-import { ButtonComponent, GoldenPolyhedronComponent } from '../../../../shared';
+import { ButtonComponent, GoldenPolyhedronComponent, MarkdownPipe } from '../../../../shared';
 
 import { PolyhedronActivity } from '../../../../shared/golden-polyhedron/polyhedron-activity.model';
 
 import { ChatSessionsStore, ChatStore } from '../../application';
 
+import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
+
 import { ChatRepository } from '../../domain';
 
 import { SseChatRepository } from '../../infrastructure';
+
+import {
+  AudioPlaybackStore,
+  DictationStore,
+  prefersReducedMotion,
+  SpeechToTextProvider,
+  TextToSpeechProvider,
+} from '../../../audio';
+
+import {
+  HttpSttProvider,
+  HttpTtsProvider,
+  HybridSpeechToTextProvider,
+  HybridTextToSpeechProvider,
+  WebSpeechSttProvider,
+  WebSpeechTtsProvider,
+} from '../../../audio/infrastructure';
+
+import { TalkButtonComponent } from '../../../realtime';
 
 import { ChartComponent } from '../../../../shared/charts';
 
@@ -37,24 +60,23 @@ import { ChatContextRailComponent } from '../chat-context-rail/chat-context-rail
 
 import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
 
-import { CHAT_VOICE_DUMMY_LISTEN_MS } from './chat-voice-dummy';
-
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
+const HERO_COLLAPSE_MS = 920;
+const AVATAR_SETTLE_MS = 380;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
-
   analyst: 'chat.agent.analyst',
-
   quant: 'chat.agent.quant',
-
   advisor: 'chat.agent.advisor',
-
   consequence: 'chat.agent.consequence',
+  macro: 'chat.agent.macro',
+  sentiment: 'chat.agent.sentiment',
 };
 
 const SESSIONS_PANEL_STORAGE_KEY = 'taws-chat-sessions-open';
+const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
 
 type OracleActivity = Exclude<PolyhedronActivity, 'frozen'>;
 
@@ -82,6 +104,8 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
 
     GoldenPolyhedronComponent,
 
+    MarkdownPipe,
+
     ChatSessionsPanelComponent,
 
     ChatContextRailComponent,
@@ -89,6 +113,8 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ChatQuickActionsComponent,
 
     ChartComponent,
+
+    TalkButtonComponent,
   ],
 
   providers: [
@@ -97,6 +123,22 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ChatStore,
 
     { provide: ChatRepository, useClass: SseChatRepository },
+
+    // Hybrid TTS: HTTP server voice with a transparent Web Speech fallback.
+    // The store depends only on the TextToSpeechProvider port; the composite
+    // decides HTTP-first vs Web-Speech-only based on `ttsEnabled`.
+    HttpTtsProvider,
+    WebSpeechTtsProvider,
+    { provide: TextToSpeechProvider, useClass: HybridTextToSpeechProvider },
+    AudioPlaybackStore,
+
+    // Hybrid STT: server voice dictation with a Web Speech fallback. The store
+    // depends only on the SpeechToTextProvider port; the composite decides
+    // HTTP-first vs Web-Speech-only based on `sttEnabled`.
+    HttpSttProvider,
+    WebSpeechSttProvider,
+    { provide: SpeechToTextProvider, useClass: HybridSpeechToTextProvider },
+    DictationStore,
   ],
 
   templateUrl: './chat-page.component.html',
@@ -110,15 +152,47 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   readonly sessionsStore = inject(ChatSessionsStore);
 
+  readonly audio = inject(AudioPlaybackStore);
+
+  readonly dictation = inject(DictationStore);
+
   readonly i18n = inject(TranslationService);
 
   readonly auth = inject(AuthStore);
 
+  private readonly shellSearch = inject(ShellSearchService);
+
+  /** Suppresses the animated playback indicator when the user prefers reduced motion. */
+  readonly reducedMotion = prefersReducedMotion();
+
+  private readonly route = inject(ActivatedRoute);
+
+  private readonly router = inject(Router);
+
   readonly draft = signal('');
 
-  readonly isListening = signal(false);
+  /** True while voice dictation is capturing — drives the mic/oracle UI. */
+  readonly isListening = computed(() => this.dictation.isRecording());
+
+  /** Whether any dictation path works; hides the mic button otherwise. */
+  readonly micAvailable = this.dictation.isSupported();
+
+  /** True while the hero orb animates down to avatar size on the first send. */
+  readonly heroCollapsing = signal(false);
+  /** Brief crossfade once the flying orb lands on the avatar slot. */
+  readonly avatarSettling = signal(false);
+  readonly collapseStyle = signal<Record<string, string>>({});
+  readonly collapseReady = signal(false);
 
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
+
+  private sessionsMobileMq =
+    typeof window !== 'undefined' ? window.matchMedia(SESSIONS_MOBILE_BREAKPOINT) : null;
+  private readonly onSessionsMobileChange = (event: MediaQueryListEvent): void => {
+    if (event.matches) {
+      this.closeSessionsPanel();
+    }
+  };
 
   readonly hasMessages = computed(() => this.store.messages().length > 0);
 
@@ -130,6 +204,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   readonly oracleActivity = computed<OracleActivity>(() => {
     if (this.isListening()) {
       return 'listening';
+    }
+
+    if (this.heroCollapsing()) {
+      return 'composing';
     }
 
     if (this.store.isStreaming()) {
@@ -151,8 +229,40 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     return hop ? this.agentLabel(hop.agent) : this.i18n.t('chat.role.assistant');
   });
 
+  /** Live status line while the backend routes agents or streams tokens. */
+  readonly thinkingStatusLabel = computed(() => {
+    if (!this.store.isStreaming()) {
+      return '';
+    }
+
+    const latestAssistant = [...this.store.messages()]
+      .reverse()
+      .find((message) => message.role === 'assistant');
+
+    if (latestAssistant?.content) {
+      return this.i18n.t('chat.thinking.writing');
+    }
+
+    const hops = this.store.routingHops();
+    const activeHop = [...hops]
+      .reverse()
+      .find((hop) => hop.status === 'active' || hop.status === 'routing');
+
+    if (activeHop?.status === 'routing') {
+      return this.i18n.t('chat.thinking.routing');
+    }
+
+    if (activeHop) {
+      return `${this.i18n.t('chat.thinking.consulting')} ${this.agentLabel(activeHop.agent)}…`;
+    }
+
+    return this.i18n.t('chat.thinking.analyzing');
+  });
+
   private readonly composerInput = viewChild<ElementRef<HTMLInputElement>>('composerInput');
-  private voiceDummyTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly messagesViewport = viewChild<ElementRef<HTMLElement>>('messagesViewport');
+  private heroCollapseTimer: ReturnType<typeof setTimeout> | null = null;
+  private avatarSettleTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -160,11 +270,26 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
       if (userId) {
         this.sessionsStore.bootstrap(userId);
+        void this.syncSessionRoute(this.route.snapshot.paramMap.get('sessionId'));
 
         return;
       }
 
       this.sessionsStore.clear();
+    });
+
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      if (!this.auth.user()?.id) {
+        return;
+      }
+      void this.syncSessionRoute(params.get('sessionId'));
+    });
+
+    effect(() => {
+      this.store.messages();
+      this.store.isStreaming();
+      this.thinkingStatusLabel();
+      queueMicrotask(() => this.scrollToLatest());
     });
   }
 
@@ -178,6 +303,16 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     const assistants = this.store.messages().filter((m) => m.role === 'assistant');
 
     return assistants[assistants.length - 1]?.id === messageId;
+  }
+
+  isThinkingMessage(messageId: string, pending: boolean, content: string): boolean {
+    if (!this.isLatestAssistant(messageId)) {
+      return false;
+    }
+    if (content.trim()) {
+      return false;
+    }
+    return pending || this.store.isStreaming();
   }
 
   avatarActivity(messageId: string, pending: boolean): PolyhedronActivity {
@@ -208,14 +343,28 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     document.documentElement.classList.add('route-chat');
 
     document.body.classList.add('route-chat');
+
+    this.sessionsMobileMq?.addEventListener('change', this.onSessionsMobileChange);
+    if (this.sessionsMobileMq?.matches) {
+      this.closeSessionsPanel();
+    }
+
+    const pendingQuery = this.shellSearch.consumeChatDraftIntent();
+    if (pendingQuery) {
+      this.draft.set(pendingQuery);
+    }
   }
 
   ngOnDestroy(): void {
+    this.sessionsMobileMq?.removeEventListener('change', this.onSessionsMobileChange);
+
     document.documentElement.classList.remove('route-chat');
 
     document.body.classList.remove('route-chat');
 
-    this.clearVoiceDummyTimer();
+    this.dictation.cancelDictation();
+
+    this.clearHeroCollapseTimer();
   }
 
   onSend(): void {
@@ -223,13 +372,26 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.stopListening();
+    this.dictation.cancelDictation();
 
     const message = this.draft();
 
     this.draft.set('');
 
+    const isFirstMessage = !this.hasMessages();
     void this.store.send(message);
+    if (isFirstMessage) {
+      this.beginHeroCollapse();
+    }
+  }
+
+  /**
+   * Click-only playback for a completed assistant message (never auto-speak on
+   * stream completion — browser autoplay policy). Clicking the message that is
+   * already playing toggles it off; the store handles the hybrid fallback.
+   */
+  speakMessage(messageId: string, content: string): void {
+    void this.audio.play(messageId, content);
   }
 
   useSuggestion(key: TranslationKey): void {
@@ -244,45 +406,102 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.useSuggestion(suggestionKey as TranslationKey);
   }
 
-  toggleVoiceDummy(): void {
-    if (!this.canCompose()) {
+  onNewsQuestion(prompt: string): void {
+    if (!this.auth.isAuthenticated() || this.store.isStreaming()) {
+      return;
+    }
+    this.draft.set(prompt);
+    this.focusComposer();
+  }
+
+  /**
+   * Toggles voice dictation. Requires a user gesture (this click) — capture is
+   * never auto-started. On stop, the transcribed text is appended to the
+   * current draft so the user can review/edit it before sending. The hybrid
+   * fallback is handled inside DictationStore's provider.
+   */
+  async toggleDictation(): Promise<void> {
+    if (!this.canCompose() || !this.micAvailable) {
       return;
     }
 
-    if (this.isListening()) {
-      this.stopListening();
-
+    if (this.dictation.isRecording()) {
+      const transcript = await this.dictation.stopDictation();
+      this.appendTranscript(transcript);
       return;
     }
 
-    this.isListening.set(true);
-
-    this.clearVoiceDummyTimer();
-
-    this.voiceDummyTimer = setTimeout(() => {
-      this.draft.set(this.i18n.t('chat.voice.dummyTranscript'));
-
-      this.isListening.set(false);
-
-      this.voiceDummyTimer = null;
-    }, CHAT_VOICE_DUMMY_LISTEN_MS);
+    await this.dictation.startDictation();
   }
 
-  private stopListening(): void {
-    this.isListening.set(false);
+  private appendTranscript(transcript: string): void {
+    const clean = transcript.trim();
+    if (!clean) {
+      return;
+    }
 
-    this.clearVoiceDummyTimer();
+    const current = this.draft().trim();
+    this.draft.set(current ? `${current} ${clean}` : clean);
   }
 
-  private clearVoiceDummyTimer(): void {
-    if (this.voiceDummyTimer !== null) {
-      clearTimeout(this.voiceDummyTimer);
+  private beginHeroCollapse(): void {
+    this.heroCollapsing.set(true);
+    this.avatarSettling.set(false);
+    this.collapseReady.set(false);
+    this.collapseStyle.set({});
+    this.clearHeroCollapseTimer();
 
-      this.voiceDummyTimer = null;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => this.measureCollapsePath());
+    });
+
+    this.heroCollapseTimer = setTimeout(() => {
+      this.heroCollapsing.set(false);
+      this.collapseReady.set(false);
+      this.collapseStyle.set({});
+      this.avatarSettling.set(true);
+      this.avatarSettleTimer = setTimeout(() => {
+        this.avatarSettling.set(false);
+        this.avatarSettleTimer = null;
+      }, AVATAR_SETTLE_MS);
+    }, HERO_COLLAPSE_MS);
+  }
+
+  private measureCollapsePath(): void {
+    const frame = document.querySelector('.chat-page__frame')?.getBoundingClientRect();
+    const anchor = document.querySelector('[data-chat-avatar-anchor]')?.getBoundingClientRect();
+
+    const startX = frame ? frame.left + frame.width / 2 : window.innerWidth / 2;
+    const startY = frame ? frame.top + frame.height * 0.3 : window.innerHeight * 0.32;
+    const endX = anchor ? anchor.left + anchor.width / 2 : startX;
+    const endY = anchor ? anchor.top + anchor.height / 2 : startY + 140;
+
+    this.collapseStyle.set({
+      '--collapse-start-x': `${startX}px`,
+      '--collapse-start-y': `${startY}px`,
+      '--collapse-end-x': `${endX}px`,
+      '--collapse-end-y': `${endY}px`,
+      '--collapse-duration': `${HERO_COLLAPSE_MS}ms`,
+    });
+    this.collapseReady.set(true);
+  }
+
+  private clearHeroCollapseTimer(): void {
+    if (this.heroCollapseTimer !== null) {
+      clearTimeout(this.heroCollapseTimer);
+      this.heroCollapseTimer = null;
+    }
+    if (this.avatarSettleTimer !== null) {
+      clearTimeout(this.avatarSettleTimer);
+      this.avatarSettleTimer = null;
     }
   }
 
   private readSessionsPanelOpen(): boolean {
+    if (typeof window !== 'undefined' && window.matchMedia(SESSIONS_MOBILE_BREAKPOINT).matches) {
+      return false;
+    }
+
     if (typeof localStorage === 'undefined') {
       return true;
     }
@@ -296,5 +515,22 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(SESSIONS_PANEL_STORAGE_KEY, String(open));
     }
+  }
+
+  private async syncSessionRoute(sessionId: string | null): Promise<void> {
+    const resolvedId = this.sessionsStore.resolveSessionRoute(sessionId);
+    if (sessionId !== resolvedId) {
+      await this.router.navigate(['/chat', resolvedId], {
+        replaceUrl: sessionId === null,
+      });
+    }
+  }
+
+  private scrollToLatest(): void {
+    const viewport = this.messagesViewport()?.nativeElement;
+    if (!viewport) {
+      return;
+    }
+    viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
   }
 }

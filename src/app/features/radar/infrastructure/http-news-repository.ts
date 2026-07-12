@@ -1,13 +1,22 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
 import { NewsItem, NewsRepository, RadarFilters } from '../domain';
 import { mapNewsItemDto } from './map-news-item-dto';
 import { NewsItemDto } from './news-item-dto';
+import { NewsListResponseDto } from './news-list-response-dto';
 
 const NEWS_PATH = '/api/v1/news';
 const NEWS_REQUEST_TIMEOUT_MS = 8_000;
+const HTTP_NOT_FOUND = 404;
+
+/** Backend may return a bare array or a paginated `{ items }` envelope. */
+type NewsWireResponse = NewsListResponseDto | NewsItemDto[];
+
+function unwrapNewsItems(response: NewsWireResponse): NewsItemDto[] {
+  return Array.isArray(response) ? response : (response.items ?? []);
+}
 
 /**
  * Infrastructure adapter for `NewsRepository`. Calls the real
@@ -39,12 +48,37 @@ export class HttpNewsRepository extends NewsRepository {
         params = params.set('asset_class', filters.assetClass);
       }
 
-      const dtos = await firstValueFrom(
+      const response = await firstValueFrom(
         this.http
-          .get<NewsItemDto[]>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
+          .get<NewsWireResponse>(`${this.config.apiBaseUrl}${NEWS_PATH}`, { params })
           .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
       );
-      return dtos.map(mapNewsItemDto);
+      return unwrapNewsItems(response).map(mapNewsItemDto);
     });
+  }
+
+  async getNewsById(id: string): Promise<NewsItem | null> {
+    return cachedFetch(this.cache, 'news-item', id, this.config.newsCacheTtlMs, async () => {
+      try {
+        const dto = await firstValueFrom(
+          this.http
+            .get<NewsItemDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
+            .pipe(timeout(NEWS_REQUEST_TIMEOUT_MS)),
+        );
+        return mapNewsItemDto(dto);
+      } catch (error: unknown) {
+        if (error instanceof HttpErrorResponse && error.status === HTTP_NOT_FOUND) {
+          return this.findNewsInRecentFeed(id);
+        }
+        throw error;
+      }
+    });
+  }
+
+  /** Fallback when the detail endpoint is unavailable — scan the recent feed. */
+  private async findNewsInRecentFeed(id: string): Promise<NewsItem | null> {
+    const defaultFilters: RadarFilters = { sinceHours: 720, symbol: null, assetClass: null };
+    const news = await this.fetchNews(defaultFilters);
+    return news.find((item) => item.id === id) ?? null;
   }
 }

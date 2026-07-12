@@ -1,3 +1,4 @@
+import { OhlcBar } from '../../../../shared/charts';
 import { UnusualMove } from './unusual-move.model';
 
 export type VolatilityRegimeLevel = 'low' | 'normal' | 'elevated' | 'high';
@@ -11,5 +12,7 @@ export interface MarketStats {
   volatilityPct: number | null;
   volatilityRegime: VolatilityRegimeLevel | null;
   unusualMoves: UnusualMove[];
+  /** OHLC candles (oldest → newest); empty when the backend has none. */
+  candles: OhlcBar[];
   asOf: Date;
 }

@@ -27,6 +27,9 @@ export class ScenarioLabStore {
   private readonly resultSignal = signal<ScenarioResult | null>(null);
   private readonly isGeneratingSignal = signal(false);
   private readonly generateErrorSignal = signal<string | null>(null);
+  private readonly isLoadingResultSignal = signal(false);
+  private readonly isResultNotFoundSignal = signal(false);
+  private readonly resultLoadErrorSignal = signal<string | null>(null);
 
   private readonly briefingActionStatusSignal = signal<BriefingActionStatus>('idle');
 
@@ -48,6 +51,9 @@ export class ScenarioLabStore {
   readonly result = this.resultSignal.asReadonly();
   readonly isGenerating = this.isGeneratingSignal.asReadonly();
   readonly generateError = this.generateErrorSignal.asReadonly();
+  readonly isLoadingResult = this.isLoadingResultSignal.asReadonly();
+  readonly isResultNotFound = this.isResultNotFoundSignal.asReadonly();
+  readonly resultLoadError = this.resultLoadErrorSignal.asReadonly();
 
   readonly briefingActionStatus = this.briefingActionStatusSignal.asReadonly();
 
@@ -106,9 +112,9 @@ export class ScenarioLabStore {
   }
 
   /** Runs the Scenario Simulation graph for the active intake mode (preset or free text). */
-  async generate(): Promise<void> {
+  async generate(): Promise<ScenarioResult | null> {
     if (!this.canGenerate()) {
-      return;
+      return null;
     }
 
     this.isGeneratingSignal.set(true);
@@ -124,9 +130,11 @@ export class ScenarioLabStore {
       );
       this.resultSignal.set(result);
       await this.loadRecentScenarios();
+      return result;
     } catch (error: unknown) {
       this.generateErrorSignal.set(this.toErrorMessage(error));
       this.resultSignal.set(null);
+      return null;
     } finally {
       this.isGeneratingSignal.set(false);
     }
@@ -197,14 +205,35 @@ export class ScenarioLabStore {
   }
 
   async loadScenarioById(scenarioId: string): Promise<void> {
-    this.generateErrorSignal.set(null);
+    this.isLoadingResultSignal.set(true);
+    this.isResultNotFoundSignal.set(false);
+    this.resultLoadErrorSignal.set(null);
+    this.briefingActionStatusSignal.set('idle');
+
+    const cached = this.recentScenariosSignal().find((scenario) => scenario.id === scenarioId);
+    if (cached) {
+      this.resultSignal.set(cached);
+    }
+
     try {
       const result = await this.scenarioRepository.getScenario(scenarioId);
+      if (result === null) {
+        this.isResultNotFoundSignal.set(true);
+        if (!cached) {
+          this.resultSignal.set(null);
+        }
+        return;
+      }
       this.resultSignal.set(result);
       this.monitorSignal.set(null);
       this.monitorErrorSignal.set(null);
     } catch (error: unknown) {
-      this.generateErrorSignal.set(this.toErrorMessage(error));
+      this.resultLoadErrorSignal.set(this.toErrorMessage(error));
+      if (!cached) {
+        this.resultSignal.set(null);
+      }
+    } finally {
+      this.isLoadingResultSignal.set(false);
     }
   }
 

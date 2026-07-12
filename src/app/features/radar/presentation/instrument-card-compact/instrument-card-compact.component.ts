@@ -1,7 +1,9 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { InstrumentTickerBadgeComponent, ReturnSparklineComponent } from '../../../../shared';
+import { RadarStore } from '../../application';
 import { RadarSignal, ImpactClass } from '../../domain';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
@@ -23,6 +25,28 @@ export class InstrumentCardCompactComponent {
   @Input({ required: true }) signal!: RadarSignal;
 
   readonly i18n = inject(TranslationService);
+  readonly store = inject(RadarStore);
+  private readonly router = inject(Router);
+
+  isUnclassified(): boolean {
+    return !this.signal.impactClass;
+  }
+
+  isGenerating(): boolean {
+    return this.store.isGeneratingFor(this.signal.symbol);
+  }
+
+  onCardActivate(event: Event): void {
+    if ((event.target as HTMLElement).closest('button')) {
+      return;
+    }
+    void this.router.navigate(['/radar', this.signal.symbol]);
+  }
+
+  onAnalyze(event: Event): void {
+    event.stopPropagation();
+    void this.store.generateSignal(this.signal.symbol);
+  }
 
   impactLabel(): string {
     if (!this.signal.impactClass) {
@@ -31,20 +55,20 @@ export class InstrumentCardCompactComponent {
     return this.i18n.t(IMPACT_LABELS[this.signal.impactClass]);
   }
 
-  confidencePct(): string | null {
+  confidenceValue(): number | null {
     if (this.signal.confidence === undefined) {
       return null;
     }
-    return `${Math.round(this.signal.confidence * 100)}%`;
+    return Math.round(this.signal.confidence * 100);
   }
 
   priceDeltaClass(): string {
     const delta = this.signal.priceDelta ?? 0;
     if (delta > 0) {
-      return 'instrument-card-compact__delta--up';
+      return 'instrument-row__delta--up';
     }
     if (delta < 0) {
-      return 'instrument-card-compact__delta--down';
+      return 'instrument-row__delta--down';
     }
     return '';
   }

@@ -47,7 +47,9 @@
   <div class="signal-card__metrics-panel">
     <div class="signal-card__chart-block">
       <span class="signal-card__chart-label">{{ i18n.t('radar.card.priceMoves') }}</span>
-      @if (signal.marketStats?.unusualMoves?.length) {
+      @if (candlestickSpec(); as chartSpec) {
+        <taws-chart class="signal-card__candles" [spec]="chartSpec" />
+      } @else if (signal.marketStats?.unusualMoves?.length) {
         <app-return-sparkline [moves]="signal.marketStats!.unusualMoves" />
       } @else {
         <div class="signal-card__chart-placeholder">{{ i18n.t('radar.card.chartPending') }}</div>

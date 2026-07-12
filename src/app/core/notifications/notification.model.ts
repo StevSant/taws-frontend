@@ -1,7 +1,13 @@
 import { TranslationKey } from '../i18n';
 
 /** Where an in-app notification originated — drives icon/styling if needed later. */
-export type NotificationSource = 'radar' | 'briefing';
+export type NotificationSource = 'radar' | 'briefing' | 'auth';
+
+/** In-app route the bell navigates to when the notification is opened. */
+export interface NotificationLink {
+  commands: string[];
+  queryParams?: Record<string, string>;
+}
 
 /**
  * One in-app notification (bell dropdown). In-memory only — no backend
@@ -28,6 +34,8 @@ export interface Notification {
    * — the bell dropdown just renders it verbatim.
    */
   detail?: string;
+  /** Where to navigate when the user opens this notification. */
+  link?: NotificationLink;
   /** ISO-8601 timestamp of when the notification was created. */
   createdAt: string;
 }

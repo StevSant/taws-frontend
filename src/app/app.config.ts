@@ -9,7 +9,7 @@ import { provideRouter } from '@angular/router';
 import { provideLucideConfig } from '@lucide/angular';
 
 import { routes } from './app.routes';
-import { authInterceptor, ThemeService } from './core';
+import { authErrorInterceptor, authInterceptor, ThemeService } from './core';
 import { AuthStore } from './features/auth/application';
 import { AuthRepository } from './features/auth/domain';
 import { SupabaseAuthRepository } from './features/auth/infrastructure';
@@ -26,6 +26,7 @@ import {
 import {
   InstrumentRepository,
   MacroRepository,
+  SentimentRepository,
   NewsRepository,
   QuantRepository,
   SignalRepository,
@@ -34,6 +35,7 @@ import {
 import {
   HttpInstrumentRepository,
   HttpMacroRepository,
+  HttpSentimentRepository,
   HttpNewsRepository,
   HttpQuantRepository,
   HttpSignalRepository,
@@ -48,7 +50,9 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideLucideConfig({ strokeWidth: 1.75 }),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    // `authErrorInterceptor` is registered first (outermost) so its 401 retry
+    // replays through `authInterceptor` and re-attaches the refreshed token.
+    provideHttpClient(withInterceptors([authErrorInterceptor, authInterceptor])),
     { provide: AuthRepository, useClass: SupabaseAuthRepository },
     { provide: NewsRepository, useClass: HttpNewsRepository },
     { provide: InstrumentRepository, useClass: HttpInstrumentRepository },
@@ -56,6 +60,7 @@ export const appConfig: ApplicationConfig = {
     { provide: SignalReviewRepository, useClass: HttpSignalReviewRepository },
     { provide: QuantRepository, useClass: HttpQuantRepository },
     { provide: MacroRepository, useClass: HttpMacroRepository },
+    { provide: SentimentRepository, useClass: HttpSentimentRepository },
     { provide: WatchlistRepository, useClass: HttpWatchlistRepository },
     { provide: BriefingRepository, useClass: HttpBriefingRepository },
     { provide: ReviewRepository, useClass: HttpReviewRepository },

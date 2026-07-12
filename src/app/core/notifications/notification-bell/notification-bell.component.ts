@@ -10,7 +10,8 @@ import {
 } from '@angular/core';
 import { LucideBell, LucideX } from '@lucide/angular';
 import { TranslationService } from '../../i18n';
-import { Notification } from '../notification.model';
+import { Notification, NotificationLink } from '../notification.model';
+import { resolveNotificationLink } from '../resolve-notification-link';
 
 /**
  * Presentational bell icon + dropdown for in-app notifications, mounted in
@@ -31,6 +32,7 @@ export class NotificationBellComponent {
   @Input() notifications: Notification[] = [];
   @Output() dismiss = new EventEmitter<string>();
   @Output() clearAll = new EventEmitter<void>();
+  @Output() openNotification = new EventEmitter<Notification>();
 
   readonly isOpen = signal(false);
 
@@ -46,6 +48,18 @@ export class NotificationBellComponent {
   onDismiss(id: string, event: MouseEvent): void {
     event.stopPropagation();
     this.dismiss.emit(id);
+  }
+
+  onOpen(notification: Notification): void {
+    if (!this.linkFor(notification)) {
+      return;
+    }
+    this.openNotification.emit(notification);
+    this.isOpen.set(false);
+  }
+
+  linkFor(notification: Notification): NotificationLink | undefined {
+    return notification.link ?? resolveNotificationLink(notification.messageKey, notification.detail);
   }
 
   onClearAll(): void {

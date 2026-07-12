@@ -1,0 +1,163 @@
+<div class="feature-page asset-detail">
+  <a class="asset-detail__back" routerLink="/radar">&#8592; {{ i18n.t('radar.detail.back') }}</a>
+
+  @if (store.isLoading()) {
+    <div class="asset-detail__state" aria-busy="true">
+      <app-spinner />
+      <span>{{ i18n.t('radar.detail.asset.loading') }}</span>
+    </div>
+  }
+
+  @if (store.error(); as error) {
+    <div class="feature-error" role="alert">
+      <span>{{ i18n.t('radar.error.banner') }}{{ error }}</span>
+      <app-button [label]="i18n.t('radar.error.retry')" (pressed)="onRetry()" />
+    </div>
+  }
+
+  @if (store.isNotFound()) {
+    <app-empty-state
+      [title]="i18n.t('radar.detail.asset.notFound.title')"
+      [description]="i18n.t('radar.detail.asset.notFound.description')"
+    />
+  }
+
+  @if (store.instrument(); as instrument) {
+    <header class="asset-detail__header">
+      <div class="asset-detail__identity">
+        <app-instrument-ticker-badge [symbol]="instrument.symbol" size="md" />
+        <div>
+          <h1 class="asset-detail__symbol">{{ instrument.symbol }}</h1>
+          <p class="asset-detail__name">
+            {{ instrument.name }} ·
+            <span class="asset-detail__asset-class">{{ assetClassLabel(instrument.assetClass) }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="asset-detail__watchlist">
+        <app-button
+          [label]="
+            store.watchlistBusy()
+              ? i18n.t('radar.detail.watchlist.busy')
+              : store.inWatchlist()
+                ? i18n.t('radar.detail.watchlist.remove')
+                : i18n.t('radar.detail.watchlist.add')
+          "
+          [disabled]="!store.watchlistAvailable() || store.watchlistBusy()"
+          (pressed)="onToggleWatchlist()"
+        />
+        @if (!store.watchlistAvailable()) {
+          <span class="asset-detail__watchlist-hint">{{
+            i18n.t('radar.detail.watchlist.signInHint')
+          }}</span>
+        }
+        @if (store.watchlistError(); as watchlistError) {
+          <span class="asset-detail__watchlist-error" role="alert"
+            >{{ i18n.t('radar.detail.watchlist.error') }} {{ watchlistError }}</span
+          >
+        }
+      </div>
+    </header>
+
+    @if (store.marketStats(); as stats) {
+      <section class="asset-detail__stats feature-panel">
+        <div class="asset-detail__stat">
+          <span class="asset-detail__stat-label">{{ i18n.t('radar.detail.stats.lastPrice') }}</span>
+          <span class="asset-detail__stat-value">
+            @if (stats.lastPrice !== null) {
+              {{ stats.lastPrice | number: '1.2-2' }} {{ instrument.currency }}
+            } @else {
+              —
+            }
+          </span>
+        </div>
+        <div class="asset-detail__stat">
+          <span class="asset-detail__stat-label">{{ i18n.t('radar.detail.stats.priceDelta') }}</span>
+          <span class="asset-detail__stat-value" [class]="deltaClass(stats.priceDeltaPct)">{{
+            formatDelta(stats.priceDeltaPct)
+          }}</span>
+        </div>
+        <div class="asset-detail__stat">
+          <span class="asset-detail__stat-label">{{ i18n.t('radar.detail.stats.volatility') }}</span>
+          <span class="asset-detail__stat-value">
+            @if (stats.volatilityPct !== null) {
+              {{ stats.volatilityPct | number: '1.1-1' }}%
+            } @else {
+              —
+            }
+          </span>
+        </div>
+        <div class="asset-detail__stat">
+          <span class="asset-detail__stat-label">{{ i18n.t('radar.detail.stats.regime') }}</span>
+          <span class="asset-detail__stat-value">
+            @if (stats.volatilityRegime) {
+              {{ volatilityLabel(stats.volatilityRegime) }}
+            } @else {
+              —
+            }
+          </span>
+        </div>
+      </section>
+    }
+
+    <section class="asset-detail__chart feature-panel">
+      <h2 class="asset-detail__section-title">{{ i18n.t('radar.detail.asset.priceChart') }}</h2>
+      <app-asset-price-chart [symbol]="instrument.symbol" [fallbackCandles]="store.candles()" />
+    </section>
+
+    <section class="asset-detail__signal feature-panel">
+      <h2 class="asset-detail__section-title">{{ i18n.t('radar.detail.signalSection') }}</h2>
+      @if (store.latestSignal(); as signal) {
+        <div class="asset-detail__signal-head">
+          <span
+            class="asset-detail__signal-badge"
+            [class.asset-detail__signal-badge--positive]="signal.impactClass === 'positive'"
+            [class.asset-detail__signal-badge--negative]="signal.impactClass === 'negative'"
+            >{{ impactLabel(signal.impactClass) }}</span
+          >
+          <span class="asset-detail__signal-confidence"
+            >{{ i18n.t('radar.timeline.confidence') }}
+            {{ confidencePercent(signal.confidence) }}%</span
+          >
+        </div>
+        <app-signal-analysis
+          [thesis]="signal.thesis"
+          [keyDrivers]="signal.keyDrivers"
+          [riskFactors]="signal.riskFactors"
+          [analysisAvailable]="signal.analysisAvailable"
+        />
+      } @else {
+        <p class="asset-detail__no-signal">{{ i18n.t('radar.detail.noSignal') }}</p>
+        <app-button
+          [label]="
+            store.isGenerating()
+              ? i18n.t('radar.generate.generating')
+              : i18n.t('radar.generate.action')
+          "
+          [disabled]="store.isGenerating()"
+          (pressed)="onGenerate()"
+        />
+      }
+    </section>
+
+    <section class="asset-detail__news feature-panel">
+      <h2 class="asset-detail__section-title">{{ i18n.t('radar.detail.relatedNews') }}</h2>
+      @if (store.relatedNews().length > 0) {
+        <ul class="asset-detail__news-list">
+          @for (item of store.relatedNews(); track item.id) {
+            <li class="asset-detail__news-item">
+              <time class="asset-detail__news-time">{{ item.publishedAt | date: 'MMM d, HH:mm' }}</time>
+              <a class="asset-detail__news-title" [routerLink]="['/radar/news', item.id]">{{
+                item.title
+              }}</a>
+              <span class="asset-detail__news-source">{{ item.source }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="asset-detail__no-news">{{ i18n.t('radar.detail.relatedNews.empty') }}</p>
+      }
+    </section>
+  }
+</div>

@@ -38,18 +38,31 @@ export class ChatSessionsStore {
       messages: session.messages.map((message) => ({ ...message, pending: false })),
     }));
     this.sessionsSignal.set(loaded);
+    this.activeIdSignal.set(null);
     this.persist();
+  }
 
-    if (loaded.length === 0) {
-      const id = this.createSession();
-      this.activeIdSignal.set(id);
-      return;
+  /**
+   * Activates the session referenced by a route param, or falls back to the most
+   * recent session (creating one when the list is empty). Returns the canonical
+   * id the router should use in `/chat/:sessionId`.
+   */
+  resolveSessionRoute(sessionId: string | null): string {
+    const sessions = this.sessionsSignal();
+    if (sessionId && sessions.some((session) => session.id === sessionId)) {
+      this.activeIdSignal.set(sessionId);
+      return sessionId;
     }
 
-    const mostRecent = [...loaded].sort(
+    if (sessions.length === 0) {
+      return this.createSession();
+    }
+
+    const mostRecent = [...sessions].sort(
       (left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt),
     )[0];
-    this.activeIdSignal.set(mostRecent?.id ?? loaded[0].id);
+    this.activeIdSignal.set(mostRecent.id);
+    return mostRecent.id;
   }
 
   clear(): void {

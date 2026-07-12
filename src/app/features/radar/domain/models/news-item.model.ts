@@ -1,7 +1,10 @@
+import { AnalysisStatus } from './analysis-status.model';
+import { NewsEntity } from './news-entity.model';
+
 /**
  * A single news article, optionally linked to one or more instruments.
- * Mirrors `NewsItemResponse` (`GET /api/v1/news`) — always carries `source`
- * and `publishedAt` (HU1 acceptance criteria).
+ * Mirrors `NewsItemResponse` (`GET /api/v1/news` and `GET /api/v1/news/{id}`)
+ * — always carries `source` and `publishedAt` (HU1 acceptance criteria).
  */
 export interface NewsItem {
   id: string;
@@ -18,4 +21,15 @@ export interface NewsItem {
    * Optional so older/cached backend responses without this field don't break.
    */
   provider?: string;
+  /**
+   * Enrichment fields (issue #38 detail view). `entities`/`sentimentScore` are
+   * populated only by enrichment-capable sources (currently Marketaux) and are
+   * `undefined` otherwise — never defaulted to a misleading value.
+   */
+  entities?: NewsEntity[];
+  sentimentScore?: number;
+  /** Analyst-classification lifecycle for this persisted item. */
+  analysisStatus?: AnalysisStatus;
+  /** Id of the Signal produced for this item, when `analysisStatus === 'analyzed'`. */
+  signalId?: string;
 }

@@ -11,6 +11,16 @@ import { DemoAuthPerspective } from '../../features/auth/domain/models/demo-auth
 export class AppConfigService {
   readonly apiBaseUrl: string = environment.apiBaseUrl;
   readonly production: boolean = environment.production;
+  /** Whether server-side TTS is available; gates the primary TTS provider. */
+  readonly ttsEnabled: boolean = environment.ttsEnabled;
+  /** Whether server-side STT is available; gates the primary STT provider. */
+  readonly sttEnabled: boolean = environment.sttEnabled;
+  /**
+   * Whether the realtime voice agent (`POST /api/v1/chat/realtime/session`) is
+   * available. When false, the Talk button is hidden — never rendered as a dead
+   * control that only yields a 503.
+   */
+  readonly realtimeEnabled: boolean = environment.realtimeEnabled;
   readonly supabaseUrl: string = environment.supabaseUrl;
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */
@@ -21,6 +31,8 @@ export class AppConfigService {
   readonly watchlistsCacheTtlMs: number = environment.watchlistsCacheTtlMs;
   readonly scenarioPresetsCacheTtlMs: number = environment.scenarioPresetsCacheTtlMs;
   readonly radarSignalFetchBatchSize: number = environment.radarSignalFetchBatchSize;
+  /** Initial timeframe requested when rendering an instrument price chart (see asset-price-chart). */
+  readonly chartDefaultTimeframe: string = environment.chartDefaultTimeframe;
   /** Dev-only demo personas for role-based one-click login. */
   readonly demoAuthPerspectives: DemoAuthPerspective[] = environment.demoAuthPerspectives;
 }

@@ -80,6 +80,17 @@ export class SupabaseAuthRepository extends AuthRepository {
     return this.toAuthSession(data.session);
   }
 
+  async refreshSession(): Promise<AuthSession | null> {
+    if (!this.client) {
+      return null;
+    }
+    const { data, error } = await this.client.auth.refreshSession();
+    if (error) {
+      throw new Error(error.message);
+    }
+    return this.toAuthSession(data.session);
+  }
+
   onSessionChange(callback: (session: AuthSession | null) => void): () => void {
     if (!this.client) {
       return () => {};

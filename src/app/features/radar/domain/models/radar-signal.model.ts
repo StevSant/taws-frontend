@@ -28,6 +28,18 @@ export interface RadarSignal {
   priceDelta?: number;
   /** Latest persisted Analyst signal id, when one exists for this instrument. */
   signalId?: string;
+  /**
+   * Real AI analysis carried from the latest `Signal` (issue #40). Empty /
+   * `undefined` when the Analyst hasn't produced a signal yet.
+   * `analysisAvailable` is `false` when classification fell back to an
+   * uncertain/zero-confidence call — the UI labels those "análisis no
+   * disponible" instead of rendering an empty thesis as a genuine judgment.
+   */
+  thesis?: string;
+  keyDrivers?: string[];
+  riskFactors?: string[];
+  analysisAvailable?: boolean;
+  disclaimer?: string;
   /** Quant stats for sparkline / live price context (independent of Analyst signal). */
   marketStats?: MarketStats;
 }

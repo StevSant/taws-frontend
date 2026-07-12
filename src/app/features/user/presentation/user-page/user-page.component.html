@@ -1,0 +1,61 @@
+<div class="feature-page feature-page--narrow user-page">
+  <app-feature-page-header
+    [title]="i18n.t('user.title')"
+    [description]="i18n.t('user.description')"
+  />
+
+  <section class="user-page__hero feature-panel">
+    <app-user-profile-chip
+      class="user-page__chip"
+      [initial]="userInitial()"
+      [email]="userEmail()"
+      [roleLabel]="displayName()"
+    />
+    <p class="user-page__status">
+      <span class="user-page__status-dot" aria-hidden="true"></span>
+      {{ i18n.t('user.status.activeSession') }}
+    </p>
+  </section>
+
+  <section class="user-page__section feature-panel">
+    <h2 class="user-page__section-title">{{ i18n.t('user.section.account') }}</h2>
+    <dl class="user-page__details">
+      <div class="user-page__detail">
+        <dt>{{ i18n.t('user.field.displayName') }}</dt>
+        <dd>{{ displayName() }}</dd>
+      </div>
+      <div class="user-page__detail">
+        <dt>{{ i18n.t('user.field.email') }}</dt>
+        <dd>{{ userEmail() || '—' }}</dd>
+      </div>
+      <div class="user-page__detail">
+        <dt>{{ i18n.t('user.field.userId') }}</dt>
+        <dd class="user-page__mono">{{ user()?.id ?? '—' }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="user-page__section feature-panel">
+    <h2 class="user-page__section-title">{{ i18n.t('user.section.preferences') }}</h2>
+    <dl class="user-page__details">
+      <div class="user-page__detail user-page__detail--control">
+        <dt>{{ i18n.t('user.field.theme') }}</dt>
+        <dd>
+          <span class="user-page__pref-value">{{ themeLabel() }}</span>
+          <app-theme-toggle />
+        </dd>
+      </div>
+      <div class="user-page__detail user-page__detail--control">
+        <dt>{{ i18n.t('user.field.language') }}</dt>
+        <dd>
+          <span class="user-page__pref-value">{{ languageLabel() }}</span>
+          <app-language-toggle />
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <div class="user-page__actions">
+    <app-button [label]="i18n.t('shell.auth.logout')" (pressed)="logout()" />
+  </div>
+</div>

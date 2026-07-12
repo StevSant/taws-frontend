@@ -37,7 +37,7 @@
 
   &__item {
     display: grid;
-    grid-template-columns: 3rem 1.75rem minmax(0, 1fr) auto;
+    grid-template-columns: 3rem minmax(0, 1fr);
     gap: var(--space-3);
     align-items: start;
     padding: var(--space-3);
@@ -88,6 +88,29 @@
     }
   }
 
+  &__summary {
+    margin: 0.35rem 0 0;
+    font-size: 0.74rem;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  &__external {
+    flex-shrink: 0;
+    font-size: 0.82rem;
+    line-height: 1;
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--color-gold-bright);
+    }
+  }
+
   &__meta {
     display: block;
     margin-top: 0.15rem;
@@ -107,21 +130,22 @@
     color: var(--color-text-muted);
   }
 
-  &__actions {
+  &__symbols {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: var(--space-2);
+    gap: 0.35rem;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    list-style: none;
     min-width: 0;
-    max-width: 7.5rem;
-    flex-shrink: 0;
   }
 
-  &__sentiment {
+  &__symbol {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.15rem;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    min-width: 0;
   }
 
   &__pill {
@@ -192,26 +216,6 @@
 @media (max-width: 900px) {
   .news-timeline__item {
     grid-template-columns: 2.5rem minmax(0, 1fr);
-    grid-template-areas:
-      'time copy'
-      'badge actions';
-  }
-
-  .news-timeline__time {
-    grid-area: time;
-  }
-
-  .news-timeline__badge-icon {
-    grid-area: badge;
-  }
-
-  .news-timeline__copy {
-    grid-area: copy;
-  }
-
-  .news-timeline__actions {
-    grid-area: actions;
-    align-items: flex-start;
   }
 
   .news-timeline__headline {

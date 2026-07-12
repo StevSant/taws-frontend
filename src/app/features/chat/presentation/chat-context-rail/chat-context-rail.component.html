@@ -44,29 +44,38 @@
 
     <ul class="chat-context-rail__news">
       @for (entry of topNews(); track entry.news.id) {
-        <li class="chat-context-rail__news-item">
-          <app-instrument-ticker-badge [symbol]="entry.symbol" size="sm" />
-          <div class="chat-context-rail__news-copy">
-            <a
-              class="chat-context-rail__news-headline"
-              [href]="entry.news.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ entry.news.title }}</a
+        @if (entry.symbols[0]; as primary) {
+          <li class="chat-context-rail__news-item">
+            <app-instrument-ticker-badge [symbol]="primary.symbol" size="sm" />
+            <div class="chat-context-rail__news-copy">
+              <a
+                class="chat-context-rail__news-headline"
+                [href]="entry.news.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                >{{ entry.news.title }}</a
+              >
+              <span class="chat-context-rail__news-meta"
+                >{{ entry.news.source }} · {{ entry.news.publishedAt | date: 'shortTime' }}</span
+              >
+              <button
+                class="chat-context-rail__news-ask"
+                type="button"
+                (click)="askAboutNews(entry.news.title, primary.symbol)"
+              >
+                {{ i18n.t('chat.rail.news.ask') }}
+              </button>
+            </div>
+            <span
+              class="chat-context-rail__badge"
+              [class.chat-context-rail__badge--positive]="primary.impactClass === 'positive'"
+              [class.chat-context-rail__badge--neutral]="
+                !primary.impactClass || primary.impactClass === 'neutral'
+              "
+              >{{ impactLabel(primary.impactClass) }}</span
             >
-            <span class="chat-context-rail__news-meta"
-              >{{ entry.news.source }} · {{ entry.news.publishedAt | date: 'shortTime' }}</span
-            >
-          </div>
-          <span
-            class="chat-context-rail__badge"
-            [class.chat-context-rail__badge--positive]="entry.impactClass === 'positive'"
-            [class.chat-context-rail__badge--neutral]="
-              !entry.impactClass || entry.impactClass === 'neutral'
-            "
-            >{{ impactLabel(entry.impactClass) }}</span
-          >
-        </li>
+          </li>
+        }
       }
     </ul>
   </section>

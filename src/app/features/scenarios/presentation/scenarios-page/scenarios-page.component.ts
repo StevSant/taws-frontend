@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, computed } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import {
   ActivityFeedComponent,
@@ -11,10 +12,8 @@ import {
   GuideNotesTabsComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
-import { AuthStore } from '../../../auth/application';
 import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
 import { PresetPickerComponent } from '../preset-picker/preset-picker.component';
-import { ScenarioResultViewComponent } from '../scenario-result-view/scenario-result-view.component';
 
 const FREE_TEXT_MAX_LENGTH = 1000;
 
@@ -56,7 +55,6 @@ const EMPTY_SCENARIO_NOTES: readonly string[] = [];
     SkeletonCardComponent,
     EmptyStateComponent,
     PresetPickerComponent,
-    ScenarioResultViewComponent,
   ],
   providers: [DatePipe],
   templateUrl: './scenarios-page.component.html',
@@ -77,13 +75,14 @@ export class ScenariosPageComponent implements OnInit {
       id: scenario.id,
       title: scenario.title,
       meta: this.datePipe.transform(scenario.createdAt, 'short') ?? scenario.createdAt,
-      active: this.store.result()?.id === scenario.id,
+      active: false,
     })),
   );
 
+  private readonly router = inject(Router);
+
   constructor(
     readonly store: ScenarioLabStore,
-    readonly auth: AuthStore,
     readonly i18n: TranslationService,
     private readonly datePipe: DatePipe,
   ) {}
@@ -109,22 +108,14 @@ export class ScenariosPageComponent implements OnInit {
   }
 
   onGenerate(): void {
-    void this.store.generate();
-  }
-
-  onAddToBriefing(): void {
-    void this.store.addToBriefing();
-  }
-
-  onArmMonitor(): void {
-    void this.store.armMonitor();
-  }
-
-  onDisarmMonitor(): void {
-    void this.store.disarmMonitor();
+    void this.store.generate().then((result) => {
+      if (result) {
+        void this.router.navigate(['/scenarios', result.id]);
+      }
+    });
   }
 
   onLoadScenario(scenarioId: string): void {
-    void this.store.loadScenarioById(scenarioId);
+    void this.router.navigate(['/scenarios', scenarioId]);
   }
 }
