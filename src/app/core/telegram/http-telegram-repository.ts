@@ -37,8 +37,6 @@ export class HttpTelegramRepository extends TelegramRepository {
   }
 
   async unlink(): Promise<void> {
-    await firstValueFrom(
-      this.http.delete<void>(`${this.config.apiBaseUrl}${TELEGRAM_PATH}/link`),
-    );
+    await firstValueFrom(this.http.delete<void>(`${this.config.apiBaseUrl}${TELEGRAM_PATH}/link`));
   }
 }

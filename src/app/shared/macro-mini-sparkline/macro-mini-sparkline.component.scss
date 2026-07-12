@@ -1,0 +1,21 @@
+.macro-spark {
+  width: 100%;
+  height: 1.35rem;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+
+  &--up {
+    stroke: var(--color-gain);
+  }
+
+  &--down {
+    stroke: var(--color-loss);
+  }
+
+  &--flat {
+    stroke: var(--color-text-muted);
+    opacity: 0.45;
+  }
+}

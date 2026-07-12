@@ -1,0 +1,28 @@
+<section class="radar-market-pulse feature-panel">
+  <header class="radar-market-pulse__header">
+    <h2 class="radar-market-pulse__title">{{ i18n.t('radar.pulse.title') }}</h2>
+  </header>
+
+  <div class="radar-market-pulse__legend">
+    @for (segment of segments; track segment.key) {
+      <span class="radar-market-pulse__legend-item">
+        <span class="radar-market-pulse__swatch" [style.background]="segment.color"></span>
+        {{ i18n.t(segment.labelKey) }}: {{ segment.count }}
+      </span>
+    }
+  </div>
+
+  <div class="radar-market-pulse__bar" role="img" [attr.aria-label]="i18n.t('radar.pulse.title')">
+    @for (segment of segments; track segment.key) {
+      <span
+        class="radar-market-pulse__segment"
+        [style.flex-grow]="segment.count"
+        [style.background]="segment.color"
+      ></span>
+    }
+  </div>
+
+  <p class="radar-market-pulse__processed">
+    {{ marketScore.processedPct }}% {{ i18n.t('radar.pulse.processed') }}
+  </p>
+</section>

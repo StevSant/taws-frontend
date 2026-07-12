@@ -1,0 +1,52 @@
+<article
+  class="instrument-card-compact"
+  [class.instrument-card-compact--positive]="signal.impactClass === 'positive'"
+  [class.instrument-card-compact--negative]="signal.impactClass === 'negative'"
+>
+  <header class="instrument-card-compact__header">
+    <div class="instrument-card-compact__identity">
+      <app-instrument-ticker-badge [symbol]="signal.symbol" size="sm" />
+      <div>
+        <span class="instrument-card-compact__ticker">{{ signal.symbol }}</span>
+        @if (signal.instrument) {
+          <span class="instrument-card-compact__name">{{ signal.instrument.name }}</span>
+        }
+      </div>
+    </div>
+    <div class="instrument-card-compact__price-block">
+      @if (signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined) {
+        <span class="instrument-card-compact__price">{{
+          signal.marketStats!.lastPrice | number: '1.2-2'
+        }}</span>
+      }
+      <span class="instrument-card-compact__delta" [class]="priceDeltaClass()">{{
+        formatDelta()
+      }}</span>
+    </div>
+  </header>
+
+  <div class="instrument-card-compact__chart">
+    @if (signal.marketStats?.unusualMoves?.length) {
+      <app-return-sparkline [moves]="signal.marketStats!.unusualMoves" />
+    } @else {
+      <span class="instrument-card-compact__chart-placeholder">—</span>
+    }
+  </div>
+
+  <footer class="instrument-card-compact__footer">
+    <span class="instrument-card-compact__news"
+      >{{ signal.news.length }} {{ i18n.t('radar.card.newsCount') }}</span
+    >
+    <span
+      class="instrument-card-compact__badge"
+      [class.instrument-card-compact__badge--positive]="signal.impactClass === 'positive'"
+      [class.instrument-card-compact__badge--negative]="signal.impactClass === 'negative'"
+      [class.instrument-card-compact__badge--pending]="!signal.impactClass"
+    >
+      {{ impactLabel() }}
+      @if (confidencePct(); as pct) {
+        <span>{{ i18n.t('radar.timeline.confidence') }} {{ pct }}</span>
+      }
+    </span>
+  </footer>
+</article>

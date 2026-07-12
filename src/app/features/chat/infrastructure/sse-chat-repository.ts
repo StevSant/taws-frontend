@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { AppConfigService, AuthTokenService } from '../../../core';
 import { AgentTrace, ChatRepository, ChatStreamEvent } from '../domain';
+import { ChartSpec } from '../../../shared/charts';
 
 const CHAT_STREAM_PATH = '/api/v1/chat/stream';
 const SSE_DATA_PREFIX = 'data:';
@@ -9,6 +10,7 @@ const SSE_DATA_PREFIX = 'data:';
 interface ChatStreamFrame {
   t?: string;
   trace?: AgentTrace;
+  chart?: ChartSpec;
   error?: string;
   done?: boolean;
 }
@@ -73,6 +75,10 @@ export class SseChatRepository extends ChatRepository {
           }
           if (frame.trace !== undefined) {
             yield { kind: 'trace', trace: frame.trace };
+            continue;
+          }
+          if (frame.chart !== undefined) {
+            yield { kind: 'chart', chart: frame.chart };
             continue;
           }
           if (frame.t !== undefined) {

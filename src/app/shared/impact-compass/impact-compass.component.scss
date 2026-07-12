@@ -1,0 +1,54 @@
+.impact-compass {
+  --ic-color: var(--color-text-muted);
+  --ic-glow: color-mix(in srgb, var(--color-gold) 20%, transparent);
+
+  display: block;
+  flex-shrink: 0;
+
+  &__ring {
+    fill: none;
+    stroke: color-mix(in srgb, var(--ic-color) 35%, var(--color-border));
+    stroke-width: 3;
+  }
+
+  &__inner {
+    fill: color-mix(in srgb, var(--ic-color) 8%, var(--color-surface));
+    stroke: color-mix(in srgb, var(--ic-color) 25%, var(--color-border));
+    stroke-width: 1;
+  }
+
+  &__needle {
+    stroke: var(--ic-color);
+    stroke-width: 4;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 4px var(--ic-glow));
+  }
+
+  &__hub {
+    fill: var(--ic-color);
+  }
+
+  &--positive {
+    --ic-color: var(--color-gain);
+    --ic-glow: color-mix(in srgb, var(--color-gain) 40%, transparent);
+  }
+
+  &--negative {
+    --ic-color: var(--color-loss);
+    --ic-glow: color-mix(in srgb, var(--color-loss) 40%, transparent);
+  }
+
+  &--neutral {
+    --ic-color: var(--color-text-secondary);
+  }
+
+  &--uncertain {
+    --ic-color: var(--color-warn);
+    --ic-glow: color-mix(in srgb, var(--color-warn) 35%, transparent);
+  }
+
+  &--unclassified {
+    --ic-color: var(--color-gold);
+    --ic-glow: color-mix(in srgb, var(--color-gold) 35%, transparent);
+  }
+}

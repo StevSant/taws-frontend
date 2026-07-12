@@ -4,6 +4,14 @@
 }
 
 .briefings-page {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    flex: 1;
+    min-width: 0;
+  }
+
   &__toolbar {
     display: flex;
     align-items: flex-end;
@@ -20,5 +28,23 @@
     margin: 0;
     color: var(--color-text-secondary);
     font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .briefings-page__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .briefings-page__field {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .briefings-page__content {
+    gap: var(--space-4);
   }
 }

@@ -1,9 +1,10 @@
 .preset-picker {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-3);
 
   &__card {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -16,58 +17,128 @@
     text-align: left;
     cursor: pointer;
     box-shadow: var(--elevation-1);
-    transition: all 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.15s ease;
 
     &:hover {
-      border-color: var(--color-gold-border-hi);
+      border-color: var(--color-gold-border);
       box-shadow: var(--elevation-2);
     }
 
     &:active {
-      transform: scale(0.98);
+      transform: scale(0.99);
     }
 
     &--selected {
-      border-color: var(--color-gold-border-hi);
-      background: var(--color-gold-dim-bg);
+      border-color: var(--color-gold);
+      background: linear-gradient(
+        145deg,
+        var(--color-gold-dim-bg),
+        color-mix(in srgb, var(--color-surface) 92%, var(--color-gold) 8%)
+      );
       box-shadow:
-        0 0 0 1px var(--color-gold-border-hi),
+        0 0 0 1px var(--color-gold-border),
         var(--elevation-2);
     }
   }
 
+  &__check {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 1.25rem;
+    height: 1.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    background: var(--color-gold);
+    color: var(--color-background);
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  // Icon tile, keyed by preset `eventType` (see PRESET_ICON_KEYS).
+  &__icon {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-md);
+    background: var(--color-gold-dim-bg);
+    border: 1px solid var(--color-gold-border);
+    color: var(--color-gold);
+  }
+
   &__title {
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: var(--color-text-primary);
+    padding-right: 1.5rem;
+    padding-left: 2rem;
+    line-height: 1.35;
   }
 
   &__description {
     color: var(--color-text-secondary);
-    font-size: 0.85rem;
-    line-height: 1.45;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    flex: 1;
   }
 
   &__meta {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--space-2);
   }
 
   &__badge {
-    padding: 0.1rem var(--space-2);
+    padding: 0.15rem 0.5rem;
     border-radius: var(--radius-full);
-    background: var(--color-gold-dim-bg);
-    border: 1px solid var(--color-gold-border);
-    color: var(--color-gold-bright);
     font-family: var(--font-family-mono);
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
+
+    &--magnitude {
+      border: 1px solid var(--color-warn-border);
+      background: var(--color-warn-dim);
+      color: var(--color-warn);
+    }
+
+    &--horizon {
+      border: 1px solid var(--color-border);
+      background: var(--color-surface-raised);
+      color: var(--color-text-muted);
+    }
   }
 
-  &__symbols {
-    color: var(--color-text-muted);
-    font-size: 0.75rem;
+  &__assets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  &__asset-chip {
     font-family: var(--font-family-mono);
+    font-size: 0.62rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-gold-border);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-gold-bright);
+  }
+}
+
+@media (max-width: 560px) {
+  .preset-picker {
+    grid-template-columns: 1fr;
   }
 }

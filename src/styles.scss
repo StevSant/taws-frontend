@@ -1,8 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 @use './styles/tokens';
 @use './styles/typography';
+@use './styles/page-atmosphere';
 @use './styles/feature-page';
-
+@use './styles/route-transitions';
 // ============================================================================
 // Global keyframes + utility classes shared across the MIDAS design system
 // primitives (NeuralOrb, GoldenPolyhedron, ConfidenceGauge, glass surfaces).
@@ -88,7 +89,7 @@ body.route-chat {
   overflow: hidden;
   height: 100dvh;
   max-height: 100dvh;
-  background: var(--color-background-deep);
+  background: var(--color-background);
 }
 
 body.route-chat .app-shell {
@@ -96,7 +97,14 @@ body.route-chat .app-shell {
   max-height: 100dvh;
   min-height: 0;
   overflow: hidden;
-  background: transparent;
+  background: var(--color-background);
+}
+
+body.route-chat .app-shell__main {
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 body.route-login {
@@ -116,13 +124,11 @@ body.route-chat .app-shell__content {
   display: flex;
   flex-direction: column;
   min-height: 0;
-}
+  flex: 1;
 
-body.route-chat .app-shell__header {
-  min-height: 3rem;
-  padding: 0 var(--space-3);
-  background: var(--color-background-deep);
-  border-bottom-color: var(--color-border);
+  &::before {
+    display: none;
+  }
 }
 
 .glass {
@@ -133,4 +139,12 @@ body.route-chat .app-shell__header {
 
 .blink {
   animation: blink 1.7s ease-in-out infinite;
+}
+
+/* Instrument logos — black SVG marks on a theme-aware tile */
+.ticker-badge--logo {
+  background: var(--ticker-logo-bg, var(--color-surface));
+  box-shadow:
+    inset 0 0 0 1px var(--ticker-logo-border, var(--color-border)),
+    var(--ticker-logo-elevation, none);
 }

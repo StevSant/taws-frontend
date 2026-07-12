@@ -1,0 +1,24 @@
+<div
+  class="impact-compass"
+  [class.impact-compass--positive]="impact() === 'positive'"
+  [class.impact-compass--negative]="impact() === 'negative'"
+  [class.impact-compass--neutral]="impact() === 'neutral'"
+  [class.impact-compass--uncertain]="impact() === 'uncertain'"
+  [class.impact-compass--unclassified]="!impact() || impact() === 'unclassified'"
+  [style.width.px]="size()"
+  [style.height.px]="size()"
+>
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <circle class="impact-compass__ring" cx="50" cy="50" r="42" />
+    <circle class="impact-compass__inner" cx="50" cy="50" r="28" />
+    <line
+      class="impact-compass__needle"
+      x1="50"
+      y1="50"
+      x2="50"
+      y2="14"
+      [attr.transform]="'rotate(' + rotation() + ' 50 50)'"
+    />
+    <circle class="impact-compass__hub" cx="50" cy="50" r="5" />
+  </svg>
+</div>

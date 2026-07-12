@@ -1,0 +1,44 @@
+<div class="user-menu" [class.user-menu--open]="isOpen()">
+  <button
+    type="button"
+    class="user-menu__trigger"
+    [attr.aria-label]="i18n.t('shell.user.menuLabel')"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-haspopup]="true"
+    (click)="toggle()"
+  >
+    <span class="user-menu__avatar" aria-hidden="true">{{ initial() }}</span>
+    <span class="user-menu__name">{{ triggerLabel() }}</span>
+    <svg
+      class="user-menu__chevron"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      aria-hidden="true"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </button>
+
+  @if (isOpen()) {
+    <div
+      class="user-menu__panel"
+      role="menu"
+      [style.top.px]="menuAnchor().top"
+      [style.left.px]="menuAnchor().left"
+    >
+      <div class="user-menu__profile">
+        <app-user-profile-chip
+          [initial]="initial()"
+          [email]="email()"
+          [roleLabel]="displayName()"
+        />
+      </div>
+
+      <button type="button" class="user-menu__logout" role="menuitem" (click)="onLogout()">
+        {{ i18n.t('shell.auth.logout') }}
+      </button>
+    </div>
+  }
+</div>

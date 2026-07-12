@@ -1,0 +1,83 @@
+// Route + page assembly transitions (shell tabs, feature blocks, auth)
+
+@keyframes routeEnterForward {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes routeEnterBack {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes routeEnterFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageBlockIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes authPageIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@mixin stagger-children($selector, $max: 14, $base-delay: 0.08s, $step: 0.045s) {
+  #{$selector} {
+    animation: pageBlockIn 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @for $i from 1 through $max {
+    #{$selector}:nth-child(#{$i}) {
+      animation-delay: calc(#{$base-delay} + #{($i - 1) * $step});
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

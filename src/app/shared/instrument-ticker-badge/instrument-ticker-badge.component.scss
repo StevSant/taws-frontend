@@ -1,0 +1,39 @@
+.ticker-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+
+  &--sm {
+    width: 1.65rem;
+    height: 1.65rem;
+    font-size: 0.62rem;
+    border-radius: 0.4rem;
+  }
+
+  &--logo {
+    background: var(--ticker-logo-bg, var(--color-surface));
+    box-shadow:
+      inset 0 0 0 1px var(--ticker-logo-border, var(--color-border)),
+      var(--ticker-logo-elevation, none);
+    overflow: hidden;
+  }
+
+  &__img {
+    width: 72%;
+    height: 72%;
+    object-fit: contain;
+    display: block;
+  }
+
+  &--logo.ticker-badge--sm &__img {
+    width: 76%;
+    height: 76%;
+  }
+}

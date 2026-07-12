@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   AgentTrace,
+  ChartSpec,
   ChatMessage,
   ChatRepository,
   ChatStreamEvent,
@@ -71,6 +72,9 @@ export class ChatStore {
       case 'trace':
         this.tracesSignal.update((traces) => [...traces, event.trace]);
         break;
+      case 'chart':
+        this.appendChart(assistantId, event.chart);
+        break;
       case 'error':
         this.errorSignal.set(event.message);
         break;
@@ -85,6 +89,16 @@ export class ChatStore {
     this.sessionsStore.syncActiveMessages(
       this.messages().map((message) =>
         message.id === messageId ? { ...message, content: message.content + token } : message,
+      ),
+    );
+  }
+
+  private appendChart(messageId: string, chart: ChartSpec): void {
+    this.sessionsStore.syncActiveMessages(
+      this.messages().map((message) =>
+        message.id === messageId
+          ? { ...message, charts: [...(message.charts ?? []), chart] }
+          : message,
       ),
     );
   }

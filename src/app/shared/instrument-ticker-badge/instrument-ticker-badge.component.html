@@ -1,0 +1,23 @@
+@if (logoPath(); as path) {
+  <span
+    class="ticker-badge ticker-badge--logo"
+    [class.ticker-badge--sm]="size === 'sm'"
+    [attr.aria-label]="symbol"
+  >
+    <img class="ticker-badge__img" [src]="path" [alt]="symbol" loading="lazy" decoding="async" />
+  </span>
+} @else {
+  <span
+    class="ticker-badge"
+    [class.ticker-badge--sm]="size === 'sm'"
+    [style.background]="brand().background"
+    [style.color]="brand().color"
+    [attr.aria-label]="symbol"
+  >
+    @if (brand().label) {
+      {{ brand().label }}
+    } @else {
+      {{ symbol.slice(0, 1) }}
+    }
+  </span>
+}

@@ -1,0 +1,103 @@
+.guide-notes-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  &__header {
+    display: flex;
+    gap: var(--space-1);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__tab {
+    position: relative;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--color-text-primary);
+    }
+
+    &--active {
+      color: var(--color-gold-bright);
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: var(--space-2);
+        right: var(--space-2);
+        bottom: -1px;
+        height: 2px;
+        border-radius: 1px;
+        background: var(--color-gold);
+      }
+    }
+  }
+
+  &__panel {
+    min-height: 0;
+  }
+
+  &__notes-title {
+    margin: 0 0 var(--space-2);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-gold-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__notes {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__note {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+
+  &__empty {
+    margin: 0;
+    padding: var(--space-3);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .guide-notes-tabs__header {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .guide-notes-tabs__tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: var(--space-2);
+  }
+}

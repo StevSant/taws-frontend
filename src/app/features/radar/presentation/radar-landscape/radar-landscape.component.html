@@ -1,0 +1,62 @@
+<section class="radar-landscape feature-panel">
+  <header class="radar-landscape__header">
+    <div>
+      <h2 class="radar-landscape__title">{{ i18n.t('radar.landscape.title') }}</h2>
+      <p class="radar-landscape__subtitle">{{ i18n.t('radar.landscape.subtitle') }}</p>
+    </div>
+    <div class="radar-landscape__totals">
+      <span class="radar-landscape__total">
+        {{ landscape.totalInstruments }} {{ i18n.t('radar.landscape.instruments') }}
+      </span>
+      <span class="radar-landscape__total">
+        {{ landscape.totalNewsItems }} {{ i18n.t('radar.landscape.headlines') }}
+      </span>
+    </div>
+  </header>
+
+  <div class="radar-landscape__grid">
+    <div class="radar-landscape__panel">
+      <h3 class="radar-landscape__panel-title">{{ i18n.t('radar.landscape.distribution') }}</h3>
+      <app-impact-distribution-chart
+        [distribution]="landscape.distribution"
+        [total]="landscape.totalInstruments"
+      />
+    </div>
+
+    <div class="radar-landscape__panel">
+      <h3 class="radar-landscape__panel-title">{{ i18n.t('radar.landscape.byAssetClass') }}</h3>
+      <p class="radar-landscape__panel-hint">{{ i18n.t('radar.landscape.filterHint') }}</p>
+      <div class="radar-landscape__asset-grid" role="list">
+        @for (assetClass of assetClasses; track assetClass) {
+          <button
+            type="button"
+            class="radar-landscape__asset-cell"
+            [class.radar-landscape__asset-cell--positive]="impactClass(assetClass) === 'positive'"
+            [class.radar-landscape__asset-cell--negative]="impactClass(assetClass) === 'negative'"
+            [class.radar-landscape__asset-cell--neutral]="impactClass(assetClass) === 'neutral'"
+            [class.radar-landscape__asset-cell--uncertain]="impactClass(assetClass) === 'uncertain'"
+            [class.radar-landscape__asset-cell--unclassified]="
+              impactClass(assetClass) === 'unclassified'
+            "
+            [class.radar-landscape__asset-cell--empty]="!cellFor(assetClass)"
+            [class.radar-landscape__asset-cell--active]="activeAssetClass === assetClass"
+            [attr.aria-pressed]="activeAssetClass === assetClass"
+            (click)="onAssetClassClick(assetClass)"
+            role="listitem"
+          >
+            <span class="radar-landscape__asset-label">{{ assetClassLabel(assetClass) }}</span>
+            <span class="radar-landscape__asset-count">{{ cellFor(assetClass)?.count ?? 0 }}</span>
+            <span class="radar-landscape__asset-impact">{{
+              impactLabel(impactClass(assetClass))
+            }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="radar-landscape__panel">
+      <h3 class="radar-landscape__panel-title">{{ i18n.t('radar.landscape.macro') }}</h3>
+      <app-radar-macro-strip [macro]="macro" />
+    </div>
+  </div>
+</section>

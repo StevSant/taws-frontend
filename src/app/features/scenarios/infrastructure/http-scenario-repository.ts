@@ -1,7 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService, cachedFetch, RequestCacheService, TranslationService } from '../../../core';
+import {
+  AppConfigService,
+  cachedFetch,
+  RequestCacheService,
+  TranslationService,
+} from '../../../core';
 import {
   ScenarioIntake,
   ScenarioMonitor,
@@ -47,9 +52,7 @@ export class HttpScenarioRepository extends ScenarioRepository {
       this.config.scenarioPresetsCacheTtlMs,
       async () => {
         const dtos = await firstValueFrom(
-          this.http.get<ScenarioPresetDto[]>(
-            `${this.config.apiBaseUrl}${SCENARIOS_PATH}/presets`,
-          ),
+          this.http.get<ScenarioPresetDto[]>(`${this.config.apiBaseUrl}${SCENARIOS_PATH}/presets`),
         );
         return dtos.map(mapScenarioPresetDto);
       },
@@ -99,9 +102,7 @@ export class HttpScenarioRepository extends ScenarioRepository {
 
   async getScenario(scenarioId: string): Promise<ScenarioResult> {
     const dto = await firstValueFrom(
-      this.http.get<ScenarioResultDto>(
-        `${this.config.apiBaseUrl}${SCENARIOS_PATH}/${scenarioId}`,
-      ),
+      this.http.get<ScenarioResultDto>(`${this.config.apiBaseUrl}${SCENARIOS_PATH}/${scenarioId}`),
     );
     return mapScenarioResultDto(dto);
   }

@@ -24,12 +24,13 @@ export class NotificationsStore {
   readonly count = computed(() => this.notificationsSignal().length);
 
   /** Pushes a new notification onto the top of the list. */
-  notify(source: NotificationSource, messageKey: TranslationKey, count = 1): void {
+  notify(source: NotificationSource, messageKey: TranslationKey, count = 1, detail?: string): void {
     const notification: Notification = {
       id: this.generateId(),
       source,
       messageKey,
       count,
+      detail,
       createdAt: new Date().toISOString(),
     };
     this.notificationsSignal.update((current) =>

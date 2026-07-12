@@ -1,7 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService, cachedFetch, RequestCacheService, TranslationService } from '../../../core';
+import {
+  AppConfigService,
+  cachedFetch,
+  RequestCacheService,
+  TranslationService,
+} from '../../../core';
 import { Signal, SignalRepository } from '../domain';
 import { GenerateSignalRequestDto } from './generate-signal-request-dto';
 import { mapSignalDto } from './map-signal-dto';

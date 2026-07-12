@@ -1,3 +1,4 @@
+import { ChartSpec } from '../../../../shared/charts';
 import { AgentTrace } from './agent-trace.model';
 
 /**
@@ -8,4 +9,5 @@ import { AgentTrace } from './agent-trace.model';
 export type ChatStreamEvent =
   | { kind: 'token'; text: string }
   | { kind: 'trace'; trace: AgentTrace }
+  | { kind: 'chart'; chart: ChartSpec }
   | { kind: 'error'; message: string };

@@ -1,0 +1,417 @@
+@if (isNeuralOrb(glyph())) {
+  <app-neural-orb [size]="size()" />
+} @else {
+  <svg
+    class="midas-glyph"
+    [class.midas-glyph--animated]="animated()"
+    [attr.width]="size()"
+    [attr.height]="size()"
+    viewBox="0 0 40 40"
+    role="img"
+    aria-hidden="true"
+  >
+    <defs>
+      <radialGradient [attr.id]="uid + '-g'" cx="50%" cy="45%" r="55%">
+        <stop offset="0%" stop-color="var(--color-gold-bright)" />
+        <stop offset="100%" stop-color="var(--color-gold)" />
+      </radialGradient>
+      <filter [attr.id]="uid + '-glow'" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="1.2" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    @switch (glyph()) {
+      @case ('brand-midas-sigil') {
+        <circle class="midas-glyph__ring" cx="20" cy="20" r="16" />
+        <g class="midas-glyph__lines" stroke-width="0.7">
+          <polygon points="20,11 25.5,14 25.5,19.5 20,22.5 14.5,19.5 14.5,14" fill="none" />
+          <polygon points="20,11 23,15.5 20,22.5 17,15.5" fill="none" />
+          <line x1="14.5" y1="14" x2="17" y2="15.5" />
+          <line x1="25.5" y1="14" x2="23" y2="15.5" />
+          <line x1="14.5" y1="19.5" x2="17" y2="15.5" />
+          <line x1="25.5" y1="19.5" x2="23" y2="15.5" />
+        </g>
+        <path
+          class="midas-glyph__hand"
+          d="M9 31 V24 M11.5 31 V20 M14.5 31 V18 M17.5 31 V21 M20.5 31 V24 L25 27"
+          fill="none"
+          stroke-width="0.85"
+          stroke-linecap="round"
+        />
+        <line class="midas-glyph__touch-beam" x1="22" y1="24" x2="20" y2="20" />
+        <circle
+          class="midas-glyph__spark"
+          cx="20"
+          cy="19"
+          r="2.4"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          [attr.filter]="'url(#' + uid + '-glow)'"
+        />
+        <circle class="midas-glyph__node" cx="25" cy="27" r="1.3" />
+      }
+
+      @case ('brand-oracle-seal') {
+        <circle class="midas-glyph__lines" cx="20" cy="20" r="15" fill="none" stroke-width="0.9" />
+        <circle class="midas-glyph__ring" cx="20" cy="20" r="11.5" />
+        <g class="midas-glyph__lines" stroke-width="0.65">
+          <polygon points="20,13 24,15.5 24,20 20,22.5 16,20 16,15.5" fill="none" />
+          <line x1="20" y1="13" x2="20" y2="22.5" />
+          <line x1="16" y1="15.5" x2="24" y2="20" />
+          <line x1="24" y1="15.5" x2="16" y2="20" />
+        </g>
+        <line class="midas-glyph__touch-beam" x1="20" y1="7" x2="20" y2="12" />
+        <circle
+          class="midas-glyph__spark"
+          cx="20"
+          cy="7"
+          r="1.8"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="18"
+          r="2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          opacity="0.85"
+        />
+      }
+
+      @case ('brand-icosahedron') {
+        <g class="midas-glyph__icosa">
+          <circle class="midas-glyph__icosa-halo" cx="20" cy="20" r="14.5" />
+          <g class="midas-glyph__icosa-wire midas-glyph__lines" stroke-width="0.75">
+            <polygon points="20,4 33,11 33,27 20,34 7,27 7,11" fill="none" />
+            <polygon points="20,4 26.5,20 20,34 13.5,20" fill="none" />
+            <polygon points="7,11 13.5,20 20,4 26.5,20 33,11" fill="none" />
+            <polygon points="7,27 13.5,20 20,34 26.5,20 33,27" fill="none" />
+            <line x1="20" y1="4" x2="20" y2="34" />
+            <line x1="7" y1="11" x2="33" y2="27" />
+            <line x1="33" y1="11" x2="7" y2="27" />
+          </g>
+          <circle
+            class="midas-glyph__core"
+            cx="20"
+            cy="20"
+            r="3.2"
+            [attr.fill]="'url(#' + uid + '-g)'"
+            [attr.filter]="animated() ? 'url(#' + uid + '-glow)' : null"
+          />
+        </g>
+      }
+
+      @case ('brand-dodecahedron') {
+        <g class="midas-glyph__lines" stroke-width="0.7">
+          <polygon points="20,5 28,9 32,17 28,25 20,29 12,25 8,17 12,9" fill="none" />
+          <polygon points="20,11 24,13 26,17 24,21 20,23 16,21 14,17 16,13" fill="none" />
+          <line x1="20" y1="5" x2="20" y2="11" />
+          <line x1="28" y1="9" x2="24" y2="13" />
+          <line x1="32" y1="17" x2="26" y2="17" />
+          <line x1="28" y1="25" x2="24" y2="21" />
+          <line x1="20" y1="29" x2="20" y2="23" />
+          <line x1="12" y1="25" x2="16" y2="21" />
+          <line x1="8" y1="17" x2="14" y2="17" />
+          <line x1="12" y1="9" x2="16" y2="13" />
+        </g>
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="17"
+          r="2.6"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('brand-golden-hand') {
+        <g class="midas-glyph__lines midas-glyph__hand" stroke-width="0.85" stroke-linecap="round">
+          <path
+            d="M11 30 V20 M14 30 V14 M17.5 30 V11 M21 30 V15 M24.5 30 V19 L30 23 V30 Z"
+            fill="none"
+          />
+        </g>
+        <g class="midas-glyph__rays">
+          <line x1="30" y1="23" x2="35" y2="18" />
+          <line x1="30" y1="23" x2="36" y2="23" />
+          <line x1="30" y1="23" x2="35" y2="28" />
+        </g>
+        <circle
+          class="midas-glyph__spark"
+          cx="30"
+          cy="23"
+          r="2.2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          [attr.filter]="'url(#' + uid + '-glow)'"
+        />
+      }
+
+      @case ('brand-midas-touch') {
+        <g class="midas-glyph__lines midas-glyph__hand" stroke-width="0.8" stroke-linecap="round">
+          <path
+            d="M8 28 V18 M10.5 28 V12 M13.5 28 V10 M16.5 28 V14 M19.5 28 V18 L24 21"
+            fill="none"
+          />
+        </g>
+        <circle class="midas-glyph__lines" cx="30" cy="20" r="7" fill="none" stroke-width="0.8" />
+        <path class="midas-glyph__gold-fill" d="M30 27 A7 7 0 0 1 30 13 Z" />
+        <line class="midas-glyph__touch-beam" x1="24" y1="21" x2="23" y2="20" />
+        <circle
+          class="midas-glyph__spark"
+          cx="24"
+          cy="21"
+          r="1.5"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('brand-king-aureole') {
+        <path
+          class="midas-glyph__lines"
+          d="M10 24 L13 14 L16 20 L20 10 L24 20 L27 14 L30 24 Z"
+          fill="none"
+          stroke-width="0.85"
+          stroke-linejoin="round"
+        />
+        <circle class="midas-glyph__ring" cx="20" cy="22" r="9" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="22"
+          r="3.2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          [attr.filter]="'url(#' + uid + '-glow)'"
+        />
+        <circle class="midas-glyph__node" cx="20" cy="10" r="1.4" />
+      }
+
+      @case ('brand-golden-flow') {
+        <path
+          class="midas-glyph__flow"
+          d="M6 26 C10 22, 12 18, 16 20 S22 24, 26 18 S32 12, 34 10"
+          fill="none"
+          stroke-width="1.1"
+          stroke-linecap="round"
+        />
+        <circle class="midas-glyph__node" cx="16" cy="20" r="1.3" />
+        <circle class="midas-glyph__node" cx="22" cy="22" r="1.3" />
+        <circle
+          class="midas-glyph__node"
+          cx="28"
+          cy="17"
+          r="1.5"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+        <circle
+          class="midas-glyph__spark"
+          cx="34"
+          cy="10"
+          r="2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          opacity="0.9"
+        />
+      }
+
+      @case ('supervisor-orbit') {
+        <circle class="midas-glyph__ring" cx="20" cy="20" r="12" />
+        <g class="midas-glyph__lines" stroke-width="0.6">
+          <line x1="20" y1="20" x2="20" y2="8" />
+          <line x1="20" y1="20" x2="31.4" y2="15" />
+          <line x1="20" y1="20" x2="28.2" y2="27" />
+          <line x1="20" y1="20" x2="11.8" y2="27" />
+          <line x1="20" y1="20" x2="8.6" y2="15" />
+        </g>
+        <circle class="midas-glyph__node" cx="20" cy="8" r="1.8" />
+        <circle class="midas-glyph__node" cx="31.4" cy="15" r="1.8" />
+        <circle class="midas-glyph__node" cx="28.2" cy="27" r="1.8" />
+        <circle class="midas-glyph__node" cx="11.8" cy="27" r="1.8" />
+        <circle class="midas-glyph__node" cx="8.6" cy="15" r="1.8" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="20"
+          r="4"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          [attr.filter]="'url(#' + uid + '-glow)'"
+        />
+      }
+
+      @case ('supervisor-octahedron') {
+        <g class="midas-glyph__lines" stroke-width="0.8">
+          <polygon points="20,6 30,20 20,34 10,20" fill="none" />
+          <line x1="20" y1="6" x2="20" y2="34" />
+          <line x1="10" y1="20" x2="30" y2="20" />
+          <line x1="20" y1="6" x2="10" y2="20" />
+          <line x1="20" y1="6" x2="30" y2="20" />
+          <line x1="20" y1="34" x2="10" y2="20" />
+          <line x1="20" y1="34" x2="30" y2="20" />
+        </g>
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="20"
+          r="2.8"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('analyst-prism') {
+        <g class="midas-glyph__lines" stroke-width="0.8">
+          <polygon points="20,7 32,30 8,30" fill="none" />
+          <line x1="20" y1="7" x2="20" y2="30" />
+          <line x1="8" y1="30" x2="26" y2="18.5" />
+          <line x1="32" y1="30" x2="14" y2="18.5" />
+        </g>
+        <polygon class="midas-glyph__facet" points="20,7 26,18.5 14,18.5" opacity="0.35" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="19"
+          r="2.4"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('analyst-lens') {
+        <ellipse
+          class="midas-glyph__lines"
+          cx="20"
+          cy="20"
+          rx="13"
+          ry="9"
+          fill="none"
+          stroke-width="0.8"
+        />
+        <line class="midas-glyph__scan" x1="7" y1="20" x2="33" y2="20" />
+        <polygon class="midas-glyph__facet" points="20,11 27,20 20,29 13,20" opacity="0.28" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="20"
+          r="3"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          [attr.filter]="'url(#' + uid + '-glow)'"
+        />
+      }
+
+      @case ('quant-cube') {
+        <g class="midas-glyph__lines" stroke-width="0.75">
+          <polygon points="12,14 22,9 32,14 22,19" fill="none" />
+          <polygon points="12,14 12,26 22,31 22,19" fill="none" />
+          <polygon points="22,19 22,31 32,26 32,14" fill="none" />
+          <line x1="12" y1="14" x2="22" y2="19" />
+          <line x1="22" y1="9" x2="32" y2="14" />
+          <line x1="22" y1="19" x2="32" y2="14" />
+          <line x1="12" y1="26" x2="22" y2="31" />
+          <line x1="22" y1="31" x2="32" y2="26" />
+        </g>
+        <circle
+          class="midas-glyph__core"
+          cx="22"
+          cy="20"
+          r="2.2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('quant-tetrahedron') {
+        <g class="midas-glyph__lines" stroke-width="0.85">
+          <polygon points="20,8 32,30 8,30" fill="none" />
+          <line x1="20" y1="8" x2="20" y2="22" />
+          <line x1="8" y1="30" x2="20" y2="22" />
+          <line x1="32" y1="30" x2="20" y2="22" />
+        </g>
+        <line class="midas-glyph__grid" x1="14" y1="26" x2="26" y2="26" />
+        <line class="midas-glyph__grid" x1="17" y1="22" x2="23" y2="22" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="21"
+          r="2.3"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('advisor-compass') {
+        <polygon
+          class="midas-glyph__lines"
+          points="20,6 30,13 27,25 13,25 10,13"
+          fill="none"
+          stroke-width="0.8"
+        />
+        <g class="midas-glyph__lines" stroke-width="0.6">
+          <line x1="20" y1="10" x2="20" y2="30" />
+          <line x1="12" y1="20" x2="28" y2="20" />
+          <line x1="14.5" y1="14.5" x2="25.5" y2="25.5" />
+          <line x1="25.5" y1="14.5" x2="14.5" y2="25.5" />
+        </g>
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="20"
+          r="3.2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('advisor-scales') {
+        <g class="midas-glyph__lines" stroke-width="0.8">
+          <polygon points="20,8 28,20 20,22 12,20" fill="none" />
+          <polygon points="20,32 28,20 20,18 12,20" fill="none" />
+          <line x1="20" y1="8" x2="20" y2="32" />
+        </g>
+        <circle class="midas-glyph__node" cx="12" cy="20" r="1.6" />
+        <circle class="midas-glyph__node" cx="28" cy="20" r="1.6" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="20"
+          r="2.5"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('consequence-fork') {
+        <g class="midas-glyph__lines" stroke-width="0.8">
+          <line x1="20" y1="8" x2="20" y2="18" />
+          <line x1="20" y1="18" x2="10" y2="30" />
+          <line x1="20" y1="18" x2="30" y2="30" />
+          <line x1="10" y1="30" x2="16" y2="24" />
+          <line x1="30" y1="30" x2="24" y2="24" />
+        </g>
+        <circle class="midas-glyph__node" cx="20" cy="8" r="2" />
+        <circle class="midas-glyph__node" cx="10" cy="30" r="2" />
+        <circle class="midas-glyph__node" cx="30" cy="30" r="2" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="18"
+          r="2.6"
+          [attr.fill]="'url(#' + uid + '-g)'"
+        />
+      }
+
+      @case ('consequence-chain') {
+        <g class="midas-glyph__lines" stroke-width="0.75">
+          <polygon points="8,20 12,14 16,20 12,26" fill="none" />
+          <polygon points="16,20 20,14 24,20 20,26" fill="none" />
+          <polygon points="24,20 28,14 32,20 28,26" fill="none" />
+          <line x1="16" y1="20" x2="24" y2="20" />
+        </g>
+        <circle class="midas-glyph__node" cx="12" cy="20" r="1.5" />
+        <circle class="midas-glyph__node" cx="20" cy="20" r="1.5" />
+        <circle class="midas-glyph__node" cx="28" cy="20" r="1.5" />
+        <circle
+          class="midas-glyph__core"
+          cx="20"
+          cy="20"
+          r="2.2"
+          [attr.fill]="'url(#' + uid + '-g)'"
+          [attr.filter]="'url(#' + uid + '-glow)'"
+        />
+      }
+    }
+  </svg>
+}

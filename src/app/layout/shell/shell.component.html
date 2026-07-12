@@ -1,60 +1,95 @@
 <div class="app-shell">
-  <header class="app-shell__header">
-    <a class="app-shell__brand" routerLink="/radar">
-      <app-midas-logo class="app-shell__brand-mark" [size]="26" />
-      <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
-    </a>
+  <div class="app-shell__main">
+    <header class="app-shell__topbar">
+      <a class="app-shell__brand" routerLink="/radar">
+        <app-midas-logo class="app-shell__brand-mark" [size]="24" />
+        <span class="app-shell__brand-name">{{ i18n.t('shell.brand') }}</span>
+      </a>
 
-    <nav class="app-shell__nav" [attr.aria-label]="i18n.t('shell.nav.label')">
-      <a
-        class="app-shell__nav-link"
-        routerLink="/radar"
-        routerLinkActive="app-shell__nav-link--active"
-        >{{ i18n.t('shell.nav.radar') }}</a
-      >
-      <a
-        class="app-shell__nav-link"
-        routerLink="/chat"
-        routerLinkActive="app-shell__nav-link--active"
-        >{{ i18n.t('shell.nav.chat') }}</a
-      >
-      <a
-        class="app-shell__nav-link"
-        routerLink="/scenarios"
-        routerLinkActive="app-shell__nav-link--active"
-        >{{ i18n.t('shell.nav.scenarios') }}</a
-      >
-      <a
-        class="app-shell__nav-link"
-        routerLink="/briefings"
-        routerLinkActive="app-shell__nav-link--active"
-        >{{ i18n.t('shell.nav.briefings') }}</a
-      >
-    </nav>
+      <nav class="app-shell__tabs" [attr.aria-label]="i18n.t('shell.nav.label')">
+        <a
+          class="app-shell__tab"
+          routerLink="/radar"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.radar.hint')"
+          >{{ i18n.t('shell.nav.radar') }}</a
+        >
+        <a
+          class="app-shell__tab"
+          routerLink="/chat"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.chat.hint')"
+          >{{ i18n.t('shell.nav.chat') }}</a
+        >
+        <a
+          class="app-shell__tab"
+          routerLink="/scenarios"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.scenarios.hint')"
+          >{{ i18n.t('shell.nav.scenarios') }}</a
+        >
+        <a
+          class="app-shell__tab"
+          routerLink="/briefings"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.briefings.hint')"
+          >{{ i18n.t('shell.nav.briefings') }}</a
+        >
+      </nav>
 
-    <div class="app-shell__cluster">
-      <app-notification-bell
-        [notifications]="notifications.notifications()"
-        (dismiss)="notifications.dismiss($event)"
-        (clearAll)="notifications.clearAll()"
-      />
+      <div class="app-shell__search">
+        <svg lucideSearch class="app-shell__search-icon" [size]="16" aria-hidden="true"></svg>
+        <input
+          #searchInput
+          class="app-shell__search-input"
+          type="search"
+          [placeholder]="i18n.t('shell.search.placeholder')"
+          [attr.aria-label]="i18n.t('shell.search.label')"
+        />
+      </div>
 
-      <app-telegram-link-panel [isAuthenticated]="auth.isAuthenticated()" />
+      <div class="app-shell__cluster">
+        <app-notification-bell
+          [notifications]="notifications.notifications()"
+          (dismiss)="notifications.dismiss($event)"
+          (clearAll)="notifications.clearAll()"
+        />
 
-      <app-theme-toggle />
-      <app-language-toggle />
+        <app-theme-toggle />
+        <app-language-toggle />
 
-      @if (auth.isAuthenticated()) {
-        <button type="button" class="app-shell__auth-btn" (click)="logout()">
-          {{ i18n.t('shell.auth.logout') }}
-        </button>
-      } @else {
-        <a class="app-shell__auth-btn" routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
-      }
-    </div>
-  </header>
+        @if (auth.isAuthenticated()) {
+          <app-user-menu
+            [initial]="userInitial()"
+            [email]="userEmail()"
+            [displayName]="i18n.t('chat.profile.guest')"
+            (logout)="logout()"
+          />
+        } @else {
+          <a class="app-shell__auth-btn app-shell__auth-btn--primary" routerLink="/login">{{
+            i18n.t('shell.auth.login')
+          }}</a>
+        }
+      </div>
+    </header>
 
-  <main class="app-shell__content">
-    <router-outlet></router-outlet>
-  </main>
+    <main
+      class="app-shell__content"
+      [class.app-shell__content--forward]="routeTransition() === 'forward'"
+      [class.app-shell__content--back]="routeTransition() === 'back'"
+      [class.app-shell__content--neutral]="routeTransition() === 'neutral'"
+    >
+      <router-outlet></router-outlet>
+    </main>
+
+    @if (!usesCustomLayout()) {
+      <footer class="app-shell__footer">
+        <span class="app-shell__disclaimer">{{ i18n.t('shell.footer.disclaimer') }}</span>
+        <span class="app-shell__status">
+          <span class="app-shell__status-dot" aria-hidden="true"></span>
+          {{ i18n.t('shell.footer.demoStatus') }}
+        </span>
+      </footer>
+    }
+  </div>
 </div>

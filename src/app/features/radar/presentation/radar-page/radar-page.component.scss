@@ -1,20 +1,207 @@
 :host {
   display: flex;
   flex: 1;
+  min-width: 0;
 }
 
 .radar-page {
-  &__filters {
-    padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-bottom: var(--space-8);
+
+  &__hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-bottom: var(--space-2);
   }
 
-  &__unlinked-note {
+  &__title {
     margin: 0;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-    background: color-mix(in srgb, var(--color-gold-dim-bg) 60%, transparent);
-    color: var(--color-text-muted);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+
+  &__summary {
+    margin: var(--space-2) 0 0;
+    max-width: 42rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+
+  &__filters--inline {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  &__kpis {
+    display: block;
+    width: 100%;
+  }
+
+  &__overview {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  &__enriching {
+    margin: calc(var(--space-2) * -1) 0 0;
     font-family: var(--font-family-mono);
     font-size: 0.72rem;
+    color: var(--color-gold-bright);
+    text-align: center;
+  }
+
+  &__split {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: var(--space-5);
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+    margin-top: var(--space-2);
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  &__timeline {
+    min-width: 0;
+  }
+
+  &__instruments {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+    min-height: 0;
+  }
+
+  &__instruments-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  }
+
+  &__instruments-copy {
+    flex: 1 1 12rem;
+    min-width: 0;
+  }
+
+  &__instruments-action {
+    flex: 0 1 auto;
+    max-width: 100%;
+
+    ::ng-deep .app-button {
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__instruments-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  &__instruments-subtitle {
+    margin: 0.35rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+  }
+
+  &__instrument-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  &__skeletons {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 1320px) {
+  .radar-page__overview {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .radar-page__split {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+}
+
+@media (max-width: 1100px) {
+  .radar-page__instrument-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .radar-page__skeletons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .radar-page {
+    gap: var(--space-5);
+  }
+
+  .radar-page__hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .radar-page__filters--inline {
+    width: 100%;
+  }
+
+  .radar-page__instruments-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .radar-page__instruments-action {
+    width: 100%;
+
+    ::ng-deep .app-button {
+      width: 100%;
+    }
+  }
+
+  .radar-page__instrument-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .radar-page__skeletons {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,61 +1,100 @@
-<article class="signal-card">
-  <header class="signal-card__header">
+<article
+  class="signal-card"
+  [class.signal-card--positive]="signal.impactClass === 'positive'"
+  [class.signal-card--negative]="signal.impactClass === 'negative'"
+  [class.signal-card--neutral]="signal.impactClass === 'neutral'"
+  [class.signal-card--uncertain]="signal.impactClass === 'uncertain'"
+  [class.signal-card--pending]="!signal.impactClass"
+>
+  <div class="signal-card__status">
+    <app-impact-compass
+      class="signal-card__compass"
+      [impact]="signal.impactClass ?? 'unclassified'"
+      [size]="56"
+    />
+    <div class="signal-card__status-copy">
+      <span class="signal-card__status-label">{{ i18n.t('radar.card.status.label') }}</span>
+      <span class="signal-card__status-value">{{ statusLabel() }}</span>
+    </div>
     <div class="signal-card__instrument">
       <span class="signal-card__ticker">{{ signal.symbol }}</span>
       @if (signal.instrument) {
         <span class="signal-card__name">{{ signal.instrument.name }}</span>
-        <span class="signal-card__asset-class">{{ signal.instrument.assetClass }}</span>
+        <span class="signal-card__asset-class">{{
+          assetClassLabel(signal.instrument.assetClass)
+        }}</span>
       }
-    </div>
-
-    <div
-      class="signal-card__impact"
-      [class.signal-card__impact--positive]="signal.impactClass === 'positive'"
-      [class.signal-card__impact--negative]="signal.impactClass === 'negative'"
-      [class.signal-card__impact--neutral]="signal.impactClass === 'neutral'"
-      [class.signal-card__impact--uncertain]="signal.impactClass === 'uncertain'"
-    >
-      <span class="signal-card__impact-label">{{ i18n.t('radar.card.impact.label') }}</span>
-      <span class="signal-card__impact-value">
-        {{
-          signal.impactClass
-            ? impactClassLabel(signal.impactClass)
-            : i18n.t('radar.card.impact.unclassified')
-        }}
-      </span>
-    </div>
-  </header>
-
-  <div class="signal-card__metrics">
-    <div class="signal-card__metric signal-card__metric--confidence">
-      <span class="signal-card__metric-label">{{ i18n.t('radar.card.confidence.label') }}</span>
-      @if (signal.confidence !== undefined) {
-        <app-confidence-gauge [value]="confidencePercent(signal.confidence)" [size]="52" />
-      } @else {
-        <span class="signal-card__metric-value signal-card__metric-value--muted">
-          {{ i18n.t('radar.card.confidence.unavailable') }}
+      @if (signal.marketStats?.volatilityRegime; as regime) {
+        <span class="signal-card__vol-chip" [attr.data-regime]="regime">
+          {{ volatilityLabel(regime) }}
         </span>
       }
     </div>
+  </div>
 
-    <div class="signal-card__metric">
-      <span class="signal-card__metric-label">{{ i18n.t('radar.card.priceDelta.label') }}</span>
-      <span
-        class="signal-card__metric-value"
-        [class.signal-card__metric-value--positive]="(signal.priceDelta ?? 0) > 0"
-        [class.signal-card__metric-value--negative]="(signal.priceDelta ?? 0) < 0"
-      >
-        {{
-          signal.priceDelta !== undefined
-            ? formatPriceDelta(signal.priceDelta)
-            : i18n.t('radar.card.priceDelta.unavailable')
-        }}
+  @if (leadHeadline(); as headline) {
+    <div class="signal-card__story">
+      <p class="signal-card__headline">{{ headline }}</p>
+      @if (leadSummary(); as summary) {
+        <p class="signal-card__summary">{{ summary }}</p>
+      }
+      <span class="signal-card__news-pill">
+        {{ signal.news.length }} {{ i18n.t('radar.card.newsCount') }}
       </span>
+    </div>
+  }
+
+  <div class="signal-card__metrics-panel">
+    <div class="signal-card__chart-block">
+      <span class="signal-card__chart-label">{{ i18n.t('radar.card.priceMoves') }}</span>
+      @if (signal.marketStats?.unusualMoves?.length) {
+        <app-return-sparkline [moves]="signal.marketStats!.unusualMoves" />
+      } @else {
+        <div class="signal-card__chart-placeholder">{{ i18n.t('radar.card.chartPending') }}</div>
+      }
+    </div>
+
+    <div class="signal-card__metrics">
+      <div class="signal-card__metric signal-card__metric--confidence">
+        <span class="signal-card__metric-label">{{ i18n.t('radar.card.confidence.label') }}</span>
+        @if (signal.confidence !== undefined) {
+          <app-confidence-gauge [value]="confidencePercent(signal.confidence)" [size]="48" />
+        } @else {
+          <span class="signal-card__metric-value signal-card__metric-value--muted">
+            {{ i18n.t('radar.card.confidence.unavailable') }}
+          </span>
+        }
+      </div>
+
+      <div class="signal-card__metric">
+        <span class="signal-card__metric-label">{{ i18n.t('radar.card.priceDelta.label') }}</span>
+        <span
+          class="signal-card__metric-value signal-card__metric-value--large"
+          [class.signal-card__metric-value--positive]="(signal.priceDelta ?? 0) > 0"
+          [class.signal-card__metric-value--negative]="(signal.priceDelta ?? 0) < 0"
+        >
+          {{
+            signal.priceDelta !== undefined
+              ? formatPriceDelta(signal.priceDelta)
+              : i18n.t('radar.card.priceDelta.unavailable')
+          }}
+          @if (signal.priceDelta !== undefined) {
+            %
+          }
+        </span>
+        @if (
+          signal.marketStats?.lastPrice !== null && signal.marketStats?.lastPrice !== undefined
+        ) {
+          <span class="signal-card__last-price">
+            {{ signal.marketStats!.lastPrice | number: '1.2-2' }}
+          </span>
+        }
+      </div>
     </div>
   </div>
 
   @if (!signal.impactClass) {
-    <div class="signal-card__actions">
+    <div class="signal-card__cta">
       <app-button
         [label]="
           store.isGeneratingFor(signal.symbol)
@@ -65,31 +104,39 @@
         [disabled]="store.isGeneratingFor(signal.symbol)"
         (pressed)="onGenerate()"
       />
+      <p class="signal-card__cta-hint">{{ i18n.t('radar.generate.hint') }}</p>
     </div>
   }
 
   <div class="signal-card__evidence">
     <span class="signal-card__evidence-title">{{ i18n.t('radar.card.evidence.title') }}</span>
     <ul class="signal-card__evidence-list">
-      @for (item of signal.news; track item.id) {
+      @for (item of visibleNews(); track item.id) {
         <li class="signal-card__evidence-item">
-          <span class="signal-card__evidence-chevron" aria-hidden="true">›</span>
-          <div class="signal-card__evidence-body">
-            <a
-              class="signal-card__evidence-headline"
-              [href]="item.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ item.title }}</a
-            >
-            <div class="signal-card__evidence-meta">
-              <span class="signal-card__evidence-source">{{ item.source }}</span>
-              <span class="signal-card__evidence-date">{{ item.publishedAt | date: 'short' }}</span>
-            </div>
+          <a
+            class="signal-card__evidence-headline"
+            [href]="item.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ item.title }}</a
+          >
+          <div class="signal-card__evidence-meta">
+            <span class="signal-card__evidence-source">{{ item.source }}</span>
+            <span class="signal-card__evidence-date">{{ item.publishedAt | date: 'short' }}</span>
           </div>
         </li>
       }
     </ul>
+    @if (hiddenNewsCount() > 0 && !showAllNews()) {
+      <button type="button" class="signal-card__more" (click)="toggleNews()">
+        {{ i18n.t('radar.card.moreNews') }} ({{ hiddenNewsCount() }})
+      </button>
+    }
+    @if (showAllNews() && signal.news.length > 2) {
+      <button type="button" class="signal-card__more" (click)="toggleNews()">
+        {{ i18n.t('radar.card.lessNews') }}
+      </button>
+    }
   </div>
 
   @if (signal.signalId && auth.isAuthenticated()) {

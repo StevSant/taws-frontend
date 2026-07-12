@@ -1,51 +1,61 @@
-<form class="radar-filters feature-panel">
-  <div class="radar-filters__group feature-field">
-    <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.type.label') }}</span>
-    <div
-      class="radar-filters__pills"
-      role="group"
-      [attr.aria-label]="i18n.t('radar.filters.type.label')"
-    >
-      <button
-        type="button"
-        class="radar-filters__pill"
-        [class.radar-filters__pill--active]="filters.assetClass === null"
-        (click)="selectAssetClass(null)"
+<form class="radar-filters" [class.radar-filters--compact]="compact">
+  @if (!compact) {
+    <div class="radar-filters__group feature-field">
+      <span class="radar-filters__label feature-label">{{
+        i18n.t('radar.filters.type.label')
+      }}</span>
+      <div
+        class="radar-filters__pills"
+        role="group"
+        [attr.aria-label]="i18n.t('radar.filters.type.label')"
       >
-        {{ i18n.t('radar.filters.type.all') }}
-      </button>
-      @for (assetClass of assetClasses; track assetClass) {
         <button
           type="button"
           class="radar-filters__pill"
-          [class.radar-filters__pill--active]="filters.assetClass === assetClass"
-          (click)="selectAssetClass(assetClass)"
+          [class.radar-filters__pill--active]="filters.assetClass === null"
+          (click)="selectAssetClass(null)"
         >
-          {{ assetClassLabel(assetClass) }}
+          {{ i18n.t('radar.filters.type.all') }}
         </button>
-      }
+        @for (assetClass of assetClasses; track assetClass) {
+          <button
+            type="button"
+            class="radar-filters__pill"
+            [class.radar-filters__pill--active]="filters.assetClass === assetClass"
+            (click)="selectAssetClass(assetClass)"
+          >
+            {{ assetClassLabel(assetClass) }}
+          </button>
+        }
+      </div>
     </div>
-  </div>
 
-  <label class="radar-filters__field feature-field">
-    <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.asset.label') }}</span>
-    <select
-      class="radar-filters__select feature-select"
-      name="symbol"
-      [ngModel]="filters.symbol"
-      (ngModelChange)="symbolChange.emit($event)"
-    >
-      <option [ngValue]="null">{{ i18n.t('radar.filters.asset.all') }}</option>
-      @for (instrument of instrumentOptions; track instrument.symbol) {
-        <option [ngValue]="instrument.symbol">
-          {{ instrument.symbol }} — {{ instrument.name }}
-        </option>
-      }
-    </select>
-  </label>
+    <label class="radar-filters__field feature-field">
+      <span class="radar-filters__label feature-label">{{
+        i18n.t('radar.filters.asset.label')
+      }}</span>
+      <select
+        class="radar-filters__select feature-select"
+        name="symbol"
+        [ngModel]="filters.symbol"
+        (ngModelChange)="symbolChange.emit($event)"
+      >
+        <option [ngValue]="null">{{ i18n.t('radar.filters.asset.all') }}</option>
+        @for (instrument of instrumentOptions; track instrument.symbol) {
+          <option [ngValue]="instrument.symbol">
+            {{ instrument.symbol }} — {{ instrument.name }}
+          </option>
+        }
+      </select>
+    </label>
+  }
 
   <div class="radar-filters__group feature-field">
-    <span class="radar-filters__label feature-label">{{ i18n.t('radar.filters.recency.label') }}</span>
+    @if (!compact) {
+      <span class="radar-filters__label feature-label">{{
+        i18n.t('radar.filters.recency.label')
+      }}</span>
+    }
     <div
       class="radar-filters__pills"
       role="group"

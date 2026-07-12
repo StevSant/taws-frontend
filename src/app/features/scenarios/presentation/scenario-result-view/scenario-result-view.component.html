@@ -1,20 +1,51 @@
 <article class="scenario-result">
-  <header class="scenario-result__header">
-    <h2 class="scenario-result__title">{{ result.title }}</h2>
-    <div class="scenario-result__meta">
-      <span class="scenario-result__badge">{{ magnitudeLabel(result.spec.magnitude) }}</span>
-      <span class="scenario-result__badge">{{ horizonLabel(result.spec.horizon) }}</span>
+  <header class="scenario-result__hero">
+    <div class="scenario-result__hero-top">
+      <span class="scenario-result__eyebrow">{{ i18n.t('scenarios.result.title') }}</span>
+      <div class="scenario-result__meta">
+        <span class="scenario-result__badge">{{ magnitudeLabel(result.spec.magnitude) }}</span>
+        <span class="scenario-result__badge">{{ horizonLabel(result.spec.horizon) }}</span>
+      </div>
     </div>
+    <h2 class="scenario-result__title">{{ result.title }}</h2>
+    <blockquote class="scenario-result__narrative">{{ result.narrative }}</blockquote>
   </header>
 
-  <p class="scenario-result__narrative">{{ result.narrative }}</p>
-
-  <section class="scenario-result__section">
+  <section class="scenario-result__section scenario-result__section--featured">
+    <header class="scenario-result__section-header">
+      <span class="scenario-result__section-num">1</span>
+      <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.heatmap.title') }}</h3>
+    </header>
     <app-impact-heatmap [impactMap]="result.impactMap" />
   </section>
 
   <section class="scenario-result__section">
-    <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.impact.title') }}</h3>
+    <header class="scenario-result__section-header">
+      <span class="scenario-result__section-num">2</span>
+      <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.chain.title') }}</h3>
+    </header>
+    <app-causal-chain-view [chain]="result.consequenceChain" />
+  </section>
+
+  <section class="scenario-result__section">
+    <header class="scenario-result__section-header">
+      <span class="scenario-result__section-num">3</span>
+      <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.actions.title') }}</h3>
+    </header>
+    <ol class="scenario-result__actions">
+      @for (action of result.recommendedActions; track $index) {
+        <li class="scenario-result__action">
+          <span class="scenario-result__action-num">{{ $index + 1 }}</span>
+          <span>{{ action }}</span>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <details class="scenario-result__details">
+    <summary class="scenario-result__details-summary">
+      {{ i18n.t('scenarios.result.details.toggle') }}
+    </summary>
     <div class="scenario-result__impact-grid">
       @for (impact of result.impactMap; track impact.assetClass) {
         <div
@@ -33,128 +64,113 @@
             }}</span>
           </header>
           <div class="scenario-result__impact-confidence">
-            <span class="scenario-result__impact-confidence-label">{{
-              i18n.t('scenarios.result.impact.confidence.label')
-            }}</span>
+            <span class="scenario-result__impact-confidence-label">
+              {{ i18n.t('scenarios.result.impact.confidence.label') }}
+            </span>
             <app-confidence-gauge [value]="impact.confidence * 100" [size]="44" />
           </div>
-
           <app-evidence-panel [evidence]="impact.evidence" />
         </div>
       }
     </div>
-  </section>
+  </details>
 
-  <section class="scenario-result__section">
-    <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.chain.title') }}</h3>
-    <app-causal-chain-view [chain]="result.consequenceChain" />
-  </section>
-
-  <section class="scenario-result__section">
-    <h3 class="scenario-result__section-title">{{ i18n.t('scenarios.result.actions.title') }}</h3>
-    <ul class="scenario-result__actions">
-      @for (action of result.recommendedActions; track $index) {
-        <li class="scenario-result__action">
-          <span class="scenario-result__action-chevron" aria-hidden="true">›</span>
-          <span>{{ action }}</span>
-        </li>
-      }
-    </ul>
-  </section>
-
-  <p class="scenario-result__disclaimer">
-    <strong>{{ i18n.t('scenarios.result.disclaimer.label') }}:</strong> {{ result.disclaimer }}
-  </p>
-
-  <section class="scenario-result__briefing">
-    <p class="scenario-result__briefing-explain">
-      {{ i18n.t('scenarios.result.addToBriefing.explain') }}
-    </p>
-    <button type="button" class="scenario-result__briefing-action" (click)="onAddToBriefing()">
-      {{ i18n.t('scenarios.result.addToBriefing.action') }}
-    </button>
-    @if (briefingActionStatus === 'copied') {
-      <p class="scenario-result__briefing-status" role="status">
-        {{ i18n.t('scenarios.result.addToBriefing.copied') }}
-      </p>
-    }
-    @if (briefingActionStatus === 'error') {
-      <p
-        class="scenario-result__briefing-status scenario-result__briefing-status--error"
-        role="alert"
-      >
-        {{ i18n.t('scenarios.result.addToBriefing.error') }}
-      </p>
-    }
-  </section>
-
-  <section class="scenario-result__monitor">
-    <p class="scenario-result__monitor-explain">
-      {{ i18n.t('scenarios.result.monitor.explain') }}
+  <footer class="scenario-result__footer">
+    <p class="scenario-result__disclaimer">
+      <strong>{{ i18n.t('scenarios.result.disclaimer.label') }}:</strong> {{ result.disclaimer }}
     </p>
 
-    @if (isAuthenticated) {
-      @if (monitor && monitor.status !== 'expired') {
-        <div class="scenario-result__monitor-status" role="status">
-          <span
-            class="scenario-result__monitor-badge"
-            [class.scenario-result__monitor-badge--matched]="monitor.status === 'matched'"
-          >
-            {{ monitorStatusLabel(monitor.status) }}
-          </span>
-          @if (monitor.status === 'matched' && monitor.matchReason) {
-            <p class="scenario-result__monitor-reason">
-              <strong>{{ i18n.t('scenarios.result.monitor.matchReason.label') }}:</strong>
-              {{ monitor.matchReason }}
-            </p>
-          }
-        </div>
-        <button
-          type="button"
-          class="scenario-result__monitor-action"
-          [disabled]="isArmingMonitor"
-          (click)="onDisarmMonitor()"
-        >
-          {{
-            isArmingMonitor
-              ? i18n.t('scenarios.result.monitor.disarming')
-              : i18n.t('scenarios.result.monitor.disarm.action')
-          }}
+    <div class="scenario-result__footer-actions">
+      <section class="scenario-result__briefing">
+        <p class="scenario-result__briefing-explain">
+          {{ i18n.t('scenarios.result.addToBriefing.explain') }}
+        </p>
+        <button type="button" class="scenario-result__briefing-action" (click)="onAddToBriefing()">
+          {{ i18n.t('scenarios.result.copySummary.action') }}
         </button>
-      } @else {
-        @if (monitor?.status === 'expired') {
-          <p class="scenario-result__monitor-status" role="status">
-            <span class="scenario-result__monitor-badge">
-              {{ monitorStatusLabel('expired') }}
-            </span>
+        @if (briefingActionStatus === 'copied') {
+          <p class="scenario-result__briefing-status" role="status">
+            {{ i18n.t('scenarios.result.addToBriefing.copied') }}
           </p>
         }
-        <button
-          type="button"
-          class="scenario-result__monitor-action"
-          [disabled]="isArmingMonitor"
-          (click)="onArmMonitor()"
-        >
-          {{
-            isArmingMonitor
-              ? i18n.t('scenarios.result.monitor.arming')
-              : i18n.t('scenarios.result.monitor.arm.action')
-          }}
-        </button>
-      }
-      @if (monitorError) {
-        <p
-          class="scenario-result__monitor-status scenario-result__monitor-status--error"
-          role="alert"
-        >
-          {{ i18n.t('scenarios.result.monitor.error.banner') }}{{ monitorError }}
+        @if (briefingActionStatus === 'error') {
+          <p
+            class="scenario-result__briefing-status scenario-result__briefing-status--error"
+            role="alert"
+          >
+            {{ i18n.t('scenarios.result.addToBriefing.error') }}
+          </p>
+        }
+      </section>
+
+      <section class="scenario-result__monitor">
+        <p class="scenario-result__monitor-explain">
+          {{ i18n.t('scenarios.result.monitor.explain') }}
         </p>
-      }
-    } @else {
-      <p class="scenario-result__monitor-signin">
-        {{ i18n.t('scenarios.result.monitor.signInPrompt') }}
-        <a routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
-      </p>
-    }
-  </section>
+        @if (isAuthenticated) {
+          @if (monitor && monitor.status !== 'expired') {
+            <div class="scenario-result__monitor-status" role="status">
+              <span
+                class="scenario-result__monitor-badge"
+                [class.scenario-result__monitor-badge--matched]="monitor.status === 'matched'"
+              >
+                {{ monitorStatusLabel(monitor.status) }}
+              </span>
+              @if (monitor.status === 'matched' && monitor.matchReason) {
+                <p class="scenario-result__monitor-reason">
+                  <strong>{{ i18n.t('scenarios.result.monitor.matchReason.label') }}:</strong>
+                  {{ monitor.matchReason }}
+                </p>
+              }
+            </div>
+            <button
+              type="button"
+              class="scenario-result__monitor-action"
+              [disabled]="isArmingMonitor"
+              (click)="onDisarmMonitor()"
+            >
+              {{
+                isArmingMonitor
+                  ? i18n.t('scenarios.result.monitor.disarming')
+                  : i18n.t('scenarios.result.monitor.disarm.action')
+              }}
+            </button>
+          } @else {
+            @if (monitor?.status === 'expired') {
+              <p class="scenario-result__monitor-status" role="status">
+                <span class="scenario-result__monitor-badge">{{
+                  monitorStatusLabel('expired')
+                }}</span>
+              </p>
+            }
+            <button
+              type="button"
+              class="scenario-result__monitor-action"
+              [disabled]="isArmingMonitor"
+              (click)="onArmMonitor()"
+            >
+              {{
+                isArmingMonitor
+                  ? i18n.t('scenarios.result.monitor.arming')
+                  : i18n.t('scenarios.result.monitor.arm.action')
+              }}
+            </button>
+          }
+          @if (monitorError) {
+            <p
+              class="scenario-result__monitor-status scenario-result__monitor-status--error"
+              role="alert"
+            >
+              {{ i18n.t('scenarios.result.monitor.error.banner') }}{{ monitorError }}
+            </p>
+          }
+        } @else {
+          <p class="scenario-result__monitor-signin">
+            {{ i18n.t('scenarios.result.monitor.signInPrompt') }}
+            <a routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
+          </p>
+        }
+      </section>
+    </div>
+  </footer>
 </article>

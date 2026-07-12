@@ -12,6 +12,13 @@
     color: var(--color-text-muted);
   }
 
+  &__subtitle {
+    margin: calc(-1 * var(--space-2)) 0 0;
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+  }
+
   &__create,
   &__add {
     display: flex;
@@ -107,5 +114,24 @@
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--color-gold);
+  }
+}
+
+@media (max-width: 480px) {
+  .watchlist-manager__create,
+  .watchlist-manager__add {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .watchlist-manager__create .feature-input,
+  .watchlist-manager__add .feature-input {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .watchlist-manager__selected-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

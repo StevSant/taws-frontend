@@ -1,11 +1,14 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslationService } from '../../../../core';
 import {
+  ActivityFeedComponent,
+  ActivityFeedItem,
   ButtonComponent,
   EmptyStateComponent,
   FeaturePageHeaderComponent,
+  GuideNotesTabsComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
 import { AuthStore } from '../../../auth/application';
@@ -14,6 +17,9 @@ import { PresetPickerComponent } from '../preset-picker/preset-picker.component'
 import { ScenarioResultViewComponent } from '../scenario-result-view/scenario-result-view.component';
 
 const FREE_TEXT_MAX_LENGTH = 1000;
+
+/** Placeholder — no notes feature exists yet; keeps `app-guide-notes-tabs`'s Notes tab wired but empty. */
+const EMPTY_SCENARIO_NOTES: readonly string[] = [];
 
 /**
  * Scenario Lab page (issue #13, extended by #20, plus #34's "arm monitor"
@@ -42,25 +48,44 @@ const FREE_TEXT_MAX_LENGTH = 1000;
   selector: 'app-scenarios-page',
   standalone: true,
   imports: [
-    DatePipe,
     FormsModule,
+    ActivityFeedComponent,
     ButtonComponent,
     FeaturePageHeaderComponent,
+    GuideNotesTabsComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
     PresetPickerComponent,
     ScenarioResultViewComponent,
   ],
+  providers: [DatePipe],
   templateUrl: './scenarios-page.component.html',
   styleUrl: './scenarios-page.component.scss',
 })
 export class ScenariosPageComponent implements OnInit {
   readonly freeTextMaxLength = FREE_TEXT_MAX_LENGTH;
+  readonly scenarioNotes = EMPTY_SCENARIO_NOTES;
+
+  readonly guideSteps = computed(() => [
+    this.i18n.t('scenarios.guide.step1'),
+    this.i18n.t('scenarios.guide.step2'),
+    this.i18n.t('scenarios.guide.step3'),
+  ]);
+
+  readonly recentScenarioItems = computed<ActivityFeedItem[]>(() =>
+    this.store.recentScenarios().map((scenario) => ({
+      id: scenario.id,
+      title: scenario.title,
+      meta: this.datePipe.transform(scenario.createdAt, 'short') ?? scenario.createdAt,
+      active: this.store.result()?.id === scenario.id,
+    })),
+  );
 
   constructor(
     readonly store: ScenarioLabStore,
     readonly auth: AuthStore,
     readonly i18n: TranslationService,
+    private readonly datePipe: DatePipe,
   ) {}
 
   ngOnInit(): void {

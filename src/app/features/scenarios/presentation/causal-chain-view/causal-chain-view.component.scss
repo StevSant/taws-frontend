@@ -6,50 +6,8 @@
   &__hint {
     margin: 0;
     font-size: 0.75rem;
-    font-style: italic;
     color: var(--color-text-muted);
-  }
-
-  &__overview {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  &__overview-arrow {
-    color: var(--color-gold-border-hi);
-    font-family: var(--font-family-mono);
-  }
-
-  &__node,
-  &__edge-node {
-    padding: 0.25rem var(--space-3);
-    border-radius: var(--radius-full);
-    border: 1px solid var(--color-border);
-    background: var(--color-surface-raised);
-    color: var(--color-text-primary);
-    font-family: var(--font-family-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      border-color: var(--color-gold-border-hi);
-      opacity: 0.85;
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
-  }
-
-  &__node--selected,
-  &__edge-node--selected {
-    border-color: var(--color-gold-border-hi);
-    background: var(--color-gold-dim-bg);
-    color: var(--color-gold-bright);
+    line-height: 1.45;
   }
 
   &__empty {
@@ -59,110 +17,154 @@
     font-style: italic;
   }
 
-  &__edges {
+  &__timeline {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: 0;
   }
 
-  &__edge {
+  &__step {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-left: 2px solid var(--color-border);
+    margin-left: 0.75rem;
+    padding-left: var(--space-4);
+    position: relative;
+    transition: opacity 0.2s ease;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -0.45rem;
+      top: 1.25rem;
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      background: var(--color-gold);
+      border: 2px solid var(--color-surface);
+    }
+
+    &:last-child {
+      border-left-color: transparent;
+    }
+
+    &--highlighted {
+      .causal-chain__step-body {
+        background: var(--color-gold-dim-bg);
+        border-color: var(--color-gold-border);
+      }
+    }
+
+    &--dimmed {
+      opacity: 0.4;
+    }
+  }
+
+  &__step-num {
+    flex-shrink: 0;
+    width: 1.25rem;
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--color-gold-bright);
+    padding-top: 0.15rem;
+  }
+
+  &__step-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    min-width: 0;
+  }
+
+  &__nodes {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2);
-    border-radius: var(--radius-md);
-    transition:
-      opacity 0.2s ease,
-      background 0.2s ease;
   }
 
-  &__edge--highlighted {
-    background: var(--color-gold-dim-bg);
-  }
-
-  &__edge--dimmed {
-    opacity: 0.4;
-  }
-
-  &__edge-node {
-    font-size: 0.75rem;
-    flex-shrink: 0;
-  }
-
-  &__mechanism {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    flex: 1 1 260px;
-    min-width: 0;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
+  &__node {
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-full);
     border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text-secondary);
-    font-family: inherit;
-    text-align: left;
+    background: var(--color-surface-raised);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 
     &:hover {
-      border-color: var(--color-gold-border-hi);
-      opacity: 0.9;
+      border-color: var(--color-gold-border);
     }
 
-    &:active {
-      transform: scale(0.98);
-    }
-
-    // Confidence "size-coded" as border weight — a non-color cue, on top
-    // of the always-visible percentage badge.
-    &--low {
-      border-width: 1px;
-    }
-    &--medium {
-      border-width: 2px;
-    }
-    &--high {
-      border-width: 2px;
-      border-color: var(--color-gold-border-hi);
+    &--selected {
+      border-color: var(--color-gold);
       background: var(--color-gold-dim-bg);
+      color: var(--color-gold-bright);
     }
   }
 
-  &__mechanism-arrow {
-    flex-shrink: 0;
+  &__arrow {
     color: var(--color-gold);
     font-family: var(--font-family-mono);
     font-weight: 700;
   }
 
+  &__mechanism {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+    background: color-mix(in srgb, var(--color-surface-raised) 90%, transparent);
+    color: var(--color-text-secondary);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+      border-color: var(--color-gold-border);
+    }
+
+    &--expanded .causal-chain__mechanism-text {
+      -webkit-line-clamp: unset;
+    }
+  }
+
   &__mechanism-text {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1;
     font-size: 0.85rem;
-    line-height: 1.4;
+    line-height: 1.45;
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
   }
 
-  &__mechanism--expanded &__mechanism-text {
-    -webkit-line-clamp: unset;
-  }
-
   &__mechanism-confidence {
     flex-shrink: 0;
-    padding: 0.1rem var(--space-2);
+    padding: 0.1rem 0.45rem;
     border-radius: var(--radius-full);
     background: var(--color-gold-dim-bg);
     color: var(--color-gold-bright);
     font-family: var(--font-family-mono);
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     font-weight: 700;
   }
 }
