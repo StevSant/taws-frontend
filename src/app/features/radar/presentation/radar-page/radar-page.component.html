@@ -92,10 +92,7 @@
           <app-radar-market-score [marketScore]="overviewMarketScore()" />
         </div>
       </div>
-      <app-radar-macro-cards
-        [macro]="store.macroState()"
-        [marketPulse]="store.marketPulse()"
-      />
+      <app-radar-macro-cards [macro]="store.macroState()" [marketPulse]="store.marketPulse()" />
     </div>
 
     <section class="radar-page__macro-strip feature-panel">

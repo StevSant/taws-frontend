@@ -38,9 +38,8 @@ export class RadarMacroCardsComponent {
   strongestIndex(): MarketPulse['indices'][number] | null {
     const indices = this.marketPulse?.indices ?? [];
     return (
-      [...indices].sort(
-        (left, right) => Math.abs(right.changePct) - Math.abs(left.changePct),
-      )[0] ?? null
+      [...indices].sort((left, right) => Math.abs(right.changePct) - Math.abs(left.changePct))[0] ??
+      null
     );
   }
 
