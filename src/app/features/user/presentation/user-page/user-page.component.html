@@ -56,8 +56,8 @@
   </section>
 
   <section class="user-page__section feature-panel">
-    <h2 class="user-page__section-title">{{ i18n.t('telegram.botRegistration.title') }}</h2>
-    <app-bot-registration-panel />
+    <h2 class="user-page__section-title">{{ i18n.t('telegram.title') }}</h2>
+    <app-telegram-link-panel [isAuthenticated]="!!user()" />
   </section>
 
   <div class="user-page__actions">
