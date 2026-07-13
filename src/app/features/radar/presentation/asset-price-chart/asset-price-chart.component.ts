@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { TranslationService } from '../../../../core';
@@ -13,6 +14,7 @@ import { SpinnerComponent } from '../../../../shared';
 import {
   buildCandlestickSpec,
   ChartComponent,
+  ChartDateWindow,
   ChartRepository,
   ChartSpec,
   OhlcBar,
@@ -47,6 +49,9 @@ const MIN_CANDLES_FOR_CHART = 2;
 export class AssetPriceChartComponent {
   readonly symbol = input.required<string>();
   readonly fallbackCandles = input<OhlcBar[]>([]);
+
+  /** Bubbles the chart's selected date window up to the asset-detail page. */
+  readonly windowSelected = output<ChartDateWindow>();
 
   readonly i18n = inject(TranslationService);
   private readonly charts = inject(ChartRepository);

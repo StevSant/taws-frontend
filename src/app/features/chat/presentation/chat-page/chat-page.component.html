@@ -4,7 +4,6 @@
   [class.chat-page--listening]="oracleActivity() === 'listening'"
   [class.chat-page--streaming]="oracleActivity() === 'streaming'"
   [class.chat-page--conversation]="hasMessages()"
-  [class.chat-page--hero-collapsing]="heroCollapsing()"
   [class.chat-page--sessions]="auth.isAuthenticated()"
   [class.chat-page--sessions-open]="auth.isAuthenticated() && sessionsOpen()"
   [class.chat-page--rail-open]="auth.isAuthenticated() && railOpen()"
@@ -139,15 +138,8 @@
                     <li class="chat-page__message-row chat-page__message-row--assistant">
                       <div
                         class="chat-page__avatar"
-                        [attr.data-chat-avatar-anchor]="isLatestAssistant(message.id) ? true : null"
                         [class.chat-page__avatar--live]="
                           message.pending && isLatestAssistant(message.id)
-                        "
-                        [class.chat-page__avatar--hidden]="
-                          heroCollapsing() && isLatestAssistant(message.id)
-                        "
-                        [class.chat-page__avatar--settling]="
-                          avatarSettling() && isLatestAssistant(message.id)
                         "
                       >
                         @if (message.pending && isLatestAssistant(message.id)) {
@@ -308,6 +300,12 @@
                   } @else {
                     <li class="chat-page__message-row chat-page__message-row--user">
                       <article class="chat-page__bubble chat-page__bubble--user">
+                        @if (message.reference; as reference) {
+                          <app-chat-reference-chip
+                            class="chat-page__message-reference"
+                            [reference]="reference"
+                          />
+                        }
                         <div
                           class="chat-page__content taws-markdown"
                           [innerHTML]="message.content | markdown"
@@ -326,21 +324,6 @@
             </div>
           }
         </section>
-
-        @if (heroCollapsing()) {
-          <div
-            class="chat-page__hero-collapse"
-            [class.chat-page__hero-collapse--ready]="collapseReady()"
-            aria-hidden="true"
-            [style]="collapseStyle()"
-          >
-            <div class="chat-page__hero-collapse-corona">
-              <span class="chat-page__hero-collapse-glow"></span>
-              <span class="chat-page__hero-collapse-ring"></span>
-            </div>
-            <app-golden-polyhedron [size]="heroSize()" [activity]="oracleActivity()" />
-          </div>
-        }
       </div>
 
       <footer class="chat-page__footer">
@@ -358,6 +341,16 @@
             <p class="chat-page__voice-hint">{{ i18n.t('chat.voice.hint') }}</p>
           } @else if (!micAvailable && !hasMessages()) {
             <p class="chat-page__voice-hint">{{ i18n.t('chat.stt.unavailable') }}</p>
+          }
+
+          @if (store.pendingReference(); as reference) {
+            <div class="chat-page__pending-reference">
+              <app-chat-reference-chip
+                [reference]="reference"
+                [dismissable]="true"
+                (dismiss)="onDismissReference()"
+              />
+            </div>
           }
 
           <form class="chat-page__composer glass" (ngSubmit)="onSend()">

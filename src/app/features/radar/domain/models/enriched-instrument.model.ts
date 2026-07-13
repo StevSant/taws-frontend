@@ -22,4 +22,10 @@ export interface EnrichedInstrument {
   /** Downsampled closing prices (oldest → newest). */
   sparkline: number[];
   latestSignal: Signal | null;
+  /** Market capitalization in `currency` units. `null` when unavailable. */
+  marketCap: number | null;
+  /** Trailing 24h traded volume in `currency` units. `null` when unavailable. */
+  volume24h: number | null;
+  /** Trailing 7-day price change, as a percentage. `null` when unavailable. */
+  change7dPct: number | null;
 }

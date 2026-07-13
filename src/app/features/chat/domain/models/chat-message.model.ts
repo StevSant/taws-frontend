@@ -1,4 +1,5 @@
 import { ChartSpec } from '../../../../shared/charts';
+import { ChatReference } from './chat-reference.model';
 import { RoutingHop } from './routing-hop.model';
 import { ToolHopSnapshot } from './tool-call.model';
 
@@ -21,4 +22,6 @@ export interface ChatMessage {
   routingHops?: RoutingHop[];
   /** Tool hops captured during the turn (for transparency after streaming). */
   tools?: ToolHopSnapshot[];
+  /** Market/news the question was grounded on — rendered as a chip on the turn. */
+  reference?: ChatReference;
 }

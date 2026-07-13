@@ -8,6 +8,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 
@@ -33,6 +34,7 @@ import { ShellSearchService } from '../../../../layout/shell/shell-search.servic
 
 import {
   ChatMessage,
+  ChatNewsQuestion,
   ChatRepository,
   RoutingHop,
   ToolHopSnapshot,
@@ -68,13 +70,12 @@ import { ChartComponent } from '../../../../shared/charts';
 import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions-panel.component';
 
 import { ChatContextRailComponent } from '../chat-context-rail/chat-context-rail.component';
+import { ChatReferenceChipComponent } from '../chat-reference-chip/chat-reference-chip.component';
 
 import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
 
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
-const HERO_COLLAPSE_MS = 920;
-const AVATAR_SETTLE_MS = 380;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
@@ -121,6 +122,7 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ChatSessionsPanelComponent,
 
     ChatContextRailComponent,
+    ChatReferenceChipComponent,
 
     ChatQuickActionsComponent,
 
@@ -197,13 +199,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   /** Whether any dictation path works; hides the mic button otherwise. */
   readonly micAvailable = this.dictation.isSupported();
 
-  /** True while the hero orb animates down to avatar size on the first send. */
-  readonly heroCollapsing = signal(false);
-  /** Brief crossfade once the flying orb lands on the avatar slot. */
-  readonly avatarSettling = signal(false);
-  readonly collapseStyle = signal<Record<string, string>>({});
-  readonly collapseReady = signal(false);
-
   readonly sessionsOpen = signal(this.readSessionsPanelOpen());
 
   readonly railOpen = signal(this.readContextRailOpen());
@@ -226,10 +221,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   readonly oracleActivity = computed<OracleActivity>(() => {
     if (this.isListening()) {
       return 'listening';
-    }
-
-    if (this.heroCollapsing()) {
-      return 'composing';
     }
 
     if (this.store.isStreaming()) {
@@ -287,8 +278,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   private readonly composerInput = viewChild<ElementRef<HTMLInputElement>>('composerInput');
   private readonly messagesViewport = viewChild<ElementRef<HTMLElement>>('messagesViewport');
-  private heroCollapseTimer: ReturnType<typeof setTimeout> | null = null;
-  private avatarSettleTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     effect(() => {
@@ -297,6 +286,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       if (userId) {
         this.sessionsStore.bootstrap(userId);
         void this.syncSessionRoute(this.route.snapshot.paramMap.get('sessionId'));
+
+        // Apply a pending market/news reference AFTER the session is resolved, so the
+        // fresh chat it opens stays the active session (issue #73 follow-up). `untracked`
+        // keeps this one-shot consume from making the effect depend on the intent signal.
+        untracked(() => this.applyPendingReferenceIntent());
 
         return;
       }
@@ -445,8 +439,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     document.body.classList.remove('route-chat');
 
     this.dictation.cancelDictation();
-
-    this.clearHeroCollapseTimer();
   }
 
   onSend(): void {
@@ -460,11 +452,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     this.draft.set('');
 
-    const isFirstMessage = !this.hasMessages();
     void this.store.send(message);
-    if (isFirstMessage) {
-      this.beginHeroCollapse();
-    }
   }
 
   /**
@@ -488,12 +476,33 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.useSuggestion(suggestionKey as TranslationKey);
   }
 
-  onNewsQuestion(prompt: string): void {
+  onNewsQuestion(question: ChatNewsQuestion): void {
     if (!this.auth.isAuthenticated() || this.store.isStreaming()) {
       return;
     }
-    this.draft.set(prompt);
+    // Asking about a rail news item opens a fresh chat (issue #73 follow-up).
+    this.sessionsStore.createSession();
+    this.draft.set(question.prompt);
+    this.store.setReference(question.reference);
     this.focusComposer();
+  }
+
+  onDismissReference(): void {
+    this.store.clearReference();
+  }
+
+  /**
+   * Consumes a one-shot reference intent (from an asset/news detail "Preguntar a Midas")
+   * and opens a fresh chat grounded on it. Called from the bootstrap effect AFTER the
+   * session is resolved, so the new session is the final active one — not clobbered by
+   * the bootstrap that runs after `ngOnInit` (issue #73 follow-up).
+   */
+  private applyPendingReferenceIntent(): void {
+    const reference = this.shellSearch.consumeChatReferenceIntent();
+    if (reference) {
+      this.sessionsStore.createSession();
+      this.store.setReference(reference);
+    }
   }
 
   /**
@@ -534,59 +543,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     const current = this.draft().trim();
     this.draft.set(current ? `${current} ${clean}` : clean);
-  }
-
-  private beginHeroCollapse(): void {
-    this.heroCollapsing.set(true);
-    this.avatarSettling.set(false);
-    this.collapseReady.set(false);
-    this.collapseStyle.set({});
-    this.clearHeroCollapseTimer();
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => this.measureCollapsePath());
-    });
-
-    this.heroCollapseTimer = setTimeout(() => {
-      this.heroCollapsing.set(false);
-      this.collapseReady.set(false);
-      this.collapseStyle.set({});
-      this.avatarSettling.set(true);
-      this.avatarSettleTimer = setTimeout(() => {
-        this.avatarSettling.set(false);
-        this.avatarSettleTimer = null;
-      }, AVATAR_SETTLE_MS);
-    }, HERO_COLLAPSE_MS);
-  }
-
-  private measureCollapsePath(): void {
-    const frame = document.querySelector('.chat-page__frame')?.getBoundingClientRect();
-    const anchor = document.querySelector('[data-chat-avatar-anchor]')?.getBoundingClientRect();
-
-    const startX = frame ? frame.left + frame.width / 2 : window.innerWidth / 2;
-    const startY = frame ? frame.top + frame.height * 0.3 : window.innerHeight * 0.32;
-    const endX = anchor ? anchor.left + anchor.width / 2 : startX;
-    const endY = anchor ? anchor.top + anchor.height / 2 : startY + 140;
-
-    this.collapseStyle.set({
-      '--collapse-start-x': `${startX}px`,
-      '--collapse-start-y': `${startY}px`,
-      '--collapse-end-x': `${endX}px`,
-      '--collapse-end-y': `${endY}px`,
-      '--collapse-duration': `${HERO_COLLAPSE_MS}ms`,
-    });
-    this.collapseReady.set(true);
-  }
-
-  private clearHeroCollapseTimer(): void {
-    if (this.heroCollapseTimer !== null) {
-      clearTimeout(this.heroCollapseTimer);
-      this.heroCollapseTimer = null;
-    }
-    if (this.avatarSettleTimer !== null) {
-      clearTimeout(this.avatarSettleTimer);
-      this.avatarSettleTimer = null;
-    }
   }
 
   private readSessionsPanelOpen(): boolean {

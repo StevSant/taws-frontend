@@ -9,6 +9,25 @@ const CONFIG_MISSING_MESSAGE =
   'Supabase is not configured — set supabaseAnonKey in src/environments/environment.ts (get it from the Supabase dashboard: Project Settings -> API -> anon/public key). Auth is disabled until then.';
 
 /**
+ * Where the confirmation email sends the user back to. Derived from the
+ * running origin rather than config so a signup on localhost:4200 confirms
+ * back to localhost:4200 and one on the deployed site confirms back to the
+ * deployed site — without it, Supabase falls back to the project's single
+ * global Site URL and every environment lands on whichever one that is.
+ *
+ * Every origin used here must also be listed under Authentication -> URL
+ * Configuration -> Redirect URLs in the Supabase dashboard; Supabase ignores
+ * an `emailRedirectTo` that isn't on that allow-list and silently uses the
+ * Site URL instead.
+ *
+ * `/login` is the target because it already handles both outcomes: on success
+ * the SDK picks the session out of the URL hash and the page's effect
+ * forwards the now-authenticated user into the app; on failure (expired or
+ * already-used link) the user is left on a page where they can just sign in.
+ */
+const EMAIL_CONFIRM_REDIRECT_PATH = '/login';
+
+/**
  * Infrastructure adapter for AuthRepository, backed by the Supabase JS SDK.
  *
  * The SDK owns session persistence (localStorage) and access-token refresh
@@ -36,7 +55,13 @@ export class SupabaseAuthRepository extends AuthRepository {
   }
 
   async signUp(email: string, password: string): Promise<AuthSession | null> {
-    const { data, error } = await this.requireClient().auth.signUp({ email, password });
+    const { data, error } = await this.requireClient().auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}${EMAIL_CONFIRM_REDIRECT_PATH}`,
+      },
+    });
     if (error) {
       throw new Error(error.message);
     }

@@ -6,6 +6,8 @@ export { SignalReviewRepository } from './signal-review-repository';
 export type { AssetClass } from './models/asset-class.model';
 export { ASSET_CLASSES } from './models/asset-class.model';
 export type { Instrument } from './models/instrument.model';
+export type { CoinCandidate } from './models/coin-candidate.model';
+export type { RegisterInstrumentResult } from './models/register-instrument-result.model';
 export type { AssetSource } from './models/asset-source.model';
 export type { NewsItem } from './models/news-item.model';
 export type { NewsAssetImpact } from './models/news-asset-impact.model';

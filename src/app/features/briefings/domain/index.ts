@@ -1,9 +1,13 @@
 export { WatchlistRepository } from './watchlist-repository';
 export { BriefingRepository } from './briefing-repository';
 export { ReviewRepository } from './review-repository';
+export { RelevantNewsRepository } from './relevant-news-repository';
 export type { Watchlist } from './models/watchlist.model';
 export type { WatchlistItem } from './models/watchlist-item.model';
 export type { Briefing } from './models/briefing.model';
+export type { LinkedSignal } from './models/linked-signal.model';
+export type { SignalImpact } from './models/signal-impact.model';
 export type { ReviewDecision } from './models/review-decision.model';
 export { REVIEW_DECISIONS, TERMINAL_REVIEW_DECISIONS } from './models/review-decision.model';
 export type { ReviewState } from './models/review-state.model';
+export type { RelevantNews } from './models/relevant-news.model';

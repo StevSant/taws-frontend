@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { TranslationService } from '../../../../core';
 import { AddInstrumentStore } from '../../application';
 import { WatchlistItem } from '../../../briefings/domain';
-import { Instrument } from '../../domain';
+import { CoinCandidate, Instrument } from '../../domain';
 
 /**
  * "Agregar instrumento" picker (issue #60). Replaces the old dead-end link to /briefings:
@@ -40,6 +40,16 @@ export class RadarAddInstrumentCardComponent implements OnInit {
 
   onAdd(instrument: Instrument): void {
     void this.store.add(instrument.symbol);
+  }
+
+  /** Search CoinGecko for the current query (explicit trigger — avoids per-keystroke API calls). */
+  onSearchCoinGecko(): void {
+    void this.store.search(this.store.query());
+  }
+
+  /** Register a searched coin into the global catalog and follow it. */
+  onRegister(candidate: CoinCandidate): void {
+    void this.store.registerAndFollow(candidate);
   }
 
   onRemove(item: WatchlistItem): void {

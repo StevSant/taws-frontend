@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { TranslationService } from '../../../core';
 import { ChartComponent, ChartSpec } from '../../../shared/charts';
-import { GoldenPolyhedronComponent, MidasGlyphComponent } from '../../../shared';
+import { GoldenPolyhedronComponent, MidasLogoComponent } from '../../../shared';
 import { PolyhedronActivity } from '../../../shared/golden-polyhedron/polyhedron-activity.model';
 import { RealtimeConnectionState } from '../domain';
 
@@ -38,7 +38,7 @@ const ORB_SIZE = 240;
 @Component({
   selector: 'app-voice-mode-overlay',
   standalone: true,
-  imports: [GoldenPolyhedronComponent, MidasGlyphComponent, ChartComponent],
+  imports: [GoldenPolyhedronComponent, MidasLogoComponent, ChartComponent],
   templateUrl: './voice-mode-overlay.component.html',
   styleUrl: './voice-mode-overlay.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

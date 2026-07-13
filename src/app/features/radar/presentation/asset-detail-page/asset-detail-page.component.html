@@ -49,6 +49,12 @@
           <span class="asset-detail__source-link-icon" aria-hidden="true">&#8599;</span>
         </a>
 
+        <app-button
+          class="asset-detail__ask-midas"
+          [label]="i18n.t('chat.reference.ask')"
+          (pressed)="onAskMidas()"
+        />
+
         <div class="asset-detail__watchlist">
           <app-button
             [label]="
@@ -122,7 +128,19 @@
 
     <section class="asset-detail__chart feature-panel">
       <h2 class="asset-detail__section-title">{{ i18n.t('radar.detail.asset.priceChart') }}</h2>
-      <app-asset-price-chart [symbol]="instrument.symbol" [fallbackCandles]="store.candles()" />
+      <app-asset-price-chart
+        [symbol]="instrument.symbol"
+        [fallbackCandles]="store.candles()"
+        (windowSelected)="onChartWindow($event)"
+      />
+      @if (selectedWindow(); as window) {
+        <div class="asset-detail__ask-why">
+          <app-button [label]="i18n.t('radar.detail.askWhy')" (pressed)="onAskWhy()" />
+          <span class="asset-detail__ask-why-range"
+            >{{ window.fromDate }} → {{ window.toDate }}</span
+          >
+        </div>
+      }
     </section>
 
     <section class="asset-detail__signal feature-panel">
@@ -140,11 +158,18 @@
             {{ confidencePercent(signal.confidence) }}%</span
           >
         </div>
+        <!-- `canRegenerate` is what makes the "análisis no disponible" state a way out rather
+             than a dead end (issue #21): a classified signal with no thesis/drivers/risks can
+             be re-run from here. `SignalAnalysisComponent` only shows it in that state. -->
         <app-signal-analysis
           [thesis]="signal.thesis"
           [keyDrivers]="signal.keyDrivers"
           [riskFactors]="signal.riskFactors"
           [analysisAvailable]="signal.analysisAvailable"
+          [canRegenerate]="true"
+          [isRegenerating]="store.isGenerating()"
+          [regenerateError]="store.generateError()"
+          (regenerate)="onGenerate()"
         />
       } @else {
         <p class="asset-detail__no-signal">{{ i18n.t('radar.detail.noSignal') }}</p>
@@ -157,6 +182,11 @@
           [disabled]="store.isGenerating()"
           (pressed)="onGenerate()"
         />
+        @if (store.generateError(); as generateError) {
+          <span class="asset-detail__generate-error" role="alert"
+            >{{ i18n.t('radar.analysis.regenerateError') }} {{ generateError }}</span
+          >
+        }
       }
     </section>
 

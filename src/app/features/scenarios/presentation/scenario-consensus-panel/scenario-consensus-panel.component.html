@@ -1,0 +1,109 @@
+@if (completedContributions().length || consensus()) {
+  <section class="committee" aria-labelledby="scenario-committee-title">
+    <header class="committee__header">
+      <div>
+        <span class="committee__eyebrow">{{ i18n.t('scenarios.result.committee.eyebrow') }}</span>
+        <h3 id="scenario-committee-title">{{ i18n.t('scenarios.result.committee.title') }}</h3>
+      </div>
+      <p>{{ i18n.t('scenarios.result.committee.notVote') }}</p>
+    </header>
+
+    @if (completedContributions().length) {
+      <div class="committee__grid">
+        @for (item of completedContributions(); track item.agentId) {
+          <article class="committee__card">
+            <header class="committee__agent">
+              <app-midas-glyph
+                [glyph]="glyph(item.agentId)"
+                [size]="38"
+                [animated]="false"
+                aria-hidden="true"
+              />
+              <div>
+                <h4>{{ agentLabel(item.agentId) }}</h4>
+                <span>
+                  {{ i18n.t('scenarios.result.committee.confidence') }}
+                  {{ confidence(item.confidence) }}
+                </span>
+              </div>
+            </header>
+            <p class="committee__thesis">{{ item.thesis }}</p>
+            @if (item.keyFindings.length) {
+              <h5>{{ i18n.t('scenarios.result.committee.findings') }}</h5>
+              <ul>
+                @for (finding of item.keyFindings; track $index) {
+                  <li>{{ finding }}</li>
+                }
+              </ul>
+            }
+            @if (item.risks.length) {
+              <h5>{{ i18n.t('scenarios.result.committee.risks') }}</h5>
+              <ul class="committee__risks">
+                @for (risk of item.risks; track $index) {
+                  <li>{{ risk }}</li>
+                }
+              </ul>
+            }
+            @if (item.uncertainty) {
+              <p class="committee__uncertainty">
+                <strong>{{ i18n.t('scenarios.result.committee.uncertainty') }}:</strong>
+                {{ item.uncertainty }}
+              </p>
+            }
+          </article>
+        }
+      </div>
+    }
+
+    @if (failedCount()) {
+      <p class="committee__omissions" role="note">
+        {{ failedCount() }} {{ i18n.t('scenarios.result.committee.omitted') }}
+      </p>
+    }
+
+    @if (consensus(); as finalConsensus) {
+      <article class="committee__consensus">
+        <header>
+          <app-midas-glyph
+            glyph="brand-midas-sigil"
+            [size]="46"
+            [animated]="false"
+            aria-hidden="true"
+          />
+          <div>
+            <span>{{ i18n.t('scenarios.result.consensus.eyebrow') }}</span>
+            <h4>{{ i18n.t('scenarios.result.consensus.title') }}</h4>
+          </div>
+          <strong>{{ confidence(finalConsensus.confidence) }}</strong>
+        </header>
+        <p>{{ finalConsensus.summary }}</p>
+        <blockquote>{{ finalConsensus.conclusion }}</blockquote>
+        <div class="committee__consensus-columns">
+          @if (finalConsensus.agreements.length) {
+            <section>
+              <h5>{{ i18n.t('scenarios.result.consensus.agreements') }}</h5>
+              <ul>
+                @for (agreement of finalConsensus.agreements; track $index) {
+                  <li>{{ agreement }}</li>
+                }
+              </ul>
+            </section>
+          }
+          @if (finalConsensus.disagreements.length || finalConsensus.uncertainties.length) {
+            <section>
+              <h5>{{ i18n.t('scenarios.result.consensus.disagreements') }}</h5>
+              <ul>
+                @for (item of finalConsensus.disagreements; track $index) {
+                  <li>{{ item }}</li>
+                }
+                @for (item of finalConsensus.uncertainties; track $index) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </section>
+          }
+        </div>
+      </article>
+    }
+  </section>
+}

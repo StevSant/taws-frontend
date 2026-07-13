@@ -21,6 +21,8 @@ import { ScenarioSymbolChartComponent } from '../scenario-symbol-chart/scenario-
 import { CausalChainViewComponent } from '../causal-chain-view/causal-chain-view.component';
 import { EvidencePanelComponent } from '../evidence-panel/evidence-panel.component';
 import { ImpactHeatmapComponent } from '../impact-heatmap/impact-heatmap.component';
+import { ScenarioPipelineTracePanelComponent } from '../scenario-pipeline-trace-panel/scenario-pipeline-trace-panel.component';
+import { ScenarioConsensusPanelComponent } from '../scenario-consensus-panel/scenario-consensus-panel.component';
 
 const IMPACT_DIRECTION_LABELS: Record<ImpactDirection, TranslationKey> = {
   positive: 'scenarios.result.impact.direction.positive',
@@ -78,6 +80,8 @@ const MONITOR_STATUS_LABELS: Record<ScenarioMonitorStatus, TranslationKey> = {
     ConfidenceGaugeComponent,
     ChartComponent,
     ScenarioSymbolChartComponent,
+    ScenarioPipelineTracePanelComponent,
+    ScenarioConsensusPanelComponent,
   ],
   templateUrl: './scenario-result-view.component.html',
   styleUrl: './scenario-result-view.component.scss',
