@@ -1,9 +1,7 @@
 <div class="feature-page macro-detail">
-  <a
-    class="macro-detail__back"
-    routerLink="/radar"
-    (click)="onBack($event)"
-  >← {{ i18n.t('radar.macro.detail.back') }}</a>
+  <a class="macro-detail__back" routerLink="/radar" (click)="onBack($event)"
+    >← {{ i18n.t('radar.macro.detail.back') }}</a
+  >
 
   @if (descriptor(); as descriptor) {
     <header class="macro-detail__hero">
