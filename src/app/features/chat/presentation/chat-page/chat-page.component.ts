@@ -35,7 +35,6 @@ import { ShellSearchService } from '../../../../layout/shell/shell-search.servic
 import {
   ChatMessage,
   ChatNewsQuestion,
-  ChatRepository,
   RoutingHop,
   ToolHopSnapshot,
   formatToolName,
@@ -44,10 +43,9 @@ import {
   specialistRoutingHops,
 } from '../../domain';
 
-import { SseChatRepository } from '../../infrastructure';
-
 import {
   AudioPlaybackStore,
+  DictationErrorReason,
   DictationStore,
   prefersReducedMotion,
   SpeechToTextProvider,
@@ -71,11 +69,18 @@ import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions
 
 import { ChatContextRailComponent } from '../chat-context-rail/chat-context-rail.component';
 import { ChatReferenceChipComponent } from '../chat-reference-chip/chat-reference-chip.component';
+import { ChatCitationsPanelComponent } from '../chat-citations-panel/chat-citations-panel.component';
 
 import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
 
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
+
+/**
+ * How close (in px) the viewport's scroll must be to the bottom to count as "following"
+ * the conversation. Above this gap the user has scrolled up to read, so auto-scroll pauses.
+ */
+const NEAR_BOTTOM_PX = 80;
 
 const AGENT_LABEL_KEYS: Record<string, TranslationKey> = {
   supervisor: 'chat.agent.supervisor',
@@ -103,6 +108,17 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
   streaming: 'chat.oracle.status.streaming',
 };
 
+/**
+ * Maps a classified dictation failure to a cause-specific hint. Everything the
+ * providers can't tell apart lands on `failed` (the generic message).
+ */
+const DICTATION_ERROR_KEYS: Record<DictationErrorReason, TranslationKey> = {
+  'permission-denied': 'chat.stt.permissionDenied',
+  unsupported: 'chat.stt.unavailable',
+  'server-unavailable': 'chat.stt.serverUnavailable',
+  failed: 'chat.stt.error',
+};
+
 @Component({
   selector: 'app-chat-page',
 
@@ -123,6 +139,7 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
 
     ChatContextRailComponent,
     ChatReferenceChipComponent,
+    ChatCitationsPanelComponent,
 
     ChatQuickActionsComponent,
 
@@ -132,11 +149,13 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
   ],
 
   providers: [
-    ChatSessionsStore,
-
+    // `ChatSessionsStore` and the `ChatRepository` binding are intentionally NOT provided here —
+    // both are app-wide (root). The store is `providedIn: 'root'` so the live transcript (and its
+    // client-side charts) survives navigation; because a root service can only resolve root
+    // dependencies, its `ChatRepository` must live at root too (see `app.config.ts`, alongside
+    // every other feature repository). `ChatStore` stays page-scoped: it only holds transient
+    // per-turn streaming state and reads messages from the root sessions store.
     ChatStore,
-
-    { provide: ChatRepository, useClass: SseChatRepository },
 
     // Hybrid TTS: HTTP server voice with a transparent Web Speech fallback.
     // The store depends only on the TextToSpeechProvider port; the composite
@@ -196,6 +215,23 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   /** True while voice dictation is capturing — drives the mic/oracle UI. */
   readonly isListening = computed(() => this.dictation.isRecording());
 
+  /** True during the transcription round-trip after recording stops. */
+  readonly isTranscribing = computed(() => this.dictation.isTranscribing());
+
+  /** Elapsed recording time as `m:ss`, ticking once per second, for the live capture status. */
+  readonly recordingElapsedLabel = computed(() => {
+    const total = this.dictation.elapsedSeconds();
+    const minutes = Math.floor(total / 60);
+    const seconds = total % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  });
+
+  /** Cause-specific dictation error message, or empty when there is no error. */
+  readonly dictationErrorMessage = computed(() => {
+    const reason = this.dictation.error();
+    return reason ? this.i18n.t(DICTATION_ERROR_KEYS[reason]) : '';
+  });
+
   /** Whether any dictation path works; hides the mic button otherwise. */
   readonly micAvailable = this.dictation.isSupported();
 
@@ -212,6 +248,30 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   };
 
   readonly hasMessages = computed(() => this.store.messages().length > 0);
+
+  /**
+   * True while auto-scroll should keep pinning to the newest content. Flipped off when the
+   * user scrolls up to read, and back on when they return near the bottom, switch sessions,
+   * send a message, or tap the jump-to-latest button.
+   */
+  readonly autoFollow = signal(true);
+
+  /** Set while WE drive the scroll, so the scroll listener ignores our own scroll events. */
+  private programmaticScroll = false;
+
+  /** Id of the newest assistant message — memoized so per-row template calls stay O(1). */
+  readonly latestAssistantId = computed(() => {
+    const messages = this.store.messages();
+    for (let index = messages.length - 1; index >= 0; index--) {
+      if (messages[index].role === 'assistant') {
+        return messages[index].id;
+      }
+    }
+    return null;
+  });
+
+  /** Shows the jump-to-latest affordance only once the user has scrolled away from the tail. */
+  readonly showJumpToLatest = computed(() => !this.autoFollow() && this.hasMessages());
 
   readonly heroSize = computed(() => HERO_SIZE_IDLE);
   readonly avatarSize = AVATAR_SIZE;
@@ -284,13 +344,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       const userId = this.auth.user()?.id;
 
       if (userId) {
-        this.sessionsStore.bootstrap(userId);
-        void this.syncSessionRoute(this.route.snapshot.paramMap.get('sessionId'));
-
-        // Apply a pending market/news reference AFTER the session is resolved, so the
-        // fresh chat it opens stays the active session (issue #73 follow-up). `untracked`
-        // keeps this one-shot consume from making the effect depend on the intent signal.
-        untracked(() => this.applyPendingReferenceIntent());
+        // The session list comes from the server now, so the route can only be resolved
+        // once it has landed — everything after `bootstrap` awaits it. `untracked` keeps
+        // the effect depending on the signed-in user ONLY: the async continuation reads
+        // the sessions signal, which the streaming turn mutates on every token.
+        untracked(() => void this.bootstrapSessions(userId));
 
         return;
       }
@@ -299,17 +357,87 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     });
 
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      if (!this.auth.user()?.id) {
+      // Before the list has loaded there is nothing to resolve a route param against;
+      // `bootstrapSessions` syncs the route itself once it lands.
+      if (!this.auth.user()?.id || !this.sessionsStore.isReady()) {
         return;
       }
       void this.syncSessionRoute(params.get('sessionId'));
     });
 
+    // Follow-scroll on new content — but only while the user is at the tail. The thinking
+    // label is deliberately NOT a dependency (it changes on every routing/tool tick and used
+    // to yank the viewport); async growth like late-rendering charts is handled by the
+    // observer effect below instead.
     effect(() => {
       this.store.messages();
       this.store.isStreaming();
-      this.thinkingStatusLabel();
-      queueMicrotask(() => this.scrollToLatest());
+      if (!this.autoFollow()) {
+        return;
+      }
+      queueMicrotask(() => this.scrollToLatest('auto'));
+    });
+
+    // Track the user's scroll intent and re-pin on container growth. Re-runs whenever the
+    // conditionally-rendered viewport (@if hasMessages) mounts or remounts.
+    effect((onCleanup) => {
+      const viewport = this.messagesViewport()?.nativeElement;
+      if (!viewport) {
+        return;
+      }
+
+      const onScroll = (): void => {
+        if (this.programmaticScroll) {
+          return;
+        }
+        const distance = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+        this.autoFollow.set(distance < NEAR_BOTTOM_PX);
+      };
+      viewport.addEventListener('scroll', onScroll, { passive: true });
+
+      const repin = (): void => {
+        if (this.autoFollow()) {
+          this.scrollToLatest('auto');
+        }
+      };
+
+      // A ResizeObserver on the scroll container only catches viewport resizes; content
+      // growth (streaming text, charts) grows the message rows, so observe those too and
+      // keep the set current via a MutationObserver on the list's children.
+      const resizeObserver =
+        typeof ResizeObserver !== 'undefined' ? new ResizeObserver(repin) : null;
+      resizeObserver?.observe(viewport);
+      for (const child of Array.from(viewport.children)) {
+        resizeObserver?.observe(child);
+      }
+
+      const mutationObserver =
+        typeof MutationObserver !== 'undefined'
+          ? new MutationObserver((records) => {
+              for (const record of records) {
+                record.addedNodes.forEach((node) => {
+                  if (node instanceof Element) {
+                    resizeObserver?.observe(node);
+                  }
+                });
+              }
+              repin();
+            })
+          : null;
+      mutationObserver?.observe(viewport, { childList: true });
+
+      onCleanup(() => {
+        viewport.removeEventListener('scroll', onScroll);
+        resizeObserver?.disconnect();
+        mutationObserver?.disconnect();
+      });
+    });
+
+    // Switching conversations re-pins to the bottom of the newly active thread.
+    effect(() => {
+      this.sessionsStore.activeSessionId();
+      this.autoFollow.set(true);
+      queueMicrotask(() => this.scrollToLatest('auto'));
     });
   }
 
@@ -368,9 +496,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   isLatestAssistant(messageId: string): boolean {
-    const assistants = this.store.messages().filter((m) => m.role === 'assistant');
-
-    return assistants[assistants.length - 1]?.id === messageId;
+    return this.latestAssistantId() === messageId;
   }
 
   isThinkingMessage(messageId: string, pending: boolean, content: string): boolean {
@@ -452,7 +578,16 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     this.draft.set('');
 
+    // Sending is an explicit intent to watch the reply — always re-pin.
+    this.autoFollow.set(true);
+
     void this.store.send(message);
+  }
+
+  /** Explicit user request to re-attach to the live tail (jump-to-latest button). */
+  jumpToLatest(): void {
+    this.autoFollow.set(true);
+    this.scrollToLatest('smooth');
   }
 
   /**
@@ -512,6 +647,12 @@ export class ChatPageComponent implements OnInit, OnDestroy {
    * fallback is handled inside DictationStore's provider.
    */
   async toggleDictation(): Promise<void> {
+    // Ignore clicks while the previous capture is still being transcribed —
+    // otherwise a new recording would start on top of an in-flight round-trip.
+    if (this.dictation.isTranscribing()) {
+      return;
+    }
+
     if (!this.canCompose() || !this.micAvailable) {
       return;
     }
@@ -581,6 +722,17 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Loads the signed-in user's conversations from the server, then resolves the route
+   * against them. A pending market/news reference is applied LAST, so the fresh chat it
+   * opens stays the active session (issue #73 follow-up).
+   */
+  private async bootstrapSessions(userId: string): Promise<void> {
+    await this.sessionsStore.bootstrap(userId);
+    await this.syncSessionRoute(this.route.snapshot.paramMap.get('sessionId'));
+    this.applyPendingReferenceIntent();
+  }
+
   private async syncSessionRoute(sessionId: string | null): Promise<void> {
     const resolvedId = this.sessionsStore.resolveSessionRoute(sessionId);
     if (sessionId !== resolvedId) {
@@ -590,12 +742,22 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private scrollToLatest(): void {
+  private scrollToLatest(behavior: ScrollBehavior = 'auto'): void {
     const viewport = this.messagesViewport()?.nativeElement;
     if (!viewport) {
       return;
     }
-    viewport.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
+    // Guard the scroll listener against the event our own scrollTo emits, then release it on
+    // the next frame so genuine user scrolls resume flipping `autoFollow`.
+    this.programmaticScroll = true;
+    viewport.scrollTo({ top: viewport.scrollHeight, behavior });
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => {
+        this.programmaticScroll = false;
+      });
+    } else {
+      this.programmaticScroll = false;
+    }
   }
 
   private nextMessageId(): string {

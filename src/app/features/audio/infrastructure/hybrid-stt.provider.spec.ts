@@ -100,7 +100,7 @@ describe('HybridSpeechToTextProvider', () => {
     expect(transcript).toBe('server text');
   });
 
-  it('falls back to Web Speech when the HTTP provider throws on stop (e.g. 503)', async () => {
+  it('surfaces an HTTP transcription failure instead of starting a late empty fallback', async () => {
     const { provider, httpStop, webStart, webStop } = buildProvider({
       sttEnabled: true,
       httpStop: () => Promise.reject(new Error('503')),
@@ -108,13 +108,11 @@ describe('HybridSpeechToTextProvider', () => {
     });
 
     await provider.start();
-    const transcript = await provider.stop();
+    await expect(provider.stop()).rejects.toThrow('503');
 
     expect(httpStop).toHaveBeenCalled();
-    // On HTTP failure the fallback re-runs a fresh Web Speech capture.
-    expect(webStart).toHaveBeenCalled();
-    expect(webStop).toHaveBeenCalled();
-    expect(transcript).toBe('fallback text');
+    expect(webStart).not.toHaveBeenCalled();
+    expect(webStop).not.toHaveBeenCalled();
   });
 
   it('skips the HTTP provider entirely when STT is disabled', async () => {

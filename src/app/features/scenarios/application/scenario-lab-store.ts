@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { ScenarioMonitor, ScenarioPreset, ScenarioRepository, ScenarioResult } from '../domain';
 import { formatScenarioForBriefing } from './format-scenario-for-briefing';
@@ -270,6 +271,11 @@ export class ScenarioLabStore {
   }
 
   private toErrorMessage(error: unknown): string {
+    // HttpErrorResponse is not `instanceof Error`, so it must be handled first or every
+    // backend failure collapses into the generic fallback instead of its real detail.
+    if (error instanceof HttpErrorResponse) {
+      return error.error?.detail ?? error.message ?? 'Unknown error while running the scenario';
+    }
     return error instanceof Error ? error.message : 'Unknown error while running the scenario';
   }
 }

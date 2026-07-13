@@ -59,4 +59,8 @@ export const routes: Routes = [
       },
     ],
   },
+  // Catch-all. Without it an unmatched URL renders nothing at all — a blank white page with
+  // no nav and no error, which is exactly what a stale or malformed notification deep link
+  // used to produce. Send anything unrecognized to the radar instead.
+  { path: '**', redirectTo: '' },
 ];

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { AppConfigService, AuthTokenService } from '../../../core';
+import { AppConfigService, AuthTokenService, TranslationService } from '../../../core';
 import { ChartSpec } from '../../../shared/charts';
 import {
   RealtimeEvent,
@@ -72,6 +72,7 @@ interface RealtimeSessionResponse {
 export class RealtimeWebrtcService extends RealtimeSessionProvider {
   private readonly config = inject(AppConfigService);
   private readonly authToken = inject(AuthTokenService);
+  private readonly translation = inject(TranslationService);
 
   private listener: ((event: RealtimeEvent) => void) | null = null;
   private pc: RTCPeerConnection | null = null;
@@ -246,7 +247,14 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
    * other non-2xx is a generic transient failure the user can retry.
    */
   private async mintSession(): Promise<RealtimeSessionResponse> {
-    const response = await fetch(`${this.config.apiBaseUrl}${SESSION_PATH}`, {
+    // Send the active UI locale so the voice agent speaks the language the user picked.
+    // Without it the backend fell back to its default and the session was minted with an
+    // English-only prompt, so the assistant answered Spanish users in English. Same
+    // precedence as the text chat: explicit locale > stored preference > backend default.
+    const url = `${this.config.apiBaseUrl}${SESSION_PATH}?locale=${encodeURIComponent(
+      this.translation.locale(),
+    )}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: this.backendHeaders(),
     });

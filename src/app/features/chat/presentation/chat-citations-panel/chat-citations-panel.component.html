@@ -1,18 +1,35 @@
-@if (citations().length > 0) {
+@if (displayCitations().length > 0) {
   <aside class="chat-citations" [attr.aria-label]="i18n.t('chat.citations.title')">
     <span class="chat-citations__title">{{ i18n.t('chat.citations.title') }}</span>
     <div class="chat-citations__list">
-      @for (citation of citations(); track citation.url; let index = $index) {
-        <a
-          class="chat-citations__item"
-          [href]="citation.url"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="chat-citations__index">{{ index + 1 }}</span>
-          <span class="chat-citations__label">{{ citation.label }}</span>
-          <span class="chat-citations__external" aria-hidden="true">↗</span>
-        </a>
+      @for (citation of displayCitations(); track citation.key; let index = $index) {
+        @if (citation.url) {
+          <a
+            class="chat-citations__item"
+            [href]="citation.url"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="chat-citations__index">{{ index + 1 }}</span>
+            <span class="chat-citations__text">
+              <span class="chat-citations__label">{{ citation.label }}</span>
+              @if (citation.detail) {
+                <span class="chat-citations__detail">{{ citation.detail }}</span>
+              }
+            </span>
+            <span class="chat-citations__external" aria-hidden="true">↗</span>
+          </a>
+        } @else {
+          <div class="chat-citations__item chat-citations__item--computed">
+            <span class="chat-citations__index">{{ index + 1 }}</span>
+            <span class="chat-citations__text">
+              <span class="chat-citations__label">{{ citation.label }}</span>
+              @if (citation.detail) {
+                <span class="chat-citations__detail">{{ citation.detail }}</span>
+              }
+            </span>
+          </div>
+        }
       }
     </div>
   </aside>

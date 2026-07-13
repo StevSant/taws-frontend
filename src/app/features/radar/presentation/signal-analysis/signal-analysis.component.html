@@ -2,29 +2,73 @@
   <div class="signal-analysis">
     <span class="signal-analysis__eyebrow">{{ i18n.t('radar.analysis.title') }}</span>
 
+    <div
+      class="signal-analysis__tablist"
+      role="tablist"
+      [attr.aria-label]="i18n.t('radar.analysis.title')"
+      (keydown)="onTablistKeydown($event)"
+    >
+      @for (tab of availableTabs(); track tab) {
+        <button
+          type="button"
+          role="tab"
+          class="signal-analysis__tab"
+          [class.signal-analysis__tab--active]="activeTab() === tab"
+          [id]="tabId(tab)"
+          [attr.aria-selected]="activeTab() === tab"
+          [attr.aria-controls]="panelId(tab)"
+          [attr.tabindex]="activeTab() === tab ? 0 : -1"
+          (click)="select(tab)"
+        >
+          <span class="signal-analysis__tab-label">{{ i18n.t(tabLabelKey(tab)) }}</span>
+          @if (tabCount(tab); as count) {
+            <span class="signal-analysis__tab-count">{{ count }}</span>
+          }
+        </button>
+      }
+    </div>
+
     @if (hasThesis()) {
-      <div class="signal-analysis__block">
-        <span class="signal-analysis__label">{{ i18n.t('radar.analysis.thesis') }}</span>
-        <p class="signal-analysis__thesis">{{ thesis }}</p>
+      <div
+        class="signal-analysis__panel"
+        role="tabpanel"
+        tabindex="0"
+        [id]="panelId('thesis')"
+        [attr.aria-labelledby]="tabId('thesis')"
+        [hidden]="activeTab() !== 'thesis'"
+      >
+        <p class="signal-analysis__thesis">{{ thesis() }}</p>
       </div>
     }
 
-    @if (keyDrivers.length > 0) {
-      <div class="signal-analysis__block">
-        <span class="signal-analysis__label">{{ i18n.t('radar.analysis.drivers') }}</span>
+    @if (keyDrivers().length > 0) {
+      <div
+        class="signal-analysis__panel"
+        role="tabpanel"
+        tabindex="0"
+        [id]="panelId('drivers')"
+        [attr.aria-labelledby]="tabId('drivers')"
+        [hidden]="activeTab() !== 'drivers'"
+      >
         <ul class="signal-analysis__list signal-analysis__list--drivers">
-          @for (driver of keyDrivers; track driver) {
+          @for (driver of keyDrivers(); track driver) {
             <li class="signal-analysis__item">{{ driver }}</li>
           }
         </ul>
       </div>
     }
 
-    @if (riskFactors.length > 0) {
-      <div class="signal-analysis__block">
-        <span class="signal-analysis__label">{{ i18n.t('radar.analysis.risks') }}</span>
+    @if (riskFactors().length > 0) {
+      <div
+        class="signal-analysis__panel"
+        role="tabpanel"
+        tabindex="0"
+        [id]="panelId('risks')"
+        [attr.aria-labelledby]="tabId('risks')"
+        [hidden]="activeTab() !== 'risks'"
+      >
         <ul class="signal-analysis__list signal-analysis__list--risks">
-          @for (risk of riskFactors; track risk) {
+          @for (risk of riskFactors(); track risk) {
             <li class="signal-analysis__item">{{ risk }}</li>
           }
         </ul>
@@ -38,18 +82,18 @@
     }}</span>
     <p class="signal-analysis__unavailable-hint">{{ i18n.t('radar.analysis.unavailableHint') }}</p>
 
-    @if (canRegenerate) {
+    @if (canRegenerate()) {
       <div class="signal-analysis__regenerate">
         <app-button
           [label]="
-            isRegenerating
+            isRegenerating()
               ? i18n.t('radar.analysis.regenerating')
               : i18n.t('radar.analysis.regenerate')
           "
-          [disabled]="isRegenerating"
+          [disabled]="isRegenerating()"
           (pressed)="onRegenerate()"
         />
-        @if (regenerateError; as error) {
+        @if (regenerateError(); as error) {
           <span class="signal-analysis__regenerate-error" role="alert"
             >{{ i18n.t('radar.analysis.regenerateError') }} {{ error }}</span
           >

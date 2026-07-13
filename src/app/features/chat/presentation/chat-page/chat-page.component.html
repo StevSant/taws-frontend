@@ -234,6 +234,13 @@
                         }
 
                         @if (!message.pending && message.content) {
+                          <app-chat-citations-panel
+                            [citations]="message.citations ?? []"
+                            [content]="message.content"
+                          />
+                        }
+
+                        @if (!message.pending && message.content) {
                           <footer class="chat-page__bubble-actions">
                             <button
                               type="button"
@@ -315,12 +322,48 @@
                   }
                 }
               </ul>
+
+              @if (showJumpToLatest()) {
+                <button
+                  type="button"
+                  class="chat-page__jump-latest"
+                  [attr.aria-label]="i18n.t('chat.jumpToLatest')"
+                  (click)="jumpToLatest()"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 5v14M5 12l7 7 7-7" />
+                  </svg>
+                  <span>{{ i18n.t('chat.jumpToLatest') }}</span>
+                </button>
+              }
             </div>
           }
 
           @if (store.error(); as error) {
             <div class="chat-page__error" role="alert">
               {{ i18n.t('chat.error.banner') }}{{ error }}
+            </div>
+          }
+
+          @if (sessionsStore.missingSessionNotice()) {
+            <div class="chat-page__notice" role="status">
+              <span>{{ i18n.t('chat.sessions.missingNotice') }}</span>
+              <button
+                type="button"
+                class="chat-page__notice-dismiss"
+                (click)="sessionsStore.dismissMissingSessionNotice()"
+                [attr.aria-label]="i18n.t('chat.sessions.missingNotice.dismiss')"
+              >
+                ×
+              </button>
             </div>
           }
         </section>
@@ -333,9 +376,18 @@
               {{ i18n.t('chat.auth.signInPrompt') }}
               <a routerLink="/login">{{ i18n.t('shell.auth.login') }}</a>
             </p>
+          } @else if (isListening()) {
+            <p class="chat-page__voice-hint chat-page__voice-hint--recording" role="status">
+              <span class="chat-page__recording-dot" aria-hidden="true"></span>
+              {{ i18n.t('chat.stt.listening') }} {{ recordingElapsedLabel() }}
+            </p>
+          } @else if (isTranscribing()) {
+            <p class="chat-page__voice-hint chat-page__voice-hint--active" role="status">
+              {{ i18n.t('chat.stt.transcribing') }}
+            </p>
           } @else if (dictation.error()) {
             <p class="chat-page__voice-hint chat-page__voice-hint--error" role="alert">
-              {{ i18n.t('chat.stt.error') }}
+              {{ dictationErrorMessage() }}
             </p>
           } @else if (micAvailable && !hasMessages()) {
             <p class="chat-page__voice-hint">{{ i18n.t('chat.voice.hint') }}</p>
@@ -359,12 +411,18 @@
                 type="button"
                 class="chat-page__voice-btn"
                 [class.chat-page__voice-btn--active]="isListening()"
+                [class.chat-page__voice-btn--transcribing]="isTranscribing()"
                 [class.chat-page__voice-btn--reduced-motion]="reducedMotion"
                 [attr.aria-label]="
-                  isListening() ? i18n.t('chat.stt.stop') : i18n.t('chat.stt.start')
+                  isTranscribing()
+                    ? i18n.t('chat.stt.transcribing')
+                    : isListening()
+                      ? i18n.t('chat.stt.stop')
+                      : i18n.t('chat.stt.start')
                 "
                 [attr.aria-pressed]="isListening()"
-                [disabled]="!canCompose() && !isListening()"
+                [attr.aria-busy]="isTranscribing()"
+                [disabled]="(!canCompose() && !isListening()) || isTranscribing()"
                 (click)="toggleDictation()"
               >
                 <svg
@@ -374,7 +432,10 @@
                   stroke-width="1.8"
                   aria-hidden="true"
                 >
-                  @if (isListening()) {
+                  @if (isTranscribing()) {
+                    <circle cx="12" cy="12" r="8" stroke-opacity="0.3" />
+                    <path d="M12 4a8 8 0 0 1 8 8" stroke-linecap="round" />
+                  } @else if (isListening()) {
                     <rect x="7" y="7" width="10" height="10" rx="1.5" />
                   } @else {
                     <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z" />
@@ -416,6 +477,10 @@
               </svg>
             </button>
           </form>
+
+          <p class="chat-page__disclaimer" aria-hidden="false">
+            {{ i18n.t('shell.footer.disclaimer') }}
+          </p>
         </div>
       </footer>
     </div>

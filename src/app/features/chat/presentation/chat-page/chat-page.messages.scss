@@ -1,12 +1,61 @@
 // Conversation thread: messages, avatars, bubbles, welcome, and content.
 .chat-page {
   &__conversation {
+    position: relative;
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
     overflow: hidden;
     mask-image: linear-gradient(to bottom, transparent 0, #000 0.75rem, #000 100%);
+  }
+
+  &__jump-latest {
+    position: absolute;
+    left: 50%;
+    bottom: var(--space-3);
+    transform: translateX(-50%);
+    z-index: 5;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-gold-border-hi);
+    background: color-mix(in srgb, var(--color-surface-raised) 88%, var(--color-gold) 12%);
+    color: var(--color-gold);
+    font-family: var(--font-family-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow:
+      0 6px 20px rgba(212, 160, 23, 0.24),
+      inset 0 1px 0 color-mix(in srgb, var(--color-gold) 22%, transparent);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease;
+
+    &:hover {
+      transform: translateX(-50%) translateY(-1px);
+      border-color: var(--color-gold-bright);
+      background: var(--color-gold-dim-bg);
+      box-shadow:
+        0 10px 26px rgba(212, 160, 23, 0.3),
+        inset 0 1px 0 color-mix(in srgb, var(--color-gold) 28%, transparent);
+    }
+
+    &:active {
+      transform: translateX(-50%) scale(0.97);
+    }
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
   }
 
   &--conversation &__messages {
@@ -518,5 +567,30 @@
     color: var(--color-loss);
     font-family: var(--font-family-mono);
     font-size: 0.85rem;
+  }
+
+  &__notice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-gold) 12%, var(--color-surface));
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+    color: var(--color-gold-bright, var(--color-gold));
+    font-family: var(--font-family-mono);
+    font-size: 0.85rem;
+  }
+
+  &__notice-dismiss {
+    flex-shrink: 0;
+    padding: 0 var(--space-2);
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
   }
 }

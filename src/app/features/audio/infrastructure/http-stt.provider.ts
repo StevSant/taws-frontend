@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AppConfigService, AuthTokenService } from '../../../core';
-import { SpeechToTextProvider } from '../domain';
+import { DictationError, SpeechToTextProvider } from '../domain';
 
 const TRANSCRIBE_PATH = '/api/v1/chat/transcribe';
 const AUDIO_FILE_NAME = 'dictation.webm';
@@ -16,9 +16,13 @@ interface TranscriptionResponse {
  * `{apiBaseUrl}/api/v1/chat/transcribe` with `fetch` (mirroring
  * SseChatRepository's/HttpTtsProvider's auth-header handling).
  *
- * On a non-OK response (including 503 when STT is unconfigured) it THROWS so
- * DictationStore can transparently fall back to the Web Speech adapter. The
- * microphone tracks are always released on stop/cancel to free the device.
+ * On a non-OK response it THROWS a `DictationError` the store maps to a
+ * cause-specific hint: 503 (STT unconfigured) → `server-unavailable`, a denied
+ * mic prompt → `permission-denied`. There is no runtime replay through Web
+ * Speech — two-phase STT can't re-feed already-captured audio to the live
+ * recognizer, so the hybrid picks a path at `start()` and a late HTTP failure is
+ * surfaced, not retried (see HybridSpeechToTextProvider). The microphone tracks
+ * are always released on stop/cancel to free the device.
  */
 @Injectable()
 export class HttpSttProvider extends SpeechToTextProvider {
@@ -40,7 +44,18 @@ export class HttpSttProvider extends SpeechToTextProvider {
 
   async start(): Promise<void> {
     this.chunks = [];
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (error) {
+      // A blocked/dismissed permission prompt rejects with NotAllowedError (or
+      // the legacy PermissionDeniedError / SecurityError). Classify it so the UI
+      // can tell the user to allow the mic instead of showing a generic failure.
+      if (this.isPermissionError(error)) {
+        throw new DictationError('permission-denied', 'Microphone permission was denied');
+      }
+      throw error;
+    }
     this.stream = stream;
 
     try {
@@ -112,11 +127,28 @@ export class HttpSttProvider extends SpeechToTextProvider {
     });
 
     if (!response.ok) {
+      // 503 is the server's explicit "STT not configured" signal (see the
+      // backend /transcribe endpoint); classify it so the UI can say dictation
+      // is unavailable rather than blaming speech recognition generically.
+      if (response.status === 503) {
+        throw new DictationError('server-unavailable', 'Server speech-to-text is not configured');
+      }
       throw new Error(`STT request failed with status ${response.status}`);
     }
 
     const payload = (await response.json()) as TranscriptionResponse;
     return payload.text ?? '';
+  }
+
+  private isPermissionError(error: unknown): boolean {
+    if (typeof DOMException !== 'undefined' && error instanceof DOMException) {
+      return error.name === 'NotAllowedError' || error.name === 'SecurityError';
+    }
+    // Some browsers throw a plain object/Error whose `name` still carries the code.
+    return (
+      error instanceof Error &&
+      (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError')
+    );
   }
 
   private releaseStream(): void {

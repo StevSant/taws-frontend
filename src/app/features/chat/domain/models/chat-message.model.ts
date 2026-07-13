@@ -1,5 +1,6 @@
 import { ChartSpec } from '../../../../shared/charts';
 import { ChatReference } from './chat-reference.model';
+import { ChatCitation } from './chat-citation.model';
 import { RoutingHop } from './routing-hop.model';
 import { ToolHopSnapshot } from './tool-call.model';
 
@@ -16,6 +17,7 @@ export interface ChatMessage {
   content: string;
   pending?: boolean;
   charts?: ChartSpec[];
+  citations?: ChatCitation[];
   /** Specialist that authored the reply (when known). */
   agent?: string;
   /** Specialists that participated in the turn (for tags after streaming). */

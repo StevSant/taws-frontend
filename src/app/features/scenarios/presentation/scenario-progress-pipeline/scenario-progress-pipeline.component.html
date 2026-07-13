@@ -1,0 +1,17 @@
+<ol class="scenario-pipeline">
+  @for (step of steps(); track step.label) {
+    <li
+      class="scenario-pipeline__step"
+      [class.scenario-pipeline__step--pending]="step.state === 'pending'"
+      [class.scenario-pipeline__step--active]="step.state === 'active'"
+      [class.scenario-pipeline__step--done]="step.state === 'done'"
+      [class.scenario-pipeline__step--error]="step.state === 'error'"
+      [attr.aria-current]="step.state === 'active' ? 'step' : null"
+    >
+      <span class="scenario-pipeline__marker" aria-hidden="true">
+        <span class="scenario-pipeline__dot"></span>
+      </span>
+      <span class="scenario-pipeline__label">{{ step.label }}</span>
+    </li>
+  }
+</ol>

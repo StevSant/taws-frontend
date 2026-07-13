@@ -8,16 +8,15 @@ import { WebSpeechSttProvider } from './web-speech-stt.provider';
  * Composite SpeechToTextProvider that implements the hybrid strategy so the
  * application store depends only on the port:
  *
- * - `sttEnabled` → capture via the server HTTP provider; if its `stop()` throws
- *   (e.g. a 503 when STT is misconfigured, or a network error), transparently
- *   fall back to a fresh Web Speech capture when that path is supported.
+ * - `sttEnabled` → capture via the server HTTP provider when supported.
  * - `!sttEnabled` → use the Web Speech provider directly, without POSTing audio
  *   to the server just to receive a 503.
  *
- * Because STT is two-phase (start → stop), the recorded HTTP audio cannot be
- * replayed through Web Speech after an HTTP failure; the fallback therefore
- * re-runs a short fresh Web Speech capture. `supported` reports whether ANY
- * path can run so the composer can hide the mic otherwise.
+ * STT is two-phase (start → stop), so a failed HTTP recording cannot be replayed
+ * through Web Speech after the user has finished speaking. The failure is surfaced
+ * to the store instead of starting and immediately stopping a late, empty capture.
+ * `supported` reports whether any path can run so the composer can hide the mic
+ * otherwise.
  *
  * Bound via `{ provide: SpeechToTextProvider, useClass: HybridSpeechToTextProvider }`.
  */
@@ -54,13 +53,6 @@ export class HybridSpeechToTextProvider extends SpeechToTextProvider {
 
     try {
       return await this.httpProvider.stop();
-    } catch (error: unknown) {
-      if (!this.webSpeechProvider.supported) {
-        throw error;
-      }
-      // The HTTP recording is unusable; capture a fresh short Web Speech pass.
-      await this.webSpeechProvider.start();
-      return this.webSpeechProvider.stop();
     } finally {
       this.usingHttp = false;
     }

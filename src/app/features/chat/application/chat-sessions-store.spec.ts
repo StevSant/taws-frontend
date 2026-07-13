@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChartSpec } from '../../../shared/charts';
-import { ChatSession } from '../domain/models/chat-session.model';
+import { ChatMessage, ChatRepository, Conversation, ConversationSummary } from '../domain';
 import { ChatSessionsStore } from './chat-sessions-store';
 
 const TEST_CHART: ChartSpec = {
@@ -17,27 +18,129 @@ const TEST_CHART: ChartSpec = {
   },
 };
 
+const SUMMARY: ConversationSummary = {
+  id: 'session-1',
+  title: 'Existing chat',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+};
+
+const CONVERSATION: Conversation = {
+  ...SUMMARY,
+  messages: [{ id: 'old', role: 'user', content: 'Earlier message' }],
+};
+
+function buildStore(overrides: Partial<ChatRepository> = {}) {
+  const listConversations = vi.fn(() => Promise.resolve<ConversationSummary[]>([SUMMARY]));
+  const getConversation = vi.fn((_id: string) => Promise.resolve<Conversation>(CONVERSATION));
+  const deleteConversation = vi.fn((_id: string) => Promise.resolve());
+  const generateTitle = vi.fn((_messages: readonly ChatMessage[], _threadId: string) =>
+    Promise.resolve('Apple outlook'),
+  );
+
+  TestBed.resetTestingModule();
+  TestBed.configureTestingModule({
+    providers: [
+      ChatSessionsStore,
+      {
+        provide: ChatRepository,
+        useValue: {
+          streamReply: vi.fn(),
+          listConversations,
+          getConversation,
+          deleteConversation,
+          generateTitle,
+          ...overrides,
+        },
+      },
+    ],
+  });
+
+  return {
+    store: TestBed.inject(ChatSessionsStore),
+    listConversations,
+    getConversation,
+    deleteConversation,
+    generateTitle,
+  };
+}
+
 describe('ChatSessionsStore', () => {
   const userId = 'history-user';
-  const storageKey = `taws.chat.sessions.${userId}`;
-  let store: ChatSessionsStore;
 
   beforeEach(() => {
     localStorage.clear();
-    const session: ChatSession = {
-      id: 'session-1',
-      title: 'Existing chat',
-      messages: [{ id: 'old', role: 'user', content: 'Earlier message' }],
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    };
-    localStorage.setItem(storageKey, JSON.stringify([session]));
-    store = new ChatSessionsStore();
-    store.bootstrap(userId);
-    store.resolveSessionRoute(session.id);
   });
 
-  it('appends realtime messages to the active session and persists charts', () => {
+  it('loads the session list from the server, not from localStorage', async () => {
+    const { store, listConversations } = buildStore();
+
+    await store.bootstrap(userId);
+
+    expect(listConversations).toHaveBeenCalledTimes(1);
+    expect(store.sessions().map((session) => session.id)).toEqual(['session-1']);
+    expect(store.isReady()).toBe(true);
+  });
+
+  it('degrades to an empty sidebar when the list request fails', async () => {
+    const { store } = buildStore({
+      listConversations: vi.fn(() => Promise.reject(new Error('offline'))),
+    });
+
+    await store.bootstrap(userId);
+
+    expect(store.sessions()).toEqual([]);
+    expect(store.isReady()).toBe(true);
+  });
+
+  it('rehydrates the transcript from the server when a session is opened', async () => {
+    const { store, getConversation } = buildStore();
+    await store.bootstrap(userId);
+
+    store.resolveSessionRoute('session-1');
+    await vi.waitFor(() => expect(store.activeMessages().length).toBe(1));
+
+    expect(getConversation).toHaveBeenCalledWith('session-1');
+    expect(store.activeMessages()[0]).toMatchObject({ role: 'user', content: 'Earlier message' });
+  });
+
+  it('deletes the conversation on the server', async () => {
+    const { store, deleteConversation } = buildStore();
+    await store.bootstrap(userId);
+    store.resolveSessionRoute('session-1');
+
+    store.deleteSession('session-1');
+
+    expect(deleteConversation).toHaveBeenCalledWith('session-1');
+    expect(store.sessions().some((session) => session.id === 'session-1')).toBe(false);
+  });
+
+  it('keeps streamed messages in memory without writing to localStorage', async () => {
+    const { store } = buildStore();
+    await store.bootstrap(userId);
+    store.resolveSessionRoute('session-1');
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+
+    store.syncActiveMessages([
+      { id: 'token-turn', role: 'assistant', content: 'Hel', pending: true },
+    ]);
+    store.syncActiveMessages([
+      { id: 'token-turn', role: 'assistant', content: 'Hello', pending: true },
+    ]);
+
+    expect(store.activeMessages()).toEqual([
+      { id: 'token-turn', role: 'assistant', content: 'Hello', pending: true },
+    ]);
+    expect(setItem).not.toHaveBeenCalled();
+    setItem.mockRestore();
+  });
+
+  it('appends realtime messages to the active session and keeps their charts', async () => {
+    const { store } = buildStore();
+    await store.bootstrap(userId);
+    store.resolveSessionRoute('session-1');
+    await vi.waitFor(() => expect(store.activeMessages().length).toBe(1));
+
     store.appendActiveMessages([
       { id: 'voice-user', role: 'user', content: 'Show me Apple' },
       {
@@ -59,13 +162,24 @@ describe('ChatSessionsStore', () => {
       charts: [TEST_CHART],
       pending: false,
     });
+  });
 
-    const persisted = JSON.parse(localStorage.getItem(storageKey) ?? '[]') as ChatSession[];
-    expect(persisted[0].messages.map((message) => message.id)).toEqual([
-      'old',
-      'voice-user',
-      'voice-assistant',
+  it('asks the backend to title a thread once it has a complete exchange', async () => {
+    const { store, generateTitle } = buildStore();
+    await store.bootstrap(userId);
+    const sessionId = store.createSession();
+
+    store.replaceActiveMessages([
+      { id: 'u', role: 'user', content: 'How is AAPL doing?' },
+      { id: 'a', role: 'assistant', content: 'Up 2% today.' },
     ]);
-    expect(persisted[0].messages.at(-1)?.charts).toEqual([TEST_CHART]);
+
+    await vi.waitFor(() => expect(generateTitle).toHaveBeenCalledTimes(1));
+    expect(generateTitle.mock.calls[0][1]).toBe(sessionId);
+    await vi.waitFor(() =>
+      expect(store.sessions().find((session) => session.id === sessionId)?.title).toBe(
+        'Apple outlook',
+      ),
+    );
   });
 });

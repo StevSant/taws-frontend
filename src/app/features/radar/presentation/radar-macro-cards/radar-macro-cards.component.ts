@@ -4,6 +4,9 @@ import { TranslationKey, TranslationService } from '../../../../core';
 import { FearGreedArcGaugeComponent } from '../../../../shared';
 import { FearGreedClassification, MacroState, MarketPulse } from '../../domain';
 
+/** Rendered in place of a delta/percentage the API returned as null (thin/absent series). */
+const MISSING_VALUE = '—';
+
 const CLASSIFICATION_KEYS: Record<FearGreedClassification, TranslationKey> = {
   extreme_fear: 'radar.macro.fearGreed.extremeFear',
   fear: 'radar.macro.fearGreed.fear',
@@ -40,7 +43,10 @@ export class RadarMacroCardsComponent {
     return this.i18n.t(CLASSIFICATION_KEYS[classification]);
   }
 
-  deltaLabel(delta: number): string {
+  deltaLabel(delta: number | null | undefined): string {
+    if (delta === null || delta === undefined || Number.isNaN(delta)) {
+      return MISSING_VALUE;
+    }
     const sign = delta > 0 ? '+' : '';
     return `${sign}${delta.toFixed(0)}`;
   }
@@ -53,7 +59,10 @@ export class RadarMacroCardsComponent {
     );
   }
 
-  percentageLabel(value: number): string {
+  percentageLabel(value: number | null | undefined): string {
+    if (value === null || value === undefined || Number.isNaN(value)) {
+      return MISSING_VALUE;
+    }
     const sign = value >= 0 ? '+' : '';
     return `${sign}${value.toFixed(2)}%`;
   }

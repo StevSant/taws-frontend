@@ -1,25 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { AppConfigService, AuthTokenService, TranslationService } from '../../../core';
-import { AgentTrace, ChatReference, ChatRepository, ChatStreamEvent, ToolCall } from '../domain';
-import { ChartSpec } from '../../../shared/charts';
+import { ChatReference, ChatStreamEvent } from '../domain';
+import { ChatStreamFrame } from './chat-stream-frame';
+import { mapChatStreamFrame } from './map-chat-stream-frame';
 
 const CHAT_STREAM_PATH = '/api/v1/chat/stream';
 const SSE_DATA_PREFIX = 'data:';
 
-/** Shape of a decoded SSE-v2 frame's JSON payload — see backend `chat.py`'s `_to_sse`. */
-interface ChatStreamFrame {
-  t?: string;
-  trace?: AgentTrace;
-  tool?: ToolCall;
-  chart?: ChartSpec;
-  error?: string;
-  done?: boolean;
-}
-
 /**
- * Infrastructure adapter for ChatRepository. Calls the backend SSE-v2
- * endpoint with `fetch` and reads the `ReadableStream` body directly (no
- * EventSource, since EventSource can't send a POST body/JSON payload).
+ * The streaming half of the ChatRepository adapter — composed by `HttpChatRepository`,
+ * which is what's bound to the port (the other half, conversation history, is plain JSON
+ * over `HttpClient`). Calls the backend SSE-v2 endpoint with `fetch` and reads the
+ * `ReadableStream` body directly (no EventSource, since EventSource can't send a POST
+ * body/JSON payload).
  *
  * Parses `data: <json>` lines per the SSE-v2 wire protocol and maps each
  * frame kind to a `ChatStreamEvent`:
@@ -28,10 +21,11 @@ interface ChatStreamFrame {
  * - `{"error": "<message>"}` -> `{ kind: 'error', message }`, then the stream ends
  * - `{"done": true}`        -> the stream ends (no event emitted)
  *
- * Bound to ChatRepository in chat-page.component.ts's `providers`.
+ * The backend persists both turns of the exchange onto `thread_id` as it streams, so
+ * nothing here has to save the transcript.
  */
 @Injectable()
-export class SseChatRepository extends ChatRepository {
+export class SseChatRepository {
   private readonly config = inject(AppConfigService);
   private readonly authToken = inject(AuthTokenService);
   private readonly translation = inject(TranslationService);
@@ -40,12 +34,24 @@ export class SseChatRepository extends ChatRepository {
     input: string,
     threadId: string,
     reference?: ChatReference,
+    signal?: AbortSignal,
   ): AsyncIterable<ChatStreamEvent> {
-    const response = await fetch(`${this.config.apiBaseUrl}${CHAT_STREAM_PATH}`, {
-      method: 'POST',
-      headers: this.buildHeaders(),
-      body: JSON.stringify(this.buildBody(input, threadId, reference)),
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${this.config.apiBaseUrl}${CHAT_STREAM_PATH}`, {
+        method: 'POST',
+        headers: this.buildHeaders(),
+        body: JSON.stringify(this.buildBody(input, threadId, reference)),
+        signal,
+      });
+    } catch (error: unknown) {
+      // A caller-initiated abort (component destroyed mid-turn) is not a failure — end
+      // the stream silently instead of surfacing an error to the UI.
+      if (this.isAbortError(error)) {
+        return;
+      }
+      throw error;
+    }
 
     if (!response.ok || !response.body) {
       throw new Error(`Chat stream request failed with status ${response.status}`);
@@ -75,30 +81,35 @@ export class SseChatRepository extends ChatRepository {
           if (frame.done) {
             return;
           }
-          if (frame.error !== undefined) {
-            yield { kind: 'error', message: frame.error };
-            return;
-          }
-          if (frame.trace !== undefined) {
-            yield { kind: 'trace', trace: frame.trace };
-            continue;
-          }
-          if (frame.tool !== undefined) {
-            yield { kind: 'tool', tool: frame.tool };
-            continue;
-          }
-          if (frame.chart !== undefined) {
-            yield { kind: 'chart', chart: frame.chart };
-            continue;
-          }
-          if (frame.t !== undefined) {
-            yield { kind: 'token', text: frame.t };
+          const event = mapChatStreamFrame(frame);
+          if (event !== null) {
+            yield event;
+            if (event.kind === 'error') return;
           }
         }
+      }
+
+      // Flush the tail: a final frame that arrived without a trailing newline is still
+      // sitting in `buffer` when the reader signals done, so its token/event would be
+      // dropped without this.
+      const tail = this.parseDataLine(buffer);
+      if (tail !== null && !tail.done) {
+        const event = mapChatStreamFrame(tail);
+        if (event !== null) {
+          yield event;
+        }
+      }
+    } catch (error: unknown) {
+      if (!this.isAbortError(error)) {
+        throw error;
       }
     } finally {
       reader.releaseLock();
     }
+  }
+
+  private isAbortError(error: unknown): boolean {
+    return (error instanceof DOMException || error instanceof Error) && error.name === 'AbortError';
   }
 
   /**

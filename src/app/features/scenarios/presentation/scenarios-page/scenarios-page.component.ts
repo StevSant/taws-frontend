@@ -15,6 +15,7 @@ import {
 import { NotesPanelComponent } from '../../../notes/presentation';
 import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
 import { PresetPickerComponent } from '../preset-picker/preset-picker.component';
+import { ScenarioProgressPipelineComponent } from '../scenario-progress-pipeline/scenario-progress-pipeline.component';
 
 const FREE_TEXT_MAX_LENGTH = 1000;
 
@@ -53,6 +54,7 @@ const FREE_TEXT_MAX_LENGTH = 1000;
     SkeletonCardComponent,
     EmptyStateComponent,
     PresetPickerComponent,
+    ScenarioProgressPipelineComponent,
     NotesPanelComponent,
   ],
   providers: [DatePipe],
@@ -71,6 +73,14 @@ export class ScenariosPageComponent implements OnInit {
     this.i18n.t('scenarios.freeform.example.btc'),
     this.i18n.t('scenarios.freeform.example.nvda'),
     this.i18n.t('scenarios.freeform.example.rates'),
+  ]);
+
+  /** Ordered agent stages fed to the progress pipeline while a scenario runs. */
+  readonly progressSteps = computed(() => [
+    this.i18n.t('scenarios.progress.intake'),
+    this.i18n.t('scenarios.progress.data'),
+    this.i18n.t('scenarios.progress.quant'),
+    this.i18n.t('scenarios.progress.synthesis'),
   ]);
 
   readonly recentScenarioItems = computed<ActivityFeedItem[]>(() =>

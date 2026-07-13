@@ -239,7 +239,11 @@ function comparisonOption(
 ): EChartsOption {
   const palette = [theme.gold, theme.gain, theme.loss, theme.textSecondary];
   return {
-    legend: { textStyle: { color: theme.textSecondary } },
+    // `selectedMode: false` keeps the legend as a read-only colour key. It is interactive by
+    // default in ECharts, so clicking a series name toggled it off — and toggling the only
+    // (or the last visible) series left the whole chart blank, which read as "the chart
+    // disappeared". These are analytical comparisons, not layers to show/hide.
+    legend: { textStyle: { color: theme.textSecondary }, selectedMode: false },
     xAxis: {
       type: 'time',
       axisLine: { lineStyle: { color: theme.grid } },

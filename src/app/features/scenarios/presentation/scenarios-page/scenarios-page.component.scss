@@ -193,38 +193,6 @@
     background: var(--color-gold-dim-bg);
   }
 
-  &__progress-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-2);
-    margin: var(--space-3) 0 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: progress;
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      color: var(--color-text-secondary);
-      font-size: 0.75rem;
-      counter-increment: progress;
-
-      &::before {
-        display: grid;
-        width: 1.35rem;
-        height: 1.35rem;
-        place-items: center;
-        border-radius: var(--radius-full);
-        background: var(--color-gold);
-        color: var(--color-background);
-        content: counter(progress);
-        font-size: 0.62rem;
-        font-weight: 800;
-      }
-    }
-  }
-
   &__sidebar {
     display: flex;
     flex-direction: column;
@@ -232,6 +200,33 @@
     position: sticky;
     top: var(--space-4);
     max-height: calc(100dvh - 8rem);
+    min-height: 0;
+    overflow: hidden;
+
+    // Keep the recent-simulations feed inside the sticky panel: it fills the
+    // leftover height and scrolls internally, so a long history never spills
+    // past the sidebar at any viewport height. The feed's header stays pinned;
+    // only its list scrolls, with the app's thin gold scrollbar.
+    app-activity-feed {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+
+      ::ng-deep .activity-feed {
+        flex: 1 1 auto;
+        min-height: 0;
+      }
+
+      ::ng-deep .activity-feed__list {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-gold-border) transparent;
+      }
+    }
   }
 
   &__history-title {

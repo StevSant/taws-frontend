@@ -63,9 +63,34 @@
     &--error {
       color: var(--color-danger, #d14343);
     }
+
+    // In-progress transcription: gold, to read as an active state rather than a passive tip.
+    &--active {
+      color: var(--color-gold);
+    }
+
+    // Live capture: gold, with tabular digits so the ticking m:ss timer does not jitter width.
+    &--recording {
+      color: var(--color-gold);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  // Blinking dot beside the "Escuchando… m:ss" status — a second, textual "recording" cue for
+  // when the composer button is out of the user's focus.
+  &__recording-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.35rem;
+    border-radius: var(--radius-full);
+    background: var(--color-gold);
+    vertical-align: middle;
+    animation: recordingBlink 1.1s ease-in-out infinite;
   }
 
   &__voice-btn {
+    position: relative;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -100,8 +125,41 @@
       box-shadow: 0 0 18px rgba(212, 160, 23, 0.45);
       animation: voicePulse 1.1s ease-in-out infinite;
 
-      // The recording cue is visual only; suppress it for reduced motion.
+      // A gold ring pinging outward from the button — an unmistakable "recording" cue layered
+      // on top of the scale pulse, so the live capture state never reads as inert.
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        animation: voiceRingPulse 1.6s ease-out infinite;
+      }
+
+      // The recording cue is visual only; suppress the pulse and ping for reduced motion —
+      // the gold fill + stop glyph still read the button as active.
       &.chat-page__voice-btn--reduced-motion {
+        animation: none;
+
+        &::after {
+          animation: none;
+          box-shadow: none;
+        }
+      }
+    }
+
+    // Transcription round-trip: distinct from recording — a spinning ring, not a pulse.
+    &--transcribing {
+      border-color: var(--color-gold-border-hi);
+      background: var(--color-gold-dim-bg);
+      color: var(--color-gold);
+
+      svg {
+        animation: voiceSpin 0.8s linear infinite;
+      }
+
+      // The spinner is visual only; freeze it (button still reads as disabled) for reduced motion.
+      &.chat-page__voice-btn--reduced-motion svg {
         animation: none;
       }
     }
@@ -109,6 +167,12 @@
     &:disabled {
       opacity: 0.45;
       cursor: not-allowed;
+    }
+
+    // Keep the transcribing button legible while disabled — the spinner is the busy cue.
+    &--transcribing:disabled {
+      opacity: 0.85;
+      cursor: progress;
     }
   }
 
@@ -179,6 +243,16 @@
   &__tts-error {
     font-size: 0.75rem;
     color: var(--color-danger, #d14343);
+  }
+
+  // Standing compliance line under the composer: informational-only, not personalized advice.
+  // Sits below the input via the footer-inner flex gap so it never shifts the composer layout.
+  &__disclaimer {
+    margin: 0;
+    text-align: center;
+    font-size: 0.68rem;
+    line-height: 1.4;
+    color: var(--color-text-muted);
   }
 
   &__auth-prompt {

@@ -1,0 +1,195 @@
+:host {
+  display: block;
+}
+
+.scenario-pipeline {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+
+  &__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: start;
+    padding-bottom: var(--space-4);
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    // Connector line running from this marker down to the next step's marker.
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 0.75rem;
+      top: 1.6rem;
+      bottom: -0.1rem;
+      width: 2px;
+      transform: translateX(-50%);
+      border-radius: var(--radius-full);
+      background: var(--color-border);
+      transition: background 0.35s ease;
+    }
+
+    // Once a step is done its outgoing connection reads as "travelled".
+    &--done:not(:last-child)::after {
+      background: var(--color-gold-border);
+    }
+  }
+
+  &__marker {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    transition:
+      border-color 0.3s ease,
+      background 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  &__dot {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: var(--radius-full);
+    background: var(--color-border);
+    transition: background 0.3s ease;
+  }
+
+  &__label {
+    align-self: center;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--color-text-secondary);
+    transition:
+      color 0.3s ease,
+      font-weight 0.3s ease;
+  }
+
+  // PENDING — dim, still waiting its turn.
+  &__step--pending {
+    .scenario-pipeline__label {
+      color: var(--color-text-muted);
+    }
+  }
+
+  // ACTIVE — gold ring + pulsing dot, emphasized label.
+  &__step--active {
+    .scenario-pipeline__marker {
+      border-color: var(--color-gold);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold) 16%, transparent);
+    }
+
+    .scenario-pipeline__dot {
+      background: var(--color-gold);
+      animation: scenario-pipeline-dot 1.4s ease-in-out infinite;
+    }
+
+    .scenario-pipeline__marker::after {
+      content: '';
+      position: absolute;
+      inset: -1.5px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--color-gold);
+      animation: scenario-pipeline-ring 1.6s ease-out infinite;
+    }
+
+    .scenario-pipeline__label {
+      color: var(--color-gold);
+      font-weight: 700;
+    }
+  }
+
+  // DONE — settled gold marker with a check, de-emphasized label.
+  &__step--done {
+    .scenario-pipeline__marker {
+      border-color: var(--color-gold-border);
+      background: var(--color-gold-dim-bg);
+    }
+
+    .scenario-pipeline__marker::before {
+      content: '✓';
+      font-size: 0.8rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--color-gold);
+    }
+
+    .scenario-pipeline__dot {
+      display: none;
+    }
+  }
+
+  // ERROR — loss-toned marker, frozen on the failed step.
+  &__step--error {
+    .scenario-pipeline__marker {
+      border-color: var(--color-loss-border);
+      background: var(--color-loss-dim);
+    }
+
+    .scenario-pipeline__marker::before {
+      content: '!';
+      font-family: var(--font-family-mono);
+      font-size: 0.85rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--color-loss);
+    }
+
+    .scenario-pipeline__dot {
+      display: none;
+    }
+
+    .scenario-pipeline__label {
+      color: var(--color-loss);
+      font-weight: 600;
+    }
+  }
+}
+
+@keyframes scenario-pipeline-dot {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+}
+
+@keyframes scenario-pipeline-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+// Reduced-motion: keep every state change (colour, ring, check) but drop the
+// pulsing so the pipeline reads statically. Mirrors how the rest of the app
+// honours `prefers-reduced-motion`.
+@media (prefers-reduced-motion: reduce) {
+  .scenario-pipeline__step--active {
+    .scenario-pipeline__dot {
+      animation: none;
+    }
+
+    .scenario-pipeline__marker::after {
+      animation: none;
+      opacity: 0;
+    }
+  }
+}

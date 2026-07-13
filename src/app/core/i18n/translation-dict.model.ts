@@ -101,6 +101,7 @@ export interface TranslationDict {
   'auth.demo.persona.compliance': string;
   'chat.placeholder': string;
   'chat.send': string;
+  'chat.jumpToLatest': string;
   'chat.streaming': string;
   'chat.role.user': string;
   'chat.role.assistant': string;
@@ -116,6 +117,7 @@ export interface TranslationDict {
   'chat.agent.macro': string;
   'chat.agent.sentiment': string;
   'chat.citations.title': string;
+  'chat.citations.computed': string;
   'agents.title': string;
   'agents.subtitle': string;
   'agents.ask': string;
@@ -153,8 +155,11 @@ export interface TranslationDict {
   'chat.stt.start': string;
   'chat.stt.stop': string;
   'chat.stt.listening': string;
+  'chat.stt.transcribing': string;
   'chat.stt.error': string;
   'chat.stt.unavailable': string;
+  'chat.stt.permissionDenied': string;
+  'chat.stt.serverUnavailable': string;
   'chat.realtime.talk': string;
   'chat.realtime.talkCta': string;
   'chat.realtime.stop': string;
@@ -193,6 +198,8 @@ export interface TranslationDict {
   'chat.sessions.delete': string;
   'chat.sessions.toggle': string;
   'chat.sessions.hide': string;
+  'chat.sessions.missingNotice': string;
+  'chat.sessions.missingNotice.dismiss': string;
   'chat.welcome.hello': string;
   'chat.profile.guest': string;
   'chat.plan.label': string;

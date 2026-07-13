@@ -136,17 +136,16 @@
         </div>
       }
 
-      @if (store.isGenerating()) {
+      @if (store.isGenerating() || store.generateError()) {
         <section class="scenarios-page__progress feature-panel" aria-live="polite">
           <h3 class="scenarios-page__preview-title">
             {{ i18n.t('scenarios.progress.title') }}
           </h3>
-          <ol class="scenarios-page__progress-list">
-            <li>{{ i18n.t('scenarios.progress.intake') }}</li>
-            <li>{{ i18n.t('scenarios.progress.data') }}</li>
-            <li>{{ i18n.t('scenarios.progress.quant') }}</li>
-            <li>{{ i18n.t('scenarios.progress.synthesis') }}</li>
-          </ol>
+          <app-scenario-progress-pipeline
+            [labels]="progressSteps()"
+            [isRunning]="store.isGenerating()"
+            [errorMessage]="store.generateError()"
+          />
         </section>
       } @else {
         <section class="scenarios-page__preview feature-panel">

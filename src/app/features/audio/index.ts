@@ -1,4 +1,5 @@
-export { TextToSpeechProvider, SpeechToTextProvider } from './domain';
+export { TextToSpeechProvider, SpeechToTextProvider, DictationError } from './domain';
+export type { DictationErrorReason } from './domain';
 export { AudioPlaybackStore, DictationStore } from './application';
 export {
   HttpTtsProvider,

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import {
   AgentTrace,
   ChartSpec,
@@ -27,6 +27,19 @@ const USER_ROLE = 'user';
 @Injectable()
 export class ChatStore {
   private readonly sessionsStore = inject(ChatSessionsStore);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Aborts the in-flight stream when the page-scoped store is destroyed (navigation). */
+  private abortController: AbortController | null = null;
+
+  /**
+   * Coalesces streamed tokens: every token is buffered and flushed at most once per
+   * animation frame into a single `syncActiveMessages` call, so a fast stream no longer
+   * rebuilds the messages array (and re-runs change detection) on every token.
+   */
+  private tokenBuffer = '';
+  private tokenTargetId: string | null = null;
+  private flushHandle: number | null = null;
 
   private readonly streamingSignal = signal(false);
   private readonly tracesSignal = signal<AgentTrace[]>([]);
@@ -45,7 +58,14 @@ export class ChatStore {
   /** Market/news reference that will be attached to the next message sent. */
   readonly pendingReference = this.pendingReferenceSignal.asReadonly();
 
-  constructor(private readonly chatRepository: ChatRepository) {}
+  constructor(private readonly chatRepository: ChatRepository) {
+    // The store is page-scoped, so navigation away destroys it mid-turn: abort the fetch
+    // and drop any buffered tokens so no late frame writes to the (root) sessions store.
+    this.destroyRef.onDestroy(() => {
+      this.abortController?.abort();
+      this.cancelScheduledFlush();
+    });
+  }
 
   /** Pins a market/news reference to the next message; shown as a chip until sent. */
   setReference(reference: ChatReference): void {
@@ -81,24 +101,46 @@ export class ChatStore {
     this.tracesSignal.set([]);
     this.toolCallsSignal.set([]);
 
+    const controller = this.createAbortController();
+    this.abortController = controller;
+
     try {
       for await (const event of this.chatRepository.streamReply(
         trimmed,
         threadId,
         reference ?? undefined,
+        controller?.signal,
       )) {
         this.applyStreamEvent(assistantId, event);
       }
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      if (!this.isAbortError(error)) {
+        this.errorSignal.set(this.toErrorMessage(error));
+      }
     } finally {
-      this.markSettled(assistantId);
+      this.flushTokens();
+      if (this.abortController === controller) {
+        this.abortController = null;
+      }
+      // Skip the full settle when the turn was aborted (store destroyed): the sessions store
+      // is root-scoped and survives, so writing a half-finished turn into whatever session is
+      // now active would clobber it. Still clear the aborted thread's pending flag by id so a
+      // return to that chat doesn't show a thinking bubble that never completes.
+      if (controller?.signal.aborted ?? false) {
+        this.sessionsStore.settlePendingMessages(threadId);
+      } else {
+        this.settleTurn(assistantId);
+      }
       this.streamingSignal.set(false);
-      this.sessionsStore.replaceActiveMessages(this.messages());
     }
   }
 
   private applyStreamEvent(assistantId: string, event: ChatStreamEvent): void {
+    // Every non-token event (chart, citations, trace, tool, error) must land after the
+    // tokens that preceded it, so flush the pending buffer first to preserve ordering.
+    if (event.kind !== 'token') {
+      this.flushTokens();
+    }
     switch (event.kind) {
       case 'token':
         this.appendToken(assistantId, event.text);
@@ -112,6 +154,9 @@ export class ChatStore {
       case 'chart':
         this.appendChart(assistantId, event.chart);
         break;
+      case 'citations':
+        this.setCitations(assistantId, event.citations);
+        break;
       case 'error':
         this.errorSignal.set(event.message);
         break;
@@ -123,11 +168,56 @@ export class ChatStore {
   }
 
   private appendToken(messageId: string, token: string): void {
+    this.tokenTargetId = messageId;
+    this.tokenBuffer += token;
+    this.scheduleFlush();
+  }
+
+  /** Schedules a token flush on the next animation frame (immediate where rAF is absent). */
+  private scheduleFlush(): void {
+    if (this.flushHandle !== null) {
+      return;
+    }
+    if (typeof requestAnimationFrame !== 'function') {
+      this.flushTokens();
+      return;
+    }
+    this.flushHandle = requestAnimationFrame(() => {
+      this.flushHandle = null;
+      this.flushTokens();
+    });
+  }
+
+  /** Writes the buffered tokens into the target message in one array rebuild. */
+  private flushTokens(): void {
+    if (this.flushHandle !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(this.flushHandle);
+    }
+    this.flushHandle = null;
+
+    if (!this.tokenBuffer || this.tokenTargetId === null) {
+      return;
+    }
+    const messageId = this.tokenTargetId;
+    const chunk = this.tokenBuffer;
+    this.tokenBuffer = '';
+    this.tokenTargetId = null;
+
     this.sessionsStore.syncActiveMessages(
       this.messages().map((message) =>
-        message.id === messageId ? { ...message, content: message.content + token } : message,
+        message.id === messageId ? { ...message, content: message.content + chunk } : message,
       ),
     );
+  }
+
+  /** Drops any buffered tokens and pending flush without writing (used on destroy). */
+  private cancelScheduledFlush(): void {
+    if (this.flushHandle !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(this.flushHandle);
+    }
+    this.flushHandle = null;
+    this.tokenBuffer = '';
+    this.tokenTargetId = null;
   }
 
   private appendChart(messageId: string, chart: ChartSpec): void {
@@ -140,24 +230,47 @@ export class ChatStore {
     );
   }
 
-  private markSettled(messageId: string): void {
+  private setCitations(messageId: string, citations: ChatMessage['citations']): void {
+    this.sessionsStore.syncActiveMessages(
+      this.messages().map((message) =>
+        message.id === messageId ? { ...message, citations: citations ?? [] } : message,
+      ),
+    );
+  }
+
+  /**
+   * Settles the turn in a SINGLE messages write: enriches the assistant message with the
+   * resolved agent/routing/tools, then hands the full array to `replaceActiveMessages`,
+   * which clears the pending flags, refreshes the title, and triggers server-side titling.
+   * Previously this was two writes (a `syncActiveMessages` here plus a `replaceActiveMessages`
+   * in the caller) — two change-detection passes at the end of every stream.
+   */
+  private settleTurn(messageId: string): void {
     const agent = resolveRespondingAgent(this.routingHops());
     const routingHops = snapshotRoutingHops(this.routingHops());
     const tools = snapshotToolHops(this.toolHops());
 
-    this.sessionsStore.syncActiveMessages(
-      this.messages().map((message) =>
-        message.id === messageId
-          ? {
-              ...message,
-              pending: false,
-              ...(agent ? { agent } : {}),
-              ...(routingHops.length > 0 ? { routingHops } : {}),
-              ...(tools.length > 0 ? { tools } : {}),
-            }
-          : message,
-      ),
+    const settled = this.messages().map((message) =>
+      message.id === messageId
+        ? {
+            ...message,
+            pending: false,
+            ...(agent ? { agent } : {}),
+            ...(routingHops.length > 0 ? { routingHops } : {}),
+            ...(tools.length > 0 ? { tools } : {}),
+          }
+        : message,
     );
+
+    this.sessionsStore.replaceActiveMessages(settled);
+  }
+
+  private createAbortController(): AbortController | null {
+    return typeof AbortController === 'function' ? new AbortController() : null;
+  }
+
+  private isAbortError(error: unknown): boolean {
+    return (error instanceof DOMException || error instanceof Error) && error.name === 'AbortError';
   }
 
   private toErrorMessage(error: unknown): string {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SpeechToTextProvider } from '../domain';
+import { DictationError, SpeechToTextProvider } from '../domain';
 
 /**
  * Minimal structural types for the Web Speech Recognition API, which is not in
@@ -51,7 +51,7 @@ export class WebSpeechSttProvider extends SpeechToTextProvider {
     return new Promise<void>((resolve, reject) => {
       const Ctor = this.recognitionCtor();
       if (!Ctor) {
-        reject(new Error('Web Speech Recognition API is not available'));
+        reject(new DictationError('unsupported', 'Web Speech Recognition API is not available'));
         return;
       }
 
@@ -88,7 +88,14 @@ export class WebSpeechSttProvider extends SpeechToTextProvider {
         }
         settled = true;
         this.recognition = null;
-        reject(new Error(`Web Speech recognition failed: ${event.error ?? 'unknown'}`));
+        const code = event.error ?? 'unknown';
+        // 'not-allowed'/'service-not-allowed' mean the browser blocked mic access
+        // for recognition — classify as a permission failure; anything else stays generic.
+        if (code === 'not-allowed' || code === 'service-not-allowed') {
+          reject(new DictationError('permission-denied', 'Microphone permission was denied'));
+          return;
+        }
+        reject(new Error(`Web Speech recognition failed: ${code}`));
       };
       recognition.onend = () => {
         if (settled) {

@@ -104,6 +104,7 @@ export const ES_TRANSLATIONS = {
   'auth.demo.persona.compliance': 'Elena Ruiz · revisión HITL',
   'chat.placeholder': 'Escribí un mensaje…',
   'chat.send': 'Enviar',
+  'chat.jumpToLatest': 'Ir al último',
   'chat.streaming': 'Transmitiendo…',
   'chat.role.user': 'Vos',
   'chat.role.assistant': 'Midas',
@@ -119,6 +120,7 @@ export const ES_TRANSLATIONS = {
   'chat.agent.macro': 'Macro',
   'chat.agent.sentiment': 'Sentimiento',
   'chat.citations.title': 'Fuentes',
+  'chat.citations.computed': 'Calculado',
   'agents.title': 'Equipo IA',
   'agents.subtitle':
     'El supervisor enruta cada pregunta al especialista correcto. Elige uno y prueba un ejemplo en el Chat.',
@@ -196,8 +198,13 @@ export const ES_TRANSLATIONS = {
   'chat.stt.start': 'Iniciar dictado',
   'chat.stt.stop': 'Detener dictado',
   'chat.stt.listening': 'Escuchando…',
+  'chat.stt.transcribing': 'Transcribiendo…',
   'chat.stt.error': 'El reconocimiento de voz falló',
   'chat.stt.unavailable': 'El reconocimiento de voz no está disponible en este navegador',
+  'chat.stt.permissionDenied':
+    'Acceso al micrófono denegado. Permití el acceso al micrófono para dictar.',
+  'chat.stt.serverUnavailable':
+    'El dictado por voz no está disponible en este momento. Escribí tu mensaje.',
   'chat.realtime.talk': 'Hablar',
   'chat.realtime.talkCta': 'Hablá con Midas',
   'chat.realtime.stop': 'Detener',
@@ -239,6 +246,9 @@ export const ES_TRANSLATIONS = {
   'chat.sessions.delete': 'Eliminar conversación',
   'chat.sessions.toggle': 'Abrir panel de sesiones',
   'chat.sessions.hide': 'Ocultar sesiones',
+  'chat.sessions.missingNotice':
+    'Esa conversación ya no existe o nunca llegó a guardarse — te abrimos un chat nuevo.',
+  'chat.sessions.missingNotice.dismiss': 'Descartar aviso',
   'radar.title': 'Radar de mercado',
   'radar.description':
     'Vigilancia de mercado potenciada por IA — señales, noticias y contexto macro.',

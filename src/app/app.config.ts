@@ -54,6 +54,8 @@ import { NoteRepository } from './features/notes/domain';
 import { HttpNoteRepository } from './features/notes/infrastructure';
 import { ScenarioRepository } from './features/scenarios/domain';
 import { HttpScenarioRepository } from './features/scenarios/infrastructure';
+import { ChatRepository } from './features/chat/domain';
+import { HttpChatRepository, SseChatRepository } from './features/chat/infrastructure';
 import { ChartRepository, HttpChartRepository } from './shared/charts';
 
 export const appConfig: ApplicationConfig = {
@@ -80,6 +82,12 @@ export const appConfig: ApplicationConfig = {
     { provide: NoteRepository, useClass: HttpNoteRepository },
     { provide: ProfileRepository, useClass: HttpProfileRepository },
     { provide: ChartRepository, useClass: HttpChartRepository },
+    // Chat repository is app-wide (root), not page-scoped: `ChatSessionsStore` is
+    // `providedIn: 'root'` and a root service can only resolve root-level dependencies, so its
+    // `ChatRepository` (and the `SseChatRepository` that `HttpChatRepository` composes) must live
+    // here too — same as every other feature repository above.
+    SseChatRepository,
+    { provide: ChatRepository, useClass: HttpChatRepository },
     // Restores Supabase session in the background so the shell + Radar can
     // paint immediately. `authGuard` waits for `AuthStore.ready` on guarded
     // routes so a refresh on /briefings doesn't false-redirect to login.

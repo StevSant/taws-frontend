@@ -1,8 +1,12 @@
 export { ChatRepository } from './chat-repository';
 export type { ChatMessage, ChatRole } from './models/chat-message.model';
+export type { ChatCitation } from './models/chat-citation.model';
 export type { ChatReference } from './models/chat-reference.model';
 export type { ChatNewsQuestion } from './models/chat-news-question.model';
 export type { ChatThread } from './models/chat-thread.model';
+export type { ChatSession } from './models/chat-session.model';
+export type { Conversation } from './models/conversation.model';
+export type { ConversationSummary } from './models/conversation-summary.model';
 export type { AgentTrace, AgentTraceEvent } from './models/agent-trace.model';
 export type { ChatStreamEvent } from './models/chat-stream-event.model';
 export type { RoutingHop, RoutingHopStatus } from './models/routing-hop.model';

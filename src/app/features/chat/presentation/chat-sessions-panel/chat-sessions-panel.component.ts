@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import { ChatSessionsStore } from '../../application/chat-sessions-store';
+import { ChatSession } from '../../domain';
 import { MarqueeOnHoverDirective } from './marquee-on-hover.directive';
 
 const SESSIONS_MOBILE_BREAKPOINT = '(max-width: 900px)';
@@ -54,6 +55,22 @@ export class ChatSessionsPanelComponent implements OnDestroy {
       return this.i18n.t('chat.sessions.new');
     }
     return title;
+  }
+
+  /**
+   * The list the server returns carries no transcripts — a thread's turns are fetched when
+   * it is opened — so the meta line shows when the thread was last active instead of a
+   * message count that would read "0" for every thread the user hasn't opened yet.
+   */
+  sessionMeta(session: ChatSession): string {
+    const updatedAt = new Date(session.updatedAt);
+    if (Number.isNaN(updatedAt.getTime())) {
+      return '';
+    }
+    return new Intl.DateTimeFormat(this.i18n.locale(), {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(updatedAt);
   }
 
   onClose(): void {

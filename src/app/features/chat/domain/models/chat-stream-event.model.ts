@@ -1,6 +1,7 @@
 import { ChartSpec } from '../../../../shared/charts';
 import { AgentTrace } from './agent-trace.model';
 import { ToolCall } from './tool-call.model';
+import { ChatCitation } from './chat-citation.model';
 
 /**
  * Discriminated union of everything the SSE-v2 wire protocol can emit for a
@@ -12,4 +13,5 @@ export type ChatStreamEvent =
   | { kind: 'trace'; trace: AgentTrace }
   | { kind: 'tool'; tool: ToolCall }
   | { kind: 'chart'; chart: ChartSpec }
+  | { kind: 'citations'; citations: ChatCitation[] }
   | { kind: 'error'; message: string };

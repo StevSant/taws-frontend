@@ -99,6 +99,27 @@
   }
 }
 
+// Gold ring pinging outward from the recording button: gold at zero spread, fading to
+// transparent as it expands. Loops seamlessly (transparent at both ends of the reset).
+@keyframes voiceRingPulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-gold) 50%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--color-gold) 0%, transparent);
+  }
+}
+
+@keyframes recordingBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
 @keyframes ttsPulse {
   0%,
   100% {
@@ -106,6 +127,12 @@
   }
   50% {
     box-shadow: 0 0 20px rgba(212, 160, 23, 0.55);
+  }
+}
+
+@keyframes voiceSpin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -120,8 +147,11 @@
   .chat-page__hex-field,
   .chat-page__energy-pulse,
   .chat-page__voice-btn--active,
+  .chat-page__voice-btn--active::after,
+  .chat-page__voice-btn--transcribing svg,
   .chat-page__tts-btn--active,
   .chat-page__oracle-status-dot,
+  .chat-page__recording-dot,
   .chat-page__avatar--live {
     animation: none;
   }

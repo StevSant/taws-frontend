@@ -74,7 +74,10 @@ export class InstrumentCardCompactComponent {
   }
 
   formatDelta(): string {
-    if (this.signal.priceDelta === undefined) {
+    // `priceDelta` can be null (not just undefined): it flows from the quant API's
+    // `price_delta_pct`, which is null for a thin/short series. Guard both, or `.toFixed`
+    // throws on null.
+    if (this.signal.priceDelta === undefined || this.signal.priceDelta === null) {
       return '—';
     }
     const sign = this.signal.priceDelta > 0 ? '+' : '';

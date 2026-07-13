@@ -516,6 +516,21 @@ export class RadarStore {
     return symbols.filter((symbol) => known.has(symbol.toUpperCase()));
   }
 
+  /**
+   * Symbols worth enriching on a feed tick: everything the news feed references, PLUS every
+   * watchlisted symbol.
+   *
+   * The watchlist half is not redundant. An instrument with no recent news never appears in
+   * `news`, so scoping enrichment to news-derived symbols alone left exactly the cards the
+   * user pinned with no signal and no price — rendering "unclassified" and "—" even when a
+   * perfectly good signal was already stored. `signalsBySymbolSignal` is *replaced* on every
+   * tick (unlike `marketStatsBySymbolSignal`, which merges), so a watchlisted symbol absent
+   * from the feed was dropped from the map on each poll and could never recover.
+   */
+  private enrichmentSymbols(news: NewsItem[]): string[] {
+    return Array.from(new Set([...this.trackedSymbols(news), ...this.watchlistStore.symbols()]));
+  }
+
   private async loadInstruments(): Promise<void> {
     try {
       const instruments = await this.instrumentRepository.fetchInstruments();
@@ -565,6 +580,13 @@ export class RadarStore {
   private async enrichFeed(news: NewsItem[]): Promise<void> {
     this.isEnrichingSignal.set(true);
     try {
+      // `init()` kicks the watchlist off without awaiting it so the news feed can paint first,
+      // which means on first paint it may still be in flight — and `enrichmentSymbols` would
+      // then see an empty watchlist and enrich news symbols only, leaving the watchlist cards
+      // blank until the next poll tick. Awaiting it here (idempotent, and already resolved on
+      // every tick after the first) is what makes the pinned cards correct on first paint.
+      // Swallowed: a watchlist failure must still leave the news half of the feed enriched.
+      await this.watchlistStore.ensureLoaded().catch(() => undefined);
       await Promise.all([this.loadSignals(news), this.loadMarketStats(news)]);
     } finally {
       this.isEnrichingSignal.set(false);
@@ -594,7 +616,7 @@ export class RadarStore {
   }
 
   private async loadMarketStats(news: NewsItem[]): Promise<void> {
-    const symbols = this.trackedSymbols(news);
+    const symbols = this.enrichmentSymbols(news);
     const fetched = await mapInBatches(
       symbols,
       this.config.radarSignalFetchBatchSize,
@@ -618,14 +640,14 @@ export class RadarStore {
   }
 
   /**
-   * Fetches the latest signal for every instrument symbol referenced by
-   * `news` and merges the result into `signalsBySymbolSignal`. Swallowed on
-   * failure per symbol — a signal is enrichment on top of the news feed, so
-   * one instrument's fetch failing shouldn't blank out the others or the
-   * page itself (same posture as `loadInstruments`).
+   * Fetches the latest signal for every symbol in `enrichmentSymbols` (the news feed's
+   * instruments plus the watchlist's) and replaces `signalsBySymbolSignal` with the result.
+   * Swallowed on failure per symbol — a signal is enrichment on top of the news feed, so
+   * one instrument's fetch failing shouldn't blank out the others or the page itself (same
+   * posture as `loadInstruments`).
    */
   private async loadSignals(news: NewsItem[]): Promise<void> {
-    const symbols = this.trackedSymbols(news);
+    const symbols = this.enrichmentSymbols(news);
     const fetched = await mapInBatches(
       symbols,
       this.config.radarSignalFetchBatchSize,
