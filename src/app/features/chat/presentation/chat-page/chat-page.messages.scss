@@ -23,6 +23,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
@@ -193,6 +194,13 @@
       color: color-mix(in srgb, #eff6ff 92%, var(--color-text-primary));
       box-shadow: 0 4px 16px rgba(37, 99, 235, 0.14);
     }
+  }
+
+  &__message-reference {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__bubble-header {
