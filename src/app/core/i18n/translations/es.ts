@@ -601,29 +601,9 @@ export const ES_TRANSLATIONS = {
   'telegram.unlink': 'Desvincular',
   'telegram.expires': 'El enlace expira',
   'telegram.loginRequired': 'Iniciá sesión para conectar Telegram',
-  'telegram.botRegistration.title': 'Tus Bots de Telegram',
-  'telegram.botRegistration.instructions':
-    'Creá un bot en @BotFather, copiá el mensaje completo que te envió y pegalo aquí. Antes de registrar, enviá cualquier mensaje a tu bot para que podamos obtener tu chat_id.',
-  'telegram.botRegistration.placeholder': 'Pegá aquí el mensaje de BotFather…',
-  'telegram.botRegistration.register': 'Registrar Bot',
-  'telegram.botRegistration.registering': 'Registrando…',
-  'telegram.botRegistration.success': '✅ Bot @{username} registrado correctamente',
-  'telegram.botRegistration.chatId': 'Chat ID: {chatId}',
-  'telegram.botRegistration.error.noToken':
-    'No se pudo extraer el token del texto. Asegurate de pegar el mensaje completo de BotFather.',
-  'telegram.botRegistration.error.noMessages':
-    'No se encontró ningún mensaje en el bot. Enviá cualquier mensaje a @{username} y volvé a intentarlo.',
-  'telegram.botRegistration.error.generic':
-    'Ocurrió un error al registrar el bot. Intentá de nuevo.',
-  'telegram.botRegistration.sendTestNews': 'Enviar noticia de prueba',
-  'telegram.botRegistration.sendingTestNews': 'Enviando…',
-  'telegram.botRegistration.testNewsSent': '✅ Noticia de prueba enviada: {eventTitle}',
-  'telegram.botRegistration.testNewsError.noEvents':
-    'No hay eventos de noticias disponibles. Intentá de nuevo más tarde.',
-  'telegram.botRegistration.testNewsError.noBot':
-    'No tenés un bot de Telegram registrado. Registrá uno primero.',
-  'telegram.botRegistration.testNewsError.generic':
-    'Ocurrió un error al enviar la noticia de prueba. Intentá de nuevo.',
+  'telegram.testNews.send': 'Enviar noticia de prueba',
+  'telegram.testNews.sending': 'Enviando…',
+  'telegram.testNews.sent': '✅ Noticia de prueba enviada',
   'scenarios.description':
     'Simulá el impacto de mercado de un evento geopolítico o macroeconómico.',
   'scenarios.disclaimer.static':

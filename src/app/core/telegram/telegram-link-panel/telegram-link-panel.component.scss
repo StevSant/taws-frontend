@@ -1,83 +1,27 @@
 .telegram-link {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 
-  &__toggle {
-    position: relative;
-    display: inline-flex;
+  &__header {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-full);
-    background: transparent;
-    cursor: pointer;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease;
-
-    &:hover {
-      border-color: var(--color-gold-border);
-      background: var(--color-gold-dim-bg);
-    }
-
-    &--linked {
-      border-color: var(--color-gold-border-hi);
-    }
+    gap: var(--space-2);
   }
 
   &__icon {
     display: block;
-    color: var(--color-text-secondary);
-    transition: color 0.15s ease;
-
-    .telegram-link__toggle:hover & {
-      color: var(--color-gold);
-    }
+    color: var(--color-gold);
   }
 
-  &__dot {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 7px;
-    height: 7px;
-    border-radius: var(--radius-full);
-    background: var(--color-gold);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--color-gold) 60%, transparent);
-  }
-
-  &__panel {
-    position: absolute;
-    top: calc(100% + var(--space-2));
-    right: 0;
-    width: 300px;
-    max-width: 90vw;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-3);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-    box-shadow: var(--elevation-3);
-    z-index: 20;
-  }
-
-  &__panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
-  }
-
-  &__panel-title {
+  &__title {
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.92rem;
     color: var(--color-text-primary);
   }
 
   &__badge {
+    margin-left: auto;
     font-family: var(--font-family-mono);
     font-size: 0.62rem;
     letter-spacing: 0.06em;
@@ -105,6 +49,18 @@
     margin: 0;
     color: var(--color-danger);
     font-size: 0.78rem;
+  }
+
+  &__sent {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 0.8rem;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
   }
 
   &__action {

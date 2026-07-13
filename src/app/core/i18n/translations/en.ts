@@ -585,28 +585,9 @@ export const EN_TRANSLATIONS = {
   'telegram.unlink': 'Unlink',
   'telegram.expires': 'Link expires',
   'telegram.loginRequired': 'Sign in to connect Telegram',
-  'telegram.botRegistration.title': 'Your Telegram Bots',
-  'telegram.botRegistration.instructions':
-    'Create a bot on @BotFather, copy the full message it sent you and paste it here. Before registering, send any message to your bot so we can get your chat_id.',
-  'telegram.botRegistration.placeholder': 'Paste the BotFather message here…',
-  'telegram.botRegistration.register': 'Register Bot',
-  'telegram.botRegistration.registering': 'Registering…',
-  'telegram.botRegistration.success': '✅ Bot @{username} registered successfully',
-  'telegram.botRegistration.chatId': 'Chat ID: {chatId}',
-  'telegram.botRegistration.error.noToken':
-    'Could not extract the token from the text. Make sure to paste the full BotFather message.',
-  'telegram.botRegistration.error.noMessages':
-    'No messages found for the bot. Send any message to @{username} and try again.',
-  'telegram.botRegistration.error.generic':
-    'An error occurred while registering the bot. Please try again.',
-  'telegram.botRegistration.sendTestNews': 'Send Test News',
-  'telegram.botRegistration.sendingTestNews': 'Sending…',
-  'telegram.botRegistration.testNewsSent': '✅ Test news sent: {eventTitle}',
-  'telegram.botRegistration.testNewsError.noEvents': 'No news events available. Try again later.',
-  'telegram.botRegistration.testNewsError.noBot':
-    "You don't have a Telegram bot registered. Register one first.",
-  'telegram.botRegistration.testNewsError.generic':
-    'An error occurred while sending the test news. Please try again.',
+  'telegram.testNews.send': 'Send test news',
+  'telegram.testNews.sending': 'Sending…',
+  'telegram.testNews.sent': '✅ Test news sent',
   'scenarios.description': 'Simulate the market impact of a geopolitical or macro event.',
   'scenarios.disclaimer.static':
     'Scenario simulations are for informational purposes only — not financial advice or trade signals.',

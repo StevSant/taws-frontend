@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { Router } from '@angular/router';
 import { AuthStore } from '../../../auth/application';
 import { ThemeService, TranslationService } from '../../../../core';
-import { BotRegistrationPanelComponent } from '../../../../core/telegram';
+import { TelegramLinkPanelComponent } from '../../../../core/telegram';
 import {
   ButtonComponent,
   FeaturePageHeaderComponent,
@@ -20,7 +20,7 @@ import {
     ThemeToggleComponent,
     LanguageToggleComponent,
     ButtonComponent,
-    BotRegistrationPanelComponent,
+    TelegramLinkPanelComponent,
   ],
   templateUrl: './user-page.component.html',
   styleUrl: './user-page.component.scss',
