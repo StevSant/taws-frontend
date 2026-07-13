@@ -10,6 +10,7 @@ import {
   PaginationComponent,
   SpinnerComponent,
 } from '../../../../shared';
+import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 import { NewsDetailStore } from '../../application';
 import { ImpactClass, MarketStats } from '../../domain';
 import { NewsCardComponent } from '../news-card/news-card.component';
@@ -55,6 +56,7 @@ export class NewsDetailPageComponent {
   readonly store = inject(NewsDetailStore);
   readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly shellSearch = inject(ShellSearchService);
   private currentId: string | null = null;
 
   constructor() {
@@ -139,5 +141,19 @@ export class NewsDetailPageComponent {
     if (img instanceof HTMLImageElement) {
       img.closest('.news-detail__hero')?.remove();
     }
+  }
+
+  /** Opens the chat grounded on this news article (issue #73). */
+  onAskMidas(): void {
+    const news = this.store.news();
+    if (!news) {
+      return;
+    }
+    void this.shellSearch.goToChatWithReference({
+      kind: 'news',
+      newsId: news.id,
+      title: news.title,
+      source: news.source,
+    });
   }
 }

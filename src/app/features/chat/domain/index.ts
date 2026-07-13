@@ -1,5 +1,6 @@
 export { ChatRepository } from './chat-repository';
 export type { ChatMessage, ChatRole } from './models/chat-message.model';
+export type { ChatReference } from './models/chat-reference.model';
 export type { ChatThread } from './models/chat-thread.model';
 export type { AgentTrace, AgentTraceEvent } from './models/agent-trace.model';
 export type { ChatStreamEvent } from './models/chat-stream-event.model';

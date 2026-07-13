@@ -49,6 +49,12 @@
           <span class="asset-detail__source-link-icon" aria-hidden="true">&#8599;</span>
         </a>
 
+        <app-button
+          class="asset-detail__ask-midas"
+          [label]="i18n.t('chat.reference.ask')"
+          (pressed)="onAskMidas()"
+        />
+
         <div class="asset-detail__watchlist">
           <app-button
             [label]="

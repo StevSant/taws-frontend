@@ -1,0 +1,27 @@
+<div class="reference-chip" [class.reference-chip--dismissable]="dismissable()">
+  <a class="reference-chip__link" [routerLink]="routerLink()">
+    @if (asset(); as asset) {
+      <span class="reference-chip__kind">{{ i18n.t('chat.reference.asset') }}</span>
+      <span class="reference-chip__label">{{ asset.symbol }}</span>
+      @if (asset.name) {
+        <span class="reference-chip__meta">{{ asset.name }}</span>
+      }
+    } @else if (news(); as news) {
+      <span class="reference-chip__kind">{{ i18n.t('chat.reference.news') }}</span>
+      <span class="reference-chip__label">{{ news.title ?? news.newsId }}</span>
+      @if (news.source) {
+        <span class="reference-chip__meta">{{ news.source }}</span>
+      }
+    }
+  </a>
+  @if (dismissable()) {
+    <button
+      type="button"
+      class="reference-chip__dismiss"
+      (click)="onDismiss($event)"
+      [attr.aria-label]="i18n.t('chat.reference.dismiss')"
+    >
+      ×
+    </button>
+  }
+</div>

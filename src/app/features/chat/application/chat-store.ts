@@ -4,6 +4,7 @@ import {
   AgentTrace,
   ChartSpec,
   ChatMessage,
+  ChatReference,
   ChatRepository,
   ChatStreamEvent,
   ToolCall,
@@ -31,6 +32,7 @@ export class ChatStore {
   private readonly tracesSignal = signal<AgentTrace[]>([]);
   private readonly toolCallsSignal = signal<ToolCall[]>([]);
   private readonly errorSignal = signal<string | null>(null);
+  private readonly pendingReferenceSignal = signal<ChatReference | null>(null);
 
   readonly messages = this.sessionsStore.activeMessages;
   readonly isStreaming = this.streamingSignal.asReadonly();
@@ -40,8 +42,20 @@ export class ChatStore {
   readonly toolHops = computed(() => buildToolHops(this.toolCallsSignal()));
   readonly error = this.errorSignal.asReadonly();
   readonly canSend = computed(() => !this.streamingSignal());
+  /** Market/news reference that will be attached to the next message sent. */
+  readonly pendingReference = this.pendingReferenceSignal.asReadonly();
 
   constructor(private readonly chatRepository: ChatRepository) {}
+
+  /** Pins a market/news reference to the next message; shown as a chip until sent. */
+  setReference(reference: ChatReference): void {
+    this.pendingReferenceSignal.set(reference);
+  }
+
+  /** Drops the pending reference (user dismissed the chip). */
+  clearReference(): void {
+    this.pendingReferenceSignal.set(null);
+  }
 
   async send(message: string): Promise<void> {
     const trimmed = message.trim();
@@ -49,9 +63,16 @@ export class ChatStore {
       return;
     }
 
+    const reference = this.pendingReferenceSignal();
     const threadId = this.sessionsStore.ensureActiveSession();
-    const userMessage: ChatMessage = { id: this.nextId(), role: USER_ROLE, content: trimmed };
+    const userMessage: ChatMessage = {
+      id: this.nextId(),
+      role: USER_ROLE,
+      content: trimmed,
+      ...(reference ? { reference } : {}),
+    };
     this.appendMessage(userMessage);
+    this.clearReference();
     this.errorSignal.set(null);
     this.streamingSignal.set(true);
 
@@ -61,7 +82,11 @@ export class ChatStore {
     this.toolCallsSignal.set([]);
 
     try {
-      for await (const event of this.chatRepository.streamReply(trimmed, threadId)) {
+      for await (const event of this.chatRepository.streamReply(
+        trimmed,
+        threadId,
+        reference ?? undefined,
+      )) {
         this.applyStreamEvent(assistantId, event);
       }
     } catch (error: unknown) {

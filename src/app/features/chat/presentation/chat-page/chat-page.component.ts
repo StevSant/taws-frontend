@@ -68,6 +68,7 @@ import { ChartComponent } from '../../../../shared/charts';
 import { ChatSessionsPanelComponent } from '../chat-sessions-panel/chat-sessions-panel.component';
 
 import { ChatContextRailComponent } from '../chat-context-rail/chat-context-rail.component';
+import { ChatReferenceChipComponent } from '../chat-reference-chip/chat-reference-chip.component';
 
 import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
 
@@ -121,6 +122,7 @@ const ORACLE_STATUS_KEYS: Record<OracleActivity, TranslationKey> = {
     ChatSessionsPanelComponent,
 
     ChatContextRailComponent,
+    ChatReferenceChipComponent,
 
     ChatQuickActionsComponent,
 
@@ -435,6 +437,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     if (pendingQuery) {
       this.draft.set(pendingQuery);
     }
+
+    const pendingReference = this.shellSearch.consumeChatReferenceIntent();
+    if (pendingReference) {
+      this.store.setReference(pendingReference);
+    }
   }
 
   ngOnDestroy(): void {
@@ -494,6 +501,10 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
     this.draft.set(prompt);
     this.focusComposer();
+  }
+
+  onDismissReference(): void {
+    this.store.clearReference();
   }
 
   /**

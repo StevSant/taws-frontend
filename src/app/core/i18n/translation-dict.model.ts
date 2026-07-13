@@ -221,6 +221,10 @@ export interface TranslationDict {
   'chat.rail.news.askPrompt': string;
   'chat.rail.watchlist.title': string;
   'chat.rail.watchlist.add': string;
+  'chat.reference.ask': string;
+  'chat.reference.asset': string;
+  'chat.reference.news': string;
+  'chat.reference.dismiss': string;
   'radar.title': string;
   'radar.description': string;
   'radar.guide.title': string;

@@ -173,6 +173,12 @@
       }
 
       <footer class="news-detail__footer">
+        <app-button
+          class="news-detail__ask-midas"
+          [label]="i18n.t('chat.reference.ask')"
+          (pressed)="onAskMidas()"
+        />
+
         <a
           class="news-detail__external"
           [href]="news.url"
