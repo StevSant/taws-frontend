@@ -67,16 +67,16 @@
                 <a class="news-detail__chip" [routerLink]="['/radar', symbol]">
                   <app-instrument-ticker-badge [symbol]="symbol" size="sm" />
                   <span class="news-detail__chip-ticker">{{ symbol }}</span>
-                  @if (statFor(symbol); as stat) {
-                    @if (stat.lastPrice !== null) {
+                  @if (impactFor(symbol); as impact) {
+                    @if (impact.lastPrice !== undefined) {
                       <span class="news-detail__chip-price">{{
-                        stat.lastPrice | number: '1.2-2'
+                        impact.lastPrice | number: '1.2-2'
                       }}</span>
                     }
                     <span
                       class="news-detail__chip-delta"
-                      [class]="deltaClass(stat.priceDeltaPct)"
-                      >{{ formatDelta(stat.priceDeltaPct) }}</span
+                      [class]="deltaClass(impact.priceDeltaPct)"
+                      >{{ formatDelta(impact.priceDeltaPct) }}</span
                     >
                   }
                 </a>
@@ -134,6 +134,51 @@
             [riskFactors]="signal.riskFactors"
             [analysisAvailable]="signal.analysisAvailable"
           />
+
+          @if (store.classifiedImpacts().length > 0) {
+            <h3 class="news-detail__subsection-title">
+              {{ i18n.t('radar.detail.assetImpacts') }}
+            </h3>
+            <ul class="news-detail__impacts">
+              @for (impact of store.classifiedImpacts(); track impact.symbol) {
+                <li class="news-detail__impact-row">
+                  <a class="news-detail__impact-asset" [routerLink]="['/radar', impact.symbol]">
+                    <span class="news-detail__impact-symbol">{{ impact.symbol }}</span>
+                    <span class="news-detail__impact-name">{{ impact.name }}</span>
+                  </a>
+                  <span class="news-detail__impact-asset-class">{{
+                    assetClassLabel(impact.assetClass)
+                  }}</span>
+                  @if (impact.impactClass; as impactClass) {
+                    <span
+                      class="news-detail__impact"
+                      [class.news-detail__impact--positive]="impactClass === 'positive'"
+                      [class.news-detail__impact--negative]="impactClass === 'negative'"
+                      [class.news-detail__impact--neutral]="impactClass === 'neutral'"
+                      [class.news-detail__impact--uncertain]="impactClass === 'uncertain'"
+                    >
+                      {{ impactLabel(impactClass) }}
+                    </span>
+                  }
+                  @if (impact.confidence !== undefined) {
+                    <span class="news-detail__confidence">
+                      {{ i18n.t('radar.card.confidence.label') }}:
+                      {{ confidencePercent(impact.confidence) }}%
+                    </span>
+                  }
+                  @if (impact.sentimentScore !== undefined) {
+                    <span
+                      class="news-detail__impact-sentiment"
+                      [class]="sentimentClass(impact.sentimentScore)"
+                    >
+                      {{ i18n.t('radar.detail.sentiment') }}:
+                      {{ sentimentValue(impact.sentimentScore) }}
+                    </span>
+                  }
+                </li>
+              }
+            </ul>
+          }
         } @else {
           <div class="news-detail__no-signal">
             <p class="news-detail__no-signal-text">{{ i18n.t('radar.detail.noSignal') }}</p>

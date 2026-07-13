@@ -508,6 +508,7 @@ export const ES_TRANSLATIONS = {
   'radar.detail.relatedInstruments': 'Instrumentos relacionados',
   'radar.detail.entities': 'Entidades clave',
   'radar.detail.signalSection': 'Clasificación de señal',
+  'radar.detail.assetImpacts': 'Impacto por activo',
   'radar.detail.noSignal': 'No se produjo ninguna señal para esta noticia.',
   'radar.detail.openOriginal': 'Abrir original',
   // --- Análisis de noticias: por qué no hay señal, y el disparador manual "Analizar ahora" ---

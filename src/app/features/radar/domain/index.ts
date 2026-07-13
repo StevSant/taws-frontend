@@ -8,6 +8,8 @@ export { ASSET_CLASSES } from './models/asset-class.model';
 export type { Instrument } from './models/instrument.model';
 export type { AssetSource } from './models/asset-source.model';
 export type { NewsItem } from './models/news-item.model';
+export type { NewsAssetImpact } from './models/news-asset-impact.model';
+export type { NewsDetail } from './models/news-detail.model';
 export type { NewsPage } from './models/news-page.model';
 export type { NewsPageRequest } from './models/news-page-request.model';
 export type { NewsEntity } from './models/news-entity.model';

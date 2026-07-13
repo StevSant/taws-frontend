@@ -462,6 +462,7 @@ export interface TranslationDict {
   'radar.detail.relatedInstruments': string;
   'radar.detail.entities': string;
   'radar.detail.signalSection': string;
+  'radar.detail.assetImpacts': string;
   'radar.detail.noSignal': string;
   'radar.detail.openOriginal': string;
   // --- News analysis: why an item has no signal, + the manual "Analizar ahora" trigger ---
