@@ -437,6 +437,9 @@ export interface TranslationDict {
   'markets.col.trend': string;
   'markets.col.signal': string;
   'markets.col.follow': string;
+  'markets.col.marketCap': string;
+  'markets.col.volume24h': string;
+  'markets.col.change7d': string;
   'markets.signal.positive': string;
   'markets.signal.negative': string;
   'markets.signal.neutral': string;

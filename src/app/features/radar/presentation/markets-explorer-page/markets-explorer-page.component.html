@@ -107,6 +107,9 @@
         {{ i18n.t('markets.col.change') }} {{ sortIndicator('change') }}
       </button>
       <span>{{ i18n.t('markets.col.volatility') }}</span>
+      <span>{{ i18n.t('markets.col.marketCap') }}</span>
+      <span>{{ i18n.t('markets.col.volume24h') }}</span>
+      <span>{{ i18n.t('markets.col.change7d') }}</span>
       <span>{{ i18n.t('markets.col.trend') }}</span>
       <span>{{ i18n.t('markets.col.signal') }}</span>
       <span>{{ i18n.t('markets.col.follow') }}</span>
@@ -155,6 +158,22 @@
 
             <span class="markets-explorer__volatility">
               {{ row.volatilityPct !== null ? row.volatilityPct.toFixed(1) + '%' : '—' }}
+            </span>
+
+            <span class="markets-explorer__market-cap">
+              {{ formatCompactCurrency(row.marketCap, row.currency) }}
+            </span>
+
+            <span class="markets-explorer__volume">
+              {{ formatCompactCurrency(row.volume24h, row.currency) }}
+            </span>
+
+            <span
+              class="markets-explorer__delta"
+              [class.markets-explorer__delta--up]="row.change7dPct !== null && row.change7dPct >= 0"
+              [class.markets-explorer__delta--down]="row.change7dPct !== null && row.change7dPct < 0"
+            >
+              {{ formatPct(row.change7dPct) }}
             </span>
 
             <div class="markets-explorer__trend">
