@@ -88,17 +88,7 @@
   &__mesh {
     position: absolute;
     inset: 0;
-    opacity: calc(0.62 + var(--texture-glow) * 0.28);
-    transition: opacity 0.8s ease;
-    background:
-      radial-gradient(
-        ellipse 120% 85% at 50% 42%,
-        var(--chat-mesh-top, rgba(212, 160, 23, 0.18)) 0%,
-        transparent 72%
-      ),
-      radial-gradient(ellipse 80% 55% at 0% 100%, rgba(212, 160, 23, 0.1) 0%, transparent 75%),
-      radial-gradient(ellipse 80% 55% at 100% 100%, rgba(245, 200, 66, 0.08) 0%, transparent 75%),
-      radial-gradient(ellipse 90% 45% at 50% 100%, rgba(212, 160, 23, 0.1) 0%, transparent 68%);
+    background: none;
   }
 
   &__hex-field {
@@ -117,20 +107,7 @@
   }
 
   &__energy-pulse {
-    position: absolute;
-    top: 38%;
-    left: 50%;
-    width: min(72vw, 640px);
-    height: min(72vw, 640px);
-    border-radius: var(--radius-full);
-    transform: translate(-50%, -50%);
-    background: radial-gradient(
-      circle,
-      rgba(212, 160, 23, calc(0.08 + var(--texture-glow) * 0.22)) 0%,
-      transparent 68%
-    );
-    opacity: calc(0.35 + var(--texture-glow) * 0.65);
-    transition: opacity 0.8s ease;
+    display: none;
   }
 
   &__viewport {

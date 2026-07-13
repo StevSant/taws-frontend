@@ -482,6 +482,7 @@ export interface TranslationDict {
   'radar.detail.watchlist.signInHint': string;
   'radar.detail.watchlist.error': string;
   'radar.detail.watchlist.defaultName': string;
+  'radar.detail.viewOnSource': string;
   'scenarios.title': string;
   'scenarios.guide.title': string;
   'scenarios.guide.step1': string;

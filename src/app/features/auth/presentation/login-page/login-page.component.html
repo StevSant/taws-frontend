@@ -130,50 +130,46 @@
     </section>
 
     <aside class="login-page__showcase" aria-labelledby="login-showcase-title">
-      <div class="login-page__showcase-brand">
-        <app-midas-logo [size]="28" />
-        <div>
-          <span class="login-page__showcase-name">{{ i18n.t('shell.brand') }}</span>
-          <span class="login-page__showcase-tag">{{ i18n.t('shell.tagline') }}</span>
-        </div>
-      </div>
+      <svg
+        class="login-page__market-trend"
+        viewBox="0 0 800 500"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="login-trend-stroke" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stop-color="#8f6b12" stop-opacity="0.08" />
+            <stop offset="55%" stop-color="#d4a017" stop-opacity="0.34" />
+            <stop offset="100%" stop-color="#f5c842" stop-opacity="0.62" />
+          </linearGradient>
+          <linearGradient id="login-trend-area" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d4a017" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="#d4a017" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path
+          class="login-page__market-area"
+          d="M0 430 L58 418 L104 382 L152 396 L207 350 L254 370 L310 318 L356 334 L410 278 L458 301 L512 244 L556 258 L614 184 L662 205 L714 142 L756 158 L800 92 L800 500 L0 500 Z"
+        />
+        <path
+          class="login-page__market-line"
+          d="M0 430 L58 418 L104 382 L152 396 L207 350 L254 370 L310 318 L356 334 L410 278 L458 301 L512 244 L556 258 L614 184 L662 205 L714 142 L756 158 L800 92"
+        />
+        <circle class="login-page__market-point" cx="800" cy="92" r="4" />
+      </svg>
 
       <div class="login-page__constellation" aria-hidden="true">
-        <svg class="login-page__network" viewBox="0 0 560 360" preserveAspectRatio="none">
-          <defs>
-            <radialGradient id="login-halo">
-              <stop offset="0%" stop-color="#f5c842" stop-opacity="0.22" />
-              <stop offset="100%" stop-color="#f5c842" stop-opacity="0" />
-            </radialGradient>
-            <linearGradient id="login-line" x1="0" x2="1">
-              <stop offset="0%" stop-color="#d4a017" stop-opacity="0.12" />
-              <stop offset="50%" stop-color="#f5c842" stop-opacity="0.7" />
-              <stop offset="100%" stop-color="#d4a017" stop-opacity="0.12" />
-            </linearGradient>
-          </defs>
-          <ellipse cx="280" cy="177" rx="122" ry="116" fill="url(#login-halo)" />
-          <circle class="login-page__orbit login-page__orbit--outer" cx="280" cy="177" r="145" />
-          <circle class="login-page__orbit login-page__orbit--inner" cx="280" cy="177" r="91" />
-          <path class="login-page__network-line" d="M280 177 L98 70" />
-          <path class="login-page__network-line" d="M280 177 L459 67" />
-          <path class="login-page__network-line" d="M280 177 L55 187" />
-          <path class="login-page__network-line" d="M280 177 L503 179" />
-          <path class="login-page__network-line" d="M280 177 L147 302" />
-          <path class="login-page__network-line" d="M280 177 L414 302" />
-          <circle class="login-page__network-pulse" cx="280" cy="177" r="4" />
-        </svg>
-
         <div class="login-page__hub">
           <div class="login-page__hub-glyph">
-            <app-midas-glyph [glyph]="glyphFor(supervisor)" [size]="96" />
+            <app-midas-logo [size]="showcaseMidasSize()" />
           </div>
-          <span class="login-page__hub-label">{{ i18n.t(supervisor.nameKey) }}</span>
+          <span class="login-page__hub-label">{{ i18n.t('shell.brand') }}</span>
         </div>
 
         @for (agent of specialists; track agent.id; let i = $index) {
           <div class="login-page__sat" [attr.data-slot]="i">
             <div class="login-page__sat-glyph">
-              <app-midas-glyph [glyph]="glyphFor(agent)" [size]="46" />
+              <app-midas-glyph [glyph]="glyphFor(agent)" [size]="showcaseAgentSize()" />
             </div>
             <span>{{ i18n.t(agent.nameKey) }}</span>
           </div>
@@ -182,8 +178,8 @@
 
       <div class="login-page__agent-strip" aria-hidden="true">
         <div class="login-page__agent-chip login-page__agent-chip--hub">
-          <app-midas-glyph [glyph]="glyphFor(supervisor)" [size]="30" />
-          <span>{{ i18n.t(supervisor.nameKey) }}</span>
+          <app-midas-logo [size]="30" />
+          <span>{{ i18n.t('shell.brand') }}</span>
         </div>
         @for (agent of specialists; track agent.id) {
           <div class="login-page__agent-chip">

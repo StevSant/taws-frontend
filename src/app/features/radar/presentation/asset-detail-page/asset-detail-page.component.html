@@ -23,6 +23,7 @@
   }
 
   @if (store.instrument(); as instrument) {
+    @let source = assetSource(instrument);
     <header class="asset-detail__header">
       <div class="asset-detail__identity">
         <app-instrument-ticker-badge [symbol]="instrument.symbol" size="md" />
@@ -37,28 +38,40 @@
         </div>
       </div>
 
-      <div class="asset-detail__watchlist">
-        <app-button
-          [label]="
-            store.watchlistBusy()
-              ? i18n.t('radar.detail.watchlist.busy')
-              : store.inWatchlist()
-                ? i18n.t('radar.detail.watchlist.remove')
-                : i18n.t('radar.detail.watchlist.add')
-          "
-          [disabled]="!store.watchlistAvailable() || store.watchlistBusy()"
-          (pressed)="onToggleWatchlist()"
-        />
-        @if (!store.watchlistAvailable()) {
-          <span class="asset-detail__watchlist-hint">{{
-            i18n.t('radar.detail.watchlist.signInHint')
-          }}</span>
-        }
-        @if (store.watchlistError(); as watchlistError) {
-          <span class="asset-detail__watchlist-error" role="alert"
-            >{{ i18n.t('radar.detail.watchlist.error') }} {{ watchlistError }}</span
-          >
-        }
+      <div class="asset-detail__actions">
+        <a
+          class="asset-detail__source-link"
+          [href]="source.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>{{ i18n.t('radar.detail.viewOnSource') }} {{ source.name }}</span>
+          <span class="asset-detail__source-link-icon" aria-hidden="true">&#8599;</span>
+        </a>
+
+        <div class="asset-detail__watchlist">
+          <app-button
+            [label]="
+              store.watchlistBusy()
+                ? i18n.t('radar.detail.watchlist.busy')
+                : store.inWatchlist()
+                  ? i18n.t('radar.detail.watchlist.remove')
+                  : i18n.t('radar.detail.watchlist.add')
+            "
+            [disabled]="!store.watchlistAvailable() || store.watchlistBusy()"
+            (pressed)="onToggleWatchlist()"
+          />
+          @if (!store.watchlistAvailable()) {
+            <span class="asset-detail__watchlist-hint">{{
+              i18n.t('radar.detail.watchlist.signInHint')
+            }}</span>
+          }
+          @if (store.watchlistError(); as watchlistError) {
+            <span class="asset-detail__watchlist-error" role="alert"
+              >{{ i18n.t('radar.detail.watchlist.error') }} {{ watchlistError }}</span
+            >
+          }
+        </div>
       </div>
     </header>
 

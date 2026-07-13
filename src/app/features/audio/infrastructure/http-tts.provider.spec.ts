@@ -122,4 +122,46 @@ describe('HttpTtsProvider', () => {
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:fake-url');
     await playback;
   });
+
+  it('splits a long multi-sentence reply and plays the chunks in sequence (pipelined)', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 200, blob: () => Promise.resolve(new Blob()) });
+
+    // Two sentences too long to merge into one chunk -> synthesized as a pipeline.
+    const first = `${'A'.repeat(120)}.`;
+    const second = `${'B'.repeat(120)}.`;
+    const playback = provider.speak(`${first} ${second}`);
+
+    await flush();
+    // Chunk 0 is awaited AND chunk 1 is prefetched while chunk 0 plays.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(FakeAudio.lastAudio?.play).toHaveBeenCalled();
+    FakeAudio.lastAudio?.onended?.(); // finish chunk 0
+
+    await flush();
+    FakeAudio.lastAudio?.onended?.(); // finish chunk 1
+    await playback;
+
+    const bodies = fetchMock.mock.calls.map((call) => JSON.parse(call[1].body).text as string);
+    expect(bodies[0].startsWith('A')).toBe(true);
+    expect(bodies[1].startsWith('B')).toBe(true);
+  });
+
+  it('supersedes the previous session on stop()+speak() without hanging (message switch)', async () => {
+    fetchMock.mockResolvedValue({ ok: true, status: 200, blob: () => Promise.resolve(new Blob()) });
+
+    const first = provider.speak('hi');
+    await flush();
+
+    // AudioPlaybackStore.play() does exactly this synchronous pair when switching messages.
+    provider.stop();
+    const second = provider.speak('bye');
+    await flush();
+
+    // The second session is the active one and plays its own clip.
+    expect(FakeAudio.lastAudio?.play).toHaveBeenCalled();
+    FakeAudio.lastAudio?.onended?.();
+
+    // Both settle — the superseded first call resolves as a cancel, the second completes.
+    await expect(Promise.all([first, second])).resolves.toBeDefined();
+  });
 });

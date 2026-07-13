@@ -527,6 +527,7 @@ export const ES_TRANSLATIONS = {
   'radar.detail.watchlist.signInHint': 'Inicia sesión para crear y gestionar listas de seguimiento',
   'radar.detail.watchlist.error': 'No se pudo actualizar la lista de seguimiento:',
   'radar.detail.watchlist.defaultName': 'Mi lista de seguimiento',
+  'radar.detail.viewOnSource': 'Ver en',
   'scenarios.title': 'Escenarios',
   'scenarios.guide.title': 'Cómo funcionan los escenarios',
   'scenarios.guide.step1': 'Describí un evento o situación (ej. "La Fed baja tasas 50pb").',
