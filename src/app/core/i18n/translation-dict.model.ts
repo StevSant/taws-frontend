@@ -548,6 +548,12 @@ export interface TranslationDict {
   'telegram.botRegistration.error.noToken': string;
   'telegram.botRegistration.error.noMessages': string;
   'telegram.botRegistration.error.generic': string;
+  'telegram.botRegistration.sendTestNews': string;
+  'telegram.botRegistration.sendingTestNews': string;
+  'telegram.botRegistration.testNewsSent': string;
+  'telegram.botRegistration.testNewsError.noEvents': string;
+  'telegram.botRegistration.testNewsError.noBot': string;
+  'telegram.botRegistration.testNewsError.generic': string;
   'scenarios.description': string;
   'scenarios.disclaimer.static': string;
   'scenarios.mode.preset': string;

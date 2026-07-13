@@ -586,6 +586,15 @@ export const EN_TRANSLATIONS = {
     'No messages found for the bot. Send any message to @{username} and try again.',
   'telegram.botRegistration.error.generic':
     'An error occurred while registering the bot. Please try again.',
+  'telegram.botRegistration.sendTestNews': 'Send Test News',
+  'telegram.botRegistration.sendingTestNews': 'Sending…',
+  'telegram.botRegistration.testNewsSent': '✅ Test news sent: {eventTitle}',
+  'telegram.botRegistration.testNewsError.noEvents':
+    'No news events available. Try again later.',
+  'telegram.botRegistration.testNewsError.noBot':
+    'You don\'t have a Telegram bot registered. Register one first.',
+  'telegram.botRegistration.testNewsError.generic':
+    'An error occurred while sending the test news. Please try again.',
   'scenarios.description': 'Simulate the market impact of a geopolitical or macro event.',
   'scenarios.disclaimer.static':
     'Scenario simulations are for informational purposes only — not financial advice or trade signals.',

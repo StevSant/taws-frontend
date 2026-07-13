@@ -602,6 +602,15 @@ export const ES_TRANSLATIONS = {
     'No se encontró ningún mensaje en el bot. Enviá cualquier mensaje a @{username} y volvé a intentarlo.',
   'telegram.botRegistration.error.generic':
     'Ocurrió un error al registrar el bot. Intentá de nuevo.',
+  'telegram.botRegistration.sendTestNews': 'Enviar noticia de prueba',
+  'telegram.botRegistration.sendingTestNews': 'Enviando…',
+  'telegram.botRegistration.testNewsSent': '✅ Noticia de prueba enviada: {eventTitle}',
+  'telegram.botRegistration.testNewsError.noEvents':
+    'No hay eventos de noticias disponibles. Intentá de nuevo más tarde.',
+  'telegram.botRegistration.testNewsError.noBot':
+    'No tenés un bot de Telegram registrado. Registrá uno primero.',
+  'telegram.botRegistration.testNewsError.generic':
+    'Ocurrió un error al enviar la noticia de prueba. Intentá de nuevo.',
   'scenarios.description':
     'Simulá el impacto de mercado de un evento geopolítico o macroeconómico.',
   'scenarios.disclaimer.static':

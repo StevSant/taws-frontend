@@ -28,6 +28,16 @@
     (pressed)="onRegister()"
   />
 
+  <app-button
+    [label]="
+      testNewsStore.isPending()
+        ? i18n.t('telegram.botRegistration.sendingTestNews')
+        : i18n.t('telegram.botRegistration.sendTestNews')
+    "
+    [disabled]="testNewsStore.isPending()"
+    (pressed)="onSendTestNews()"
+  />
+
   @if (store.error(); as error) {
     <div class="bot-registration-panel__error feature-error" role="alert">
       {{ error }}
@@ -43,6 +53,23 @@
         </p>
         <p class="bot-registration-panel__success-chat">
           {{ i18n.t('telegram.botRegistration.chatId').replace('{chatId}', result.chatId) }}
+        </p>
+      </div>
+    </div>
+  }
+
+  @if (testNewsStore.error(); as error) {
+    <div class="bot-registration-panel__error feature-error" role="alert">
+      {{ error }}
+    </div>
+  }
+
+  @if (testNewsStore.result(); as result) {
+    <div class="bot-registration-panel__success">
+      <span class="bot-registration-panel__success-icon">&#x2705;</span>
+      <div class="bot-registration-panel__success-body">
+        <p class="bot-registration-panel__success-text">
+          {{ i18n.t('telegram.botRegistration.testNewsSent').replace('{eventTitle}', result.eventTitle) }}
         </p>
       </div>
     </div>
