@@ -510,13 +510,22 @@ export class BriefingPanelStore {
     if (!background && this.watchlistsSignal().length === 0) {
       this.isLoadingWatchlistsSignal.set(true);
     }
-    this.errorSignal.set(null);
+    if (!background) {
+      this.errorSignal.set(null);
+    }
     try {
       const watchlists = await this.watchlistRepository.fetchWatchlists();
       this.watchlistsSignal.set(watchlists);
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-      this.watchlistsSignal.set([]);
+      // A background refresh must never destroy the last-known-good list: a
+      // transient failure (e.g. an intermittent 500) would otherwise empty the
+      // watchlist selector even though we already had a valid set loaded. Only
+      // a foreground load — where there is nothing to preserve — surfaces the
+      // error and reflects the empty result.
+      if (!background) {
+        this.errorSignal.set(this.toErrorMessage(error));
+        this.watchlistsSignal.set([]);
+      }
     } finally {
       this.isLoadingWatchlistsSignal.set(false);
     }
