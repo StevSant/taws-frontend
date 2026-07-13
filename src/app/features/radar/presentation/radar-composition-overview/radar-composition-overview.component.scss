@@ -57,9 +57,20 @@
     background: color-mix(in srgb, var(--color-surface) 92%, transparent);
     transition:
       border-color 0.15s ease,
-      box-shadow 0.15s ease;
+      box-shadow 0.15s ease,
+      opacity 0.15s ease;
+
+    &--selected {
+      border-color: var(--color-gold-border-hi);
+      box-shadow: 0 0 0 1px var(--color-gold-dim-bg);
+    }
+
+    &--muted {
+      opacity: 0.58;
+    }
 
     &:hover {
+      opacity: 1;
       border-color: var(--color-gold-border);
       box-shadow: 0 6px 18px rgba(212, 160, 23, 0.08);
     }
@@ -90,6 +101,10 @@
     color: inherit;
     text-align: left;
     cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+    }
   }
 
   &__lane-lead {

@@ -175,4 +175,84 @@
     color: var(--color-negative, #ea3943);
     font-size: 0.78rem;
   }
+
+  &__coingecko {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__cg-search {
+    align-self: flex-start;
+    padding: 0.35rem 0.7rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-gold-border);
+    background: none;
+    color: var(--color-gold);
+    font-size: 0.78rem;
+    font-weight: 650;
+    cursor: pointer;
+    transition: background 0.12s ease;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    }
+
+    &:disabled {
+      cursor: default;
+      color: var(--color-text-muted);
+      border-color: var(--color-border);
+    }
+  }
+
+  &__cg-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  &__cg-result-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: 0.4rem 0.55rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: none;
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background 0.12s ease,
+      border-color 0.12s ease;
+
+    .radar-add-instrument__result-name {
+      flex: 1;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-gold-border);
+      background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    }
+
+    &:disabled {
+      cursor: default;
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__cg-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
 }

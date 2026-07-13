@@ -80,10 +80,26 @@ export class NewsCardComponent {
     return classifyNewsSentiment(this.news.sentimentScore);
   }
 
+  /**
+   * Whether this article is linked to no instrument at all — a distinct, terminal state, not
+   * a pending one (issue #68). Signals are generated per instrument, so such an article will
+   * never be classified, however long you wait. Collapsing it into "Sin clasificar" alongside
+   * items that simply haven't been analyzed yet is what made the whole feed look broken.
+   *
+   * Trusts the backend's persisted `skipReason` first, and falls back to the absence of
+   * `relatedSymbols` for items no analysis run has looked at yet.
+   */
+  hasNoInstrument(): boolean {
+    return this.news.skipReason === 'no_linked_instrument' || this.news.relatedSymbols.length === 0;
+  }
+
   sentimentLabel(): string {
     const impact = this.sentiment();
-    return impact
-      ? this.i18n.t(IMPACT_LABELS[impact])
+    if (impact) {
+      return this.i18n.t(IMPACT_LABELS[impact]);
+    }
+    return this.hasNoInstrument()
+      ? this.i18n.t('radar.card.impact.noInstrument')
       : this.i18n.t('radar.card.impact.unclassified');
   }
 

@@ -5,15 +5,20 @@ import { AppConfigService, cachedFetch, RequestCacheService } from '../../../cor
 import {
   NewsBrowsePage,
   NewsBrowseQuery,
+  NewsDetail,
   NewsFacets,
   NewsItem,
+  NewsNotAnalyzableError,
   NewsPage,
   NewsPageRequest,
   NewsRepository,
+  NewsSkipReason,
   RadarFilters,
 } from '../domain';
+import { mapNewsDetailDto } from './map-news-detail-dto';
 import { mapNewsItemDto } from './map-news-item-dto';
 import { NewsBrowseResponseDto } from './news-browse-response-dto';
+import { NewsDetailDto } from './news-detail-dto';
 import { NewsFacetsDto } from './news-facets-dto';
 import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
@@ -22,6 +27,23 @@ const NEWS_PATH = '/api/v1/news';
 const NEWS_BROWSE_PATH = '/api/v1/news/browse';
 const NEWS_FACETS_PATH = '/api/v1/news/facets';
 const HTTP_NOT_FOUND = 404;
+const HTTP_UNPROCESSABLE = 422;
+/** Cache namespace `getNewsById` stores single items under (keyed by news id). */
+const NEWS_ITEM_CACHE = 'news-item';
+
+/** Shape of the backend's 422 body from `POST /news/{id}/analyze`. */
+interface NotAnalyzableDetail {
+  skip_reason?: NewsSkipReason;
+}
+
+/** Reads `detail.skip_reason` out of a 422, or `null` if the body isn't the shape we expect. */
+function readSkipReason(error: HttpErrorResponse): NewsSkipReason | null {
+  const detail: unknown = error.error?.detail;
+  if (detail && typeof detail === 'object' && 'skip_reason' in detail) {
+    return (detail as NotAnalyzableDetail).skip_reason ?? null;
+  }
+  return null;
+}
 
 /** Backend may return a bare array or a paginated `{ items }` envelope. */
 type NewsWireResponse = NewsListResponseDto | NewsItemDto[];
@@ -167,15 +189,18 @@ export class HttpNewsRepository extends NewsRepository {
     );
   }
 
-  async getNewsById(id: string): Promise<NewsItem | null> {
-    return cachedFetch(this.cache, 'news-item', id, this.config.newsCacheTtlMs, async () => {
+  async getNewsDetail(id: string, options?: { refresh?: boolean }): Promise<NewsDetail | null> {
+    if (options?.refresh) {
+      this.cache.delete(NEWS_ITEM_CACHE, id);
+    }
+    return cachedFetch(this.cache, NEWS_ITEM_CACHE, id, this.config.newsCacheTtlMs, async () => {
       try {
         const dto = await firstValueFrom(
           this.http
-            .get<NewsItemDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
+            .get<NewsDetailDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
             .pipe(timeout(this.config.newsRequestTimeoutMs)),
         );
-        return mapNewsItemDto(dto);
+        return mapNewsDetailDto(dto);
       } catch (error: unknown) {
         if (error instanceof HttpErrorResponse && error.status === HTTP_NOT_FOUND) {
           return this.findNewsInRecentFeed(id);
@@ -185,10 +210,46 @@ export class HttpNewsRepository extends NewsRepository {
     });
   }
 
-  /** Fallback when the detail endpoint is unavailable — scan the recent feed. */
-  private async findNewsInRecentFeed(id: string): Promise<NewsItem | null> {
+  /**
+   * Fallback when the detail endpoint is unavailable — scan the recent feed. The feed carries
+   * news items, not the enriched detail, so the affected-instrument and related-news sections
+   * are empty here: the page degrades to the article itself rather than to a 404.
+   */
+  private async findNewsInRecentFeed(id: string): Promise<NewsDetail | null> {
     const defaultFilters: RadarFilters = { sinceHours: 720, symbol: null, assetClass: null };
     const news = await this.fetchNews(defaultFilters);
-    return news.find((item) => item.id === id) ?? null;
+    const match = news.find((item) => item.id === id);
+    return match ? { news: match, affectedInstruments: [], relatedNews: [] } : null;
+  }
+
+  /**
+   * Force-analyzes one item (issue #27). Deliberately not cached — it's a mutation, and the
+   * whole point of the button is to re-run something the backend already decided about.
+   *
+   * Evicts the stale `getNewsDetail` entry on every outcome. The endpoint answers with the
+   * article alone, not the enriched detail this cache holds, and the run has just invalidated
+   * both halves of it: on success there is now a signal (so the per-asset impact changed), and
+   * on a 422 the backend has just persisted *why* there isn't one. Leaving the pre-run entry
+   * cached would let a back-navigation inside the TTL resurrect it.
+   */
+  async analyzeNewsItem(id: string): Promise<NewsItem> {
+    try {
+      const dto = await firstValueFrom(
+        this.http
+          .post<NewsItemDto>(
+            `${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}/analyze`,
+            {},
+          )
+          .pipe(timeout(this.config.analyzeNewsRequestTimeoutMs)),
+      );
+      this.cache.delete(NEWS_ITEM_CACHE, id);
+      return mapNewsItemDto(dto);
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse && error.status === HTTP_UNPROCESSABLE) {
+        this.cache.delete(NEWS_ITEM_CACHE, id);
+        throw new NewsNotAnalyzableError(readSkipReason(error));
+      }
+      throw error;
+    }
   }
 }

@@ -101,27 +101,30 @@
     pointer-events: none;
   }
 
+  &__market-plot {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    animation: marketPlotReveal 12s ease-in-out infinite;
+  }
+
   &__market-line {
     fill: none;
     stroke: url('#login-trend-stroke');
     stroke-width: 1.4;
     vector-effect: non-scaling-stroke;
-    stroke-dasharray: 1200;
-    stroke-dashoffset: 1200;
-    animation: marketTrendDraw 14s ease-in-out infinite;
   }
 
   &__market-area {
     fill: url('#login-trend-area');
     opacity: 0;
-    animation: marketTrendArea 14s ease-in-out infinite;
+    animation: marketAreaFill 12s ease-in-out infinite;
   }
 
   &__market-point {
     fill: var(--login-gold-bright);
     opacity: 0;
     filter: drop-shadow(0 0 5px rgba(245, 200, 66, 0.6));
-    animation: marketTrendPoint 14s ease-in-out infinite;
+    animation: marketPointReveal 12s ease-in-out infinite;
   }
 
   &__constellation {
@@ -616,32 +619,32 @@
   }
 }
 
-@keyframes marketTrendDraw {
+@keyframes marketPlotReveal {
   0% {
     opacity: 0;
-    stroke-dashoffset: 1200;
+    clip-path: inset(0 100% 0 0);
   }
-  12% {
+  6% {
     opacity: 1;
   }
-  62%,
-  88% {
+  65%,
+  90% {
     opacity: 1;
-    stroke-dashoffset: 0;
+    clip-path: inset(0 0 0 0);
   }
   100% {
     opacity: 0;
-    stroke-dashoffset: 0;
+    clip-path: inset(0 0 0 0);
   }
 }
 
-@keyframes marketTrendArea {
+@keyframes marketAreaFill {
   0%,
-  30% {
+  64% {
     opacity: 0;
   }
-  62%,
-  88% {
+  72%,
+  90% {
     opacity: 1;
   }
   100% {
@@ -649,13 +652,13 @@
   }
 }
 
-@keyframes marketTrendPoint {
+@keyframes marketPointReveal {
   0%,
-  58% {
+  62% {
     opacity: 0;
   }
-  64%,
-  88% {
+  68%,
+  90% {
     opacity: 0.9;
   }
   100% {
@@ -1174,16 +1177,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-page__market-line,
+  .login-page__market-plot,
   .login-page__market-area,
   .login-page__market-point,
   .login-page__sat {
     animation: none;
   }
 
-  .login-page__market-line {
+  .login-page__market-plot {
     opacity: 1;
-    stroke-dashoffset: 0;
+    clip-path: inset(0 0 0 0);
   }
 
   .login-page__market-area {

@@ -11,41 +11,200 @@
     flex: 1;
     min-width: 0;
   }
+}
 
-  &__toolbar {
+// ---------------------------------------------------------------------------
+// CONDENSED HOME — lead grid: the user's lists + their reports lead the page.
+// ---------------------------------------------------------------------------
+.briefings-home {
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+
+  &__lists {
+    position: sticky;
+    // Clear the sticky shell header so the pinned column never slides under it.
+    top: calc(var(--shell-header-height) + var(--space-4));
+    // Cap to the viewport below the header and scroll internally when the
+    // watchlist manager is taller than the space — avoids overlap/detachment.
+    max-height: calc(100dvh - var(--shell-header-height) - var(--space-5));
+    overflow-y: auto;
+    min-width: 0;
+  }
+
+  &__reports {
+    min-width: 0;
+  }
+}
+
+// The reports column is the lead surface: elevated, gold-touched, sets hierarchy.
+.briefings-reports {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(140% 60% at 0% 0%, var(--color-gold-dim-bg), transparent 60%),
+    var(--color-surface);
+  box-shadow: var(--elevation-2);
+
+  &__bar {
     display: flex;
     align-items: flex-end;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--space-4);
   }
 
+  &__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+  }
+
+  &__controls {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
   &__field {
-    flex: 1 1 14rem;
-    max-width: 22rem;
+    flex: 1 1 12rem;
+    max-width: 18rem;
   }
 
-  &__prompt {
+  &__grid,
+  &__skeletons {
     margin: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// RELEVANT NEWS — watchlist-filtered strip between the lead and the asides.
+// ---------------------------------------------------------------------------
+.briefings-news {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+
+    // Gold tick marks the section as a first-class home surface, not an aside.
+    &::before {
+      content: '';
+      width: 0.2rem;
+      height: 1rem;
+      border-radius: var(--radius-full);
+      background: var(--color-gold);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// DEMOTED — collapsible secondary panels (guide/notes, activity).
+// ---------------------------------------------------------------------------
+.briefings-aside {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 70%, var(--color-background));
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.15s ease;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: '▸';
+      display: inline-block;
+      color: var(--color-gold);
+      transition: transform 0.2s ease;
+    }
+
+    &:hover {
+      color: var(--color-text-primary);
+    }
   }
 
-  &__prep {
-    font-family: var(--font-family-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--color-gold);
+  &[open] &__summary::before {
+    transform: rotate(90deg);
+  }
+
+  &__body {
+    padding: 0 var(--space-4) var(--space-4);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// DEMOTED — legal disclaimer shrunk to a one-line secondary footnote.
+// ---------------------------------------------------------------------------
+.briefings-footnote {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+
+  &__label {
+    font-weight: 700;
+    color: var(--color-text-secondary);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Responsive: collapse the lead grid to a single column, unsticky the lists.
+// ---------------------------------------------------------------------------
+@media (max-width: 900px) {
+  .briefings-home {
+    grid-template-columns: 1fr;
+  }
+
+  .briefings-home__lists {
+    position: static;
+    top: auto;
+    // Drop the sticky viewport cap once the column is full-width and stacked.
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
 @media (max-width: 768px) {
-  .briefings-page__toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .briefings-reports {
+    padding: var(--space-4);
   }
 
-  .briefings-page__field {
+  .briefings-reports__controls {
+    width: 100%;
+  }
+
+  .briefings-reports__field {
     flex: 1 1 auto;
     max-width: none;
   }
@@ -54,5 +213,30 @@
 @media (max-width: 480px) {
   .briefings-page__content {
     gap: var(--space-4);
+  }
+
+  .briefings-home {
+    gap: var(--space-4);
+  }
+
+  .briefings-reports {
+    padding: var(--space-3);
+    gap: var(--space-4);
+  }
+
+  .briefings-reports__bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .briefings-reports__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .briefings-aside__summary::before {
+    transition: none;
   }
 }

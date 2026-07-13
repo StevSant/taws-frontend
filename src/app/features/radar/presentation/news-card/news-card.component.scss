@@ -76,6 +76,15 @@
       background: color-mix(in srgb, var(--color-border) 40%, transparent);
       color: var(--color-text-muted);
     }
+
+    // Terminal, not pending: this article is linked to no instrument, so it will never be
+    // classified. Rendered flatter than `--pending` so it reads as a settled state rather
+    // than as something still in the queue.
+    &--no-instrument {
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px dashed var(--color-border);
+    }
   }
 
   /**

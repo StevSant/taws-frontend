@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
@@ -11,6 +11,7 @@ import {
   SpinnerComponent,
 } from '../../../../shared';
 import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
+import { ChartDateWindow } from '../../../../shared/charts';
 import { AssetDetailStore, buildAssetSource } from '../../application';
 import { AssetClass, AssetSource, ImpactClass, Instrument } from '../../domain';
 import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
@@ -74,6 +75,9 @@ export class AssetDetailPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly shellSearch = inject(ShellSearchService);
   private currentSymbol: string | null = null;
+
+  /** Date window last selected on the price chart (via zoom); drives the "ask why" action. */
+  readonly selectedWindow = signal<ChartDateWindow | null>(null);
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -143,5 +147,33 @@ export class AssetDetailPageComponent {
       symbol: instrument.symbol,
       name: instrument.name,
     });
+  }
+
+  onChartWindow(window: ChartDateWindow): void {
+    this.selectedWindow.set(window);
+  }
+
+  /** Opens a new chat asking why this asset moved in the selected chart window (issue #73). */
+  onAskWhy(): void {
+    const instrument = this.store.instrument();
+    const window = this.selectedWindow();
+    if (!instrument || !window) {
+      return;
+    }
+    const prompt = this.i18n
+      .t('radar.detail.askWhy.prompt')
+      .replace('{symbol}', instrument.symbol)
+      .replace('{from}', window.fromDate)
+      .replace('{to}', window.toDate);
+    void this.shellSearch.goToChatWithReference(
+      {
+        kind: 'asset',
+        symbol: instrument.symbol,
+        name: instrument.name,
+        fromDate: window.fromDate,
+        toDate: window.toDate,
+      },
+      prompt,
+    );
   }
 }

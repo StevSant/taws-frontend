@@ -169,10 +169,10 @@ describe('RealtimeWebrtcService', () => {
     const update = sent.find((m) => m.type === 'session.update');
     expect(update).toBeDefined();
     expect(update.session.tools).toEqual([{ name: 'get_market_data' }]);
-    expect(update.session.tool_choice).toBe('required');
+    expect(update.session.tool_choice).toBe('auto');
   });
 
-  it('requires a real tool call when the user starts speaking', async () => {
+  it('does not force a tool call on user speech, so greetings can be answered with plain text', async () => {
     primeHandshake();
     await service.start();
     const channel = FakePeerConnection.last!.channel;
@@ -180,10 +180,10 @@ describe('RealtimeWebrtcService', () => {
     channel.emitMessage(JSON.stringify({ type: 'input_audio_buffer.speech_started' }));
 
     const sent = channel.sent.map((message) => JSON.parse(message));
-    const update = sent.find(
-      (message) => message.type === 'session.update' && message.session.tool_choice === 'required',
+    const forced = sent.find(
+      (message) => message.type === 'session.update' && message.session?.tool_choice === 'required',
     );
-    expect(update).toBeDefined();
+    expect(forced).toBeUndefined();
   });
 
   it('renders a chart directly from transcribed chart intent and a follow-up symbol', async () => {
