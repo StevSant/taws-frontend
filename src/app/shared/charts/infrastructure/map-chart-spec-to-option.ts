@@ -32,8 +32,13 @@ export function mapChartSpecToOption(
   const formatDate = createTimeAxisFormatter(locale);
 
   switch (spec.type) {
-    case 'candlestick':
-      return { ...base, ...candlestickOption(spec, theme, formatDate) };
+    case 'candlestick': {
+      const option = candlestickOption(spec, theme, formatDate);
+      // Only add the date-zoom controls when there is real series data (skip the empty spec).
+      return option.series
+        ? { ...base, ...option, ...dateZoomLayout(theme) }
+        : { ...base, ...option };
+    }
     case 'line':
     case 'area':
       return { ...base, ...lineOption(spec, theme, formatDate) };
@@ -60,6 +65,31 @@ type DateAxisFormatter = (value: string | number) => string;
  * and the rest sits above, keeping the candles readable.
  */
 const VOLUME_PLOT_FRACTION = 0.28;
+
+/**
+ * Interactive date-zoom for the price chart: mouse-wheel / drag zoom inside the plot plus a
+ * draggable range slider below, both bound to the shared category x-axis. Lets the user zoom
+ * into any sub-window of the loaded series and the price y-axis rescales to that window. The
+ * grid gets extra bottom room so the slider doesn't collide with the date labels.
+ */
+function dateZoomLayout(theme: ChartTheme): Pick<EChartsOption, 'grid' | 'dataZoom'> {
+  return {
+    grid: { left: 56, right: 20, top: 44, bottom: 64 },
+    dataZoom: [
+      { type: 'inside', xAxisIndex: 0 },
+      {
+        type: 'slider',
+        xAxisIndex: 0,
+        height: 16,
+        bottom: 8,
+        borderColor: theme.grid,
+        fillerColor: 'rgba(232, 181, 48, 0.12)',
+        handleStyle: { color: theme.gold },
+        textStyle: { color: theme.textSecondary },
+      },
+    ],
+  };
+}
 
 function candlestickOption(
   spec: ChartSpec,
