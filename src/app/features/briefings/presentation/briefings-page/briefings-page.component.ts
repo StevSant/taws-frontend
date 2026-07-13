@@ -13,10 +13,14 @@ import {
   SkeletonCardComponent,
 } from '../../../../shared';
 import { NotesPanelComponent } from '../../../notes/presentation';
-import { BriefingPanelStore } from '../../application';
+import { BriefingPanelStore, RelevantNewsStore } from '../../application';
+import { RelevantNewsRepository } from '../../domain';
+import { HttpRelevantNewsRepository } from '../../infrastructure';
 import { ReviewDecisionSubmitted } from '../review-panel/review-panel.component';
 import { BriefingCardComponent } from '../briefing-card/briefing-card.component';
 import { WatchlistManagerComponent } from '../watchlist-manager/watchlist-manager.component';
+import { GenerationFocusComponent } from '../generation-focus/generation-focus.component';
+import { NewsStripComponent } from '../news-strip/news-strip.component';
 
 /** Caps the recent-activity list to the most recent entries. */
 const ACTIVITY_FEED_LIMIT = 8;
@@ -35,8 +39,17 @@ const ACTIVITY_FEED_LIMIT = 8;
     BriefingCardComponent,
     WatchlistManagerComponent,
     NotesPanelComponent,
+    GenerationFocusComponent,
+    NewsStripComponent,
   ],
-  providers: [DatePipe],
+  providers: [
+    DatePipe,
+    // Page-scoped news slice: the store + its port→adapter binding live with the
+    // page so the "Noticias relevantes" strip stays self-contained (mirrors how
+    // chat-page provides its own repository bindings).
+    RelevantNewsStore,
+    { provide: RelevantNewsRepository, useClass: HttpRelevantNewsRepository },
+  ],
   templateUrl: './briefings-page.component.html',
   styleUrl: './briefings-page.component.scss',
 })
@@ -114,6 +127,26 @@ export class BriefingsPageComponent implements OnInit {
 
   onWatchlistChange(watchlistId: string | null): void {
     void this.store.selectWatchlist(watchlistId);
+  }
+
+  /** "Nothing selected" empty-state CTA: jump into the first available watchlist. */
+  onSelectFirstWatchlist(): void {
+    const first = this.store.watchlists()[0];
+    if (first) {
+      void this.store.selectWatchlist(first.id);
+    }
+  }
+
+  /**
+   * "No watchlists yet" empty-state CTA: scrolls the watchlist manager's create
+   * form into view and focuses its name input so the user can start a list. The
+   * manager lives in the left column (`#watchlist-create-name`); there is no
+   * standalone create action on this page, so this hands off to that form.
+   */
+  onStartFirstWatchlist(): void {
+    const input = document.getElementById('watchlist-create-name');
+    input?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    (input as HTMLInputElement | null)?.focus({ preventScroll: true });
   }
 
   onGenerate(): void {

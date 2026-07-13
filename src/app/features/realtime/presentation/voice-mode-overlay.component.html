@@ -23,10 +23,9 @@
   <div class="voice-mode__shell" [class.voice-mode__shell--chart-open]="activeChart()">
     <header class="voice-mode__header">
       <div class="voice-mode__brand">
-        <app-midas-glyph
+        <app-midas-logo
           class="voice-mode__brand-mark"
-          glyph="brand-neural-orb"
-          [size]="38"
+          [size]="32"
           [animated]="isLive() || isConnecting()"
         />
         <div class="voice-mode__brand-copy">
@@ -77,7 +76,7 @@
               <app-golden-polyhedron
                 [size]="orbSize"
                 [activity]="orbActivity()"
-                [emissiveIntensityScale]="0"
+                [emissiveIntensityScale]="0.5"
               />
             </div>
 

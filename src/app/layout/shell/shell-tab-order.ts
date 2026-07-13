@@ -6,7 +6,6 @@
 const SHELL_TAB_PREFIXES = [
   '/radar',
   '/chat',
-  '/agents',
   '/scenarios',
   '/briefings',
   '/watchlists',

@@ -1,0 +1,221 @@
+:host {
+  display: block;
+}
+
+.gen-focus {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-8) var(--space-5);
+  overflow: hidden;
+  text-align: center;
+  border: 1px solid var(--color-gold-border-hi);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(120% 80% at 50% 0%, var(--color-gold-dim-bg), transparent 70%),
+    var(--color-surface);
+  box-shadow: var(--elevation-3);
+  isolation: isolate;
+
+  &__aura {
+    position: absolute;
+    inset: -40% 20% auto;
+    z-index: -1;
+    height: 60%;
+    background: radial-gradient(closest-side, var(--color-gold-dim-bg), transparent);
+    filter: blur(24px);
+    opacity: 0.9;
+    animation: genFocusAura 4s ease-in-out infinite;
+  }
+
+  &__ring {
+    position: relative;
+    width: 8.5rem;
+    height: 8.5rem;
+  }
+
+  &__ring-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  &__ring-track {
+    fill: none;
+    stroke: var(--color-border-hi);
+    stroke-width: 8;
+  }
+
+  &__ring-progress {
+    fill: none;
+    stroke: var(--color-gold);
+    stroke-width: 8;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px var(--color-gold-dim-bg));
+    transition: stroke-dashoffset 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &--indeterminate {
+      animation: genFocusRingSpin 1.4s linear infinite;
+      transform-origin: 60px 60px;
+    }
+  }
+
+  &__ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__percent {
+    font-family: var(--font-family-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    letter-spacing: -0.02em;
+  }
+
+  &__spinner {
+    width: 1.6rem;
+    height: 1.6rem;
+    border: 3px solid var(--color-border-hi);
+    border-top-color: var(--color-gold);
+    border-radius: var(--radius-full);
+    animation: genFocusRingSpin 0.9s linear infinite;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: 44ch;
+  }
+
+  &__heading {
+    font-size: clamp(1.15rem, 1rem + 0.8vw, 1.5rem);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  &__subtext {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--color-text-secondary);
+  }
+
+  &__step {
+    margin-top: var(--space-1);
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+
+    &--indeterminate {
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__bar {
+    position: relative;
+    width: min(22rem, 100%);
+    height: 6px;
+    margin-top: var(--space-1);
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background: var(--color-border-hi);
+  }
+
+  &__bar-fill {
+    position: absolute;
+    inset: 0;
+    transform-origin: left center;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, var(--color-gold), var(--color-gold-bright));
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  &__bar-sweep {
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    border-radius: var(--radius-full);
+    background: linear-gradient(90deg, transparent, var(--color-gold-bright), transparent);
+    animation: genFocusSweep 1.3s ease-in-out infinite;
+  }
+
+  &__error {
+    max-width: 44ch;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-loss-border);
+    border-radius: var(--radius-md);
+    background: var(--color-loss-dim);
+    color: var(--color-loss);
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+}
+
+@keyframes genFocusAura {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes genFocusRingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes genFocusSweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+@media (max-width: 480px) {
+  .gen-focus {
+    padding: var(--space-6) var(--space-4);
+
+    &__ring {
+      width: 7rem;
+      height: 7rem;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gen-focus__aura,
+  .gen-focus__ring-progress--indeterminate,
+  .gen-focus__spinner,
+  .gen-focus__bar-sweep {
+    animation: none;
+  }
+
+  .gen-focus__bar-fill,
+  .gen-focus__ring-progress {
+    transition: none;
+  }
+
+  .gen-focus__spinner {
+    border-top-color: var(--color-gold);
+    opacity: 0.9;
+  }
+}

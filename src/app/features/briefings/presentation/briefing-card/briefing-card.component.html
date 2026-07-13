@@ -1,10 +1,14 @@
 <article class="briefing-card">
+  <!-- Header: report identity on the left, live review status on the right. -->
   <header class="briefing-card__header">
     <div class="briefing-card__identity">
-      <span class="briefing-card__ticker">#{{ briefing.id.slice(0, 8) }}</span>
-      <span class="briefing-card__created">
-        {{ i18n.t('briefings.card.createdAt') }} {{ briefing.createdAt | date: 'short' }}
-      </span>
+      <span class="briefing-card__eyebrow">{{ i18n.t('briefings.card.eyebrow') }}</span>
+      <div class="briefing-card__id-row">
+        <span class="briefing-card__ticker">#{{ briefing.id.slice(0, 8) }}</span>
+        <span class="briefing-card__created">
+          {{ i18n.t('briefings.card.createdAt') }} {{ briefing.createdAt | date: 'medium' }}
+        </span>
+      </div>
     </div>
 
     <div
@@ -22,29 +26,109 @@
     </div>
   </header>
 
-  <p class="briefing-card__summary">{{ briefing.summary }}</p>
+  <!-- Summary: the report body, read as comfortable prose. -->
+  <section class="briefing-card__section briefing-card__section--summary">
+    <h3 class="briefing-card__section-title">{{ i18n.t('briefings.card.summary.title') }}</h3>
+    <p class="briefing-card__summary taws-selectable">{{ briefing.summary }}</p>
+  </section>
 
-  <div class="briefing-card__linked-signals">
-    <span class="briefing-card__linked-signals-title">
-      {{ i18n.t('briefings.card.linkedSignals.title') }}
-    </span>
-    @if (briefing.linkedSignalIds.length === 0) {
-      <span class="briefing-card__linked-signals-empty">
-        {{ i18n.t('briefings.card.linkedSignals.empty') }}
-      </span>
-    } @else {
-      <ul class="briefing-card__linked-signals-list">
-        @for (signalId of briefing.linkedSignalIds; track signalId) {
-          <li class="briefing-card__linked-signal">{{ signalId }}</li>
+  <!-- Evidence: the signals backing this report, as resolved in-app links. -->
+  <section class="briefing-card__section briefing-card__evidence">
+    <div class="briefing-card__section-head">
+      <h3 class="briefing-card__section-title">
+        {{ i18n.t('briefings.card.linkedSignals.title') }}
+        <span class="briefing-card__evidence-count" aria-hidden="true">
+          {{ hasEnrichedSignals ? briefing.linkedSignals.length : briefing.linkedSignalIds.length }}
+        </span>
+      </h3>
+      <p class="briefing-card__section-sub">
+        {{ i18n.t('briefings.card.linkedSignals.subtitle') }}
+      </p>
+    </div>
+
+    @if (hasEnrichedSignals) {
+      <!--
+        Enriched evidence: each linked signal is an in-app link to its asset in
+        the radar (`/radar/:symbol`). An unresolved signal (symbol "—") degrades
+        to a non-link, de-emphasized chip so we never mint a broken link.
+      -->
+      <ul class="briefing-card__signals">
+        @for (signal of briefing.linkedSignals; track signal.signalId) {
+          <li>
+            @if (isUnresolved(signal)) {
+              <span
+                class="briefing-card__signal briefing-card__signal--unresolved"
+                [title]="signal.signalId"
+              >
+                <span class="briefing-card__signal-marker" aria-hidden="true"></span>
+                <span class="briefing-card__signal-symbol">
+                  {{ i18n.t('briefings.card.linkedSignals.unresolved') }}
+                </span>
+                <span class="briefing-card__signal-id taws-selectable">
+                  {{ shortSignalId(signal.signalId) }}
+                </span>
+              </span>
+            } @else {
+              <a
+                class="briefing-card__signal"
+                [class]="impactClass(signal.impact)"
+                [routerLink]="['/radar', signal.symbol]"
+                [title]="signal.title || signal.symbol"
+              >
+                <span
+                  class="briefing-card__signal-dot"
+                  aria-hidden="true"
+                  [attr.data-impact]="signal.impact"
+                ></span>
+                <span class="briefing-card__signal-symbol">{{ signal.symbol }}</span>
+                <span
+                  class="briefing-card__signal-confidence"
+                  [attr.aria-label]="
+                    i18n.t('briefings.card.linkedSignals.confidenceAria') +
+                    ' ' +
+                    confidencePercent(signal.confidence) +
+                    '% · ' +
+                    impactLabel(signal.impact)
+                  "
+                >
+                  {{ confidencePercent(signal.confidence) }}%
+                </span>
+                @if (signal.title) {
+                  <span class="briefing-card__signal-title">{{ signal.title }}</span>
+                }
+              </a>
+            }
+          </li>
         }
       </ul>
+    } @else if (briefing.linkedSignalIds.length > 0) {
+      <!--
+        Fallback for older/edge responses that carry raw ids but no enriched
+        `linkedSignals`: keep the de-emphasized id chips so nothing regresses.
+      -->
+      <ul class="briefing-card__evidence-list">
+        @for (signalId of briefing.linkedSignalIds; track signalId) {
+          <li class="briefing-card__evidence-item" [title]="signalId">
+            <span class="briefing-card__evidence-marker" aria-hidden="true"></span>
+            <span class="briefing-card__evidence-id taws-selectable">{{
+              shortSignalId(signalId)
+            }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="briefing-card__evidence-empty">
+        {{ i18n.t('briefings.card.linkedSignals.empty') }}
+      </p>
     }
-  </div>
+  </section>
 
+  <!-- Disclaimer: legal footnote, deliberately quiet. -->
   <p class="briefing-card__disclaimer">
     <strong>{{ i18n.t('briefings.card.disclaimer.label') }}:</strong> {{ briefing.disclaimer }}
   </p>
 
+  <!-- Actions: export lives inline with the review controls below. -->
   <div class="briefing-card__export">
     <app-button
       [label]="

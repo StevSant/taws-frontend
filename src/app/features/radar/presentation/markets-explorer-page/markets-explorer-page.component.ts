@@ -145,6 +145,18 @@ export class MarketsExplorerPageComponent implements OnInit {
     return `${sign}${value.toFixed(2)}%`;
   }
 
+  /** Compact currency formatting for large magnitudes (e.g. `$950.0B`, `$32.4M`). */
+  formatCompactCurrency(value: number | null, currency: string): string {
+    if (value === null) {
+      return '—';
+    }
+    const compact = new Intl.NumberFormat(this.i18n.locale(), {
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    }).format(value);
+    return `${compact} ${currency}`;
+  }
+
   private isAssetClass(value: string | null): value is AssetClass {
     return value !== null && (ASSET_CLASSES as readonly string[]).includes(value);
   }
