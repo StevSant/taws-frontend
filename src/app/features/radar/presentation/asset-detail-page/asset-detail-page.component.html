@@ -1,9 +1,7 @@
 <div class="feature-page asset-detail">
-  <a
-    class="asset-detail__back"
-    routerLink="/radar/explore"
-    (click)="onBack($event)"
-  >&#8592; {{ i18n.t('radar.detail.back.markets') }}</a>
+  <a class="asset-detail__back" routerLink="/radar/explore" (click)="onBack($event)"
+    >&#8592; {{ i18n.t('radar.detail.back.markets') }}</a
+  >
 
   @if (store.isLoading()) {
     <div class="asset-detail__state" aria-busy="true">
