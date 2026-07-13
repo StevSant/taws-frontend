@@ -14,7 +14,10 @@ import { InstrumentDto } from './instrument-dto';
 import { mapCoinCandidateDto } from './map-coin-candidate-dto';
 import { mapInstrumentDto } from './map-instrument-dto';
 import { mapRegisterInstrumentResponseDto } from './map-register-instrument-response-dto';
-import { RegisterInstrumentRequestDto, RegisterInstrumentResponseDto } from './register-instrument-dto';
+import {
+  RegisterInstrumentRequestDto,
+  RegisterInstrumentResponseDto,
+} from './register-instrument-dto';
 
 const INSTRUMENTS_PATH = '/api/v1/instruments';
 const INSTRUMENTS_SEARCH_PATH = '/api/v1/instruments/search';

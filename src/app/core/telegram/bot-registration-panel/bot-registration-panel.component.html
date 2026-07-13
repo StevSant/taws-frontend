@@ -69,7 +69,11 @@
       <span class="bot-registration-panel__success-icon">&#x2705;</span>
       <div class="bot-registration-panel__success-body">
         <p class="bot-registration-panel__success-text">
-          {{ i18n.t('telegram.botRegistration.testNewsSent').replace('{eventTitle}', result.eventTitle) }}
+          {{
+            i18n
+              .t('telegram.botRegistration.testNewsSent')
+              .replace('{eventTitle}', result.eventTitle)
+          }}
         </p>
       </div>
     </div>

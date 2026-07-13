@@ -5,7 +5,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TranslationService } from '../../../core';
 import { WatchlistStore } from '../../briefings/application';
 import { WatchlistItem } from '../../briefings/domain';
-import { CoinCandidate, Instrument, InstrumentRepository, RegisterInstrumentResult } from '../domain';
+import {
+  CoinCandidate,
+  Instrument,
+  InstrumentRepository,
+  RegisterInstrumentResult,
+} from '../domain';
 import { AddInstrumentStore } from './add-instrument-store';
 
 /**
@@ -45,12 +50,10 @@ class FakeInstrumentRepository extends InstrumentRepository {
     return [];
   }
   searchCoins = vi.fn(async (): Promise<CoinCandidate[]> => []);
-  registerInstrument = vi.fn(
-    async (): Promise<RegisterInstrumentResult> => ({
-      instrument: DOGE_INSTRUMENT,
-      watchlisted: true,
-    }),
-  );
+  registerInstrument = vi.fn(async (): Promise<RegisterInstrumentResult> => ({
+    instrument: DOGE_INSTRUMENT,
+    watchlisted: true,
+  }));
 }
 
 describe('AddInstrumentStore (Slice 4 — search + register)', () => {

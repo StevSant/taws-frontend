@@ -171,7 +171,9 @@
             <span
               class="markets-explorer__delta"
               [class.markets-explorer__delta--up]="row.change7dPct !== null && row.change7dPct >= 0"
-              [class.markets-explorer__delta--down]="row.change7dPct !== null && row.change7dPct < 0"
+              [class.markets-explorer__delta--down]="
+                row.change7dPct !== null && row.change7dPct < 0
+              "
             >
               {{ formatPct(row.change7dPct) }}
             </span>
