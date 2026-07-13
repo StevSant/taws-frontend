@@ -133,12 +133,12 @@
 
   &__row {
     display: grid;
-    grid-template-columns: 1.7fr 1fr 0.9fr 0.9fr 1.2fr 1fr auto;
+    grid-template-columns: 1.7fr 1fr 0.9fr 0.9fr 1fr 1fr 0.9fr 1.2fr 1fr auto;
     align-items: center;
     gap: var(--space-2);
     padding: 0.7rem var(--space-3);
     border-bottom: 1px solid var(--color-border);
-    min-width: 720px;
+    min-width: 1020px;
   }
 
   &__body &__row {
@@ -229,6 +229,13 @@
   }
 
   &__volatility {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.82rem;
+    color: var(--color-text-muted);
+  }
+
+  &__market-cap,
+  &__volume {
     font-variant-numeric: tabular-nums;
     font-size: 0.82rem;
     color: var(--color-text-muted);
