@@ -81,6 +81,10 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
   private tools: unknown[] = [];
   private pendingToolCalls = 0;
   private continuationScheduled = false;
+  /** Tool calls the model has made since the last user turn — reset on user speech. */
+  private toolCallsThisTurn = 0;
+  /** Hard cap on tool calls per user turn: a runaway-loop backstop for the realtime path. */
+  private readonly maxToolCallsPerTurn = 8;
   private visualRequestPending = false;
   private lastDirectChartRequest: { key: string; at: number } | null = null;
   private assistantTranscriptBuffer = '';
@@ -283,11 +287,16 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     return response.text();
   }
 
-  /** Re-asserts the server-authored tool schema on the open channel. */
+  /**
+   * Re-asserts the server-authored tool schema on the open channel. `tool_choice` is `auto`,
+   * never `required`: forcing a tool on every turn makes the model call one even for a
+   * greeting ("¿estás ahí?") and — because each tool result triggers another forced turn —
+   * loops forever narrating preambles. Grounding is guided by the instructions instead.
+   */
   private configureSession(): void {
     this.send({
       type: OAI_CLIENT_EVENT.sessionUpdate,
-      session: { tools: this.tools, tool_choice: 'required' },
+      session: { tools: this.tools, tool_choice: 'auto' },
     });
   }
 
@@ -306,7 +315,8 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         return;
       }
       case OAI_EVENT.inputSpeechStarted:
-        this.requireToolForNextTurn();
+        // New user turn — reset the per-turn tool budget.
+        this.toolCallsThisTurn = 0;
         return;
       case OAI_EVENT.inputTranscriptDone: {
         const transcript = parsed['transcript'];
@@ -341,7 +351,6 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         return;
       case OAI_EVENT.audioDone:
         this.emit({ kind: 'speaking-changed', speaking: false });
-        this.requireToolForNextTurn();
         return;
       case OAI_EVENT.functionCallDone:
         void this.relayFunctionCall(parsed);
@@ -364,6 +373,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     }
 
     this.pendingToolCalls += 1;
+    this.toolCallsThisTurn += 1;
     this.emit({ kind: 'tool-call-started', name });
     try {
       const response = await fetch(`${this.config.apiBaseUrl}${TOOL_PATH}`, {
@@ -479,13 +489,6 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     return [...symbols];
   }
 
-  private requireToolForNextTurn(): void {
-    this.send({
-      type: OAI_CLIENT_EVENT.sessionUpdate,
-      session: { tool_choice: 'required' },
-    });
-  }
-
   private scheduleContinuation(): void {
     if (this.pendingToolCalls > 0 || this.continuationScheduled) {
       return;
@@ -494,11 +497,14 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     queueMicrotask(() => {
       this.continuationScheduled = false;
       if (this.pendingToolCalls === 0) {
+        // Runaway-loop backstop: after too many tool calls in one user turn, force this
+        // response to be text-only (`none`) so the model MUST answer instead of calling yet
+        // another tool. Otherwise let it decide (`auto`).
+        const forceAnswer = this.toolCallsThisTurn >= this.maxToolCallsPerTurn;
         this.send({
-          type: OAI_CLIENT_EVENT.sessionUpdate,
-          session: { tool_choice: 'auto' },
+          type: OAI_CLIENT_EVENT.responseCreate,
+          response: { tool_choice: forceAnswer ? 'none' : 'auto' },
         });
-        this.send({ type: OAI_CLIENT_EVENT.responseCreate });
       }
     });
   }

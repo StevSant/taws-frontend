@@ -421,7 +421,11 @@ export const ES_TRANSLATIONS = {
     'No hay datos históricos para este indicador en el rango seleccionado.',
   'radar.macro.detail.notFound.title': 'Indicador desconocido',
   'radar.macro.detail.notFound.description': 'Este indicador macro no existe.',
-  'radar.macro.fearGreed.title': 'Fear & Greed (acciones)',
+  'radar.macro.fearGreed.title': 'Fear & Greed',
+  'radar.macro.reading.sentiment': 'Sentimiento actual',
+  'radar.macro.reading.dailyChange': 'Cambio diario',
+  'radar.macro.reading.leadingIndex': 'Mayor movimiento',
+  'radar.macro.reading.volatility': 'Volatilidad',
   'radar.macro.fearGreed.hint':
     '0 = miedo extremo, 100 = codicia extrema. Índice de sentimiento del mercado de acciones CNN.',
   'radar.macro.fearGreed.disclaimer':
@@ -534,6 +538,10 @@ export const ES_TRANSLATIONS = {
   'markets.pagination.next': 'Siguiente',
   'markets.empty.title': 'Sin resultados',
   'markets.empty.description': 'Ajusta la búsqueda o el filtro de clase de activo.',
+  'markets.coingecko.search': 'Buscar en CoinGecko:',
+  'markets.coingecko.searching': 'Buscando en CoinGecko…',
+  'markets.coingecko.add': 'Agregar',
+  'markets.coingecko.noResults': 'Sin coincidencias en CoinGecko.',
   'markets.error': 'No se pudo cargar el mercado: ',
   'radar.review.title': 'Tu revisión',
   'radar.review.subtitle': 'Registro humano de tu decisión — no es recomendación de inversión.',

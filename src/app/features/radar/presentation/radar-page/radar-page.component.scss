@@ -53,12 +53,17 @@
     display: grid;
     grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
     gap: var(--space-4);
-    align-items: start;
+    align-items: stretch;
     width: 100%;
     min-width: 0;
 
     > * {
       min-width: 0;
+    }
+
+    app-radar-macro-cards {
+      display: flex;
+      min-height: 0;
     }
   }
 
@@ -111,6 +116,15 @@
     &--strip .radar-page__catalyst-symbols {
       justify-content: flex-start;
       max-width: none;
+    }
+  }
+
+  &__macro-strip {
+    min-width: 0;
+
+    app-radar-macro-indicators {
+      display: block;
+      min-width: 0;
     }
   }
 

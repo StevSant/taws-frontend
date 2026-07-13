@@ -3,8 +3,10 @@ import { AuthTokenService, httpErrorDetail, TranslationService } from '../../../
 import { WatchlistItem, WatchlistRepository } from '../../briefings/domain';
 import {
   AssetClass,
+  CoinCandidate,
   EnrichedInstrument,
   InstrumentHighlights,
+  InstrumentRepository,
   InstrumentSortField,
   MarketsRepository,
   SortDirection,
@@ -52,6 +54,14 @@ export class MarketsExplorerStore {
   private readonly followBusySymbolSignal = signal<string | null>(null);
   private readonly watchlistErrorSignal = signal<string | null>(null);
 
+  // CoinGecko fallback: when the local catalog has no match, the user can search CoinGecko
+  // and register a coin (persisted to the global catalog) straight from the empty state.
+  private readonly coinResultsSignal = signal<CoinCandidate[]>([]);
+  private readonly coinSearchBusySignal = signal(false);
+  private readonly coinSearchedSignal = signal(false);
+  private readonly registerBusySymbolSignal = signal<string | null>(null);
+  private readonly coinSearchErrorSignal = signal<string | null>(null);
+
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly assetClass = this.assetClassSignal.asReadonly();
@@ -72,6 +82,13 @@ export class MarketsExplorerStore {
   /** Follow actions require an authenticated Supabase session (the `/watchlists` API is authed). */
   readonly watchlistAvailable = computed(() => this.authTokenService.currentToken() !== null);
 
+  readonly coinResults = this.coinResultsSignal.asReadonly();
+  readonly coinSearchBusy = this.coinSearchBusySignal.asReadonly();
+  /** True once a CoinGecko search has run for the current query (drives the "no matches" copy). */
+  readonly coinSearched = this.coinSearchedSignal.asReadonly();
+  readonly registerBusySymbol = this.registerBusySymbolSignal.asReadonly();
+  readonly coinSearchError = this.coinSearchErrorSignal.asReadonly();
+
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalSignal() / PAGE_SIZE)));
   readonly isEmpty = computed(
     () => !this.loadingSignal() && !this.errorSignal() && this.itemsSignal().length === 0,
@@ -84,6 +101,7 @@ export class MarketsExplorerStore {
   constructor(
     private readonly marketsRepository: MarketsRepository,
     private readonly watchlistRepository: WatchlistRepository,
+    private readonly instrumentRepository: InstrumentRepository,
     private readonly authTokenService: AuthTokenService,
     private readonly i18n: TranslationService,
   ) {}
@@ -100,6 +118,7 @@ export class MarketsExplorerStore {
   async setAssetClass(assetClass: AssetClass | null): Promise<void> {
     this.assetClassSignal.set(assetClass);
     this.pageSignal.set(1);
+    this.resetCoinSearch();
     await this.load();
   }
 
@@ -107,6 +126,7 @@ export class MarketsExplorerStore {
   setSearch(value: string): void {
     this.searchSignal.set(value);
     this.pageSignal.set(1);
+    this.resetCoinSearch();
     if (this.searchTimer) {
       clearTimeout(this.searchTimer);
     }
@@ -136,6 +156,53 @@ export class MarketsExplorerStore {
 
   async retry(): Promise<void> {
     await this.load();
+  }
+
+  /** Search CoinGecko for the current query; results feed the empty-state picker. Fails soft. */
+  async searchCoinGecko(): Promise<void> {
+    const query = this.searchSignal().trim();
+    if (query.length === 0) {
+      return;
+    }
+    this.coinSearchBusySignal.set(true);
+    this.coinSearchErrorSignal.set(null);
+    try {
+      this.coinResultsSignal.set(await this.instrumentRepository.searchCoins(query));
+      this.coinSearchedSignal.set(true);
+    } catch (error: unknown) {
+      this.coinResultsSignal.set([]);
+      this.coinSearchErrorSignal.set(httpErrorDetail(error, this.i18n));
+    } finally {
+      this.coinSearchBusySignal.set(false);
+    }
+  }
+
+  /**
+   * Register a searched coin (`POST /instruments`) — persisting it to the global catalog and
+   * adding it to the caller's watchlist — then reload the explorer so it appears in the table.
+   * Because the row is persisted, future views find it without re-hitting CoinGecko.
+   */
+  async registerAndReload(candidate: CoinCandidate): Promise<void> {
+    if (this.registerBusySymbolSignal()) {
+      return;
+    }
+    this.registerBusySymbolSignal.set(candidate.symbol.toUpperCase());
+    this.coinSearchErrorSignal.set(null);
+    try {
+      await this.instrumentRepository.registerInstrument(candidate);
+      this.resetCoinSearch();
+      await Promise.all([this.load(), this.loadWatchlistMembership()]);
+    } catch (error: unknown) {
+      this.coinSearchErrorSignal.set(httpErrorDetail(error, this.i18n));
+    } finally {
+      this.registerBusySymbolSignal.set(null);
+    }
+  }
+
+  private resetCoinSearch(): void {
+    this.coinResultsSignal.set([]);
+    this.coinSearchedSignal.set(false);
+    this.coinSearchErrorSignal.set(null);
   }
 
   async load(): Promise<void> {

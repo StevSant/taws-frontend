@@ -8,6 +8,7 @@ import { AssetClass, ImpactClass } from '../../domain';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { RadarKpiRowComponent } from '../radar-kpi-row/radar-kpi-row.component';
 import { RadarMacroCardsComponent } from '../radar-macro-cards/radar-macro-cards.component';
+import { RadarMacroIndicatorsComponent } from '../radar-macro-indicators/radar-macro-indicators.component';
 import { RadarAssetClassTabsComponent } from '../radar-asset-class-tabs/radar-asset-class-tabs.component';
 import { RadarCompositionOverviewComponent } from '../radar-composition-overview/radar-composition-overview.component';
 import { RadarMarketPulseComponent } from '../radar-market-pulse/radar-market-pulse.component';
@@ -30,6 +31,7 @@ const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
     RadarFiltersComponent,
     RadarKpiRowComponent,
     RadarMacroCardsComponent,
+    RadarMacroIndicatorsComponent,
     RadarAssetClassTabsComponent,
     RadarCompositionOverviewComponent,
     RadarMarketPulseComponent,
@@ -106,7 +108,6 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     return `${this.i18n.t('radar.summary.prefix')} ${kpis.newsDetected} ${this.i18n.t('radar.summary.events')} ${windowLabel}. ${kpis.pendingReview} ${this.i18n.t('radar.summary.pending')}`;
   });
 
-  readonly headlineInsight = computed(() => this.store.newsTimeline()[0]?.news.title ?? null);
   readonly recentCatalysts = computed(() => this.store.newsTimeline().slice(0, 4));
   readonly overviewDistribution = computed(
     () => this.activeSegment()?.landscape.distribution ?? this.store.landscape().distribution,

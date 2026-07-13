@@ -408,7 +408,11 @@ export const EN_TRANSLATIONS = {
     'There is no historical data for this indicator in the selected range.',
   'radar.macro.detail.notFound.title': 'Unknown indicator',
   'radar.macro.detail.notFound.description': 'This macro indicator does not exist.',
-  'radar.macro.fearGreed.title': 'Fear & Greed (stocks)',
+  'radar.macro.fearGreed.title': 'Fear & Greed',
+  'radar.macro.reading.sentiment': 'Current sentiment',
+  'radar.macro.reading.dailyChange': 'Daily change',
+  'radar.macro.reading.leadingIndex': 'Largest move',
+  'radar.macro.reading.volatility': 'Volatility',
   'radar.macro.fearGreed.hint':
     '0 = extreme fear, 100 = extreme greed. CNN stock-market sentiment index.',
   'radar.macro.fearGreed.disclaimer':
@@ -520,6 +524,10 @@ export const EN_TRANSLATIONS = {
   'markets.pagination.next': 'Next',
   'markets.empty.title': 'No results',
   'markets.empty.description': 'Try adjusting your search or asset class filter.',
+  'markets.coingecko.search': 'Search CoinGecko for',
+  'markets.coingecko.searching': 'Searching CoinGecko…',
+  'markets.coingecko.add': 'Add',
+  'markets.coingecko.noResults': 'No matches on CoinGecko.',
   'markets.error': 'Could not load market data: ',
   'radar.review.title': 'Your review',
   'radar.review.subtitle': 'Human record of your decision — not investment advice.',

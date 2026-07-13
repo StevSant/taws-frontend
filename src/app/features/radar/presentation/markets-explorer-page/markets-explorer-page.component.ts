@@ -11,6 +11,7 @@ import { MarketsExplorerStore } from '../../application';
 import {
   ASSET_CLASSES,
   AssetClass,
+  CoinCandidate,
   EnrichedInstrument,
   ImpactClass,
   InstrumentSortField,
@@ -110,6 +111,16 @@ export class MarketsExplorerPageComponent implements OnInit {
 
   onRetry(): void {
     void this.store.retry();
+  }
+
+  /** Search CoinGecko for the current query (from the empty state — finds coins not yet in the catalog). */
+  onSearchCoinGecko(): void {
+    void this.store.searchCoinGecko();
+  }
+
+  /** Register a searched coin: persists it to the global catalog + reloads the table so it shows up. */
+  onRegisterCoin(candidate: CoinCandidate): void {
+    void this.store.registerAndReload(candidate);
   }
 
   signalLabel(row: EnrichedInstrument): string {
