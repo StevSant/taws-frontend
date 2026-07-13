@@ -7,6 +7,7 @@ import {
   Instrument,
   InstrumentRepository,
   NewsBrowseQuery,
+  NewsCategory,
   NewsFacets,
   NewsItem,
   NewsRepository,
@@ -122,6 +123,10 @@ export class NewsListStore {
 
   async setSentiment(sentiment: SentimentFilterOption | null): Promise<void> {
     await this.applyFilter({ sentiment });
+  }
+
+  async setCategory(category: NewsCategory | null): Promise<void> {
+    await this.applyFilter({ category });
   }
 
   async setAnalysisStatus(analysisStatus: AnalysisStatus | null): Promise<void> {

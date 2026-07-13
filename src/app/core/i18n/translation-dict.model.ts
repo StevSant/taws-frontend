@@ -433,6 +433,16 @@ export interface TranslationDict {
   'radar.newsFilters.allProviders': string;
   'radar.newsFilters.sentiment': string;
   'radar.newsFilters.allSentiments': string;
+  'radar.newsFilters.category': string;
+  'radar.newsFilters.allCategories': string;
+  'radar.newsCategory.macro': string;
+  'radar.newsCategory.earnings': string;
+  'radar.newsCategory.regulation': string;
+  'radar.newsCategory.crypto': string;
+  'radar.newsCategory.mergersAcquisitions': string;
+  'radar.newsCategory.geopolitics': string;
+  'radar.newsCategory.companyNews': string;
+  'radar.newsCategory.uncategorized': string;
   'radar.newsFilters.status': string;
   'radar.newsFilters.allStatuses': string;
   'radar.newsFilters.status.pending': string;

@@ -12,13 +12,16 @@ import {
   AnalysisStatus,
   AssetClass,
   Instrument,
+  NEWS_CATEGORIES,
   NewsBrowseQuery,
+  NewsCategory,
   NewsFacets,
   NewsSortField,
   RadarFilters,
   SentimentFilterOption,
   SortDirection,
 } from '../../domain';
+import { NEWS_CATEGORY_LABEL_KEYS } from '../news-category-label-keys';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 
 const SENTIMENT_LABELS: Record<SentimentFilterOption, TranslationKey> = {
@@ -62,6 +65,7 @@ export class NewsFiltersComponent {
   @Output() sourceChange = new EventEmitter<string | null>();
   @Output() providerChange = new EventEmitter<string | null>();
   @Output() sentimentChange = new EventEmitter<SentimentFilterOption | null>();
+  @Output() categoryChange = new EventEmitter<NewsCategory | null>();
   @Output() analysisStatusChange = new EventEmitter<AnalysisStatus | null>();
   @Output() searchChange = new EventEmitter<string>();
   @Output() sortChange = new EventEmitter<{ sortBy: NewsSortField; sortDir: SortDirection }>();
@@ -73,6 +77,7 @@ export class NewsFiltersComponent {
     'unclassified',
   ];
   readonly statusOptions: readonly AnalysisStatus[] = ['pending', 'analyzed', 'skipped'];
+  readonly categoryOptions = NEWS_CATEGORIES;
 
   readonly i18n = inject(TranslationService);
 
@@ -93,6 +98,10 @@ export class NewsFiltersComponent {
     return this.i18n.t(STATUS_LABELS[option]);
   }
 
+  categoryLabel(option: NewsCategory): string {
+    return this.i18n.t(NEWS_CATEGORY_LABEL_KEYS[option]);
+  }
+
   /** `''` from a `<select>` is the "all" option — emit `null`, i.e. no filter. */
   emitSource(value: string): void {
     this.sourceChange.emit(value || null);
@@ -104,6 +113,10 @@ export class NewsFiltersComponent {
 
   emitSentiment(value: string): void {
     this.sentimentChange.emit(value ? (value as SentimentFilterOption) : null);
+  }
+
+  emitCategory(value: string): void {
+    this.categoryChange.emit(value ? (value as NewsCategory) : null);
   }
 
   emitStatus(value: string): void {

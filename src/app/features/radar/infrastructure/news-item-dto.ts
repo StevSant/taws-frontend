@@ -1,4 +1,4 @@
-import { AnalysisStatus, NewsSkipReason } from '../domain';
+import { AnalysisStatus, NewsCategory, NewsSkipReason } from '../domain';
 import { NewsEntityDto } from './news-entity-dto';
 
 /** Wire shape of `NewsItemResponse` (both the list `items` array and `GET /api/v1/news/{id}`). */
@@ -24,4 +24,7 @@ export interface NewsItemDto {
   image_url?: string | null;
   /** Why no signal was produced — `null`/absent when there's nothing to explain. */
   skip_reason?: NewsSkipReason | null;
+
+  /** Topical category. Absent on responses from a backend that predates the field. */
+  category?: NewsCategory | null;
 }

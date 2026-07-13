@@ -1,4 +1,5 @@
 import { AnalysisStatus } from './analysis-status.model';
+import { NewsCategory } from './news-category.model';
 import { NewsEntity } from './news-entity.model';
 import { NewsSkipReason } from './news-skip-reason.model';
 
@@ -42,4 +43,10 @@ export interface NewsItem {
    * signal-less item into the same ambiguous "Sin clasificar" tag.
    */
   skipReason?: NewsSkipReason;
+
+  /**
+   * Topical category — what the article is *about*, independent of its sentiment/impact
+   * (issue #69). `undefined` on responses from a backend that predates the field.
+   */
+  category?: NewsCategory;
 }

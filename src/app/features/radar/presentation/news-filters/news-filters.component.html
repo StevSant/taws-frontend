@@ -67,6 +67,21 @@
     </label>
 
     <label class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.category') }}</span>
+      <select
+        class="feature-select"
+        name="category"
+        [ngModel]="query.category ?? ''"
+        (ngModelChange)="emitCategory($event)"
+      >
+        <option value="">{{ i18n.t('radar.newsFilters.allCategories') }}</option>
+        @for (option of categoryOptions; track option) {
+          <option [value]="option">{{ categoryLabel(option) }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="news-filters__field feature-field">
       <span class="feature-label">{{ i18n.t('radar.newsFilters.status') }}</span>
       <select
         class="feature-select"
