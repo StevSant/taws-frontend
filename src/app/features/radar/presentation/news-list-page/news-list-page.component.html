@@ -5,13 +5,20 @@
       <p class="news-list-page__summary">{{ i18n.t('radar.newsList.description') }}</p>
     </div>
 
-    <app-radar-filters
+    <app-news-filters
       class="news-list-page__filters"
-      [filters]="store.filters()"
+      [query]="store.query()"
+      [facets]="store.facets()"
       [instrumentOptions]="store.instrumentOptions()"
       (assetClassChange)="store.setAssetClass($event)"
       (symbolChange)="store.setSymbol($event)"
       (sinceHoursChange)="store.setSinceHours($event)"
+      (sourceChange)="store.setSource($event)"
+      (providerChange)="store.setProvider($event)"
+      (sentimentChange)="store.setSentiment($event)"
+      (analysisStatusChange)="store.setAnalysisStatus($event)"
+      (searchChange)="store.setSearch($event)"
+      (sortChange)="store.setSort($event.sortBy, $event.sortDir)"
     />
   </header>
 
@@ -44,16 +51,13 @@
       }
     </div>
 
-    @if (store.hasMore()) {
-      <div class="news-list-page__more">
-        <app-button
-          [label]="
-            store.isLoadingMore() ? i18n.t('radar.loading') : i18n.t('radar.timeline.loadMore')
-          "
-          [disabled]="store.isLoadingMore()"
-          (pressed)="onLoadMore()"
-        />
-      </div>
+    @if (store.totalPages() > 1) {
+      <app-pagination
+        class="news-list-page__pager"
+        [page]="store.currentPage()"
+        [totalPages]="store.totalPages()"
+        (pageChange)="onPageChange($event)"
+      />
     }
   }
 </div>

@@ -1,4 +1,7 @@
+import { NewsBrowsePage } from './models/news-browse-page.model';
+import { NewsBrowseQuery } from './models/news-browse-query.model';
 import { NewsDetail } from './models/news-detail.model';
+import { NewsFacets } from './models/news-facets.model';
 import { NewsItem } from './models/news-item.model';
 import { NewsPage } from './models/news-page.model';
 import { NewsPageRequest } from './models/news-page-request.model';
@@ -22,6 +25,19 @@ export abstract class NewsRepository {
    * unpaginated feed used by the radar home timeline.
    */
   abstract fetchNewsPage(filters: RadarFilters, page: NewsPageRequest): Promise<NewsPage>;
+
+  /**
+   * Returns one filtered/sorted page of the persisted news archive plus the exact
+   * `total` of the full filtered set, for the numbered `/radar/news` page (issue #70).
+   *
+   * Server-side (`GET /api/v1/news/browse`) this reads the DB rather than the live
+   * provider feed — which is precisely why it can report a `total` and sort across the
+   * whole corpus, neither of which `fetchNewsPage` can do.
+   */
+  abstract browseNews(query: NewsBrowseQuery): Promise<NewsBrowsePage>;
+
+  /** Returns the distinct source/provider values for the browse filter dropdowns. */
+  abstract fetchNewsFacets(): Promise<NewsFacets>;
 
   /**
    * Returns one persisted news item by id together with everything the detail page renders

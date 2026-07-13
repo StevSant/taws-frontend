@@ -38,7 +38,11 @@
     gap: var(--space-4);
   }
 
-  &__more {
+  &__filters {
+    width: 100%;
+  }
+
+  &__pager {
     display: flex;
     justify-content: center;
     padding: var(--space-4) 0;
