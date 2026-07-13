@@ -556,6 +556,7 @@ export const ES_TRANSLATIONS = {
   'radar.review.title': 'Tu revisión',
   'radar.review.subtitle': 'Registro humano de tu decisión — no es recomendación de inversión.',
   'radar.detail.back': 'Volver al radar',
+  'radar.detail.actions': 'Acciones de la noticia',
   'radar.detail.loading': 'Cargando señal…',
   'radar.detail.notFound.title': 'Señal no encontrada',
   'radar.detail.notFound.description': 'Esta señal expiró o fue eliminada.',

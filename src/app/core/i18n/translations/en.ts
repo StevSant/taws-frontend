@@ -542,6 +542,7 @@ export const EN_TRANSLATIONS = {
   'radar.review.title': 'Your review',
   'radar.review.subtitle': 'Human record of your decision — not investment advice.',
   'radar.detail.back': 'Back to radar',
+  'radar.detail.actions': 'Article actions',
   'radar.detail.loading': 'Loading signal…',
   'radar.detail.notFound.title': 'Signal not found',
   'radar.detail.notFound.description': 'This signal has expired or was removed.',

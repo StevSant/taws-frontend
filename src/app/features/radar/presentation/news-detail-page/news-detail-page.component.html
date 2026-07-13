@@ -36,6 +36,50 @@
         }
       </header>
 
+      <nav class="news-detail__actions" [attr.aria-label]="i18n.t('radar.detail.actions')">
+        <div class="news-detail__actions-primary">
+          <app-button
+            class="news-detail__ask-midas"
+            [label]="i18n.t('chat.reference.ask')"
+            (pressed)="onAskMidas()"
+          />
+          @if (!store.signal()) {
+            <app-button
+              [label]="
+                store.isGenerating()
+                  ? i18n.t('radar.detail.analyzeNow.running')
+                  : i18n.t('radar.detail.analyzeNow.action')
+              "
+              [disabled]="!store.canAnalyze()"
+              (pressed)="onAnalyze()"
+            />
+          }
+        </div>
+        <a
+          class="news-detail__actions-source"
+          [href]="news.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ i18n.t('radar.detail.continueReading') }} →
+        </a>
+        @if (!store.signal()) {
+          @if (store.analyzeError(); as analyzeError) {
+            <p class="news-detail__analyze-error news-detail__actions-feedback" role="alert">
+              {{ i18n.t('radar.detail.analyzeNow.error') }} {{ analyzeError }}
+            </p>
+          } @else {
+            <p class="news-detail__analyze-hint news-detail__actions-feedback">
+              {{
+                store.hasLinkedInstrument()
+                  ? i18n.t('radar.detail.analyzeNow.hint')
+                  : i18n.t('radar.detail.analyzeNow.disabledHint')
+              }}
+            </p>
+          }
+        }
+      </nav>
+
       @if (news.imageUrl) {
         <figure class="news-detail__hero">
           <img
@@ -58,14 +102,6 @@
             {{ i18n.t('radar.detail.summaryPending') }}
           </p>
         }
-        <a
-          class="news-detail__continue"
-          [href]="news.url"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {{ i18n.t('radar.detail.continueReading') }} →
-        </a>
       </section>
 
       @if (news.relatedSymbols.length > 0) {
@@ -198,31 +234,6 @@
             @if (skipReasonLabel(); as reason) {
               <p class="news-detail__skip-reason">{{ reason }}</p>
             }
-
-            @if (store.analyzeError(); as analyzeError) {
-              <p class="news-detail__analyze-error" role="alert">
-                {{ i18n.t('radar.detail.analyzeNow.error') }} {{ analyzeError }}
-              </p>
-            }
-
-            <div class="news-detail__analyze">
-              <app-button
-                [label]="
-                  store.isGenerating()
-                    ? i18n.t('radar.detail.analyzeNow.running')
-                    : i18n.t('radar.detail.analyzeNow.action')
-                "
-                [disabled]="!store.canAnalyze()"
-                (pressed)="onAnalyze()"
-              />
-              <p class="news-detail__analyze-hint">
-                {{
-                  store.hasLinkedInstrument()
-                    ? i18n.t('radar.detail.analyzeNow.hint')
-                    : i18n.t('radar.detail.analyzeNow.disabledHint')
-                }}
-              </p>
-            </div>
           </div>
         }
       </section>
@@ -246,14 +257,6 @@
           }
         </section>
       }
-
-      <footer class="news-detail__footer">
-        <app-button
-          class="news-detail__ask-midas"
-          [label]="i18n.t('chat.reference.ask')"
-          (pressed)="onAskMidas()"
-        />
-      </footer>
     </article>
   }
 </div>
