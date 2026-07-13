@@ -486,6 +486,19 @@ export interface TranslationDict {
   'radar.detail.signalSection': string;
   'radar.detail.noSignal': string;
   'radar.detail.openOriginal': string;
+  // --- News analysis: why an item has no signal, + the manual "Analizar ahora" trigger ---
+  'radar.detail.skipReason.gated_low_relevance': string;
+  'radar.detail.skipReason.near_duplicate': string;
+  'radar.detail.skipReason.no_linked_instrument': string;
+  'radar.detail.skipReason.insufficient_evidence': string;
+  'radar.detail.skipReason.compliance_blocked': string;
+  'radar.detail.skipReason.analysis_failed': string;
+  'radar.detail.analyzeNow.action': string;
+  'radar.detail.analyzeNow.running': string;
+  'radar.detail.analyzeNow.hint': string;
+  'radar.detail.analyzeNow.disabledHint': string;
+  'radar.detail.analyzeNow.error': string;
+  'radar.card.impact.noInstrument': string;
   'radar.chart.loading': string;
   'radar.chart.unavailable': string;
   'radar.detail.asset.loading': string;

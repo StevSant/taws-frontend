@@ -279,6 +279,7 @@ export const ES_TRANSLATIONS = {
   'radar.card.impact.neutral': 'Neutral',
   'radar.card.impact.uncertain': 'Incierto',
   'radar.card.impact.unclassified': 'Sin clasificar',
+  'radar.card.impact.noInstrument': 'Sin instrumento',
   'radar.card.confidence.label': 'Confianza',
   'radar.card.confidence.unavailable': 'N/D',
   'radar.card.priceDelta.label': 'Δ Precio',
@@ -532,6 +533,26 @@ export const ES_TRANSLATIONS = {
   'radar.detail.signalSection': 'Clasificación de señal',
   'radar.detail.noSignal': 'No se produjo ninguna señal para esta noticia.',
   'radar.detail.openOriginal': 'Abrir original',
+  // --- Análisis de noticias: por qué no hay señal, y el disparador manual "Analizar ahora" ---
+  'radar.detail.skipReason.gated_low_relevance':
+    'Descartada por baja relevancia: el filtro previo estimó que esta noticia no justificaba una llamada al modelo. Puedes forzar el análisis igualmente.',
+  'radar.detail.skipReason.near_duplicate':
+    'Casi duplicada: otra noticia ya cubre este mismo hecho para el instrumento.',
+  'radar.detail.skipReason.no_linked_instrument':
+    'Sin instrumento vinculado: esta noticia no menciona ningún instrumento de nuestro universo, y las señales se generan por instrumento.',
+  'radar.detail.skipReason.insufficient_evidence':
+    'Evidencia insuficiente: aún no hay suficientes fuentes distintas para respaldar una señal. Se reintentará automáticamente.',
+  'radar.detail.skipReason.compliance_blocked':
+    'Bloqueada por cumplimiento: el análisis se generó pero no superó la revisión de cumplimiento, así que no se guardó ninguna señal.',
+  'radar.detail.skipReason.analysis_failed':
+    'El análisis falló por un error temporal. Se reintentará automáticamente.',
+  'radar.detail.analyzeNow.action': 'Analizar ahora',
+  'radar.detail.analyzeNow.running': 'Analizando…',
+  'radar.detail.analyzeNow.hint':
+    'Fuerza el análisis de esta noticia, omitiendo el filtro previo de coste.',
+  'radar.detail.analyzeNow.disabledHint':
+    'No se puede analizar: esta noticia no está vinculada a ningún instrumento.',
+  'radar.detail.analyzeNow.error': 'No se pudo analizar la noticia:',
   'radar.chart.loading': 'Cargando gráfico…',
   'radar.chart.unavailable': 'El gráfico no está disponible para este instrumento.',
   'radar.detail.asset.loading': 'Cargando datos del activo…',

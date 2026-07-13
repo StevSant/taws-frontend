@@ -2,13 +2,38 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
-import { NewsItem, NewsPage, NewsPageRequest, NewsRepository, RadarFilters } from '../domain';
+import {
+  NewsItem,
+  NewsNotAnalyzableError,
+  NewsPage,
+  NewsPageRequest,
+  NewsRepository,
+  NewsSkipReason,
+  RadarFilters,
+} from '../domain';
 import { mapNewsItemDto } from './map-news-item-dto';
 import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
 
 const NEWS_PATH = '/api/v1/news';
 const HTTP_NOT_FOUND = 404;
+const HTTP_UNPROCESSABLE = 422;
+/** Cache namespace `getNewsById` stores single items under (keyed by news id). */
+const NEWS_ITEM_CACHE = 'news-item';
+
+/** Shape of the backend's 422 body from `POST /news/{id}/analyze`. */
+interface NotAnalyzableDetail {
+  skip_reason?: NewsSkipReason;
+}
+
+/** Reads `detail.skip_reason` out of a 422, or `null` if the body isn't the shape we expect. */
+function readSkipReason(error: HttpErrorResponse): NewsSkipReason | null {
+  const detail: unknown = error.error?.detail;
+  if (detail && typeof detail === 'object' && 'skip_reason' in detail) {
+    return (detail as NotAnalyzableDetail).skip_reason ?? null;
+  }
+  return null;
+}
 
 /** Backend may return a bare array or a paginated `{ items }` envelope. */
 type NewsWireResponse = NewsListResponseDto | NewsItemDto[];
@@ -83,7 +108,7 @@ export class HttpNewsRepository extends NewsRepository {
   }
 
   async getNewsById(id: string): Promise<NewsItem | null> {
-    return cachedFetch(this.cache, 'news-item', id, this.config.newsCacheTtlMs, async () => {
+    return cachedFetch(this.cache, NEWS_ITEM_CACHE, id, this.config.newsCacheTtlMs, async () => {
       try {
         const dto = await firstValueFrom(
           this.http
@@ -105,5 +130,38 @@ export class HttpNewsRepository extends NewsRepository {
     const defaultFilters: RadarFilters = { sinceHours: 720, symbol: null, assetClass: null };
     const news = await this.fetchNews(defaultFilters);
     return news.find((item) => item.id === id) ?? null;
+  }
+
+  /**
+   * Force-analyzes one item (issue #27). Deliberately not cached — it's a mutation, and the
+   * whole point of the button is to re-run something the backend already decided about.
+   *
+   * The refreshed item replaces the stale `getNewsById` cache entry rather than merely
+   * evicting it: the caller is about to render this exact item, and leaving the old,
+   * signal-less version cached would let a later read (a back-navigation, the detail page
+   * re-entering) resurrect the pre-analysis state inside the TTL.
+   */
+  async analyzeNewsItem(id: string): Promise<NewsItem> {
+    try {
+      const dto = await firstValueFrom(
+        this.http
+          .post<NewsItemDto>(
+            `${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}/analyze`,
+            {},
+          )
+          .pipe(timeout(this.config.analyzeNewsRequestTimeoutMs)),
+      );
+      const item = mapNewsItemDto(dto);
+      this.cache.set(NEWS_ITEM_CACHE, id, item, this.config.newsCacheTtlMs);
+      return item;
+    } catch (error: unknown) {
+      if (error instanceof HttpErrorResponse && error.status === HTTP_UNPROCESSABLE) {
+        // The item was not analyzable, and the backend has just persisted why. Drop the
+        // stale cache entry so the next read picks up the freshly-recorded skip reason.
+        this.cache.delete(NEWS_ITEM_CACHE, id);
+        throw new NewsNotAnalyzableError(readSkipReason(error));
+      }
+      throw error;
+    }
   }
 }

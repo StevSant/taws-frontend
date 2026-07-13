@@ -13,7 +13,7 @@ import {
 import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 import { NewsDetailStore } from '../../application';
 import { NewsBlurbService } from '../../application/news-blurb.service';
-import { ImpactClass, MarketStats } from '../../domain';
+import { ImpactClass, MarketStats, NewsSkipReason } from '../../domain';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { providerLabel } from '../news-timeline/provider-label';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
@@ -23,6 +23,20 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   negative: 'radar.card.impact.negative',
   neutral: 'radar.card.impact.neutral',
   uncertain: 'radar.card.impact.uncertain',
+};
+
+/**
+ * Prose explaining each reason an article produced no signal (issue #26) — what replaces the
+ * bare "No se produjo ninguna señal para esta noticia", which read as breakage rather than as
+ * the deliberate cost decision it usually was.
+ */
+const SKIP_REASON_LABELS: Record<NewsSkipReason, TranslationKey> = {
+  gated_low_relevance: 'radar.detail.skipReason.gated_low_relevance',
+  near_duplicate: 'radar.detail.skipReason.near_duplicate',
+  no_linked_instrument: 'radar.detail.skipReason.no_linked_instrument',
+  insufficient_evidence: 'radar.detail.skipReason.insufficient_evidence',
+  compliance_blocked: 'radar.detail.skipReason.compliance_blocked',
+  analysis_failed: 'radar.detail.skipReason.analysis_failed',
 };
 
 const PERCENT_MULTIPLIER = 100;
@@ -140,8 +154,18 @@ export class NewsDetailPageComponent {
     return delta > 0 ? 'news-detail__chip-delta--up' : 'news-detail__chip-delta--down';
   }
 
+  /**
+   * Why this article has no signal, as prose — or `null` when there's nothing to explain and
+   * the generic "no signal yet" line is the honest thing to show (e.g. an item still queued
+   * for the next batch run).
+   */
+  skipReasonLabel(): string | null {
+    const reason = this.store.skipReason();
+    return reason ? this.i18n.t(SKIP_REASON_LABELS[reason]) : null;
+  }
+
   onAnalyze(): void {
-    void this.store.generate();
+    void this.store.analyze();
   }
 
   onRetry(): void {

@@ -1,5 +1,6 @@
 import { AnalysisStatus } from './analysis-status.model';
 import { NewsEntity } from './news-entity.model';
+import { NewsSkipReason } from './news-skip-reason.model';
 
 /**
  * A single news article, optionally linked to one or more instruments.
@@ -34,4 +35,11 @@ export interface NewsItem {
   signalId?: string;
   /** Hero/thumbnail image when the upstream provider supplies one. */
   imageUrl?: string;
+  /**
+   * Why this item produced no signal. `undefined` when there is nothing to explain — the
+   * item was analyzed, or nothing has looked at it yet. This is what lets the UI say
+   * "gated as low-relevance" / "no linked instrument" instead of collapsing every
+   * signal-less item into the same ambiguous "Sin clasificar" tag.
+   */
+  skipReason?: NewsSkipReason;
 }

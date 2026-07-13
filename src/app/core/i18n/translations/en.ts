@@ -270,6 +270,7 @@ export const EN_TRANSLATIONS = {
   'radar.card.impact.neutral': 'Neutral',
   'radar.card.impact.uncertain': 'Uncertain',
   'radar.card.impact.unclassified': 'Unclassified',
+  'radar.card.impact.noInstrument': 'No instrument',
   'radar.card.confidence.label': 'Confidence',
   'radar.card.confidence.unavailable': 'N/A',
   'radar.card.priceDelta.label': 'Price Δ',
@@ -518,6 +519,26 @@ export const EN_TRANSLATIONS = {
   'radar.detail.signalSection': 'Signal classification',
   'radar.detail.noSignal': 'No signal was produced for this news item.',
   'radar.detail.openOriginal': 'Open original',
+  // --- News analysis: why an item has no signal, + the manual "Analizar ahora" trigger ---
+  'radar.detail.skipReason.gated_low_relevance':
+    'Gated as low-relevance: the pre-filter judged this article not worth a model call. You can force the analysis anyway.',
+  'radar.detail.skipReason.near_duplicate':
+    'Near-duplicate: another article already covers this same event for the instrument.',
+  'radar.detail.skipReason.no_linked_instrument':
+    'No linked instrument: this article names no instrument in our universe, and signals are generated per instrument.',
+  'radar.detail.skipReason.insufficient_evidence':
+    'Insufficient evidence: there are not yet enough distinct sources to back a signal. This will be retried automatically.',
+  'radar.detail.skipReason.compliance_blocked':
+    'Compliance-blocked: the analysis was generated but did not pass compliance review, so no signal was stored.',
+  'radar.detail.skipReason.analysis_failed':
+    'The analysis failed with a temporary error. It will be retried automatically.',
+  'radar.detail.analyzeNow.action': 'Analyze now',
+  'radar.detail.analyzeNow.running': 'Analyzing…',
+  'radar.detail.analyzeNow.hint':
+    'Force the analysis of this article, bypassing the cost pre-filter.',
+  'radar.detail.analyzeNow.disabledHint':
+    'Cannot analyze: this article is not linked to any instrument.',
+  'radar.detail.analyzeNow.error': 'Could not analyze the news item:',
   'radar.chart.loading': 'Loading chart…',
   'radar.chart.unavailable': 'Chart is not available for this instrument.',
   'radar.detail.asset.loading': 'Loading asset data…',
