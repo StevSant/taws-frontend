@@ -12,6 +12,14 @@ const CLASSIFICATION_KEYS: Record<FearGreedClassification, TranslationKey> = {
   extreme_greed: 'radar.macro.fearGreed.extremeGreed',
 };
 
+const SCALE_ZONES: readonly FearGreedClassification[] = [
+  'extreme_fear',
+  'fear',
+  'neutral',
+  'greed',
+  'extreme_greed',
+];
+
 @Component({
   selector: 'app-radar-macro-cards',
   standalone: true,
@@ -23,6 +31,8 @@ const CLASSIFICATION_KEYS: Record<FearGreedClassification, TranslationKey> = {
 export class RadarMacroCardsComponent {
   @Input() macro: MacroState | null = null;
   @Input() marketPulse: MarketPulse | null = null;
+
+  readonly scaleZones = SCALE_ZONES;
 
   constructor(readonly i18n: TranslationService) {}
 
