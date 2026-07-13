@@ -33,6 +33,7 @@ import { ShellSearchService } from '../../../../layout/shell/shell-search.servic
 
 import {
   ChatMessage,
+  ChatNewsQuestion,
   ChatRepository,
   RoutingHop,
   ToolHopSnapshot,
@@ -495,11 +496,12 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     this.useSuggestion(suggestionKey as TranslationKey);
   }
 
-  onNewsQuestion(prompt: string): void {
+  onNewsQuestion(question: ChatNewsQuestion): void {
     if (!this.auth.isAuthenticated() || this.store.isStreaming()) {
       return;
     }
-    this.draft.set(prompt);
+    this.draft.set(question.prompt);
+    this.store.setReference(question.reference);
     this.focusComposer();
   }
 
