@@ -40,12 +40,10 @@ class FakeInstrumentRepository extends InstrumentRepository {
     return [];
   }
   searchCoins = vi.fn(async (): Promise<CoinCandidate[]> => []);
-  registerInstrument = vi.fn(
-    async (): Promise<RegisterInstrumentResult> => ({
-      instrument: { symbol: 'DOGE', name: 'Dogecoin', assetClass: 'crypto', currency: 'USD' },
-      watchlisted: true,
-    }),
-  );
+  registerInstrument = vi.fn(async (): Promise<RegisterInstrumentResult> => ({
+    instrument: { symbol: 'DOGE', name: 'Dogecoin', assetClass: 'crypto', currency: 'USD' },
+    watchlisted: true,
+  }));
 }
 
 describe('MarketsExplorerStore — CoinGecko fallback (search + register)', () => {
