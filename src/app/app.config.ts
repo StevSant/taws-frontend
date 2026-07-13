@@ -9,7 +9,14 @@ import { provideRouter } from '@angular/router';
 import { provideLucideConfig } from '@lucide/angular';
 
 import { routes } from './app.routes';
-import { authErrorInterceptor, authInterceptor, ThemeService } from './core';
+import {
+  authErrorInterceptor,
+  authInterceptor,
+  HttpProfileRepository,
+  LocalePreferenceService,
+  ProfileRepository,
+  ThemeService,
+} from './core';
 import { AuthStore } from './features/auth/application';
 import { AuthRepository } from './features/auth/domain';
 import { SupabaseAuthRepository } from './features/auth/infrastructure';
@@ -71,6 +78,7 @@ export const appConfig: ApplicationConfig = {
     { provide: ReviewRepository, useClass: HttpReviewRepository },
     { provide: ScenarioRepository, useClass: HttpScenarioRepository },
     { provide: NoteRepository, useClass: HttpNoteRepository },
+    { provide: ProfileRepository, useClass: HttpProfileRepository },
     { provide: ChartRepository, useClass: HttpChartRepository },
     // Restores Supabase session in the background so the shell + Radar can
     // paint immediately. `authGuard` waits for `AuthStore.ready` on guarded
@@ -81,6 +89,12 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       const theme = inject(ThemeService);
       theme.setTheme(theme.theme());
+    }),
+    // Nothing else injects `LocalePreferenceService` at bootstrap, and its effect — which
+    // seeds the UI locale from the user's saved profile once a session appears — only runs
+    // if the service exists. Instantiating it here is what arms that (issue #67).
+    provideAppInitializer(() => {
+      inject(LocalePreferenceService);
     }),
   ],
 };

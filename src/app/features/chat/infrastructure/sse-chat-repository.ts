@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { AppConfigService, AuthTokenService } from '../../../core';
+import { AppConfigService, AuthTokenService, TranslationService } from '../../../core';
 import { AgentTrace, ChatReference, ChatRepository, ChatStreamEvent, ToolCall } from '../domain';
 import { ChartSpec } from '../../../shared/charts';
 
@@ -34,6 +34,7 @@ interface ChatStreamFrame {
 export class SseChatRepository extends ChatRepository {
   private readonly config = inject(AppConfigService);
   private readonly authToken = inject(AuthTokenService);
+  private readonly translation = inject(TranslationService);
 
   async *streamReply(
     input: string,
@@ -104,13 +105,22 @@ export class SseChatRepository extends ChatRepository {
    * Builds the request body, adding the optional grounding reference as flat
    * fields the backend expects: an asset reference sends `asset_symbol`, a news
    * reference sends `news_id`. Neither is present when there is no reference.
+   *
+   * `locale` is the active UI locale (issue #67). Without it the agent's specialist
+   * prompts — all authored in English — made it answer in English no matter what the
+   * user picked. Sent on every turn, so switching language mid-conversation takes effect
+   * on the next message.
    */
   private buildBody(
     input: string,
     threadId: string,
     reference?: ChatReference,
   ): Record<string, string> {
-    const body: Record<string, string> = { message: input, thread_id: threadId };
+    const body: Record<string, string> = {
+      message: input,
+      thread_id: threadId,
+      locale: this.translation.locale(),
+    };
     if (reference?.kind === 'asset') {
       body['asset_symbol'] = reference.symbol;
     } else if (reference?.kind === 'news') {
