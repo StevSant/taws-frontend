@@ -6,21 +6,54 @@
   @if (marketPulse || macro) {
     @if (marketPulse) {
       <article class="radar-macro-cards__sentiment">
-        <div class="radar-macro-cards__gauge-wrap">
-          <span class="radar-macro-cards__sentiment-kicker">{{
-            i18n.t('radar.macro.fearGreed.title')
-          }}</span>
-          <app-fear-greed-arc-gauge
-            [value]="marketPulse.value"
-            [label]="classificationLabel(marketPulse.classification)"
-          />
-          <p
-            class="radar-macro-cards__delta"
-            [class.radar-macro-cards__delta--up]="marketPulse.deltaPoints > 0"
-            [class.radar-macro-cards__delta--down]="marketPulse.deltaPoints < 0"
-          >
-            {{ deltaLabel(marketPulse.deltaPoints) }}
-          </p>
+        <div class="radar-macro-cards__sentiment-main">
+          <div class="radar-macro-cards__gauge-wrap">
+            <span class="radar-macro-cards__sentiment-kicker">{{
+              i18n.t('radar.macro.fearGreed.title')
+            }}</span>
+            <app-fear-greed-arc-gauge
+              [value]="marketPulse.value"
+              [label]="classificationLabel(marketPulse.classification)"
+            />
+          </div>
+
+          <dl class="radar-macro-cards__readings">
+            <div>
+              <dt>{{ i18n.t('radar.macro.reading.sentiment') }}</dt>
+              <dd>{{ classificationLabel(marketPulse.classification) }}</dd>
+            </div>
+            <div>
+              <dt>{{ i18n.t('radar.macro.reading.dailyChange') }}</dt>
+              <dd
+                class="radar-macro-cards__delta"
+                [class.radar-macro-cards__delta--up]="marketPulse.deltaPoints > 0"
+                [class.radar-macro-cards__delta--down]="marketPulse.deltaPoints < 0"
+              >
+                {{ deltaLabel(marketPulse.deltaPoints) }}
+                {{ i18n.t('radar.macro.fearGreed.points') }}
+              </dd>
+            </div>
+            @if (strongestIndex(); as index) {
+              <div>
+                <dt>{{ i18n.t('radar.macro.reading.leadingIndex') }}</dt>
+                <dd>
+                  {{ index.symbol }}
+                  <span
+                    [class.radar-macro-cards__index-change--up]="index.changePct >= 0"
+                    [class.radar-macro-cards__index-change--down]="index.changePct < 0"
+                  >
+                    {{ percentageLabel(index.changePct) }}
+                  </span>
+                </dd>
+              </div>
+            }
+            @if (macro) {
+              <div>
+                <dt>{{ i18n.t('radar.macro.reading.volatility') }}</dt>
+                <dd>VIX {{ macro.volatility.vixLevel | number: '1.1-1' }}</dd>
+              </div>
+            }
+          </dl>
         </div>
 
         @if (marketPulse.indices.length > 0) {
@@ -43,26 +76,11 @@
           </div>
         }
 
-        @if (insights().length > 0) {
-          <ul class="radar-macro-cards__insights">
-            @for (insight of insights(); track $index) {
-              <li class="radar-macro-cards__insight">
-                <span class="radar-macro-cards__insight-icon" aria-hidden="true">{{
-                  insight.icon
-                }}</span>
-                <span class="radar-macro-cards__insight-text">{{ insight.text }}</span>
-              </li>
-            }
-          </ul>
-        }
-
         <span class="radar-macro-cards__sentiment-source">{{
           i18n.t('radar.macro.fearGreed.sourceStock')
         }}</span>
       </article>
     }
-
-    <app-radar-macro-indicators class="radar-macro-cards__strip" [macro]="macro" />
   } @else {
     <p class="radar-macro-cards__empty">{{ i18n.t('radar.landscape.macroUnavailable') }}</p>
   }

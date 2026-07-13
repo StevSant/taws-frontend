@@ -390,6 +390,10 @@ export interface TranslationDict {
   'radar.macro.detail.notFound.title': string;
   'radar.macro.detail.notFound.description': string;
   'radar.macro.fearGreed.title': string;
+  'radar.macro.reading.sentiment': string;
+  'radar.macro.reading.dailyChange': string;
+  'radar.macro.reading.leadingIndex': string;
+  'radar.macro.reading.volatility': string;
   'radar.macro.fearGreed.hint': string;
   'radar.macro.fearGreed.disclaimer': string;
   'radar.macro.fearGreed.points': string;

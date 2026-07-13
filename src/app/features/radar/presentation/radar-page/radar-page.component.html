@@ -95,9 +95,12 @@
       <app-radar-macro-cards
         [macro]="store.macroState()"
         [marketPulse]="store.marketPulse()"
-        [headlineInsight]="headlineInsight()"
       />
     </div>
+
+    <section class="radar-page__macro-strip feature-panel">
+      <app-radar-macro-indicators [macro]="store.macroState()" layout="strip" />
+    </section>
 
     <section class="radar-page__catalysts radar-page__catalysts--strip feature-panel">
       <header class="radar-page__catalysts-header">

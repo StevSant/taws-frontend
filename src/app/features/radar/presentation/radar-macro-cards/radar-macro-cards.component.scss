@@ -7,7 +7,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  height: 100%;
 
   &__header {
     display: flex;
@@ -25,6 +24,7 @@
   &__sentiment {
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
     gap: var(--space-3);
     padding: var(--space-4);
     border-radius: var(--radius-lg);
@@ -39,12 +39,22 @@
     box-shadow: 0 10px 32px rgba(212, 160, 23, 0.1);
   }
 
+  &__sentiment-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(9rem, 0.85fr);
+    align-items: center;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
   &__gauge-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 0.15rem;
     text-align: center;
+    --fear-greed-gauge-max-width: 240px;
   }
 
   &__sentiment-kicker {
@@ -68,6 +78,50 @@
 
     &--down {
       color: var(--color-loss);
+    }
+  }
+
+  &__readings {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+
+    > div {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: var(--space-2);
+      min-width: 0;
+      padding: 0.55rem 0.65rem;
+      border-bottom: 1px solid var(--color-border);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    dt {
+      overflow: hidden;
+      font-size: 0.62rem;
+      color: var(--color-text-muted);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    dd {
+      margin: 0;
+      font-family: var(--font-family-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      text-align: right;
+      white-space: nowrap;
     }
   }
 
@@ -119,42 +173,10 @@
     }
   }
 
-  &__insights {
-    display: flex;
-    flex-direction: column;
-    gap: 0.55rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  &__insight {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.55rem;
-    align-items: start;
-    font-size: 0.78rem;
-    line-height: 1.45;
-    color: var(--color-text-secondary);
-  }
-
-  &__insight-icon {
-    font-size: 0.95rem;
-    line-height: 1.2;
-  }
-
-  &__insight-text {
-    min-width: 0;
-  }
-
   &__sentiment-source {
     font-size: 0.65rem;
     color: var(--color-text-muted);
     text-align: center;
-  }
-
-  &__strip {
-    display: block;
   }
 
   &__empty {
@@ -166,6 +188,12 @@
 
 @media (max-width: 900px) {
   .radar-macro-cards__indices {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .radar-macro-cards__sentiment-main {
     grid-template-columns: 1fr;
   }
 }

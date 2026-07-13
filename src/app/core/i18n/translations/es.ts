@@ -421,7 +421,11 @@ export const ES_TRANSLATIONS = {
     'No hay datos históricos para este indicador en el rango seleccionado.',
   'radar.macro.detail.notFound.title': 'Indicador desconocido',
   'radar.macro.detail.notFound.description': 'Este indicador macro no existe.',
-  'radar.macro.fearGreed.title': 'Fear & Greed (acciones)',
+  'radar.macro.fearGreed.title': 'Fear & Greed',
+  'radar.macro.reading.sentiment': 'Sentimiento actual',
+  'radar.macro.reading.dailyChange': 'Cambio diario',
+  'radar.macro.reading.leadingIndex': 'Mayor movimiento',
+  'radar.macro.reading.volatility': 'Volatilidad',
   'radar.macro.fearGreed.hint':
     '0 = miedo extremo, 100 = codicia extrema. Índice de sentimiento del mercado de acciones CNN.',
   'radar.macro.fearGreed.disclaimer':

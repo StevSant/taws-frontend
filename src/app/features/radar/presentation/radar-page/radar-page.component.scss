@@ -114,6 +114,15 @@
     }
   }
 
+  &__macro-strip {
+    min-width: 0;
+
+    app-radar-macro-indicators {
+      display: block;
+      min-width: 0;
+    }
+  }
+
   &__catalysts-header {
     display: flex;
     align-items: flex-start;
