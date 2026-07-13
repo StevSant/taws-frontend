@@ -474,6 +474,10 @@ export interface TranslationDict {
   'markets.pagination.next': string;
   'markets.empty.title': string;
   'markets.empty.description': string;
+  'markets.coingecko.search': string;
+  'markets.coingecko.searching': string;
+  'markets.coingecko.add': string;
+  'markets.coingecko.noResults': string;
   'markets.error': string;
   'radar.review.title': string;
   'radar.review.subtitle': string;
