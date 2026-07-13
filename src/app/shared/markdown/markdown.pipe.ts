@@ -6,6 +6,11 @@ marked.setOptions({
   gfm: true,
 });
 
+/** Charts are rendered via `message.charts` / `<taws-chart>` — not Markdown images. */
+function stripMarkdownImages(value: string): string {
+  return value.replace(/!\[[^\]]*]\([^)]*\)/g, '').replace(/<img\b[^>]*>/gi, '');
+}
+
 /**
  * Renders assistant/user Markdown (bold, lists, code, etc.) as sanitized HTML
  * when bound with `[innerHTML]`.
@@ -17,6 +22,6 @@ export class MarkdownPipe implements PipeTransform {
       return '';
     }
 
-    return marked.parse(value, { async: false });
+    return marked.parse(stripMarkdownImages(value), { async: false });
   }
 }
