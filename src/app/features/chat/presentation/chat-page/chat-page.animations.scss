@@ -52,22 +52,6 @@
   }
 }
 
-@keyframes heroCollapseFly {
-  0% {
-    left: var(--collapse-start-x);
-    top: var(--collapse-start-y);
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-
-  100% {
-    left: var(--collapse-end-x);
-    top: var(--collapse-end-y);
-    transform: translate(-50%, -50%) scale(0.353);
-    opacity: 0;
-  }
-}
-
 @keyframes avatarSettleIn {
   from {
     opacity: 0;
@@ -138,7 +122,6 @@
   .chat-page__voice-btn--active,
   .chat-page__tts-btn--active,
   .chat-page__oracle-status-dot,
-  .chat-page__hero-collapse,
   .chat-page__avatar--live {
     animation: none;
   }
