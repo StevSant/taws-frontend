@@ -1,6 +1,7 @@
+import { Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import { EmptyStateComponent, PriceDeltaChipComponent, SpinnerComponent } from '../../../../shared';
 import { ChartComponent, ChartSpec } from '../../../../shared/charts';
@@ -8,6 +9,7 @@ import { buildMacroLineSpec, MacroDetailStore } from '../../application';
 import { MACRO_INDICATORS, MACRO_RANGE_OPTIONS_DAYS, MacroIndicator } from '../../domain';
 import { macroIndicatorDescriptor, MacroValueFormat } from '../macro-indicator-catalog';
 import { formatMacroValue, periodChangePct } from '../format-macro-value';
+import { navigateDetailBack } from '../navigate-detail-back';
 
 function isMacroIndicator(value: string | null): value is MacroIndicator {
   return value !== null && (MACRO_INDICATORS as readonly string[]).includes(value);
@@ -42,6 +44,8 @@ export class MacroDetailPageComponent {
   readonly store = inject(MacroDetailStore);
   readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
 
   readonly rangeOptions = MACRO_RANGE_OPTIONS_DAYS;
 
@@ -101,5 +105,9 @@ export class MacroDetailPageComponent {
 
   onSelectRange(days: number): void {
     void this.store.setRange(days);
+  }
+
+  onBack(event: MouseEvent): void {
+    navigateDetailBack(this.router, this.location, '/radar', event);
   }
 }

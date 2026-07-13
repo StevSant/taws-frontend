@@ -1,7 +1,7 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import {
   ButtonComponent,
@@ -18,6 +18,7 @@ import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
 import { AssetPriceChartComponent } from '../asset-price-chart/asset-price-chart.component';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
+import { navigateDetailBack } from '../navigate-detail-back';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -73,6 +74,8 @@ export class AssetDetailPageComponent {
   readonly store = inject(AssetDetailStore);
   readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly shellSearch = inject(ShellSearchService);
   private currentSymbol: string | null = null;
 
@@ -175,5 +178,9 @@ export class AssetDetailPageComponent {
       },
       prompt,
     );
+  }
+
+  onBack(event: MouseEvent): void {
+    navigateDetailBack(this.router, this.location, '/radar/explore', event);
   }
 }

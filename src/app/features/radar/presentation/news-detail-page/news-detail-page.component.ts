@@ -1,7 +1,7 @@
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, Location } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import {
   ButtonComponent,
@@ -18,6 +18,7 @@ import { ASSET_CLASS_LABEL_KEYS } from '../asset-class-label-keys';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { providerLabel } from '../news-timeline/provider-label';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
+import { navigateDetailBack } from '../navigate-detail-back';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -73,6 +74,8 @@ export class NewsDetailPageComponent {
   readonly i18n = inject(TranslationService);
   readonly blurbs = inject(NewsBlurbService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly shellSearch = inject(ShellSearchService);
   private currentId: string | null = null;
   readonly summaryText = computed(() => {
@@ -179,6 +182,10 @@ export class NewsDetailPageComponent {
     if (this.currentId) {
       void this.store.load(this.currentId);
     }
+  }
+
+  onBack(event: MouseEvent): void {
+    navigateDetailBack(this.router, this.location, '/radar/news', event);
   }
 
   onImageError(event: Event): void {

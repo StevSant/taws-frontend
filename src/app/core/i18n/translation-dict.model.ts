@@ -509,6 +509,8 @@ export interface TranslationDict {
   'radar.review.title': string;
   'radar.review.subtitle': string;
   'radar.detail.back': string;
+  'radar.detail.back.news': string;
+  'radar.detail.back.markets': string;
   'radar.detail.actions': string;
   'radar.detail.loading': string;
   'radar.detail.notFound.title': string;
