@@ -158,7 +158,16 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
    */
   private async acquireMicrophone(): Promise<MediaStream> {
     try {
-      return await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Request echo cancellation explicitly so the mic doesn't pick up Midas's own voice
+      // from the speakers and feed it back as "user speech" (which re-triggers the model and
+      // can loop). Defaults usually enable these, but on speakers being explicit matters.
+      return await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
     } catch (error: unknown) {
       if (this.isPermissionDenied(error)) {
         const denied = new RealtimePermissionDeniedError();

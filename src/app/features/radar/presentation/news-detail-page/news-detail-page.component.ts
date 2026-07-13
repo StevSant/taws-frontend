@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
@@ -10,7 +10,9 @@ import {
   PaginationComponent,
   SpinnerComponent,
 } from '../../../../shared';
+import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 import { NewsDetailStore } from '../../application';
+import { NewsBlurbService } from '../../application/news-blurb.service';
 import { ImpactClass, MarketStats, NewsSkipReason } from '../../domain';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { providerLabel } from '../news-timeline/provider-label';
@@ -68,10 +70,24 @@ const LOCALE_TAGS: Record<string, string> = { es: 'es-ES', en: 'en-US' };
 export class NewsDetailPageComponent {
   readonly store = inject(NewsDetailStore);
   readonly i18n = inject(TranslationService);
+  readonly blurbs = inject(NewsBlurbService);
   private readonly route = inject(ActivatedRoute);
+  private readonly shellSearch = inject(ShellSearchService);
   private currentId: string | null = null;
+  readonly summaryText = computed(() => {
+    this.blurbs.blurbs();
+    const news = this.store.news();
+    return news ? this.blurbs.blurbFor(news) : null;
+  });
 
   constructor() {
+    effect(() => {
+      const news = this.store.news();
+      if (news) {
+        this.blurbs.ensureBlurbs([news]);
+      }
+    });
+
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const id = params.get('id');
       if (id && id !== this.currentId) {
@@ -163,5 +179,19 @@ export class NewsDetailPageComponent {
     if (img instanceof HTMLImageElement) {
       img.closest('.news-detail__hero')?.remove();
     }
+  }
+
+  /** Opens the chat grounded on this news article (issue #73). */
+  onAskMidas(): void {
+    const news = this.store.news();
+    if (!news) {
+      return;
+    }
+    void this.shellSearch.goToChatWithReference({
+      kind: 'news',
+      newsId: news.id,
+      title: news.title,
+      source: news.source,
+    });
   }
 }

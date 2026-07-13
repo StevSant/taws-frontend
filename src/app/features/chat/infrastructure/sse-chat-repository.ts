@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AppConfigService, AuthTokenService } from '../../../core';
-import { AgentTrace, ChatRepository, ChatStreamEvent, ToolCall } from '../domain';
+import { AgentTrace, ChatReference, ChatRepository, ChatStreamEvent, ToolCall } from '../domain';
 import { ChartSpec } from '../../../shared/charts';
 
 const CHAT_STREAM_PATH = '/api/v1/chat/stream';
@@ -35,11 +35,15 @@ export class SseChatRepository extends ChatRepository {
   private readonly config = inject(AppConfigService);
   private readonly authToken = inject(AuthTokenService);
 
-  async *streamReply(input: string, threadId: string): AsyncIterable<ChatStreamEvent> {
+  async *streamReply(
+    input: string,
+    threadId: string,
+    reference?: ChatReference,
+  ): AsyncIterable<ChatStreamEvent> {
     const response = await fetch(`${this.config.apiBaseUrl}${CHAT_STREAM_PATH}`, {
       method: 'POST',
       headers: this.buildHeaders(),
-      body: JSON.stringify({ message: input, thread_id: threadId }),
+      body: JSON.stringify(this.buildBody(input, threadId, reference)),
     });
 
     if (!response.ok || !response.body) {
@@ -94,6 +98,29 @@ export class SseChatRepository extends ChatRepository {
     } finally {
       reader.releaseLock();
     }
+  }
+
+  /**
+   * Builds the request body, adding the optional grounding reference as flat
+   * fields the backend expects: an asset reference sends `asset_symbol`, a news
+   * reference sends `news_id`. Neither is present when there is no reference.
+   */
+  private buildBody(
+    input: string,
+    threadId: string,
+    reference?: ChatReference,
+  ): Record<string, string> {
+    const body: Record<string, string> = { message: input, thread_id: threadId };
+    if (reference?.kind === 'asset') {
+      body['asset_symbol'] = reference.symbol;
+      if (reference.fromDate && reference.toDate) {
+        body['from_date'] = reference.fromDate;
+        body['to_date'] = reference.toDate;
+      }
+    } else if (reference?.kind === 'news') {
+      body['news_id'] = reference.newsId;
+    }
+    return body;
   }
 
   private buildHeaders(): Record<string, string> {

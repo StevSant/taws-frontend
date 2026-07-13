@@ -19,6 +19,9 @@ export function mapEnrichedInstrumentDto(dto: EnrichedInstrumentDto): EnrichedIn
     volatilityRegime: dto.volatility_regime,
     sparkline: Array.isArray(dto.sparkline) ? dto.sparkline : [],
     latestSignal: dto.latest_signal ? mapSignalDto(dto.latest_signal) : null,
+    marketCap: dto.market_cap ?? null,
+    volume24h: dto.volume_24h ?? null,
+    change7dPct: dto.change_7d_pct ?? null,
   };
 }
 

@@ -1,0 +1,46 @@
+<section class="gen-focus" role="status" aria-live="polite">
+  <div class="gen-focus__aura" aria-hidden="true"></div>
+
+  <div class="gen-focus__ring" aria-hidden="true">
+    <svg class="gen-focus__ring-svg" viewBox="0 0 120 120">
+      <circle class="gen-focus__ring-track" cx="60" cy="60" r="52" />
+      <circle
+        class="gen-focus__ring-progress"
+        cx="60"
+        cy="60"
+        r="52"
+        [attr.stroke-dasharray]="circumference"
+        [attr.stroke-dashoffset]="dashOffset()"
+        [class.gen-focus__ring-progress--indeterminate]="percentLabel() === null"
+      />
+    </svg>
+    <div class="gen-focus__ring-center">
+      @if (percentLabel(); as pct) {
+        <span class="gen-focus__percent">{{ pct }}</span>
+      } @else {
+        <span class="gen-focus__spinner"></span>
+      }
+    </div>
+  </div>
+
+  <div class="gen-focus__body">
+    <h2 class="gen-focus__heading">{{ heading() }}</h2>
+    <p class="gen-focus__subtext">{{ subtext() }}</p>
+
+    @if (progress(); as prep) {
+      <p class="gen-focus__step">{{ stepLabel() }} {{ prep.current }}/{{ prep.total }}</p>
+      <div class="gen-focus__bar">
+        <span class="gen-focus__bar-fill" [style.transform]="'scaleX(' + fraction() + ')'"></span>
+      </div>
+    } @else {
+      <p class="gen-focus__step gen-focus__step--indeterminate">{{ preparingLabel() }}</p>
+      <div class="gen-focus__bar gen-focus__bar--indeterminate">
+        <span class="gen-focus__bar-sweep"></span>
+      </div>
+    }
+  </div>
+
+  @if (error(); as message) {
+    <p class="gen-focus__error" role="alert">{{ message }}</p>
+  }
+</section>

@@ -72,6 +72,56 @@
             }
           </ul>
         }
+
+        <div class="radar-add-instrument__coingecko">
+          <button
+            type="button"
+            class="radar-add-instrument__cg-search"
+            [disabled]="store.query().trim().length === 0"
+            (click)="onSearchCoinGecko()"
+          >
+            {{ i18n.t('radar.addInstrument.searchCoinGecko') }}
+          </button>
+          @if (store.searchResults().length > 0) {
+            <ul class="radar-add-instrument__cg-results" role="listbox">
+              @for (candidate of store.searchResults(); track candidate.id) {
+                <li class="radar-add-instrument__cg-result">
+                  <button
+                    type="button"
+                    class="radar-add-instrument__cg-result-btn"
+                    [disabled]="
+                      store.isFollowed(candidate.symbol) ||
+                      store.busySymbol() === candidate.symbol.toUpperCase()
+                    "
+                    (click)="onRegister(candidate)"
+                  >
+                    @if (candidate.thumb) {
+                      <img
+                        class="radar-add-instrument__cg-thumb"
+                        [src]="candidate.thumb"
+                        alt=""
+                        width="20"
+                        height="20"
+                      />
+                    }
+                    <span class="radar-add-instrument__result-symbol">{{
+                      candidate.symbol.toUpperCase()
+                    }}</span>
+                    <span class="radar-add-instrument__result-name">{{ candidate.name }}</span>
+                    <span class="radar-add-instrument__result-state">
+                      {{
+                        store.isFollowed(candidate.symbol)
+                          ? i18n.t('radar.addInstrument.added')
+                          : i18n.t('radar.addInstrument.register')
+                      }}
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
         @if (store.error(); as error) {
           <p class="radar-add-instrument__error" role="alert">{{ error }}</p>
         }

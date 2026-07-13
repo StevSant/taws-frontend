@@ -8,7 +8,8 @@ import {
   formatPrice,
 } from '../../../../shared';
 import { RadarStore } from '../../../radar/application';
-import { ImpactClass } from '../../../radar/domain';
+import { ImpactClass, NewsItem } from '../../../radar/domain';
+import { ChatNewsQuestion } from '../../domain';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -34,7 +35,7 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
 export class ChatContextRailComponent implements OnInit {
   readonly radar = inject(RadarStore);
   readonly i18n = inject(TranslationService);
-  readonly askNews = output<string>();
+  readonly askNews = output<ChatNewsQuestion>();
   readonly closePanel = output<void>();
 
   ngOnInit(): void {
@@ -60,12 +61,15 @@ export class ChatContextRailComponent implements OnInit {
     return this.i18n.t(IMPACT_LABELS[impact]);
   }
 
-  askAboutNews(title: string, symbol: string): void {
+  askAboutNews(news: NewsItem, symbol: string): void {
     const prompt = this.i18n
       .t('chat.rail.news.askPrompt')
       .replace('{symbol}', symbol)
-      .replace('{title}', title);
-    this.askNews.emit(prompt);
+      .replace('{title}', news.title);
+    this.askNews.emit({
+      prompt,
+      reference: { kind: 'news', newsId: news.id, title: news.title, source: news.source },
+    });
   }
 
   formatPrice(value?: number | null): string {
