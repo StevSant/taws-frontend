@@ -1,7 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
+import {
+  AppConfigService,
+  cachedFetch,
+  RequestCacheService,
+  TranslationService,
+} from '../../../core';
 import { EnrichedInstrumentQuery, InstrumentPage, MarketsRepository } from '../domain';
 import { InstrumentPageDto } from './enriched-instrument-dto';
 import { mapInstrumentPageDto } from './map-enriched-instrument-dto';
@@ -13,6 +18,12 @@ const ENRICHED_INSTRUMENTS_PATH = '/api/v1/instruments/enriched';
  * endpoint `GET /api/v1/instruments/enriched`, which returns each row already
  * enriched (price/change/volatility/sparkline/signal) plus highlight groups —
  * so the explorer never fans out one request per instrument per column.
+ *
+ * Sends the active UI locale (issue #67): the backend caches an instrument's AI signal per
+ * `(symbol, locale)`, so a request that names no locale is served whatever the *server*
+ * default is — which is how a Spanish UI ended up showing English signals. The locale is
+ * part of `params`, hence part of the client-side cache key too, so switching language
+ * doesn't serve the previous language's rows from the local cache either.
  */
 @Injectable()
 export class HttpMarketsRepository extends MarketsRepository {
@@ -21,12 +32,13 @@ export class HttpMarketsRepository extends MarketsRepository {
   constructor(
     private readonly http: HttpClient,
     private readonly config: AppConfigService,
+    private readonly translation: TranslationService,
   ) {
     super();
   }
 
   async fetchEnrichedInstruments(query: EnrichedInstrumentQuery): Promise<InstrumentPage> {
-    let params = new HttpParams();
+    let params = new HttpParams().set('locale', this.translation.locale());
     if (query.assetClass) {
       params = params.set('asset_class', query.assetClass);
     }

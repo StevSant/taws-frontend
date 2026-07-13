@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Locale, TranslationService } from '../../core';
+import { Locale, LocalePreferenceService, TranslationService } from '../../core';
 import { DropdownAnchor, syncDropdownAnchor } from '../sync-dropdown-anchor';
 
 @Component({
@@ -21,6 +21,7 @@ import { DropdownAnchor, syncDropdownAnchor } from '../sync-dropdown-anchor';
 })
 export class LanguageToggleComponent {
   readonly i18n = inject(TranslationService);
+  private readonly localePreference = inject(LocalePreferenceService);
   readonly isOpen = signal(false);
   readonly menuAnchor = signal<DropdownAnchor>({ top: 0, left: 0 });
 
@@ -34,8 +35,13 @@ export class LanguageToggleComponent {
     this.isOpen.set(opening);
   }
 
+  /**
+   * Goes through `LocalePreferenceService`, not `TranslationService`, so a logged-in user's
+   * choice is persisted to their profile and not just to this browser's localStorage — that
+   * is what lets the agent answer in this language on their other devices (issue #67).
+   */
   selectLocale(locale: Locale): void {
-    this.i18n.setLocale(locale);
+    this.localePreference.setLocale(locale);
     this.isOpen.set(false);
   }
 

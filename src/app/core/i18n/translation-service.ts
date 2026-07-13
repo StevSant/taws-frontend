@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { AppConfigService } from '../config/app-config.service';
 import { LOCALE_STORAGE_KEY } from './locale-storage-key';
 import { Locale } from './locale.model';
+import { parseLocale } from './parse-locale';
 import { TranslationDict, TranslationKey } from './translation-dict.model';
 import { EN_TRANSLATIONS } from './translations/en';
 import { ES_TRANSLATIONS } from './translations/es';
@@ -45,13 +46,18 @@ export class TranslationService {
     return value;
   }
 
+  /**
+   * Switches the UI locale and remembers it for this browser. Use
+   * `LocalePreferenceService.setLocale` instead when acting on a user's choice — it calls
+   * this and additionally persists the choice to a logged-in user's profile, which is what
+   * lets the agent answer in that language on other devices (issue #67).
+   */
   setLocale(locale: Locale): void {
     this.localeSignal.set(locale);
     localStorage.setItem(LOCALE_STORAGE_KEY, locale);
   }
 
   private readStoredLocale(): Locale {
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    return stored === 'en' || stored === 'es' ? stored : DEFAULT_LOCALE;
+    return parseLocale(localStorage.getItem(LOCALE_STORAGE_KEY)) ?? DEFAULT_LOCALE;
   }
 }
