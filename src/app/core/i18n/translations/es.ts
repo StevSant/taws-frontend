@@ -279,6 +279,7 @@ export const ES_TRANSLATIONS = {
   'radar.card.impact.neutral': 'Neutral',
   'radar.card.impact.uncertain': 'Incierto',
   'radar.card.impact.unclassified': 'Sin clasificar',
+  'radar.card.impact.noInstrument': 'Sin instrumento',
   'radar.card.confidence.label': 'Confianza',
   'radar.card.confidence.unavailable': 'N/D',
   'radar.card.priceDelta.label': 'Δ Precio',
@@ -331,6 +332,16 @@ export const ES_TRANSLATIONS = {
   'radar.analysis.unavailableHint': 'No se generó análisis de IA para esta señal.',
   'radar.analysis.expand': 'Expandir análisis',
   'radar.analysis.collapse': 'Contraer análisis',
+  // Way out of the "análisis no disponible" dead end (taws-frontend#21) + scoped news-feed
+  // failure on the radar home (taws#71).
+  'radar.analysis.regenerate': 'Regenerar análisis',
+  'radar.analysis.regenerating': 'Regenerando análisis…',
+  'radar.analysis.regenerateError': 'No se pudo regenerar el análisis.',
+  'radar.news.error.title': 'No se pudieron cargar las noticias',
+  'radar.news.error.description':
+    'El resto del radar sigue disponible. Vuelve a intentarlo en unos segundos.',
+  'radar.news.error.retry': 'Reintentar noticias',
+  'radar.news.error.retrying': 'Reintentando…',
   'radar.cards.title': 'Señales',
   'radar.cards.subtitle':
     'Señales generadas por IA a partir de noticias, documentos y datos macro.',
@@ -410,7 +421,11 @@ export const ES_TRANSLATIONS = {
     'No hay datos históricos para este indicador en el rango seleccionado.',
   'radar.macro.detail.notFound.title': 'Indicador desconocido',
   'radar.macro.detail.notFound.description': 'Este indicador macro no existe.',
-  'radar.macro.fearGreed.title': 'Fear & Greed (acciones)',
+  'radar.macro.fearGreed.title': 'Fear & Greed',
+  'radar.macro.reading.sentiment': 'Sentimiento actual',
+  'radar.macro.reading.dailyChange': 'Cambio diario',
+  'radar.macro.reading.leadingIndex': 'Mayor movimiento',
+  'radar.macro.reading.volatility': 'Volatilidad',
   'radar.macro.fearGreed.hint':
     '0 = miedo extremo, 100 = codicia extrema. Índice de sentimiento del mercado de acciones CNN.',
   'radar.macro.fearGreed.disclaimer':
@@ -441,6 +456,8 @@ export const ES_TRANSLATIONS = {
     'La codicia elevada puede anticipar correcciones si los catalizadores macro empeoran.',
   'radar.macro.insight.greed.discipline':
     'Conviene revisar tamaño de posición y take-profit antes de perseguir momentum.',
+  'radar.catalysts.title': 'Catalizadores recientes',
+  'radar.catalysts.subtitle': 'Noticias con impacto directo sobre los activos monitoreados.',
   'radar.timeline.title': 'Timeline de noticias',
   'radar.timeline.analyze': 'Analizar',
   'radar.timeline.loadMore': 'Cargar más noticias',
@@ -512,12 +529,35 @@ export const ES_TRANSLATIONS = {
   'radar.detail.notFound.title': 'Señal no encontrada',
   'radar.detail.notFound.description': 'Esta señal expiró o fue eliminada.',
   'radar.detail.summary': 'Resumen',
+  'radar.detail.summaryPending': 'Preparando un resumen breve de esta noticia…',
+  'radar.detail.continueReading': 'Continuar leyendo en la fuente',
   'radar.detail.sentiment': 'Sentimiento',
   'radar.detail.relatedInstruments': 'Instrumentos relacionados',
   'radar.detail.entities': 'Entidades clave',
   'radar.detail.signalSection': 'Clasificación de señal',
+  'radar.detail.assetImpacts': 'Impacto por activo',
   'radar.detail.noSignal': 'No se produjo ninguna señal para esta noticia.',
   'radar.detail.openOriginal': 'Abrir original',
+  // --- Análisis de noticias: por qué no hay señal, y el disparador manual "Analizar ahora" ---
+  'radar.detail.skipReason.gated_low_relevance':
+    'Descartada por baja relevancia: el filtro previo estimó que esta noticia no justificaba una llamada al modelo. Puedes forzar el análisis igualmente.',
+  'radar.detail.skipReason.near_duplicate':
+    'Casi duplicada: otra noticia ya cubre este mismo hecho para el instrumento.',
+  'radar.detail.skipReason.no_linked_instrument':
+    'Sin instrumento vinculado: esta noticia no menciona ningún instrumento de nuestro universo, y las señales se generan por instrumento.',
+  'radar.detail.skipReason.insufficient_evidence':
+    'Evidencia insuficiente: aún no hay suficientes fuentes distintas para respaldar una señal. Se reintentará automáticamente.',
+  'radar.detail.skipReason.compliance_blocked':
+    'Bloqueada por cumplimiento: el análisis se generó pero no superó la revisión de cumplimiento, así que no se guardó ninguna señal.',
+  'radar.detail.skipReason.analysis_failed':
+    'El análisis falló por un error temporal. Se reintentará automáticamente.',
+  'radar.detail.analyzeNow.action': 'Analizar ahora',
+  'radar.detail.analyzeNow.running': 'Analizando…',
+  'radar.detail.analyzeNow.hint':
+    'Fuerza el análisis de esta noticia, omitiendo el filtro previo de coste.',
+  'radar.detail.analyzeNow.disabledHint':
+    'No se puede analizar: esta noticia no está vinculada a ningún instrumento.',
+  'radar.detail.analyzeNow.error': 'No se pudo analizar la noticia:',
   'radar.chart.loading': 'Cargando gráfico…',
   'radar.chart.unavailable': 'El gráfico no está disponible para este instrumento.',
   'radar.detail.asset.loading': 'Cargando datos del activo…',
@@ -665,6 +705,68 @@ export const ES_TRANSLATIONS = {
   'scenarios.result.likelihood.note':
     'Frecuencia empírica en ventanas históricas comparables; no es una predicción ni una garantía.',
   'scenarios.result.team.label': 'Analizado por',
+  'scenarios.result.pipeline.eyebrow': 'Traza del análisis',
+  'scenarios.result.pipeline.title': 'Cómo el pipeline construyó este resultado',
+  'scenarios.result.pipeline.intro':
+    'Cada etapa se deriva del resultado persistido; describe el proceso de análisis, no una votación entre agentes independientes.',
+  'scenarios.result.pipeline.compliance': 'Compliance verificado',
+  'scenarios.result.pipeline.intake.key': 'Definición',
+  'scenarios.result.pipeline.intake.title': 'Definición del escenario',
+  'scenarios.result.pipeline.context.key': 'Contexto',
+  'scenarios.result.pipeline.context.title': 'Evidencia y alcance',
+  'scenarios.result.pipeline.context.summary':
+    'La etapa de contexto organiza la evidencia asociada a los impactos de mercado evaluados.',
+  'scenarios.result.pipeline.causal.key': 'Cadena causal',
+  'scenarios.result.pipeline.causal.title': 'Modelo de propagación',
+  'scenarios.result.pipeline.quant.key': 'Cuantificación',
+  'scenarios.result.pipeline.quant.title': 'Cuantificación',
+  'scenarios.result.pipeline.quant.summary':
+    'La frecuencia histórica y los valores de confianza cuantifican el resultado cuando hay datos disponibles.',
+  'scenarios.result.pipeline.panel.key': 'Panel',
+  'scenarios.result.pipeline.panel.title': 'Especialistas en paralelo',
+  'scenarios.result.pipeline.panel.summary':
+    'Seis especialistas analizan el mismo grounding de forma concurrente e independiente.',
+  'scenarios.result.pipeline.synthesis.key': 'Síntesis',
+  'scenarios.result.pipeline.synthesis.title': 'Conclusión integrada',
+  'scenarios.result.pipeline.synthesis.summary':
+    'La narrativa final, el mapa de impactos y las acciones se construyen a partir de las etapas anteriores.',
+  'scenarios.result.pipeline.synthesis.consensus':
+    'Midas integra acuerdos y desacuerdos del comité; consenso no significa unanimidad ni votación.',
+  'scenarios.result.committee.eyebrow': 'Panel multiagente',
+  'scenarios.result.committee.title': 'Comité de especialistas',
+  'scenarios.result.committee.notVote':
+    'Perspectivas independientes basadas en el mismo contexto; no es una votación.',
+  'scenarios.result.committee.confidence': 'Confianza',
+  'scenarios.result.committee.findings': 'Hallazgos clave',
+  'scenarios.result.committee.risks': 'Riesgos',
+  'scenarios.result.committee.uncertainty': 'Incertidumbre',
+  'scenarios.result.committee.omitted':
+    'contribución(es) no disponible(s); no se sustituyeron con contenido simulado.',
+  'scenarios.result.committee.agent.analyst': 'Analista',
+  'scenarios.result.committee.agent.quant': 'Cuantitativo',
+  'scenarios.result.committee.agent.macro': 'Macro',
+  'scenarios.result.committee.agent.sentiment': 'Sentimiento',
+  'scenarios.result.committee.agent.consequence': 'Consecuencias',
+  'scenarios.result.committee.agent.advisor': 'Asesor',
+  'scenarios.result.consensus.eyebrow': 'Síntesis Midas',
+  'scenarios.result.consensus.title': 'Consenso final',
+  'scenarios.result.consensus.agreements': 'Acuerdos',
+  'scenarios.result.consensus.disagreements': 'Desacuerdos e incertidumbres',
+  'scenarios.result.pipeline.metric.symbols': 'Símbolos',
+  'scenarios.result.pipeline.metric.assetClasses': 'Clases de activo',
+  'scenarios.result.pipeline.metric.evidence': 'Evidencias',
+  'scenarios.result.pipeline.metric.impacts': 'Impactos evaluados',
+  'scenarios.result.pipeline.metric.nodes': 'Nodos',
+  'scenarios.result.pipeline.metric.links': 'Enlaces',
+  'scenarios.result.pipeline.metric.causalConfidence': 'Confianza prom. de enlaces',
+  'scenarios.result.pipeline.metric.likelihood': 'Probabilidad histórica',
+  'scenarios.result.pipeline.metric.windows': 'Ocurrencias / ventanas',
+  'scenarios.result.pipeline.metric.impactConfidence': 'Confianza prom. de impactos',
+  'scenarios.result.pipeline.metric.synthesizedImpacts': 'Impactos sintetizados',
+  'scenarios.result.pipeline.metric.actions': 'Acciones sugeridas',
+  'scenarios.result.pipeline.metric.contributions': 'Contribuciones reales',
+  'scenarios.result.pipeline.metric.omissions': 'Omisiones',
+  'scenarios.result.pipeline.metric.unavailable': 'N/D',
   'scenarios.result.evidence.title': 'Evidencia de respaldo',
   'scenarios.result.evidence.empty': 'No hay evidencia disponible para esta simulación.',
   'scenarios.result.evidence.type.actual_data': 'Datos reales',

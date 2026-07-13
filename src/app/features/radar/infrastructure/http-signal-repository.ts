@@ -26,8 +26,11 @@ export class HttpSignalRepository extends SignalRepository {
     super();
   }
 
-  async fetchSignals(symbol: string): Promise<Signal[]> {
+  async fetchSignals(symbol: string, options?: { refresh?: boolean }): Promise<Signal[]> {
     const normalized = symbol.toUpperCase();
+    if (options?.refresh) {
+      this.cache.delete('signals', normalized);
+    }
     return cachedFetch(
       this.cache,
       'signals',

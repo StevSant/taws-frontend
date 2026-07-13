@@ -1,4 +1,4 @@
-<div class="macro-indicators">
+<div class="macro-indicators" [class.macro-indicators--strip]="layout === 'strip'">
   <header class="macro-indicators__head">
     <span class="macro-indicators__kicker">{{ i18n.t('radar.macro.indicators.title') }}</span>
     <div
@@ -22,21 +22,23 @@
 
   <ul class="macro-indicators__grid" role="list">
     @if (macro) {
-      <li
-        class="macro-indicators__card macro-indicators__card--vix"
-        [attr.title]="i18n.t('radar.macro.indicator.vix.explanation')"
-      >
-        <div class="macro-indicators__card-top">
-          <span class="macro-indicators__icon" aria-hidden="true">🌡️</span>
-          <span class="macro-indicators__label">{{
-            i18n.t('radar.macro.indicator.vix.label')
-          }}</span>
-        </div>
-        <span class="macro-indicators__value">{{ macro.volatility.vixLevel.toFixed(1) }}</span>
-        <span class="macro-indicators__regime">{{ regimeLabel(macro.volatility.regime) }}</span>
-        <p class="macro-indicators__explanation">
-          {{ i18n.t('radar.macro.indicator.vix.explanation') }}
-        </p>
+      <li class="macro-indicators__cell">
+        <article
+          class="macro-indicators__card macro-indicators__card--vix"
+          [attr.title]="i18n.t('radar.macro.indicator.vix.explanation')"
+        >
+          <div class="macro-indicators__card-top">
+            <span class="macro-indicators__icon" aria-hidden="true">🌡️</span>
+            <span class="macro-indicators__label">{{
+              i18n.t('radar.macro.indicator.vix.label')
+            }}</span>
+          </div>
+          <span class="macro-indicators__value">{{ macro.volatility.vixLevel.toFixed(1) }}</span>
+          <span class="macro-indicators__regime">{{ regimeLabel(macro.volatility.regime) }}</span>
+          <p class="macro-indicators__explanation">
+            {{ i18n.t('radar.macro.indicator.vix.explanation') }}
+          </p>
+        </article>
       </li>
     }
 

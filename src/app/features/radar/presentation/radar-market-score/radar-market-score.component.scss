@@ -1,12 +1,15 @@
 :host {
   display: block;
   min-width: 0;
+  height: 100%;
 }
 
 .radar-market-score {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  box-sizing: border-box;
+  height: 100%;
 
   &__header {
     display: flex;

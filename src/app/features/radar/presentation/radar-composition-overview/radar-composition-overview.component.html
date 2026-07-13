@@ -11,6 +11,10 @@
         <li class="composition__item">
           <div
             class="composition__lane"
+            [class.composition__lane--selected]="selectedClass === row.assetClass"
+            [class.composition__lane--muted]="
+              selectedClass !== null && selectedClass !== row.assetClass
+            "
             [style.--lane-share]="row.sharePct"
             [style.--lane-color]="row.scoreColor"
           >
@@ -19,14 +23,15 @@
             <button
               type="button"
               class="composition__lane-toggle"
-              [attr.aria-expanded]="isExpanded(row.assetClass)"
-              [attr.title]="i18n.t('radar.composition.expandHint')"
-              (click)="toggleExpand(row.assetClass)"
+              [attr.aria-expanded]="isRowExpanded(row)"
+              [attr.title]="canExpand(row) ? i18n.t('radar.composition.expandHint') : null"
+              [disabled]="!canExpand(row)"
+              (click)="toggleExpand(row)"
             >
               <span class="composition__lane-lead">
                 <span
                   class="composition__chevron"
-                  [class.composition__chevron--open]="isExpanded(row.assetClass)"
+                  [class.composition__chevron--open]="isRowExpanded(row)"
                   aria-hidden="true"
                   >▸</span
                 >
@@ -75,15 +80,11 @@
             </button>
           </div>
 
-          @if (isExpanded(row.assetClass)) {
+          @if (isRowExpanded(row)) {
             <div class="composition__instruments">
               @if (instruments.isLoading() && row.instruments.length === 0) {
                 <p class="composition__instruments-note">
                   {{ i18n.t('radar.composition.instrumentsLoading') }}
-                </p>
-              } @else if (row.instruments.length === 0) {
-                <p class="composition__instruments-note">
-                  {{ i18n.t('radar.composition.instrumentsEmpty') }}
                 </p>
               } @else {
                 <ul class="composition__instrument-list" role="list">

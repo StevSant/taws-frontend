@@ -95,6 +95,8 @@ export class RadarStore {
   private readonly loadingSignal = signal(false);
   private readonly isEnrichingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
+  private readonly newsErrorSignal = signal<string | null>(null);
+  private readonly newsRetryingSignal = signal(false);
   private readonly generatingSymbolSignal = signal<string | null>(null);
   private readonly reviewHistorySignal = signal<Record<string, ReviewState[]>>({});
   private readonly reviewErrorsSignal = signal<Record<string, string | null>>({});
@@ -108,6 +110,17 @@ export class RadarStore {
   readonly macroState = this.macroStateSignal.asReadonly();
   readonly marketPulse = this.marketPulseSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
+  /**
+   * News-feed failure, scoped to the news section — deliberately NOT `error` (issue taws#71).
+   *
+   * `GET /api/v1/news` can be slow enough to trip `newsRequestTimeoutMs`, and routing that
+   * into the page-level `error` wiped the entire radar with a full-page banner ("No se
+   * pudieron cargar los datos del radar.Timeout has occurred") — instruments, macro cards
+   * and all. The news feed is one section of the page, so its failure degrades that section
+   * (retryable via `retryNews`) and leaves everything else standing.
+   */
+  readonly newsError = this.newsErrorSignal.asReadonly();
+  readonly isNewsRetrying = this.newsRetryingSignal.asReadonly();
 
   /** Instrument options for the "asset" filter, scoped to the selected instrument type. */
   readonly instrumentOptions = computed(() => {
@@ -270,8 +283,17 @@ export class RadarStore {
   });
   /** News items fetched but not linked to any instrument — surfaced, not dropped silently. */
   readonly unlinkedNewsCount = computed(() => this.grouped().unlinkedCount);
+  /**
+   * Whether the page has any instrument card to render — news-driven or, for a user with a
+   * watchlist, their followed instruments (which don't need the news feed to exist). This is
+   * what lets the radar still render its instruments section when `loadNews` fails.
+   */
+  readonly hasSignals = computed(
+    () => this.signals().length > 0 || this.watchlistSignals().length > 0,
+  );
   readonly isEmpty = computed(
-    () => !this.loadingSignal() && !this.errorSignal() && this.signals().length === 0,
+    () =>
+      !this.loadingSignal() && !this.errorSignal() && !this.newsErrorSignal() && !this.hasSignals(),
   );
   readonly unclassifiedCount = computed(
     () => this.signals().filter((signal) => !signal.impactClass).length,
@@ -323,6 +345,23 @@ export class RadarStore {
 
   async retry(): Promise<void> {
     await Promise.all([this.loadInstruments(), this.loadNews()]);
+  }
+
+  /**
+   * Retries just the news feed, from the scoped "couldn't load news" state. Loads in the
+   * background so the rest of the page (instruments, macro, KPIs) stays on screen instead
+   * of being replaced by the full-page skeletons a foreground load would trigger.
+   */
+  async retryNews(): Promise<void> {
+    if (this.newsRetryingSignal()) {
+      return;
+    }
+    this.newsRetryingSignal.set(true);
+    try {
+      await this.loadNews({ background: true });
+    } finally {
+      this.newsRetryingSignal.set(false);
+    }
   }
 
   async setAssetClass(assetClass: AssetClass | null): Promise<void> {
@@ -498,7 +537,7 @@ export class RadarStore {
     if (forceLoading || (!background && this.newsSignal().length === 0)) {
       this.loadingSignal.set(true);
     }
-    this.errorSignal.set(null);
+    this.newsErrorSignal.set(null);
     try {
       const news = await this.newsRepository.fetchNews(this.filtersSignal());
       this.newsSignal.set(news);
@@ -510,8 +549,14 @@ export class RadarStore {
       }
       void this.enrichFeed(news);
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-      this.newsSignal.set([]);
+      // Scoped to the news section, never the page (issue taws#71) — see `newsError`.
+      this.newsErrorSignal.set(this.toErrorMessage(error));
+      if (forceLoading) {
+        // A filter change that failed: the feed on screen answers the *previous* filter, so
+        // keeping it would silently mislabel it as the new one. Drop it and show the error.
+        // Any other failure (first load, refresh, retry) keeps the last good feed on screen.
+        this.newsSignal.set([]);
+      }
     } finally {
       this.loadingSignal.set(false);
     }

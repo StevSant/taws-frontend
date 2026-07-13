@@ -18,5 +18,6 @@ export function mapNewsItemDto(dto: NewsItemDto): NewsItem {
     analysisStatus: dto.analysis_status,
     signalId: dto.signal_id ?? undefined,
     imageUrl: dto.image_url ?? undefined,
+    skipReason: dto.skip_reason ?? undefined,
   };
 }

@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
@@ -12,7 +12,9 @@ import {
 } from '../../../../shared';
 import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 import { NewsDetailStore } from '../../application';
-import { ImpactClass, MarketStats } from '../../domain';
+import { NewsBlurbService } from '../../application/news-blurb.service';
+import { AssetClass, ImpactClass, NewsAssetImpact, NewsSkipReason } from '../../domain';
+import { ASSET_CLASS_LABEL_KEYS } from '../asset-class-label-keys';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { providerLabel } from '../news-timeline/provider-label';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
@@ -22,6 +24,20 @@ const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
   negative: 'radar.card.impact.negative',
   neutral: 'radar.card.impact.neutral',
   uncertain: 'radar.card.impact.uncertain',
+};
+
+/**
+ * Prose explaining each reason an article produced no signal (issue #26) — what replaces the
+ * bare "No se produjo ninguna señal para esta noticia", which read as breakage rather than as
+ * the deliberate cost decision it usually was.
+ */
+const SKIP_REASON_LABELS: Record<NewsSkipReason, TranslationKey> = {
+  gated_low_relevance: 'radar.detail.skipReason.gated_low_relevance',
+  near_duplicate: 'radar.detail.skipReason.near_duplicate',
+  no_linked_instrument: 'radar.detail.skipReason.no_linked_instrument',
+  insufficient_evidence: 'radar.detail.skipReason.insufficient_evidence',
+  compliance_blocked: 'radar.detail.skipReason.compliance_blocked',
+  analysis_failed: 'radar.detail.skipReason.analysis_failed',
 };
 
 const PERCENT_MULTIPLIER = 100;
@@ -55,11 +71,24 @@ const LOCALE_TAGS: Record<string, string> = { es: 'es-ES', en: 'en-US' };
 export class NewsDetailPageComponent {
   readonly store = inject(NewsDetailStore);
   readonly i18n = inject(TranslationService);
+  readonly blurbs = inject(NewsBlurbService);
   private readonly route = inject(ActivatedRoute);
   private readonly shellSearch = inject(ShellSearchService);
   private currentId: string | null = null;
+  readonly summaryText = computed(() => {
+    this.blurbs.blurbs();
+    const news = this.store.news();
+    return news ? this.blurbs.blurbFor(news) : null;
+  });
 
   constructor() {
+    effect(() => {
+      const news = this.store.news();
+      if (news) {
+        this.blurbs.ensureBlurbs([news]);
+      }
+    });
+
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const id = params.get('id');
       if (id && id !== this.currentId) {
@@ -96,11 +125,17 @@ export class NewsDetailPageComponent {
     return providerLabel(provider);
   }
 
-  /** Live quant stats for an affected symbol, or `null` when the lookup hasn't resolved. */
-  statFor(symbol: string): MarketStats | null {
-    return (
-      this.store.affectedInstruments().find((stat) => stat.instrumentSymbol === symbol) ?? null
-    );
+  /**
+   * Price + % change + Analyst impact for an affected symbol, or `null` when the backend
+   * returned no row for it (a symbol outside the curated universe, or the degraded
+   * feed-scan fallback, which carries the article but none of the enrichment).
+   */
+  impactFor(symbol: string): NewsAssetImpact | null {
+    return this.store.affectedInstruments().find((impact) => impact.symbol === symbol) ?? null;
+  }
+
+  assetClassLabel(assetClass: AssetClass): string {
+    return this.i18n.t(ASSET_CLASS_LABEL_KEYS[assetClass]);
   }
 
   /** Locale-format the published date (aligns the metadata date with the rest of the app). */
@@ -111,23 +146,33 @@ export class NewsDetailPageComponent {
     );
   }
 
-  formatDelta(delta: number | null): string {
-    if (delta === null) {
+  formatDelta(delta: number | undefined): string {
+    if (delta === undefined) {
       return '—';
     }
     const sign = delta > 0 ? '+' : '';
     return `${sign}${delta.toFixed(2)}%`;
   }
 
-  deltaClass(delta: number | null): string {
-    if (delta === null || delta === 0) {
+  deltaClass(delta: number | undefined): string {
+    if (delta === undefined || delta === 0) {
       return '';
     }
     return delta > 0 ? 'news-detail__chip-delta--up' : 'news-detail__chip-delta--down';
   }
 
+  /**
+   * Why this article has no signal, as prose — or `null` when there's nothing to explain and
+   * the generic "no signal yet" line is the honest thing to show (e.g. an item still queued
+   * for the next batch run).
+   */
+  skipReasonLabel(): string | null {
+    const reason = this.store.skipReason();
+    return reason ? this.i18n.t(SKIP_REASON_LABELS[reason]) : null;
+  }
+
   onAnalyze(): void {
-    void this.store.generate();
+    void this.store.analyze();
   }
 
   onRetry(): void {

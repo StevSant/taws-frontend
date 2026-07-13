@@ -51,6 +51,7 @@ export interface MacroIndicatorCard {
 })
 export class RadarMacroIndicatorsComponent implements OnInit {
   @Input() macro: MacroState | null = null;
+  @Input() layout: 'grid' | 'strip' = 'grid';
 
   readonly store = inject(MacroSeriesStore);
   readonly i18n = inject(TranslationService);
