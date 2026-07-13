@@ -136,6 +136,9 @@ export class HttpNewsRepository extends NewsRepository {
     if (query.sentiment) {
       params = params.set('sentiment', query.sentiment);
     }
+    if (query.category) {
+      params = params.set('category', query.category);
+    }
     if (query.analysisStatus) {
       params = params.set('analysis_status', query.analysisStatus);
     }

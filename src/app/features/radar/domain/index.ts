@@ -14,6 +14,8 @@ export type { NewsBrowseQuery } from './models/news-browse-query.model';
 export { DEFAULT_NEWS_BROWSE_QUERY } from './models/news-browse-query.model';
 export type { NewsFacets } from './models/news-facets.model';
 export type { NewsSortField } from './models/news-sort.model';
+export type { NewsCategory } from './models/news-category.model';
+export { NEWS_CATEGORIES } from './models/news-category.model';
 export type { SentimentFilterOption } from './models/sentiment-filter.model';
 export type { NewsEntity } from './models/news-entity.model';
 export type { AnalysisStatus } from './models/analysis-status.model';

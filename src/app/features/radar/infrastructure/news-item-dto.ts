@@ -1,4 +1,4 @@
-import { AnalysisStatus } from '../domain';
+import { AnalysisStatus, NewsCategory } from '../domain';
 import { NewsEntityDto } from './news-entity-dto';
 
 /** Wire shape of `NewsItemResponse` (both the list `items` array and `GET /api/v1/news/{id}`). */
@@ -22,4 +22,6 @@ export interface NewsItemDto {
   analysis_status?: AnalysisStatus;
   signal_id?: string | null;
   image_url?: string | null;
+  /** Topical category. Absent on responses from a backend that predates the field. */
+  category?: NewsCategory | null;
 }

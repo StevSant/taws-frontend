@@ -1,6 +1,7 @@
 import { AnalysisStatus } from './analysis-status.model';
 import { AssetClass } from './asset-class.model';
 import { SortDirection } from './instrument-page.model';
+import { NewsCategory } from './news-category.model';
 import { NewsSortField } from './news-sort.model';
 import { SentimentFilterOption } from './sentiment-filter.model';
 
@@ -18,6 +19,7 @@ export interface NewsBrowseQuery {
   source: string | null;
   provider: string | null;
   sentiment: SentimentFilterOption | null;
+  category: NewsCategory | null;
   analysisStatus: AnalysisStatus | null;
   search: string | null;
   sinceHours: number;
@@ -37,6 +39,7 @@ export const DEFAULT_NEWS_BROWSE_QUERY: NewsBrowseQuery = {
   source: null,
   provider: null,
   sentiment: null,
+  category: null,
   analysisStatus: null,
   search: null,
   sinceHours: 48,

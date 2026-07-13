@@ -20,6 +20,27 @@
     border-color: var(--color-gold-border);
   }
 
+  /**
+   * Front-page image (issue #72). Bleeds out to the card edges by cancelling the card
+   * padding, and reserves its box with `aspect-ratio` so the card never reflows once the
+   * image decodes. Absent or failed images drop the whole figure — no broken-image icon.
+   */
+  &__media {
+    flex: none;
+    margin: calc(var(--space-3) * -1) calc(var(--space-3) * -1) 0;
+    overflow: hidden;
+    border-radius: calc(var(--radius-md) - 1px) calc(var(--radius-md) - 1px) 0 0;
+    background: var(--color-surface-raised);
+    aspect-ratio: 16 / 9;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   &__head {
     display: flex;
     align-items: center;
@@ -55,6 +76,22 @@
       background: color-mix(in srgb, var(--color-border) 40%, transparent);
       color: var(--color-text-muted);
     }
+  }
+
+  /**
+   * Topical category (issue #69). Outlined, not filled, so it reads as a different
+   * taxonomy from the solid sentiment badge sitting next to it — subject vs. impact.
+   */
+  &__category {
+    display: inline-flex;
+    padding: 0.16rem 0.5rem;
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-full);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-gold);
   }
 
   &__confidence {

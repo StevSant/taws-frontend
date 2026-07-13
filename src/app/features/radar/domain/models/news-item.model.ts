@@ -1,4 +1,5 @@
 import { AnalysisStatus } from './analysis-status.model';
+import { NewsCategory } from './news-category.model';
 import { NewsEntity } from './news-entity.model';
 
 /**
@@ -34,4 +35,9 @@ export interface NewsItem {
   signalId?: string;
   /** Hero/thumbnail image when the upstream provider supplies one. */
   imageUrl?: string;
+  /**
+   * Topical category — what the article is *about*, independent of its sentiment/impact
+   * (issue #69). `undefined` on responses from a backend that predates the field.
+   */
+  category?: NewsCategory;
 }
