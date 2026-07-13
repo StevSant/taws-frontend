@@ -1,9 +1,7 @@
 <div class="feature-page news-detail">
-  <a
-    class="news-detail__back"
-    routerLink="/radar/news"
-    (click)="onBack($event)"
-  >&larr; {{ i18n.t('radar.detail.back.news') }}</a>
+  <a class="news-detail__back" routerLink="/radar/news" (click)="onBack($event)"
+    >&larr; {{ i18n.t('radar.detail.back.news') }}</a
+  >
 
   @if (store.isLoading()) {
     <app-spinner [label]="i18n.t('radar.detail.loading')" />
