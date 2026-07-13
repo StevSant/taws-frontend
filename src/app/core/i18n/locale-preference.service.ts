@@ -42,8 +42,6 @@ export class LocalePreferenceService {
     });
   }
 
-  readonly locale = this.translation.locale;
-
   /**
    * Applies `locale` to the UI and, for a logged-in user, persists it to their profile.
    *
