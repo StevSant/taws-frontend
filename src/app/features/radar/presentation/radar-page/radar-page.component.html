@@ -100,57 +100,46 @@
     </div>
 
     <section class="radar-page__catalysts radar-page__catalysts--strip feature-panel">
-        <header class="radar-page__catalysts-header">
-          <div>
-            <h2 class="radar-page__catalysts-title">
-              {{ i18n.t('radar.catalysts.title') }}
-            </h2>
-            <p class="radar-page__catalysts-subtitle">
-              {{ i18n.t('radar.catalysts.subtitle') }}
-            </p>
-          </div>
-          <a class="radar-page__catalysts-link" routerLink="/radar/news">
-            {{ i18n.t('radar.timeline.viewAll') }}
-          </a>
-        </header>
+      <header class="radar-page__catalysts-header">
+        <div>
+          <h2 class="radar-page__catalysts-title">
+            {{ i18n.t('radar.catalysts.title') }}
+          </h2>
+          <p class="radar-page__catalysts-subtitle">
+            {{ i18n.t('radar.catalysts.subtitle') }}
+          </p>
+        </div>
+        <a class="radar-page__catalysts-link" routerLink="/radar/news">
+          {{ i18n.t('radar.timeline.viewAll') }}
+        </a>
+      </header>
 
-        <ul class="radar-page__catalysts-list">
-          @for (entry of recentCatalysts(); track entry.news.id) {
-            <li class="radar-page__catalyst">
-              <div class="radar-page__catalyst-copy">
-                <a
-                  class="radar-page__catalyst-title"
-                  [routerLink]="['/radar/news', entry.news.id]"
+      <ul class="radar-page__catalysts-list">
+        @for (entry of recentCatalysts(); track entry.news.id) {
+          <li class="radar-page__catalyst">
+            <div class="radar-page__catalyst-copy">
+              <a class="radar-page__catalyst-title" [routerLink]="['/radar/news', entry.news.id]">
+                {{ entry.news.title }}
+              </a>
+              <span class="radar-page__catalyst-source">{{ entry.news.source }}</span>
+            </div>
+            <div class="radar-page__catalyst-symbols">
+              @for (related of entry.symbols.slice(0, 3); track related.symbol) {
+                <span
+                  class="radar-page__catalyst-pill"
+                  [class.radar-page__catalyst-pill--positive]="related.impactClass === 'positive'"
+                  [class.radar-page__catalyst-pill--negative]="related.impactClass === 'negative'"
+                  [class.radar-page__catalyst-pill--neutral]="related.impactClass === 'neutral'"
+                  [class.radar-page__catalyst-pill--uncertain]="related.impactClass === 'uncertain'"
                 >
-                  {{ entry.news.title }}
-                </a>
-                <span class="radar-page__catalyst-source">{{ entry.news.source }}</span>
-              </div>
-              <div class="radar-page__catalyst-symbols">
-                @for (related of entry.symbols.slice(0, 3); track related.symbol) {
-                  <span
-                    class="radar-page__catalyst-pill"
-                    [class.radar-page__catalyst-pill--positive]="
-                      related.impactClass === 'positive'
-                    "
-                    [class.radar-page__catalyst-pill--negative]="
-                      related.impactClass === 'negative'
-                    "
-                    [class.radar-page__catalyst-pill--neutral]="
-                      related.impactClass === 'neutral'
-                    "
-                    [class.radar-page__catalyst-pill--uncertain]="
-                      related.impactClass === 'uncertain'
-                    "
-                  >
-                    <strong>{{ related.symbol }}</strong>
-                    {{ impactLabel(related.impactClass) }}
-                  </span>
-                }
-              </div>
-            </li>
-          }
-        </ul>
+                  <strong>{{ related.symbol }}</strong>
+                  {{ impactLabel(related.impactClass) }}
+                </span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
     </section>
 
     @if (store.isEnriching()) {
