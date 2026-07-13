@@ -1,0 +1,159 @@
+<section class="pipeline-trace" aria-labelledby="pipeline-trace-title">
+  <header class="pipeline-trace__header">
+    <div>
+      <span class="pipeline-trace__eyebrow">{{ i18n.t('scenarios.result.pipeline.eyebrow') }}</span>
+      <h3 id="pipeline-trace-title" class="pipeline-trace__title">
+        {{ i18n.t('scenarios.result.pipeline.title') }}
+      </h3>
+    </div>
+    <span class="pipeline-trace__compliance">
+      <span aria-hidden="true">✓</span>
+      {{ i18n.t('scenarios.result.pipeline.compliance') }}
+    </span>
+  </header>
+
+  <p class="pipeline-trace__intro">{{ i18n.t('scenarios.result.pipeline.intro') }}</p>
+
+  <ol class="pipeline-trace__stages">
+    <li class="pipeline-trace__stage">
+      <span class="pipeline-trace__index">01</span>
+      <div class="pipeline-trace__card">
+        <span class="pipeline-trace__stage-key">{{
+          i18n.t('scenarios.result.pipeline.intake.key')
+        }}</span>
+        <h4>{{ i18n.t('scenarios.result.pipeline.intake.title') }}</h4>
+        <p>{{ result.spec.description || result.spec.title }}</p>
+        <dl class="pipeline-trace__metrics">
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.symbols') }}</dt>
+            <dd>{{ trace.symbolCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.assetClasses') }}</dt>
+            <dd>{{ trace.assetClassCount }}</dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+
+    <li class="pipeline-trace__stage">
+      <span class="pipeline-trace__index">02</span>
+      <div class="pipeline-trace__card">
+        <span class="pipeline-trace__stage-key">{{
+          i18n.t('scenarios.result.pipeline.context.key')
+        }}</span>
+        <h4>{{ i18n.t('scenarios.result.pipeline.context.title') }}</h4>
+        <p>{{ i18n.t('scenarios.result.pipeline.context.summary') }}</p>
+        <dl class="pipeline-trace__metrics">
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.evidence') }}</dt>
+            <dd>{{ trace.evidenceCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.impacts') }}</dt>
+            <dd>{{ trace.impactCount }}</dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+
+    <li class="pipeline-trace__stage">
+      <span class="pipeline-trace__index">03</span>
+      <div class="pipeline-trace__card">
+        <span class="pipeline-trace__stage-key">{{
+          i18n.t('scenarios.result.pipeline.causal.key')
+        }}</span>
+        <h4>{{ i18n.t('scenarios.result.pipeline.causal.title') }}</h4>
+        <p>{{ result.consequenceChain.subject }}</p>
+        <dl class="pipeline-trace__metrics">
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.nodes') }}</dt>
+            <dd>{{ trace.nodeCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.links') }}</dt>
+            <dd>{{ trace.edgeCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.causalConfidence') }}</dt>
+            <dd>{{ formatPercent(trace.averageCausalConfidence) }}</dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+
+    <li class="pipeline-trace__stage">
+      <span class="pipeline-trace__index">04</span>
+      <div class="pipeline-trace__card">
+        <span class="pipeline-trace__stage-key">{{
+          i18n.t('scenarios.result.pipeline.quant.key')
+        }}</span>
+        <h4>{{ i18n.t('scenarios.result.pipeline.quant.title') }}</h4>
+        <p>{{ i18n.t('scenarios.result.pipeline.quant.summary') }}</p>
+        <dl class="pipeline-trace__metrics">
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.likelihood') }}</dt>
+            <dd>{{ formatLikelihood() }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.windows') }}</dt>
+            <dd>{{ trace.likelihoodOccurrences }}/{{ trace.likelihoodSampleSize }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.impactConfidence') }}</dt>
+            <dd>{{ formatPercent(trace.averageImpactConfidence) }}</dd>
+          </div>
+        </dl>
+      </div>
+    </li>
+
+    @if (result.agentContributions.length) {
+      <li class="pipeline-trace__stage">
+        <span class="pipeline-trace__index">05</span>
+        <div class="pipeline-trace__card">
+          <span class="pipeline-trace__stage-key">{{
+            i18n.t('scenarios.result.pipeline.panel.key')
+          }}</span>
+          <h4>{{ i18n.t('scenarios.result.pipeline.panel.title') }}</h4>
+          <p>{{ i18n.t('scenarios.result.pipeline.panel.summary') }}</p>
+          <dl class="pipeline-trace__metrics">
+            <div>
+              <dt>{{ i18n.t('scenarios.result.pipeline.metric.contributions') }}</dt>
+              <dd>{{ trace.completedContributionCount }}</dd>
+            </div>
+            <div>
+              <dt>{{ i18n.t('scenarios.result.pipeline.metric.omissions') }}</dt>
+              <dd>{{ trace.failedContributionCount }}</dd>
+            </div>
+          </dl>
+        </div>
+      </li>
+    }
+
+    <li class="pipeline-trace__stage pipeline-trace__stage--synthesis">
+      <span class="pipeline-trace__index">{{
+        result.agentContributions.length ? '06' : '05'
+      }}</span>
+      <div class="pipeline-trace__card">
+        <span class="pipeline-trace__stage-key">{{
+          i18n.t('scenarios.result.pipeline.synthesis.key')
+        }}</span>
+        <h4>{{ i18n.t('scenarios.result.pipeline.synthesis.title') }}</h4>
+        <p>{{ i18n.t('scenarios.result.pipeline.synthesis.summary') }}</p>
+        <dl class="pipeline-trace__metrics">
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.synthesizedImpacts') }}</dt>
+            <dd>{{ trace.impactCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ i18n.t('scenarios.result.pipeline.metric.actions') }}</dt>
+            <dd>{{ trace.actionCount }}</dd>
+          </div>
+        </dl>
+        <p class="pipeline-trace__consensus">
+          {{ i18n.t('scenarios.result.pipeline.synthesis.consensus') }}
+        </p>
+      </div>
+    </li>
+  </ol>
+</section>

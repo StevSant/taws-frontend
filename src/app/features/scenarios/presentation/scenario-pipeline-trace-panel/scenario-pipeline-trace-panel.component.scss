@@ -1,0 +1,210 @@
+.pipeline-trace {
+  padding: var(--space-4);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--color-gold) 12%, transparent),
+      transparent 38%
+    ),
+    var(--color-surface-raised);
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  &__eyebrow,
+  &__stage-key {
+    font-family: var(--font-family-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-gold-bright);
+  }
+
+  &__title {
+    margin: var(--space-1) 0 0;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+  }
+
+  &__compliance {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--color-gain-border);
+    border-radius: var(--radius-full);
+    background: var(--color-gain-dim);
+    color: var(--color-gain);
+    font-family: var(--font-family-mono);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  &__intro {
+    max-width: 70ch;
+    margin: var(--space-2) 0 var(--space-4);
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  &__stages {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__stage {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    &:not(:last-child)::after {
+      position: absolute;
+      z-index: 0;
+      top: 0.7rem;
+      left: 1.65rem;
+      width: calc(100% + var(--space-2) - 1.65rem);
+      height: 1px;
+      background: var(--color-gold-border);
+      content: '';
+    }
+
+    &--synthesis .pipeline-trace__card {
+      border-color: var(--color-gold-border);
+      background: color-mix(in srgb, var(--color-gold-dim-bg) 55%, var(--color-surface));
+    }
+  }
+
+  &__index {
+    z-index: 1;
+    display: inline-flex;
+    width: 1.4rem;
+    height: 1.4rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-gold-border);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-raised);
+    color: var(--color-gold-bright);
+    font-family: var(--font-family-mono);
+    font-size: 0.55rem;
+    font-weight: 700;
+  }
+
+  &__card {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+
+    h4,
+    p {
+      margin: 0;
+    }
+
+    h4 {
+      color: var(--color-text-primary);
+      font-size: 0.82rem;
+      line-height: 1.3;
+    }
+
+    > p {
+      color: var(--color-text-muted);
+      font-size: 0.7rem;
+      line-height: 1.45;
+    }
+  }
+
+  &__metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr));
+    gap: var(--space-1);
+    margin: auto 0 0;
+
+    div {
+      min-width: 0;
+      padding-top: var(--space-2);
+      border-top: 1px dashed var(--color-border);
+    }
+
+    dt {
+      overflow: hidden;
+      color: var(--color-text-muted);
+      font-size: 0.55rem;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+    }
+
+    dd {
+      margin: var(--space-1) 0 0;
+      color: var(--color-text-primary);
+      font-family: var(--font-family-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+  }
+
+  &__consensus {
+    padding: var(--space-2);
+    border-left: 2px solid var(--color-gold);
+    background: var(--color-gold-dim-bg);
+    color: var(--color-text-secondary) !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .pipeline-trace {
+    &__stages {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    &__stage {
+      &:not(:last-child)::after {
+        display: none;
+      }
+
+      &--synthesis {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .pipeline-trace {
+    padding: var(--space-3);
+
+    &__header {
+      flex-direction: column;
+    }
+
+    &__stages {
+      grid-template-columns: 1fr;
+    }
+
+    &__stage--synthesis {
+      grid-column: auto;
+    }
+  }
+}

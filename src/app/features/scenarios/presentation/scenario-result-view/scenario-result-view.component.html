@@ -52,15 +52,13 @@
         {{ i18n.t('scenarios.result.likelihood.note') }}
       </p>
     }
-    <div class="scenario-result__agent-strip">
-      <span class="scenario-result__agent-label">{{ i18n.t('scenarios.result.team.label') }}</span>
-      <span class="scenario-result__agent">Quant</span>
-      <span class="scenario-result__agent">Analyst</span>
-      <span class="scenario-result__agent">Macro</span>
-      <span class="scenario-result__agent">Consequence</span>
-      <span class="scenario-result__agent">Advisor</span>
-    </div>
   </header>
+
+  <app-scenario-pipeline-trace-panel [result]="result" />
+  <app-scenario-consensus-panel
+    [contributions]="result.agentContributions"
+    [consensus]="result.consensus"
+  />
 
   <section class="scenario-result__section scenario-result__section--featured">
     <header class="scenario-result__section-header">

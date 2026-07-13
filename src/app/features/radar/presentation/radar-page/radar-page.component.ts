@@ -1,19 +1,27 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { TranslationService } from '../../../../core';
+import { TranslationKey, TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
 import { RadarStore } from '../../application';
-import { AssetClass } from '../../domain';
+import { AssetClass, ImpactClass } from '../../domain';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
 import { RadarKpiRowComponent } from '../radar-kpi-row/radar-kpi-row.component';
 import { RadarMacroCardsComponent } from '../radar-macro-cards/radar-macro-cards.component';
 import { RadarAssetClassTabsComponent } from '../radar-asset-class-tabs/radar-asset-class-tabs.component';
 import { RadarCompositionOverviewComponent } from '../radar-composition-overview/radar-composition-overview.component';
-import { RadarAssetClassSectionComponent } from '../radar-asset-class-section/radar-asset-class-section.component';
+import { RadarMarketPulseComponent } from '../radar-market-pulse/radar-market-pulse.component';
+import { RadarMarketScoreComponent } from '../radar-market-score/radar-market-score.component';
 import { NewsTimelineComponent } from '../news-timeline/news-timeline.component';
 import { InstrumentCardCompactComponent } from '../instrument-card-compact/instrument-card-compact.component';
 import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/radar-add-instrument-card.component';
+
+const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
+  positive: 'radar.card.impact.positive',
+  negative: 'radar.card.impact.negative',
+  neutral: 'radar.card.impact.neutral',
+  uncertain: 'radar.card.impact.uncertain',
+};
 
 @Component({
   selector: 'app-radar-page',
@@ -24,7 +32,8 @@ import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/ra
     RadarMacroCardsComponent,
     RadarAssetClassTabsComponent,
     RadarCompositionOverviewComponent,
-    RadarAssetClassSectionComponent,
+    RadarMarketPulseComponent,
+    RadarMarketScoreComponent,
     NewsTimelineComponent,
     InstrumentCardCompactComponent,
     RadarAddInstrumentCardComponent,
@@ -98,6 +107,13 @@ export class RadarPageComponent implements OnInit, OnDestroy {
   });
 
   readonly headlineInsight = computed(() => this.store.newsTimeline()[0]?.news.title ?? null);
+  readonly recentCatalysts = computed(() => this.store.newsTimeline().slice(0, 4));
+  readonly overviewDistribution = computed(
+    () => this.activeSegment()?.landscape.distribution ?? this.store.landscape().distribution,
+  );
+  readonly overviewMarketScore = computed(
+    () => this.activeSegment()?.marketScore ?? this.store.marketScore(),
+  );
 
   constructor(
     readonly store: RadarStore,
@@ -141,6 +157,12 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   onAnalyzeAll(): void {
     void this.store.generateAllUnclassified();
+  }
+
+  impactLabel(impact?: ImpactClass): string {
+    return impact
+      ? this.i18n.t(IMPACT_LABEL_KEYS[impact])
+      : this.i18n.t('radar.landscape.unclassified');
   }
 
   private signalPriority(signal: {

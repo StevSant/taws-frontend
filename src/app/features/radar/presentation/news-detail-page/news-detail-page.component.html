@@ -49,12 +49,24 @@
         </figure>
       }
 
-      @if (news.summary) {
-        <section class="news-detail__section">
-          <h2 class="news-detail__section-title">{{ i18n.t('radar.detail.summary') }}</h2>
-          <p class="news-detail__summary">{{ news.summary }}</p>
-        </section>
-      }
+      <section class="news-detail__section news-detail__summary-card">
+        <h2 class="news-detail__section-title">{{ i18n.t('radar.detail.summary') }}</h2>
+        @if (summaryText(); as summary) {
+          <p class="news-detail__summary">{{ summary }}</p>
+        } @else {
+          <p class="news-detail__summary news-detail__summary--pending">
+            {{ i18n.t('radar.detail.summaryPending') }}
+          </p>
+        }
+        <a
+          class="news-detail__continue"
+          [href]="news.url"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ i18n.t('radar.detail.continueReading') }} →
+        </a>
+      </section>
 
       @if (news.relatedSymbols.length > 0) {
         <section class="news-detail__section">
@@ -178,15 +190,6 @@
           [label]="i18n.t('chat.reference.ask')"
           (pressed)="onAskMidas()"
         />
-
-        <a
-          class="news-detail__external"
-          [href]="news.url"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {{ i18n.t('radar.detail.openOriginal') }}
-        </a>
       </footer>
     </article>
   }
