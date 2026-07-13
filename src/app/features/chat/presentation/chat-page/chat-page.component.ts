@@ -438,7 +438,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     document.body.classList.remove('route-chat');
 
     this.dictation.cancelDictation();
-
   }
 
   onSend(): void {
