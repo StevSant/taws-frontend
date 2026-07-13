@@ -517,6 +517,7 @@ export const EN_TRANSLATIONS = {
   'radar.detail.relatedInstruments': 'Related instruments',
   'radar.detail.entities': 'Key entities',
   'radar.detail.signalSection': 'Signal classification',
+  'radar.detail.assetImpacts': 'Impact by asset',
   'radar.detail.noSignal': 'No signal was produced for this news item.',
   'radar.detail.openOriginal': 'Open original',
   // --- News analysis: why an item has no signal, + the manual "Analizar ahora" trigger ---

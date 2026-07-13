@@ -13,7 +13,8 @@ import {
 import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 import { NewsDetailStore } from '../../application';
 import { NewsBlurbService } from '../../application/news-blurb.service';
-import { ImpactClass, MarketStats, NewsSkipReason } from '../../domain';
+import { AssetClass, ImpactClass, NewsAssetImpact, NewsSkipReason } from '../../domain';
+import { ASSET_CLASS_LABEL_KEYS } from '../asset-class-label-keys';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { providerLabel } from '../news-timeline/provider-label';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
@@ -124,11 +125,17 @@ export class NewsDetailPageComponent {
     return providerLabel(provider);
   }
 
-  /** Live quant stats for an affected symbol, or `null` when the lookup hasn't resolved. */
-  statFor(symbol: string): MarketStats | null {
-    return (
-      this.store.affectedInstruments().find((stat) => stat.instrumentSymbol === symbol) ?? null
-    );
+  /**
+   * Price + % change + Analyst impact for an affected symbol, or `null` when the backend
+   * returned no row for it (a symbol outside the curated universe, or the degraded
+   * feed-scan fallback, which carries the article but none of the enrichment).
+   */
+  impactFor(symbol: string): NewsAssetImpact | null {
+    return this.store.affectedInstruments().find((impact) => impact.symbol === symbol) ?? null;
+  }
+
+  assetClassLabel(assetClass: AssetClass): string {
+    return this.i18n.t(ASSET_CLASS_LABEL_KEYS[assetClass]);
   }
 
   /** Locale-format the published date (aligns the metadata date with the rest of the app). */
@@ -139,16 +146,16 @@ export class NewsDetailPageComponent {
     );
   }
 
-  formatDelta(delta: number | null): string {
-    if (delta === null) {
+  formatDelta(delta: number | undefined): string {
+    if (delta === undefined) {
       return '—';
     }
     const sign = delta > 0 ? '+' : '';
     return `${sign}${delta.toFixed(2)}%`;
   }
 
-  deltaClass(delta: number | null): string {
-    if (delta === null || delta === 0) {
+  deltaClass(delta: number | undefined): string {
+    if (delta === undefined || delta === 0) {
       return '';
     }
     return delta > 0 ? 'news-detail__chip-delta--up' : 'news-detail__chip-delta--down';

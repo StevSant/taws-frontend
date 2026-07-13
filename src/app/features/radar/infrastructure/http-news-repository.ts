@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
 import {
+  NewsDetail,
   NewsItem,
   NewsNotAnalyzableError,
   NewsPage,
@@ -11,7 +12,9 @@ import {
   NewsSkipReason,
   RadarFilters,
 } from '../domain';
+import { mapNewsDetailDto } from './map-news-detail-dto';
 import { mapNewsItemDto } from './map-news-item-dto';
+import { NewsDetailDto } from './news-detail-dto';
 import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
 
@@ -107,15 +110,18 @@ export class HttpNewsRepository extends NewsRepository {
     );
   }
 
-  async getNewsById(id: string): Promise<NewsItem | null> {
+  async getNewsDetail(id: string, options?: { refresh?: boolean }): Promise<NewsDetail | null> {
+    if (options?.refresh) {
+      this.cache.delete(NEWS_ITEM_CACHE, id);
+    }
     return cachedFetch(this.cache, NEWS_ITEM_CACHE, id, this.config.newsCacheTtlMs, async () => {
       try {
         const dto = await firstValueFrom(
           this.http
-            .get<NewsItemDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
+            .get<NewsDetailDto>(`${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}`)
             .pipe(timeout(this.config.newsRequestTimeoutMs)),
         );
-        return mapNewsItemDto(dto);
+        return mapNewsDetailDto(dto);
       } catch (error: unknown) {
         if (error instanceof HttpErrorResponse && error.status === HTTP_NOT_FOUND) {
           return this.findNewsInRecentFeed(id);
@@ -125,21 +131,27 @@ export class HttpNewsRepository extends NewsRepository {
     });
   }
 
-  /** Fallback when the detail endpoint is unavailable — scan the recent feed. */
-  private async findNewsInRecentFeed(id: string): Promise<NewsItem | null> {
+  /**
+   * Fallback when the detail endpoint is unavailable — scan the recent feed. The feed carries
+   * news items, not the enriched detail, so the affected-instrument and related-news sections
+   * are empty here: the page degrades to the article itself rather than to a 404.
+   */
+  private async findNewsInRecentFeed(id: string): Promise<NewsDetail | null> {
     const defaultFilters: RadarFilters = { sinceHours: 720, symbol: null, assetClass: null };
     const news = await this.fetchNews(defaultFilters);
-    return news.find((item) => item.id === id) ?? null;
+    const match = news.find((item) => item.id === id);
+    return match ? { news: match, affectedInstruments: [], relatedNews: [] } : null;
   }
 
   /**
    * Force-analyzes one item (issue #27). Deliberately not cached — it's a mutation, and the
    * whole point of the button is to re-run something the backend already decided about.
    *
-   * The refreshed item replaces the stale `getNewsById` cache entry rather than merely
-   * evicting it: the caller is about to render this exact item, and leaving the old,
-   * signal-less version cached would let a later read (a back-navigation, the detail page
-   * re-entering) resurrect the pre-analysis state inside the TTL.
+   * Evicts the stale `getNewsDetail` entry on every outcome. The endpoint answers with the
+   * article alone, not the enriched detail this cache holds, and the run has just invalidated
+   * both halves of it: on success there is now a signal (so the per-asset impact changed), and
+   * on a 422 the backend has just persisted *why* there isn't one. Leaving the pre-run entry
+   * cached would let a back-navigation inside the TTL resurrect it.
    */
   async analyzeNewsItem(id: string): Promise<NewsItem> {
     try {
@@ -151,13 +163,10 @@ export class HttpNewsRepository extends NewsRepository {
           )
           .pipe(timeout(this.config.analyzeNewsRequestTimeoutMs)),
       );
-      const item = mapNewsItemDto(dto);
-      this.cache.set(NEWS_ITEM_CACHE, id, item, this.config.newsCacheTtlMs);
-      return item;
+      this.cache.delete(NEWS_ITEM_CACHE, id);
+      return mapNewsItemDto(dto);
     } catch (error: unknown) {
       if (error instanceof HttpErrorResponse && error.status === HTTP_UNPROCESSABLE) {
-        // The item was not analyzable, and the backend has just persisted why. Drop the
-        // stale cache entry so the next read picks up the freshly-recorded skip reason.
         this.cache.delete(NEWS_ITEM_CACHE, id);
         throw new NewsNotAnalyzableError(readSkipReason(error));
       }
