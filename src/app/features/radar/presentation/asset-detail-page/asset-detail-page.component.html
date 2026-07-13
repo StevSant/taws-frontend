@@ -128,7 +128,19 @@
 
     <section class="asset-detail__chart feature-panel">
       <h2 class="asset-detail__section-title">{{ i18n.t('radar.detail.asset.priceChart') }}</h2>
-      <app-asset-price-chart [symbol]="instrument.symbol" [fallbackCandles]="store.candles()" />
+      <app-asset-price-chart
+        [symbol]="instrument.symbol"
+        [fallbackCandles]="store.candles()"
+        (windowSelected)="onChartWindow($event)"
+      />
+      @if (selectedWindow(); as window) {
+        <div class="asset-detail__ask-why">
+          <app-button [label]="i18n.t('radar.detail.askWhy')" (pressed)="onAskWhy()" />
+          <span class="asset-detail__ask-why-range"
+            >{{ window.fromDate }} → {{ window.toDate }}</span
+          >
+        </div>
+      }
     </section>
 
     <section class="asset-detail__signal feature-panel">

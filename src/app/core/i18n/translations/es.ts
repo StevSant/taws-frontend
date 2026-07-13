@@ -524,6 +524,9 @@ export const ES_TRANSLATIONS = {
   'radar.detail.asset.notFound.title': 'Activo no encontrado',
   'radar.detail.asset.notFound.description': 'Este instrumento ya no está disponible.',
   'radar.detail.asset.priceChart': 'Gráfico de precio',
+  'radar.detail.askWhy': 'Preguntá por qué se movió',
+  'radar.detail.askWhy.prompt':
+    '¿Por qué {symbol} se movió entre {from} y {to}? Explicá en base a las noticias de ese período.',
   'radar.detail.stats.lastPrice': 'Último precio',
   'radar.detail.stats.priceDelta': 'Cambio de precio',
   'radar.detail.stats.volatility': 'Volatilidad',

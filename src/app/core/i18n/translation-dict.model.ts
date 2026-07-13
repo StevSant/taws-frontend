@@ -479,6 +479,8 @@ export interface TranslationDict {
   'radar.detail.asset.notFound.title': string;
   'radar.detail.asset.notFound.description': string;
   'radar.detail.asset.priceChart': string;
+  'radar.detail.askWhy': string;
+  'radar.detail.askWhy.prompt': string;
   'radar.detail.stats.lastPrice': string;
   'radar.detail.stats.priceDelta': string;
   'radar.detail.stats.volatility': string;

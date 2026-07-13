@@ -510,6 +510,9 @@ export const EN_TRANSLATIONS = {
   'radar.detail.asset.notFound.title': 'Asset not found',
   'radar.detail.asset.notFound.description': 'This instrument is no longer available.',
   'radar.detail.asset.priceChart': 'Price chart',
+  'radar.detail.askWhy': 'Ask why it moved',
+  'radar.detail.askWhy.prompt':
+    'Why did {symbol} move between {from} and {to}? Explain using the news from that period.',
   'radar.detail.stats.lastPrice': 'Last price',
   'radar.detail.stats.priceDelta': 'Price change',
   'radar.detail.stats.volatility': 'Volatility',
@@ -599,10 +602,9 @@ export const EN_TRANSLATIONS = {
   'telegram.botRegistration.sendTestNews': 'Send Test News',
   'telegram.botRegistration.sendingTestNews': 'Sending…',
   'telegram.botRegistration.testNewsSent': '✅ Test news sent: {eventTitle}',
-  'telegram.botRegistration.testNewsError.noEvents':
-    'No news events available. Try again later.',
+  'telegram.botRegistration.testNewsError.noEvents': 'No news events available. Try again later.',
   'telegram.botRegistration.testNewsError.noBot':
-    'You don\'t have a Telegram bot registered. Register one first.',
+    "You don't have a Telegram bot registered. Register one first.",
   'telegram.botRegistration.testNewsError.generic':
     'An error occurred while sending the test news. Please try again.',
   'scenarios.description': 'Simulate the market impact of a geopolitical or macro event.',
