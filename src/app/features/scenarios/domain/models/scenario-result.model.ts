@@ -1,5 +1,6 @@
 import { ConsequenceChain } from './consequence-chain.model';
 import { ScenarioAssetClassImpact } from './scenario-asset-class-impact.model';
+import { ScenarioAgentContribution, ScenarioConsensus } from './scenario-consensus.model';
 import { ScenarioSpec } from './scenario-spec.model';
 
 /**
@@ -18,6 +19,8 @@ export interface ScenarioResult {
   impactMap: ScenarioAssetClassImpact[];
   consequenceChain: ConsequenceChain;
   recommendedActions: string[];
+  agentContributions: ScenarioAgentContribution[];
+  consensus: ScenarioConsensus | null;
   disclaimer: string;
   /** ISO-8601 timestamp, as returned by the API. */
   createdAt: string;

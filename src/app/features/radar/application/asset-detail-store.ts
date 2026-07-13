@@ -41,6 +41,7 @@ export class AssetDetailStore {
   private readonly notFoundSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private readonly generatingSignal = signal(false);
+  private readonly generateErrorSignal = signal<string | null>(null);
 
   private readonly watchlistIdSignal = signal<string | null>(null);
   private readonly watchlistItemsSignal = signal<WatchlistItem[]>([]);
@@ -67,6 +68,14 @@ export class AssetDetailStore {
   readonly isNotFound = this.notFoundSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
   readonly isGenerating = this.generatingSignal.asReadonly();
+  /**
+   * Failure of the `generate()` action, kept off the page-level `error` (issue #21).
+   *
+   * The page banner bound to `error` reads "No se pudieron cargar los datos del radar" and
+   * offers a full reload — the wrong story, and the wrong remedy, for an analysis that
+   * failed to regenerate. This surfaces next to the button the user actually pressed.
+   */
+  readonly generateError = this.generateErrorSignal.asReadonly();
 
   readonly watchlistBusy = this.watchlistBusySignal.asReadonly();
   readonly watchlistError = this.watchlistErrorSignal.asReadonly();
@@ -113,6 +122,7 @@ export class AssetDetailStore {
     this.loadingSignal.set(true);
     this.notFoundSignal.set(false);
     this.errorSignal.set(null);
+    this.generateErrorSignal.set(null);
     this.instrumentSignal.set(null);
     this.marketStatsSignal.set(null);
     this.signalsSignal.set([]);
@@ -157,19 +167,26 @@ export class AssetDetailStore {
     this.relatedNewsPageSignal.set(Math.min(Math.max(1, page), this.relatedNewsPageCount()));
   }
 
-  /** Runs the Analyst pipeline for this instrument and surfaces the fresh signal. */
+  /**
+   * Runs the Analyst pipeline for this instrument and surfaces the fresh signal.
+   *
+   * Also the way *out* of the "análisis no disponible" dead end (issue #21): a signal can be
+   * classified yet carry no thesis/drivers/risks, and re-running the pipeline is what fills
+   * those in. `latestSignal` sorts by `createdAt`, so the newly-generated signal is the one
+   * the page renders.
+   */
   async generate(): Promise<void> {
     const symbol = this.symbolSignal();
     if (!symbol || this.generatingSignal()) {
       return;
     }
     this.generatingSignal.set(true);
-    this.errorSignal.set(null);
+    this.generateErrorSignal.set(null);
     try {
       const signal = await this.signalRepository.generateSignal(symbol);
       this.signalsSignal.update((signals) => [signal, ...signals]);
     } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
+      this.generateErrorSignal.set(this.toErrorMessage(error));
     } finally {
       this.generatingSignal.set(false);
     }

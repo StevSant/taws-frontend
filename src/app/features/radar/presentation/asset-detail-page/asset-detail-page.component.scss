@@ -179,6 +179,13 @@
     margin: 0 0 var(--space-2);
   }
 
+  &__generate-error {
+    display: block;
+    margin-top: var(--space-2);
+    color: var(--color-loss);
+    font-size: 0.78rem;
+  }
+
   &__news-list {
     list-style: none;
     margin: 0;
@@ -191,5 +198,19 @@
   &__news-item {
     min-width: 0;
     display: flex;
+  }
+
+  &__ask-why {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+
+  &__ask-why-range {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
   }
 }

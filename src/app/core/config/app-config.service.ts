@@ -37,6 +37,8 @@ export class AppConfigService {
   readonly newsListPageSize: number = environment.newsListPageSize;
   /** Per-request timeout for `GET /api/v1/news` (see http-news-repository.ts). */
   readonly newsRequestTimeoutMs: number = environment.newsRequestTimeoutMs;
+  /** Per-request timeout for the "Analizar ahora" force-analysis call (an LLM-latency budget). */
+  readonly analyzeNewsRequestTimeoutMs: number = environment.analyzeNewsRequestTimeoutMs;
   /** Initial timeframe requested when rendering an instrument price chart (see asset-price-chart). */
   readonly chartDefaultTimeframe: string = environment.chartDefaultTimeframe;
   /** Dev-only demo personas for role-based one-click login. */

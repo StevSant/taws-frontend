@@ -62,6 +62,7 @@ export interface CompositionRow extends MarketCompositionEntry {
 })
 export class RadarCompositionOverviewComponent implements OnInit {
   @Input({ required: true }) composition!: MarketComposition;
+  @Input() selectedClass: AssetClass | null = null;
 
   @Output() selectClass = new EventEmitter<AssetClass>();
 
@@ -102,13 +103,24 @@ export class RadarCompositionOverviewComponent implements OnInit {
     return this.expanded().has(assetClass);
   }
 
-  toggleExpand(assetClass: AssetClass): void {
+  canExpand(row: CompositionRow): boolean {
+    return this.instruments.isLoading() || row.instruments.length > 0;
+  }
+
+  isRowExpanded(row: CompositionRow): boolean {
+    return this.canExpand(row) && this.isExpanded(row.assetClass);
+  }
+
+  toggleExpand(row: CompositionRow): void {
+    if (!this.canExpand(row)) {
+      return;
+    }
     this.expanded.update((current) => {
       const next = new Set(current);
-      if (next.has(assetClass)) {
-        next.delete(assetClass);
+      if (next.has(row.assetClass)) {
+        next.delete(row.assetClass);
       } else {
-        next.add(assetClass);
+        next.add(row.assetClass);
       }
       return next;
     });
