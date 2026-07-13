@@ -1,0 +1,62 @@
+@if (store.isLoadingNews()) {
+  <div class="news-strip" role="status" [attr.aria-label]="i18n.t('briefings.news.loading')">
+    <ul class="news-strip__track" aria-hidden="true">
+      @for (slot of skeletonSlots; track slot) {
+        <li class="news-strip__cell">
+          <div class="news-strip__skeleton">
+            <span class="news-strip__skeleton-line news-strip__skeleton-line--sm"></span>
+            <span class="news-strip__skeleton-line"></span>
+            <span class="news-strip__skeleton-line news-strip__skeleton-line--md"></span>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+} @else if (store.newsError(); as error) {
+  <div class="news-strip__notice news-strip__notice--error" role="alert">
+    <span>{{ i18n.t('briefings.news.error') }}</span>
+    <button type="button" class="news-strip__retry" (click)="onRetry()">
+      {{ i18n.t('briefings.news.retry') }}
+    </button>
+  </div>
+} @else if (store.relevantNews().length === 0) {
+  <p class="news-strip__notice" role="note">{{ i18n.t('briefings.news.empty') }}</p>
+} @else {
+  <ul class="news-strip__track">
+    @for (news of store.relevantNews(); track news.id) {
+      <li class="news-strip__cell">
+        <a
+          class="news-strip__card"
+          [class.news-strip__card--positive]="sentiment(news) === 'positive'"
+          [class.news-strip__card--negative]="sentiment(news) === 'negative'"
+          [class.news-strip__card--neutral]="sentiment(news) === 'neutral'"
+          [routerLink]="['/radar/news', news.id]"
+        >
+          <span class="news-strip__meta">
+            <span class="news-strip__source">{{ news.source }}</span>
+            <span class="news-strip__time">{{ relativeTime(news) }}</span>
+          </span>
+
+          <h3 class="news-strip__title">{{ news.title }}</h3>
+
+          @if (news.summary) {
+            <p class="news-strip__summary">{{ news.summary }}</p>
+          }
+
+          @if (news.relatedSymbols.length > 0) {
+            <ul class="news-strip__symbols" aria-hidden="true">
+              @for (symbol of visibleSymbols(news); track symbol) {
+                <li class="news-strip__symbol">{{ symbol }}</li>
+              }
+              @if (extraSymbolCount(news) > 0) {
+                <li class="news-strip__symbol news-strip__symbol--extra">
+                  +{{ extraSymbolCount(news) }}
+                </li>
+              }
+            </ul>
+          }
+        </a>
+      </li>
+    }
+  </ul>
+}
