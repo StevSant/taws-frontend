@@ -8,6 +8,7 @@ import {
   effect,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 
@@ -286,6 +287,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
         this.sessionsStore.bootstrap(userId);
         void this.syncSessionRoute(this.route.snapshot.paramMap.get('sessionId'));
 
+        // Apply a pending market/news reference AFTER the session is resolved, so the
+        // fresh chat it opens stays the active session (issue #73 follow-up). `untracked`
+        // keeps this one-shot consume from making the effect depend on the intent signal.
+        untracked(() => this.applyPendingReferenceIntent());
+
         return;
       }
 
@@ -423,11 +429,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     if (pendingQuery) {
       this.draft.set(pendingQuery);
     }
-
-    const pendingReference = this.shellSearch.consumeChatReferenceIntent();
-    if (pendingReference) {
-      this.store.setReference(pendingReference);
-    }
   }
 
   ngOnDestroy(): void {
@@ -438,7 +439,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     document.body.classList.remove('route-chat');
 
     this.dictation.cancelDictation();
-
   }
 
   onSend(): void {
@@ -480,6 +480,8 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     if (!this.auth.isAuthenticated() || this.store.isStreaming()) {
       return;
     }
+    // Asking about a rail news item opens a fresh chat (issue #73 follow-up).
+    this.sessionsStore.createSession();
     this.draft.set(question.prompt);
     this.store.setReference(question.reference);
     this.focusComposer();
@@ -487,6 +489,20 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   onDismissReference(): void {
     this.store.clearReference();
+  }
+
+  /**
+   * Consumes a one-shot reference intent (from an asset/news detail "Preguntar a Midas")
+   * and opens a fresh chat grounded on it. Called from the bootstrap effect AFTER the
+   * session is resolved, so the new session is the final active one — not clobbered by
+   * the bootstrap that runs after `ngOnInit` (issue #73 follow-up).
+   */
+  private applyPendingReferenceIntent(): void {
+    const reference = this.shellSearch.consumeChatReferenceIntent();
+    if (reference) {
+      this.sessionsStore.createSession();
+      this.store.setReference(reference);
+    }
   }
 
   /**

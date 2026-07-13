@@ -11,6 +11,7 @@ import { MarketsExplorerStore } from '../../application';
 import {
   ASSET_CLASSES,
   AssetClass,
+  CoinCandidate,
   EnrichedInstrument,
   ImpactClass,
   InstrumentSortField,
@@ -112,6 +113,16 @@ export class MarketsExplorerPageComponent implements OnInit {
     void this.store.retry();
   }
 
+  /** Search CoinGecko for the current query (from the empty state — finds coins not yet in the catalog). */
+  onSearchCoinGecko(): void {
+    void this.store.searchCoinGecko();
+  }
+
+  /** Register a searched coin: persists it to the global catalog + reloads the table so it shows up. */
+  onRegisterCoin(candidate: CoinCandidate): void {
+    void this.store.registerAndReload(candidate);
+  }
+
   signalLabel(row: EnrichedInstrument): string {
     if (!row.latestSignal) {
       return this.i18n.t('markets.signal.none');
@@ -143,6 +154,18 @@ export class MarketsExplorerPageComponent implements OnInit {
     }
     const sign = value > 0 ? '+' : '';
     return `${sign}${value.toFixed(2)}%`;
+  }
+
+  /** Compact currency formatting for large magnitudes (e.g. `$950.0B`, `$32.4M`). */
+  formatCompactCurrency(value: number | null, currency: string): string {
+    if (value === null) {
+      return '—';
+    }
+    const compact = new Intl.NumberFormat(this.i18n.locale(), {
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    }).format(value);
+    return `${compact} ${currency}`;
   }
 
   private isAssetClass(value: string | null): value is AssetClass {

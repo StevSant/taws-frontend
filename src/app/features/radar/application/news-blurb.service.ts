@@ -17,7 +17,7 @@ interface LocalizeBlurbsResponseDto {
 const BLURBS_PATH = '/api/v1/news/blurbs';
 const REQUEST_TIMEOUT_MS = 20_000;
 
-/** Session-cached Spanish blurbs for English news headlines in the Radar timeline. */
+/** Session-cached locale-aware blurbs for news cards and detail pages. */
 @Injectable({ providedIn: 'root' })
 export class NewsBlurbService {
   private readonly http = inject(HttpClient);
@@ -30,7 +30,7 @@ export class NewsBlurbService {
   readonly blurbs = this.cacheSignal.asReadonly();
 
   blurbFor(news: NewsItem): string | null {
-    const cached = this.cacheSignal()[news.id];
+    const cached = this.cacheSignal()[this.cacheKey(news.id, this.i18n.locale())];
     if (cached) {
       return cached;
     }
@@ -39,12 +39,11 @@ export class NewsBlurbService {
   }
 
   ensureBlurbs(newsItems: NewsItem[]): void {
-    if (this.i18n.locale() !== 'es') {
-      return;
-    }
+    const locale = this.i18n.locale();
 
     const missing = newsItems.filter((item) => {
-      if (!item.id || this.cacheSignal()[item.id] || this.inflight.has(item.id)) {
+      const key = this.cacheKey(item.id, locale);
+      if (!item.id || this.cacheSignal()[key] || this.inflight.has(key)) {
         return false;
       }
       return Boolean(item.title?.trim());
@@ -55,21 +54,21 @@ export class NewsBlurbService {
     }
 
     for (const item of missing) {
-      this.inflight.add(item.id);
+      this.inflight.add(this.cacheKey(item.id, locale));
     }
 
-    void this.fetchBlurbs(missing)
+    void this.fetchBlurbs(missing, locale)
       .catch(() => undefined)
       .finally(() => {
         for (const item of missing) {
-          this.inflight.delete(item.id);
+          this.inflight.delete(this.cacheKey(item.id, locale));
         }
       });
   }
 
-  private async fetchBlurbs(items: NewsItem[]): Promise<void> {
+  private async fetchBlurbs(items: NewsItem[], locale: string): Promise<void> {
     const payload = {
-      locale: 'es',
+      locale,
       items: items.slice(0, 12).map((item): BlurbSourceDto => ({
         id: item.id,
         title: item.title.slice(0, 500),
@@ -91,11 +90,15 @@ export class NewsBlurbService {
       const next = { ...current };
       for (const row of response.items) {
         if (row.id && row.blurb?.trim()) {
-          next[row.id] = row.blurb.trim();
+          next[this.cacheKey(row.id, locale)] = row.blurb.trim();
         }
       }
       return next;
     });
+  }
+
+  private cacheKey(newsId: string, locale: string): string {
+    return `${locale}:${newsId}`;
   }
 }
 

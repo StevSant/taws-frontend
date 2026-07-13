@@ -123,6 +123,10 @@ export class SseChatRepository extends ChatRepository {
     };
     if (reference?.kind === 'asset') {
       body['asset_symbol'] = reference.symbol;
+      if (reference.fromDate && reference.toDate) {
+        body['from_date'] = reference.fromDate;
+        body['to_date'] = reference.toDate;
+      }
     } else if (reference?.kind === 'news') {
       body['news_id'] = reference.newsId;
     }

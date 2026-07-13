@@ -5,7 +5,7 @@
       <span class="asset-price-chart__state-label">{{ i18n.t('radar.chart.loading') }}</span>
     </div>
   } @else if (displaySpec(); as spec) {
-    <taws-chart [spec]="spec" />
+    <taws-chart [spec]="spec" (windowSelected)="windowSelected.emit($event)" />
   } @else if (isUnavailable()) {
     <div class="asset-price-chart__state">
       <span class="asset-price-chart__state-label">{{ i18n.t('radar.chart.unavailable') }}</span>

@@ -107,6 +107,9 @@
         {{ i18n.t('markets.col.change') }} {{ sortIndicator('change') }}
       </button>
       <span>{{ i18n.t('markets.col.volatility') }}</span>
+      <span>{{ i18n.t('markets.col.marketCap') }}</span>
+      <span>{{ i18n.t('markets.col.volume24h') }}</span>
+      <span>{{ i18n.t('markets.col.change7d') }}</span>
       <span>{{ i18n.t('markets.col.trend') }}</span>
       <span>{{ i18n.t('markets.col.signal') }}</span>
       <span>{{ i18n.t('markets.col.follow') }}</span>
@@ -123,6 +126,67 @@
         [title]="i18n.t('markets.empty.title')"
         [description]="i18n.t('markets.empty.description')"
       />
+
+      @if (store.search().trim().length > 0) {
+        <div class="markets-explorer__coingecko">
+          <button
+            type="button"
+            class="markets-explorer__cg-search"
+            [disabled]="store.coinSearchBusy()"
+            (click)="onSearchCoinGecko()"
+          >
+            @if (store.coinSearchBusy()) {
+              {{ i18n.t('markets.coingecko.searching') }}
+            } @else {
+              {{ i18n.t('markets.coingecko.search') }} "{{ store.search() }}"
+            }
+          </button>
+
+          @if (store.coinResults().length > 0) {
+            <ul class="markets-explorer__cg-results">
+              @for (candidate of store.coinResults(); track candidate.id) {
+                <li class="markets-explorer__cg-result">
+                  @if (candidate.thumb) {
+                    <img
+                      class="markets-explorer__cg-thumb"
+                      [src]="candidate.thumb"
+                      alt=""
+                      width="24"
+                      height="24"
+                    />
+                  }
+                  <span class="markets-explorer__cg-symbol">{{
+                    candidate.symbol.toUpperCase()
+                  }}</span>
+                  <span class="markets-explorer__cg-name">{{ candidate.name }}</span>
+                  <button
+                    type="button"
+                    class="markets-explorer__cg-add"
+                    [disabled]="
+                      !store.watchlistAvailable() ||
+                      store.registerBusySymbol() === candidate.symbol.toUpperCase()
+                    "
+                    [title]="
+                      store.watchlistAvailable()
+                        ? i18n.t('markets.coingecko.add')
+                        : i18n.t('markets.follow.auth')
+                    "
+                    (click)="onRegisterCoin(candidate)"
+                  >
+                    {{ i18n.t('markets.coingecko.add') }}
+                  </button>
+                </li>
+              }
+            </ul>
+          } @else if (store.coinSearched() && !store.coinSearchBusy()) {
+            <p class="markets-explorer__cg-empty">{{ i18n.t('markets.coingecko.noResults') }}</p>
+          }
+
+          @if (store.coinSearchError(); as cgError) {
+            <p class="markets-explorer__follow-error" role="alert">{{ cgError }}</p>
+          }
+        </div>
+      }
     } @else {
       <div class="markets-explorer__body" role="list">
         @for (row of store.items(); track row.symbol) {
@@ -155,6 +219,24 @@
 
             <span class="markets-explorer__volatility">
               {{ row.volatilityPct !== null ? row.volatilityPct.toFixed(1) + '%' : '—' }}
+            </span>
+
+            <span class="markets-explorer__market-cap">
+              {{ formatCompactCurrency(row.marketCap, row.currency) }}
+            </span>
+
+            <span class="markets-explorer__volume">
+              {{ formatCompactCurrency(row.volume24h, row.currency) }}
+            </span>
+
+            <span
+              class="markets-explorer__delta"
+              [class.markets-explorer__delta--up]="row.change7dPct !== null && row.change7dPct >= 0"
+              [class.markets-explorer__delta--down]="
+                row.change7dPct !== null && row.change7dPct < 0
+              "
+            >
+              {{ formatPct(row.change7dPct) }}
             </span>
 
             <div class="markets-explorer__trend">

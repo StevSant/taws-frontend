@@ -14,6 +14,14 @@ export interface EnrichedInstrumentDto {
   volatility_regime: VolatilityRegimeLevel | null;
   sparkline: number[];
   latest_signal: SignalDto | null;
+  /**
+   * Enrichment fields (Slice 3b, issue #instruments-catalog). Additive —
+   * absent on responses from a backend predating them, so the mapper treats
+   * `undefined` the same as an explicit `null`.
+   */
+  market_cap?: number | null;
+  volume_24h?: number | null;
+  change_7d_pct?: number | null;
 }
 
 /** Wire shape of `InstrumentHighlightsResponse`. */

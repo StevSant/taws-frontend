@@ -114,10 +114,12 @@
                   <span class="watchlist-manager__name">{{ item.name }}</span>
                 }
               </span>
-              <span class="watchlist-manager__quote">
-                <span class="watchlist-manager__price">{{ formatPrice(item.lastPrice) }}</span>
-                <app-price-delta-chip [value]="item.priceDeltaPct" />
-              </span>
+              @if (item.lastPrice !== null || item.priceDeltaPct !== null) {
+                <span class="watchlist-manager__quote">
+                  <span class="watchlist-manager__price">{{ formatPrice(item.lastPrice) }}</span>
+                  <app-price-delta-chip [value]="item.priceDeltaPct" />
+                </span>
+              }
               <button
                 type="button"
                 class="watchlist-manager__remove"

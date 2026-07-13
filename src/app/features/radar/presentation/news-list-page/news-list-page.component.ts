@@ -1,24 +1,36 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { TranslationService } from '../../../../core';
-import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
+import {
+  ButtonComponent,
+  EmptyStateComponent,
+  PaginationComponent,
+  SkeletonCardComponent,
+} from '../../../../shared';
 import { NewsListStore } from '../../application';
 import { NewsCardComponent } from '../news-card/news-card.component';
-import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
+import { NewsFiltersComponent } from '../news-filters/news-filters.component';
 
 /**
- * Paginated "all news" page, routed at `radar/news`. Reuses the radar filter
- * bar and the rich news card; state lives in `NewsListStore` (fresh instance
- * per navigation via `providers`).
+ * Numbered "all news" page, routed at `radar/news`. Backed by the browse endpoint
+ * (server-side filter/sort + an exact total) via `NewsListStore`, so it renders the shared
+ * `PaginationComponent` — "Página X de Y" — instead of the old "Load more" button, and
+ * paging replaces the item set rather than appending to it (issue #70).
+ *
+ * The radar home timeline deliberately keeps its "Show more" feed: it reads the live
+ * provider endpoint, which has no total to page against.
+ *
+ * Fresh store per navigation via `providers`.
  */
 @Component({
   selector: 'app-news-list-page',
   standalone: true,
   imports: [
-    RadarFiltersComponent,
+    NewsFiltersComponent,
     NewsCardComponent,
     ButtonComponent,
     EmptyStateComponent,
     SkeletonCardComponent,
+    PaginationComponent,
   ],
   templateUrl: './news-list-page.component.html',
   styleUrl: './news-list-page.component.scss',
@@ -37,7 +49,7 @@ export class NewsListPageComponent implements OnInit {
     void this.store.retry();
   }
 
-  onLoadMore(): void {
-    void this.store.loadMore();
+  onPageChange(page: number): void {
+    void this.store.goToPage(page);
   }
 }
