@@ -2,12 +2,25 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom, timeout } from 'rxjs';
 import { AppConfigService, cachedFetch, RequestCacheService } from '../../../core';
-import { NewsItem, NewsPage, NewsPageRequest, NewsRepository, RadarFilters } from '../domain';
+import {
+  NewsBrowsePage,
+  NewsBrowseQuery,
+  NewsFacets,
+  NewsItem,
+  NewsPage,
+  NewsPageRequest,
+  NewsRepository,
+  RadarFilters,
+} from '../domain';
 import { mapNewsItemDto } from './map-news-item-dto';
+import { NewsBrowseResponseDto } from './news-browse-response-dto';
+import { NewsFacetsDto } from './news-facets-dto';
 import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
 
 const NEWS_PATH = '/api/v1/news';
+const NEWS_BROWSE_PATH = '/api/v1/news/browse';
+const NEWS_FACETS_PATH = '/api/v1/news/facets';
 const HTTP_NOT_FOUND = 404;
 
 /** Backend may return a bare array or a paginated `{ items }` envelope. */
@@ -61,6 +74,75 @@ export class HttpNewsRepository extends NewsRepository {
       const { items, hasMore } = unwrapNewsPage(response);
       return { items: items.map(mapNewsItemDto), hasMore };
     });
+  }
+
+  async browseNews(query: NewsBrowseQuery): Promise<NewsBrowsePage> {
+    const cacheKey = JSON.stringify(query);
+    return cachedFetch(
+      this.cache,
+      'news-browse',
+      cacheKey,
+      this.config.newsCacheTtlMs,
+      async () => {
+        const dto = await firstValueFrom(
+          this.http
+            .get<NewsBrowseResponseDto>(`${this.config.apiBaseUrl}${NEWS_BROWSE_PATH}`, {
+              params: this.buildBrowseParams(query),
+            })
+            .pipe(timeout(this.config.newsRequestTimeoutMs)),
+        );
+        return {
+          items: (dto.items ?? []).map(mapNewsItemDto),
+          total: dto.total ?? 0,
+          page: dto.page ?? query.page,
+          pageSize: dto.page_size ?? query.pageSize,
+        };
+      },
+    );
+  }
+
+  async fetchNewsFacets(): Promise<NewsFacets> {
+    return cachedFetch(this.cache, 'news-facets', 'all', this.config.newsCacheTtlMs, async () => {
+      const dto = await firstValueFrom(
+        this.http
+          .get<NewsFacetsDto>(`${this.config.apiBaseUrl}${NEWS_FACETS_PATH}`)
+          .pipe(timeout(this.config.newsRequestTimeoutMs)),
+      );
+      return { sources: dto.sources ?? [], providers: dto.providers ?? [] };
+    });
+  }
+
+  /** Only set a param when the facet is actually filtered — an empty `source=` would
+   * be sent as a real (never-matching) filter rather than "no filter". */
+  private buildBrowseParams(query: NewsBrowseQuery): HttpParams {
+    let params = new HttpParams()
+      .set('since_hours', query.sinceHours)
+      .set('sort_by', query.sortBy)
+      .set('sort_dir', query.sortDir)
+      .set('page', query.page)
+      .set('page_size', query.pageSize);
+    if (query.symbol) {
+      params = params.set('symbol', query.symbol);
+    }
+    if (query.assetClass) {
+      params = params.set('asset_class', query.assetClass);
+    }
+    if (query.source) {
+      params = params.set('source', query.source);
+    }
+    if (query.provider) {
+      params = params.set('provider', query.provider);
+    }
+    if (query.sentiment) {
+      params = params.set('sentiment', query.sentiment);
+    }
+    if (query.analysisStatus) {
+      params = params.set('analysis_status', query.analysisStatus);
+    }
+    if (query.search) {
+      params = params.set('q', query.search);
+    }
+    return params;
   }
 
   private buildNewsParams(filters: RadarFilters): HttpParams {

@@ -1,0 +1,108 @@
+<div class="news-filters">
+  <app-radar-filters
+    class="news-filters__shared"
+    [filters]="radarFilters"
+    [instrumentOptions]="instrumentOptions"
+    (assetClassChange)="assetClassChange.emit($event)"
+    (symbolChange)="symbolChange.emit($event)"
+    (sinceHoursChange)="sinceHoursChange.emit($event)"
+  />
+
+  <div class="news-filters__row">
+    <label class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.search') }}</span>
+      <input
+        class="news-filters__input feature-input"
+        type="search"
+        name="q"
+        [ngModel]="query.search ?? ''"
+        (ngModelChange)="searchChange.emit($event)"
+        [placeholder]="i18n.t('radar.newsFilters.searchPlaceholder')"
+      />
+    </label>
+
+    <label class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.source') }}</span>
+      <select
+        class="feature-select"
+        name="source"
+        [ngModel]="query.source ?? ''"
+        (ngModelChange)="emitSource($event)"
+      >
+        <option value="">{{ i18n.t('radar.newsFilters.allSources') }}</option>
+        @for (source of facets.sources; track source) {
+          <option [value]="source">{{ source }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.provider') }}</span>
+      <select
+        class="feature-select"
+        name="provider"
+        [ngModel]="query.provider ?? ''"
+        (ngModelChange)="emitProvider($event)"
+      >
+        <option value="">{{ i18n.t('radar.newsFilters.allProviders') }}</option>
+        @for (provider of facets.providers; track provider) {
+          <option [value]="provider">{{ provider }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.sentiment') }}</span>
+      <select
+        class="feature-select"
+        name="sentiment"
+        [ngModel]="query.sentiment ?? ''"
+        (ngModelChange)="emitSentiment($event)"
+      >
+        <option value="">{{ i18n.t('radar.newsFilters.allSentiments') }}</option>
+        @for (option of sentimentOptions; track option) {
+          <option [value]="option">{{ sentimentLabel(option) }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.status') }}</span>
+      <select
+        class="feature-select"
+        name="analysisStatus"
+        [ngModel]="query.analysisStatus ?? ''"
+        (ngModelChange)="emitStatus($event)"
+      >
+        <option value="">{{ i18n.t('radar.newsFilters.allStatuses') }}</option>
+        @for (option of statusOptions; track option) {
+          <option [value]="option">{{ statusLabel(option) }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="news-filters__field feature-field">
+      <span class="feature-label">{{ i18n.t('radar.newsFilters.sortBy') }}</span>
+      <div class="news-filters__sort">
+        <select
+          class="feature-select"
+          name="sortBy"
+          [ngModel]="query.sortBy"
+          (ngModelChange)="emitSortBy($event)"
+        >
+          <option value="published_at">{{ i18n.t('radar.newsFilters.sort.date') }}</option>
+          <option value="source">{{ i18n.t('radar.newsFilters.sort.source') }}</option>
+        </select>
+        <button
+          type="button"
+          class="news-filters__sort-dir"
+          (click)="toggleSortDir()"
+          [attr.aria-label]="i18n.t('radar.newsFilters.toggleOrder')"
+          [title]="i18n.t('radar.newsFilters.toggleOrder')"
+        >
+          {{ query.sortDir === 'desc' ? '↓' : '↑' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

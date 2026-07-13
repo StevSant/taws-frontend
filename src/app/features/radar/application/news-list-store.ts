@@ -1,41 +1,62 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { AppConfigService } from '../../../core';
 import {
+  AnalysisStatus,
   AssetClass,
-  DEFAULT_RADAR_FILTERS,
+  DEFAULT_NEWS_BROWSE_QUERY,
   Instrument,
   InstrumentRepository,
+  NewsBrowseQuery,
+  NewsFacets,
   NewsItem,
   NewsRepository,
-  RadarFilters,
+  NewsSortField,
+  SentimentFilterOption,
+  SortDirection,
 } from '../domain';
 
+/** Debounce (ms) on the search box so typing doesn't fire a request per keystroke. */
+const SEARCH_DEBOUNCE_MS = 350;
+
+const EMPTY_FACETS: NewsFacets = { sources: [], providers: [] };
+
 /**
- * Signal-based facade for the paginated "all news" page (`radar/news`). Owns
- * the filter selection and the accumulated page list; fetches through
- * `NewsRepository.fetchNewsPage` (backend `limit`/`offset`/`has_more`) so the
- * page scales beyond the radar home timeline's single feed request.
+ * Signal-based facade for the numbered "all news" page (`radar/news`). Owns the browse
+ * query (filters + sort + page) and the current page of items, fetched through
+ * `NewsRepository.browseNews` (issue #70).
  *
- * Provided in `NewsListPageComponent.providers` so each navigation gets a
- * fresh instance (same lifecycle as `NewsDetailStore`).
+ * Page-REPLACE, not accumulate: this used to append pages behind a "Load more" button,
+ * which can't offer numbered navigation because the live feed never reports a total.
+ * Browse is DB-backed and does, so `goToPage` swaps the item set outright.
+ *
+ * Any filter/sort change resets to page 1 — page 4 of the old result set is meaningless
+ * against a new one, and would often land past the end.
+ *
+ * Provided in `NewsListPageComponent.providers` so each navigation gets a fresh instance.
  */
 @Injectable()
 export class NewsListStore {
-  private readonly filtersSignal = signal<RadarFilters>(DEFAULT_RADAR_FILTERS);
+  private readonly querySignal = signal<NewsBrowseQuery>(DEFAULT_NEWS_BROWSE_QUERY);
   private readonly itemsSignal = signal<NewsItem[]>([]);
+  private readonly totalSignal = signal(0);
+  private readonly facetsSignal = signal<NewsFacets>(EMPTY_FACETS);
   private readonly instrumentsSignal = signal<Instrument[]>([]);
-  private readonly hasMoreSignal = signal(false);
   private readonly loadingSignal = signal(false);
-  private readonly loadingMoreSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
-  private offset = 0;
 
-  readonly filters = this.filtersSignal.asReadonly();
+  private searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+  readonly query = this.querySignal.asReadonly();
   readonly items = this.itemsSignal.asReadonly();
-  readonly hasMore = this.hasMoreSignal.asReadonly();
+  readonly total = this.totalSignal.asReadonly();
+  readonly facets = this.facetsSignal.asReadonly();
   readonly isLoading = this.loadingSignal.asReadonly();
-  readonly isLoadingMore = this.loadingMoreSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
+
+  readonly currentPage = computed(() => this.querySignal().page);
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.totalSignal() / this.querySignal().pageSize)),
+  );
 
   readonly isEmpty = computed(
     () => !this.loadingSignal() && this.errorSignal() === null && this.itemsSignal().length === 0,
@@ -43,7 +64,7 @@ export class NewsListStore {
 
   /** Instrument options for the "asset" filter, scoped to the selected instrument type. */
   readonly instrumentOptions = computed(() => {
-    const assetClass = this.filtersSignal().assetClass;
+    const assetClass = this.querySignal().assetClass;
     const all = this.instrumentsSignal();
     return assetClass ? all.filter((instrument) => instrument.assetClass === assetClass) : all;
   });
@@ -52,71 +73,112 @@ export class NewsListStore {
     private readonly newsRepository: NewsRepository,
     private readonly instrumentRepository: InstrumentRepository,
     private readonly config: AppConfigService,
-  ) {}
+  ) {
+    this.querySignal.set({ ...DEFAULT_NEWS_BROWSE_QUERY, pageSize: this.config.newsListPageSize });
+  }
 
   async init(): Promise<void> {
-    await Promise.all([this.loadInstruments(), this.loadFirstPage()]);
+    await Promise.all([this.loadInstruments(), this.loadFacets(), this.load()]);
+  }
+
+  async retry(): Promise<void> {
+    await this.load();
+  }
+
+  /** Jump to a 1-based page. No-op while loading, out of bounds, or already there. */
+  async goToPage(page: number): Promise<void> {
+    if (
+      this.loadingSignal() ||
+      page < 1 ||
+      page > this.totalPages() ||
+      page === this.currentPage()
+    ) {
+      return;
+    }
+    this.patchQuery({ page });
+    await this.load();
   }
 
   async setAssetClass(assetClass: AssetClass | null): Promise<void> {
     // Changing the type resets the symbol — the old symbol may not belong to the new class.
-    this.filtersSignal.update((filters) => ({ ...filters, assetClass, symbol: null }));
-    await this.loadFirstPage();
+    await this.applyFilter({ assetClass, symbol: null });
   }
 
   async setSymbol(symbol: string | null): Promise<void> {
-    this.filtersSignal.update((filters) => ({ ...filters, symbol }));
-    await this.loadFirstPage();
+    await this.applyFilter({ symbol });
   }
 
   async setSinceHours(sinceHours: number): Promise<void> {
-    this.filtersSignal.update((filters) => ({ ...filters, sinceHours }));
-    await this.loadFirstPage();
+    await this.applyFilter({ sinceHours });
   }
 
-  async retry(): Promise<void> {
-    await this.loadFirstPage();
+  async setSource(source: string | null): Promise<void> {
+    await this.applyFilter({ source });
   }
 
-  /** Appends the next page. No-op while a page is in flight or when exhausted. */
-  async loadMore(): Promise<void> {
-    if (!this.hasMoreSignal() || this.loadingMoreSignal() || this.loadingSignal()) {
-      return;
+  async setProvider(provider: string | null): Promise<void> {
+    await this.applyFilter({ provider });
+  }
+
+  async setSentiment(sentiment: SentimentFilterOption | null): Promise<void> {
+    await this.applyFilter({ sentiment });
+  }
+
+  async setAnalysisStatus(analysisStatus: AnalysisStatus | null): Promise<void> {
+    await this.applyFilter({ analysisStatus });
+  }
+
+  async setSort(sortBy: NewsSortField, sortDir: SortDirection): Promise<void> {
+    await this.applyFilter({ sortBy, sortDir });
+  }
+
+  /**
+   * Debounced text search. The query signal updates immediately so the input stays
+   * responsive, but the refetch (and the page-1 reset) waits until the user pauses.
+   */
+  setSearch(search: string): void {
+    this.patchQuery({ search: search.trim() === '' ? null : search });
+    if (this.searchTimer !== null) {
+      clearTimeout(this.searchTimer);
     }
-    this.loadingMoreSignal.set(true);
-    try {
-      const page = await this.newsRepository.fetchNewsPage(this.filtersSignal(), {
-        limit: this.config.newsListPageSize,
-        offset: this.offset,
-      });
-      this.itemsSignal.update((current) => [...current, ...page.items]);
-      this.offset += page.items.length;
-      this.hasMoreSignal.set(page.hasMore);
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-    } finally {
-      this.loadingMoreSignal.set(false);
-    }
+    this.searchTimer = setTimeout(() => {
+      this.patchQuery({ page: 1 });
+      void this.load();
+    }, SEARCH_DEBOUNCE_MS);
   }
 
-  private async loadFirstPage(): Promise<void> {
+  /** Apply a filter/sort change, reset to page 1, and reload. */
+  private async applyFilter(patch: Partial<NewsBrowseQuery>): Promise<void> {
+    this.patchQuery({ ...patch, page: 1 });
+    await this.load();
+  }
+
+  private patchQuery(patch: Partial<NewsBrowseQuery>): void {
+    this.querySignal.update((query) => ({ ...query, ...patch }));
+  }
+
+  private async load(): Promise<void> {
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
-    this.offset = 0;
     try {
-      const page = await this.newsRepository.fetchNewsPage(this.filtersSignal(), {
-        limit: this.config.newsListPageSize,
-        offset: 0,
-      });
+      const page = await this.newsRepository.browseNews(this.querySignal());
       this.itemsSignal.set(page.items);
-      this.offset = page.items.length;
-      this.hasMoreSignal.set(page.hasMore);
+      this.totalSignal.set(page.total);
     } catch (error: unknown) {
       this.itemsSignal.set([]);
-      this.hasMoreSignal.set(false);
+      this.totalSignal.set(0);
       this.errorSignal.set(this.toErrorMessage(error));
     } finally {
       this.loadingSignal.set(false);
+    }
+  }
+
+  /** Best-effort — the filter bar still works with empty dropdowns. */
+  private async loadFacets(): Promise<void> {
+    try {
+      this.facetsSignal.set(await this.newsRepository.fetchNewsFacets());
+    } catch {
+      this.facetsSignal.set(EMPTY_FACETS);
     }
   }
 
