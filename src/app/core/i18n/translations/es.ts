@@ -470,6 +470,8 @@ export const ES_TRANSLATIONS = {
   'radar.addInstrument.added': 'Agregado',
   'radar.addInstrument.tracked': 'Instrumentos en seguimiento',
   'radar.addInstrument.remove': 'Quitar',
+  'radar.addInstrument.searchCoinGecko': 'Buscar en CoinGecko',
+  'radar.addInstrument.register': 'Agregar',
   'markets.title': 'Explorador de mercados',
   'markets.subtitle':
     'Explora todos los activos: precio, cambio 24h, volatilidad, tendencia y señal IA.',

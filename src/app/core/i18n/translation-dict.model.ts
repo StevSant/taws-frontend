@@ -426,6 +426,8 @@ export interface TranslationDict {
   'radar.addInstrument.added': string;
   'radar.addInstrument.tracked': string;
   'radar.addInstrument.remove': string;
+  'radar.addInstrument.searchCoinGecko': string;
+  'radar.addInstrument.register': string;
   'markets.title': string;
   'markets.subtitle': string;
   'markets.search.placeholder': string;

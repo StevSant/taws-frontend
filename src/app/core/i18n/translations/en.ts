@@ -457,6 +457,8 @@ export const EN_TRANSLATIONS = {
   'radar.addInstrument.added': 'Added',
   'radar.addInstrument.tracked': 'Tracked instruments',
   'radar.addInstrument.remove': 'Remove',
+  'radar.addInstrument.searchCoinGecko': 'Search CoinGecko',
+  'radar.addInstrument.register': 'Add',
   'markets.title': 'Markets explorer',
   'markets.subtitle': 'Browse every asset: price, 24h change, volatility, trend and AI signal.',
   'markets.search.placeholder': 'Search by symbol or name',
