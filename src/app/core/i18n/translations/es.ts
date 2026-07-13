@@ -331,6 +331,16 @@ export const ES_TRANSLATIONS = {
   'radar.analysis.unavailableHint': 'No se generó análisis de IA para esta señal.',
   'radar.analysis.expand': 'Expandir análisis',
   'radar.analysis.collapse': 'Contraer análisis',
+  // Way out of the "análisis no disponible" dead end (taws-frontend#21) + scoped news-feed
+  // failure on the radar home (taws#71).
+  'radar.analysis.regenerate': 'Regenerar análisis',
+  'radar.analysis.regenerating': 'Regenerando análisis…',
+  'radar.analysis.regenerateError': 'No se pudo regenerar el análisis.',
+  'radar.news.error.title': 'No se pudieron cargar las noticias',
+  'radar.news.error.description':
+    'El resto del radar sigue disponible. Vuelve a intentarlo en unos segundos.',
+  'radar.news.error.retry': 'Reintentar noticias',
+  'radar.news.error.retrying': 'Reintentando…',
   'radar.cards.title': 'Señales',
   'radar.cards.subtitle':
     'Señales generadas por IA a partir de noticias, documentos y datos macro.',

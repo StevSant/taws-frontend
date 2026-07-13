@@ -243,6 +243,39 @@
     text-align: center;
   }
 
+  // Degraded news feed, not a dead page (issue taws#71) — deliberately the `warn` palette
+  // and not `.feature-error`'s loss/red: the rest of the radar below is still good data.
+  &__news-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--color-warn-dim);
+    border: 1px solid var(--color-warn-border);
+  }
+
+  &__news-error-copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  &__news-error-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-warn);
+  }
+
+  &__news-error-hint {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--color-text-secondary);
+  }
+
   &__instruments {
     display: flex;
     flex-direction: column;

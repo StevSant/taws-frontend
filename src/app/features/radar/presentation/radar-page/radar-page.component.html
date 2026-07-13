@@ -42,7 +42,27 @@
     />
   }
 
-  @if (!store.isLoading() && store.signals().length > 0) {
+  <!-- Scoped news-feed failure (issue taws#71): the feed is one section of the radar, so a
+       slow/failed `GET /api/v1/news` degrades that section instead of wiping the page. -->
+  @if (!store.isLoading() && store.newsError()) {
+    <div class="radar-page__news-error" role="status">
+      <div class="radar-page__news-error-copy">
+        <span class="radar-page__news-error-title">{{ i18n.t('radar.news.error.title') }}</span>
+        <p class="radar-page__news-error-hint">{{ i18n.t('radar.news.error.description') }}</p>
+      </div>
+      <app-button
+        [label]="
+          store.isNewsRetrying()
+            ? i18n.t('radar.news.error.retrying')
+            : i18n.t('radar.news.error.retry')
+        "
+        [disabled]="store.isNewsRetrying()"
+        (pressed)="onRetryNews()"
+      />
+    </div>
+  }
+
+  @if (!store.isLoading() && store.hasSignals()) {
     <app-radar-kpi-row
       class="radar-page__kpis"
       [kpis]="store.kpiSummary()"
