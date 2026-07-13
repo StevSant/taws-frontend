@@ -1,0 +1,27 @@
+# Normalise line endings in the repo to LF, regardless of the contributor's OS.
+#
+# Without this, a Windows checkout with `core.autocrlf=true` (the default there) writes
+# CRLF into the working tree. Prettier's `endOfLine: "lf"` then reports EVERY file as
+# unformatted — ~615 of them — so `npm run format:check` is useless locally and the real
+# offenders are impossible to spot. Unformatted files reached `main` repeatedly that way,
+# and because the `build` job runs `format:check` before the Angular build, each one turned
+# every open PR red regardless of its own diff.
+#
+# `text=auto eol=lf` stores and checks out text files with LF everywhere, so a local
+# `format:check` now agrees with CI.
+* text=auto eol=lf
+
+# Binary assets: never touch these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.mp3 binary
+*.mp4 binary
