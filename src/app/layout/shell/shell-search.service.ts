@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../core';
 import { RadarStore } from '../../features/radar/application';
 import { AssetClass, Instrument, InstrumentRepository } from '../../features/radar/domain';
+import { ChatReference } from '../../features/chat/domain';
 import { ShellSearchResult, filterShellSearch, shellSearchResultKey } from './filter-shell-search';
 
 const ASSET_CLASS_LABEL_KEYS: Record<AssetClass, TranslationKey> = {
@@ -26,6 +27,7 @@ export class ShellSearchService {
   private readonly isOpenSignal = signal(false);
   private readonly activeIndexSignal = signal(0);
   private readonly chatDraftIntentSignal = signal<string | null>(null);
+  private readonly chatReferenceIntentSignal = signal<ChatReference | null>(null);
   private instrumentsLoadStarted = false;
 
   readonly query = this.querySignal.asReadonly();
@@ -141,9 +143,29 @@ export class ShellSearchService {
     return draft;
   }
 
+  consumeChatReferenceIntent(): ChatReference | null {
+    const reference = this.chatReferenceIntentSignal();
+    this.chatReferenceIntentSignal.set(null);
+    return reference;
+  }
+
   /** Prefill the chat composer and navigate to `/chat` (used by Agents catalog). */
   async openChatWithDraft(query: string): Promise<void> {
     await this.goToChatWithQuery(query.trim());
+  }
+
+  /**
+   * Attach a market/news reference (optionally prefilling the composer) and
+   * navigate to `/chat`. Used by the asset- and news-detail "ask Midas" actions
+   * so the next question is grounded on that specific asset/article.
+   */
+  async goToChatWithReference(reference: ChatReference, prefill?: string): Promise<void> {
+    this.chatReferenceIntentSignal.set(reference);
+    const trimmed = prefill?.trim();
+    if (trimmed) {
+      this.chatDraftIntentSignal.set(trimmed);
+    }
+    await this.router.navigate(['/chat']);
   }
 
   resultKey(result: ShellSearchResult): string {

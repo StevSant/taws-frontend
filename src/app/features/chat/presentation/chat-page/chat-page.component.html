@@ -308,6 +308,12 @@
                   } @else {
                     <li class="chat-page__message-row chat-page__message-row--user">
                       <article class="chat-page__bubble chat-page__bubble--user">
+                        @if (message.reference; as reference) {
+                          <app-chat-reference-chip
+                            class="chat-page__message-reference"
+                            [reference]="reference"
+                          />
+                        }
                         <div
                           class="chat-page__content taws-markdown"
                           [innerHTML]="message.content | markdown"
@@ -358,6 +364,16 @@
             <p class="chat-page__voice-hint">{{ i18n.t('chat.voice.hint') }}</p>
           } @else if (!micAvailable && !hasMessages()) {
             <p class="chat-page__voice-hint">{{ i18n.t('chat.stt.unavailable') }}</p>
+          }
+
+          @if (store.pendingReference(); as reference) {
+            <div class="chat-page__pending-reference">
+              <app-chat-reference-chip
+                [reference]="reference"
+                [dismissable]="true"
+                (dismiss)="onDismissReference()"
+              />
+            </div>
           }
 
           <form class="chat-page__composer glass" (ngSubmit)="onSend()">

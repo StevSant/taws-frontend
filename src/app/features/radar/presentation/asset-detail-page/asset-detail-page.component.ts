@@ -10,6 +10,7 @@ import {
   PaginationComponent,
   SpinnerComponent,
 } from '../../../../shared';
+import { ShellSearchService } from '../../../../layout/shell/shell-search.service';
 import { AssetDetailStore, buildAssetSource } from '../../application';
 import { AssetClass, AssetSource, ImpactClass, Instrument } from '../../domain';
 import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
@@ -71,6 +72,7 @@ export class AssetDetailPageComponent {
   readonly store = inject(AssetDetailStore);
   readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly shellSearch = inject(ShellSearchService);
   private currentSymbol: string | null = null;
 
   constructor() {
@@ -128,5 +130,18 @@ export class AssetDetailPageComponent {
 
   onRetry(): void {
     void this.store.retry();
+  }
+
+  /** Opens the chat grounded on this asset (issue #73). */
+  onAskMidas(): void {
+    const instrument = this.store.instrument();
+    if (!instrument) {
+      return;
+    }
+    void this.shellSearch.goToChatWithReference({
+      kind: 'asset',
+      symbol: instrument.symbol,
+      name: instrument.name,
+    });
   }
 }

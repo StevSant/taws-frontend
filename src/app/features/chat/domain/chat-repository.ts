@@ -1,3 +1,4 @@
+import { ChatReference } from './models/chat-reference.model';
 import { ChatStreamEvent } from './models/chat-stream-event.model';
 
 /**
@@ -14,5 +15,9 @@ export abstract class ChatRepository {
    * (assistant tokens, agent routing traces, or a stream-level error) as
    * they arrive over SSE-v2.
    */
-  abstract streamReply(input: string, threadId: string): AsyncIterable<ChatStreamEvent>;
+  abstract streamReply(
+    input: string,
+    threadId: string,
+    reference?: ChatReference,
+  ): AsyncIterable<ChatStreamEvent>;
 }
