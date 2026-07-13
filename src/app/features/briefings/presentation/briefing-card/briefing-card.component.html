@@ -41,7 +41,9 @@
           {{ hasEnrichedSignals ? briefing.linkedSignals.length : briefing.linkedSignalIds.length }}
         </span>
       </h3>
-      <p class="briefing-card__section-sub">{{ i18n.t('briefings.card.linkedSignals.subtitle') }}</p>
+      <p class="briefing-card__section-sub">
+        {{ i18n.t('briefings.card.linkedSignals.subtitle') }}
+      </p>
     </div>
 
     @if (hasEnrichedSignals) {
@@ -108,7 +110,9 @@
         @for (signalId of briefing.linkedSignalIds; track signalId) {
           <li class="briefing-card__evidence-item" [title]="signalId">
             <span class="briefing-card__evidence-marker" aria-hidden="true"></span>
-            <span class="briefing-card__evidence-id taws-selectable">{{ shortSignalId(signalId) }}</span>
+            <span class="briefing-card__evidence-id taws-selectable">{{
+              shortSignalId(signalId)
+            }}</span>
           </li>
         }
       </ul>
