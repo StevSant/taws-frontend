@@ -9,6 +9,7 @@ import {
 import { NewsListStore } from '../../application';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { NewsFiltersComponent } from '../news-filters/news-filters.component';
+import { RadarSubNavComponent } from '../radar-sub-nav/radar-sub-nav.component';
 
 /**
  * Numbered "all news" page, routed at `radar/news`. Backed by the browse endpoint
@@ -25,6 +26,7 @@ import { NewsFiltersComponent } from '../news-filters/news-filters.component';
   selector: 'app-news-list-page',
   standalone: true,
   imports: [
+    RadarSubNavComponent,
     NewsFiltersComponent,
     NewsCardComponent,
     ButtonComponent,

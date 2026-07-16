@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SkeletonCardComponent } from '../../../../shared';
+import { WatchlistStore } from '../../../briefings/application';
 import { RadarStore } from '../../application';
 import { AssetClass, ImpactClass } from '../../domain';
 import { RadarFiltersComponent } from '../radar-filters/radar-filters.component';
@@ -16,6 +17,9 @@ import { RadarMarketScoreComponent } from '../radar-market-score/radar-market-sc
 import { NewsTimelineComponent } from '../news-timeline/news-timeline.component';
 import { InstrumentCardCompactComponent } from '../instrument-card-compact/instrument-card-compact.component';
 import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/radar-add-instrument-card.component';
+import { WatchlistStripComponent } from '../watchlist-strip/watchlist-strip.component';
+import { RadarSubNavComponent } from '../radar-sub-nav/radar-sub-nav.component';
+import { instrumentCountLabel } from '../instrument-count-label';
 
 const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -39,6 +43,8 @@ const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
     NewsTimelineComponent,
     InstrumentCardCompactComponent,
     RadarAddInstrumentCardComponent,
+    WatchlistStripComponent,
+    RadarSubNavComponent,
     ButtonComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
@@ -108,6 +114,26 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     return `${this.i18n.t('radar.summary.prefix')} ${kpis.newsDetected} ${this.i18n.t('radar.summary.events')} ${windowLabel}. ${kpis.pendingReview} ${this.i18n.t('radar.summary.pending')}`;
   });
 
+  /**
+   * Names whatever is actually driving the instruments section. Previously it was hardcoded to
+   * "Instrumentos en seguimiento" while the KPI row above it read "En seguimiento: N" over the
+   * *whole* universe — the same words for two different sets on one screen (10 vs 3). When a
+   * watchlist is driving the section it now carries that list's name; otherwise the section is
+   * the news-driven universe and says so.
+   */
+  readonly instrumentsTitle = computed(() => {
+    const activeWatchlist = this.watchlistStore.activeWatchlist();
+    const drivenByWatchlist =
+      this.activeSegment() === null && this.store.watchlistSignals().length > 0;
+    return drivenByWatchlist && activeWatchlist
+      ? activeWatchlist.name
+      : this.i18n.t('radar.instruments.titleFallback');
+  });
+
+  readonly instrumentsCountLabel = computed(() =>
+    instrumentCountLabel(this.visibleSignals().length, this.i18n),
+  );
+
   readonly recentCatalysts = computed(() => this.store.newsTimeline().slice(0, 4));
   readonly overviewDistribution = computed(
     () => this.activeSegment()?.landscape.distribution ?? this.store.landscape().distribution,
@@ -118,6 +144,7 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   constructor(
     readonly store: RadarStore,
+    readonly watchlistStore: WatchlistStore,
     readonly i18n: TranslationService,
   ) {
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -130,6 +157,18 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   onSelectClass(assetClass: AssetClass | null): void {
     this.selectedClassSignal.set(assetClass);
+  }
+
+  /**
+   * Switches which list drives the instruments section.
+   *
+   * Clearing the asset-class tab is load-bearing, not tidiness: `visibleSignals()` gives an active
+   * segment priority over the watchlist, so picking a list while a tab was active would select it
+   * and visibly change nothing.
+   */
+  onSelectWatchlist(watchlistId: string): void {
+    this.selectedClassSignal.set(null);
+    void this.watchlistStore.selectWatchlist(watchlistId);
   }
 
   /**

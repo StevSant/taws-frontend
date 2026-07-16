@@ -1,0 +1,135 @@
+:host {
+  display: block;
+
+  // Edge shadow for the scroll affordance below. Black is invisible against the dark theme's
+  // near-black surface, so it tracks the theme: a light glow on dark, a dark shadow on light.
+  --strip-scroll-shadow: rgb(255 255 255 / 22%);
+}
+
+:host-context(html[data-theme='light']) {
+  --strip-scroll-shadow: rgb(28 25 23 / 22%);
+}
+
+.watchlist-strip__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.watchlist-strip__title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.watchlist-strip__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.watchlist-strip__manage {
+  flex: none;
+  font-size: 0.78rem;
+  color: var(--color-gold);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.watchlist-strip__scroller {
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Scroll shadows that reveal themselves only when there is somewhere to scroll:
+  // the cover gradients are `local` (they ride the content and slide away as you
+  // scroll), while the shadows underneath are `scroll` (pinned to the box). With
+  // no overflow the covers sit permanently over the shadows and nothing shows.
+  // Without this the strip is silently scrollable — the same defect the shell's
+  // tab bar has on mobile.
+  background:
+    linear-gradient(to right, var(--color-surface), transparent) left center / 1.5rem 100% no-repeat
+      local,
+    linear-gradient(to left, var(--color-surface), transparent) right center / 1.5rem 100% no-repeat
+      local,
+    linear-gradient(to right, var(--strip-scroll-shadow), transparent) left center / 1rem 100%
+      no-repeat scroll,
+    linear-gradient(to left, var(--strip-scroll-shadow), transparent) right center / 1rem 100%
+      no-repeat scroll;
+}
+
+.watchlist-strip__list {
+  display: flex;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.watchlist-strip__item {
+  flex: 0 0 15rem;
+  display: flex;
+}
+
+.watchlist-strip__create {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: var(--space-3);
+  text-align: center;
+  text-decoration: none;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-gold-border);
+    color: var(--color-gold);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+}
+
+.watchlist-strip__create-plus {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.watchlist-strip__create-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.watchlist-strip__create-hint {
+  font-size: 0.7rem;
+  color: var(--color-text-faint);
+}
+
+@media (max-width: 720px) {
+  .watchlist-strip__header {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  // Leave a sliver of the next card visible so the row reads as scrollable.
+  .watchlist-strip__item {
+    flex-basis: 82%;
+  }
+}

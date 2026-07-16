@@ -7,27 +7,17 @@
       </a>
 
       <nav class="app-shell__tabs" [attr.aria-label]="i18n.t('shell.nav.label')">
+        <!--
+          Not `exact`: Markets (/radar/explore) and News (/radar/news) are now reached from the
+          radar's own sub-nav rather than their own shell tabs, so Home stays lit anywhere in the
+          radar family. With `exact` the whole family except /radar itself would show no active tab.
+        -->
         <a
           class="app-shell__tab"
           routerLink="/radar"
-          [routerLinkActiveOptions]="{ exact: true }"
           routerLinkActive="app-shell__tab--active"
           [attr.title]="i18n.t('shell.nav.radar.hint')"
           >{{ i18n.t('shell.nav.radar') }}</a
-        >
-        <a
-          class="app-shell__tab"
-          routerLink="/radar/explore"
-          routerLinkActive="app-shell__tab--active"
-          [attr.title]="i18n.t('shell.nav.markets.hint')"
-          >{{ i18n.t('shell.nav.markets') }}</a
-        >
-        <a
-          class="app-shell__tab"
-          routerLink="/radar/news"
-          routerLinkActive="app-shell__tab--active"
-          [attr.title]="i18n.t('shell.nav.news.hint')"
-          >{{ i18n.t('shell.nav.news') }}</a
         >
         <a
           class="app-shell__tab"
@@ -49,6 +39,13 @@
           routerLinkActive="app-shell__tab--active"
           [attr.title]="i18n.t('shell.nav.briefings.hint')"
           >{{ i18n.t('shell.nav.briefings') }}</a
+        >
+        <a
+          class="app-shell__tab"
+          routerLink="/watchlists"
+          routerLinkActive="app-shell__tab--active"
+          [attr.title]="i18n.t('shell.nav.watchlists.hint')"
+          >{{ i18n.t('shell.nav.watchlists') }}</a
         >
       </nav>
 

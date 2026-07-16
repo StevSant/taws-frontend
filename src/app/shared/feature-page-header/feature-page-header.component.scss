@@ -70,6 +70,14 @@
     flex-direction: column;
     align-items: stretch;
 
+    // `flex-basis` is main-axis-relative, so the base `flex: 1 1 16rem` — meant as a *width*
+    // floor while the header is a row — silently became a 16rem (256px) *height* floor the
+    // moment this query flipped the axis, padding every feature page's header with ~200px of
+    // dead space on phones. Reset it: in a column the copy should just be its content height.
+    &__copy {
+      flex: 0 1 auto;
+    }
+
     &__stats {
       width: 100%;
     }

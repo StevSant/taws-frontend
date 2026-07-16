@@ -353,6 +353,15 @@
     letter-spacing: -0.02em;
   }
 
+  // The count is what disambiguates this section from the KPI row's "En seguimiento",
+  // so it has to stay legible rather than read as decoration.
+  &__instruments-count {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-text-muted);
+  }
+
   &__instruments-subtitle {
     margin: 0.3rem 0 0;
     font-size: 0.76rem;
@@ -444,6 +453,13 @@
   .radar-page__instruments-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  // Same axis trap as the shared feature-page-header: the base `flex: 1 1 12rem` is a *width*
+  // floor for the row layout, but this query flips the axis, turning it into a 12rem (192px)
+  // *height* floor under a ~60px title+subtitle. Reset it to content height.
+  .radar-page__instruments-copy {
+    flex: 0 1 auto;
   }
 
   .radar-page__catalyst {

@@ -1,0 +1,41 @@
+<section class="watchlist-strip feature-panel">
+  <header class="watchlist-strip__header">
+    <div class="watchlist-strip__heading">
+      <h2 class="watchlist-strip__title">{{ i18n.t('radar.watchlists.title') }}</h2>
+      <p class="watchlist-strip__subtitle">{{ i18n.t('radar.watchlists.subtitle') }}</p>
+    </div>
+    <a class="watchlist-strip__manage" routerLink="/watchlists">{{
+      i18n.t('radar.watchlists.manage')
+    }}</a>
+  </header>
+
+  <div class="watchlist-strip__scroller">
+    <ul class="watchlist-strip__list" [attr.aria-label]="i18n.t('radar.watchlists.title')">
+      @for (summary of summaries(); track summary.id) {
+        <li class="watchlist-strip__item">
+          <app-watchlist-summary-card
+            [summary]="summary"
+            [active]="summary.id === activeId()"
+            (select)="select.emit($event)"
+          />
+        </li>
+      }
+
+      <li class="watchlist-strip__item">
+        <a class="watchlist-strip__create" routerLink="/watchlists">
+          <span class="watchlist-strip__create-plus" aria-hidden="true">+</span>
+          <span class="watchlist-strip__create-label">{{
+            summaries().length === 0
+              ? i18n.t('radar.watchlists.empty.cta')
+              : i18n.t('radar.watchlists.create')
+          }}</span>
+          @if (summaries().length === 0) {
+            <span class="watchlist-strip__create-hint">{{
+              i18n.t('radar.watchlists.empty.hint')
+            }}</span>
+          }
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>

@@ -74,6 +74,19 @@
     gap: var(--space-3);
   }
 
+  // Reports only picks a list to report on; creating/editing lives on /watchlists.
+  &__manage {
+    align-self: center;
+    font-size: 0.78rem;
+    color: var(--color-gold);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   &__field {
     flex: 1 1 12rem;
     max-width: 18rem;

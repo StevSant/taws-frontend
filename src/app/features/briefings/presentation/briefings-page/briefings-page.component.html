@@ -17,13 +17,9 @@
         [preparingLabel]="i18n.t('briefings.focus.preparing')"
       />
     } @else {
-      <!-- CONDENSED HOME: lists + reports lead; the rest is demoted. -->
+      <!-- CONDENSED HOME: reports lead. Watchlist CRUD lives solely on /watchlists — this page
+           only picks which list to report on and links out to manage them. -->
       <div class="briefings-home">
-        <!-- LEAD: the user's watchlists. -->
-        <aside class="briefings-home__lists">
-          <app-watchlist-manager />
-        </aside>
-
         <!-- LEAD: the user's reports. -->
         <section class="briefings-home__reports" aria-labelledby="briefings-reports-heading">
           <div class="briefings-reports">
@@ -55,6 +51,10 @@
                   [disabled]="!store.selectedWatchlistId() || store.isGenerating()"
                   (pressed)="onGenerate()"
                 />
+
+                <a class="briefings-reports__manage" routerLink="/watchlists">{{
+                  i18n.t('radar.watchlists.manage')
+                }}</a>
               </form>
             </div>
 

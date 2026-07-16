@@ -1,5 +1,9 @@
 export { RadarPageComponent } from './radar-page/radar-page.component';
 export { RadarFiltersComponent } from './radar-filters/radar-filters.component';
+export { RadarSubNavComponent } from './radar-sub-nav/radar-sub-nav.component';
+export { instrumentCountLabel } from './instrument-count-label';
+export { WatchlistStripComponent } from './watchlist-strip/watchlist-strip.component';
+export { WatchlistSummaryCardComponent } from './watchlist-summary-card/watchlist-summary-card.component';
 export { SignalCardComponent } from './signal-card/signal-card.component';
 export { SignalAnalysisComponent } from './signal-analysis/signal-analysis.component';
 export { AssetPriceChartComponent } from './asset-price-chart/asset-price-chart.component';

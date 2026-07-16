@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import {
   ActivityFeedComponent,
@@ -18,7 +19,6 @@ import { RelevantNewsRepository } from '../../domain';
 import { HttpRelevantNewsRepository } from '../../infrastructure';
 import { ReviewDecisionSubmitted } from '../review-panel/review-panel.component';
 import { BriefingCardComponent } from '../briefing-card/briefing-card.component';
-import { WatchlistManagerComponent } from '../watchlist-manager/watchlist-manager.component';
 import { GenerationFocusComponent } from '../generation-focus/generation-focus.component';
 import { NewsStripComponent } from '../news-strip/news-strip.component';
 
@@ -30,6 +30,7 @@ const ACTIVITY_FEED_LIMIT = 8;
   standalone: true,
   imports: [
     FormsModule,
+    RouterLink,
     ButtonComponent,
     FeaturePageHeaderComponent,
     GuideNotesTabsComponent,
@@ -37,7 +38,6 @@ const ACTIVITY_FEED_LIMIT = 8;
     EmptyStateComponent,
     ActivityFeedComponent,
     BriefingCardComponent,
-    WatchlistManagerComponent,
     NotesPanelComponent,
     GenerationFocusComponent,
     NewsStripComponent,

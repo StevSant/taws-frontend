@@ -1,0 +1,21 @@
+<nav class="radar-sub-nav" [attr.aria-label]="i18n.t('radar.subnav.label')">
+  <a
+    class="radar-sub-nav__link"
+    routerLink="/radar"
+    [routerLinkActiveOptions]="{ exact: true }"
+    routerLinkActive="radar-sub-nav__link--active"
+    >{{ i18n.t('radar.subnav.radar') }}</a
+  >
+  <a
+    class="radar-sub-nav__link"
+    routerLink="/radar/explore"
+    routerLinkActive="radar-sub-nav__link--active"
+    >{{ i18n.t('shell.nav.markets') }}</a
+  >
+  <a
+    class="radar-sub-nav__link"
+    routerLink="/radar/news"
+    routerLinkActive="radar-sub-nav__link--active"
+    >{{ i18n.t('shell.nav.news') }}</a
+  >
+</nav>

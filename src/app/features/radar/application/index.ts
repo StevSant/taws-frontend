@@ -11,5 +11,8 @@ export { MacroDetailStore } from './macro-detail-store';
 export { CompositionInstrumentsStore } from './composition-instruments-store';
 export type { ClassInstruments } from './composition-instruments-store';
 export { computeClassTrend } from './compute-class-trend';
+export { computeWatchlistSummary } from './compute-watchlist-summary';
+export type { WatchlistSummary } from './watchlist-summary.model';
+export type { WatchlistSummaryMember } from './watchlist-summary-member.model';
 export { buildMacroLineSpec } from './build-macro-line-spec';
 export { buildAssetSource } from './build-asset-source';

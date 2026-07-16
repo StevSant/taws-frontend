@@ -63,6 +63,11 @@
   }
 
   &__tabs {
+    // Edge shadow for the mobile scroll affordance below. A black shadow is invisible on the
+    // dark theme (the surface is already near-black), so it tracks the theme: a light glow on
+    // dark, a dark shadow on light.
+    --tabs-scroll-shadow: rgb(255 255 255 / 22%);
+
     display: flex;
 
     align-items: center;
@@ -469,6 +474,24 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
+    // The tab strip scrolls but hides its scrollbar, so on a phone the last tabs sat
+    // off-screen with nothing to suggest they existed. These are scroll shadows that
+    // appear only when there is somewhere to scroll: the cover gradients are `local`
+    // (they ride the content and slide away as it scrolls) and sit over `scroll`-pinned
+    // shadows, so with no overflow the covers hide the shadows entirely.
+    //
+    // The cover colour must track the topbar's own background (`--color-surface`), or the
+    // covers read as smudges rather than as the strip fading out at its edge.
+    background:
+      linear-gradient(to right, var(--color-surface), transparent) left center / 1.25rem 100%
+        no-repeat local,
+      linear-gradient(to left, var(--color-surface), transparent) right center / 1.25rem 100%
+        no-repeat local,
+      linear-gradient(to right, var(--tabs-scroll-shadow), transparent) left center / 0.85rem 100%
+        no-repeat scroll,
+      linear-gradient(to left, var(--tabs-scroll-shadow), transparent) right center / 0.85rem 100%
+        no-repeat scroll;
   }
 
   .app-shell__search {
@@ -520,4 +543,11 @@
   .app-shell__content {
     overflow-x: hidden;
   }
+}
+
+// Light theme flips the scroll-shadow polarity: a white glow would vanish against the
+// near-white surface, so the edge casts a dark shadow instead. Follows the
+// `:host-context(html[data-theme='light'])` convention used by the chat components.
+:host-context(html[data-theme='light']) .app-shell__tabs {
+  --tabs-scroll-shadow: rgb(28 25 23 / 22%);
 }

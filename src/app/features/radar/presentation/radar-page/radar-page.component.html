@@ -1,4 +1,6 @@
 <div class="feature-page radar-page">
+  <app-radar-sub-nav />
+
   <header class="radar-page__hero">
     <div class="radar-page__hero-copy">
       <h1 class="radar-page__title">{{ i18n.t('radar.title') }}</h1>
@@ -68,6 +70,15 @@
       [kpis]="store.kpiSummary()"
       [sinceHours]="store.filters().sinceHours"
     />
+
+    @if (watchlistStore.available()) {
+      <app-watchlist-strip
+        class="radar-page__watchlists"
+        [summaries]="store.watchlistSummaries()"
+        [activeId]="watchlistStore.activeWatchlistId()"
+        (select)="onSelectWatchlist($event)"
+      />
+    }
 
     <app-radar-asset-class-tabs
       class="radar-page__tabs"
@@ -152,7 +163,8 @@
       <header class="radar-page__instruments-header">
         <div class="radar-page__instruments-copy">
           <h2 class="radar-page__instruments-title">
-            {{ i18n.t('radar.instruments.title') }}
+            {{ instrumentsTitle() }}
+            <span class="radar-page__instruments-count">· {{ instrumentsCountLabel() }}</span>
           </h2>
           <p class="radar-page__instruments-subtitle">
             {{ i18n.t('radar.instruments.subtitle') }}

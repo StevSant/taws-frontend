@@ -8,6 +8,7 @@ import {
   SkeletonCardComponent,
 } from '../../../../shared';
 import { MarketsExplorerStore } from '../../application';
+import { RadarSubNavComponent } from '../radar-sub-nav/radar-sub-nav.component';
 import {
   ASSET_CLASSES,
   AssetClass,
@@ -49,6 +50,7 @@ const SIGNAL_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
     SkeletonCardComponent,
     InstrumentTickerBadgeComponent,
     MarketsSparklineComponent,
+    RadarSubNavComponent,
   ],
   providers: [MarketsExplorerStore],
   templateUrl: './markets-explorer-page.component.html',

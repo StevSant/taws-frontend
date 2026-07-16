@@ -32,6 +32,8 @@ import { computeRadarLandscape } from './compute-radar-landscape';
 import { computeMarketScore, MarketScore } from './compute-market-score';
 import { computeAssetClassSegments } from './compute-asset-class-segments';
 import { computeMarketComposition } from './compute-market-composition';
+import { computeWatchlistSummary } from './compute-watchlist-summary';
+import { WatchlistSummary } from './watchlist-summary.model';
 import { groupNewsByInstrument } from './group-news-by-instrument';
 import { latestSignalBySymbol } from './latest-signal-by-symbol';
 import { mapInBatches } from './map-in-batches';
@@ -170,17 +172,41 @@ export class RadarStore {
 
   /**
    * Home instruments section when the user has a non-empty watchlist (issue #16): exactly the
-   * watchlist symbols, in watchlist order. A symbol that already has a news-driven card reuses it
-   * (full news + signal enrichment); one without recent news is synthesized from instrument
-   * metadata plus any latest signal/quant stats, so it still appears — as an "unclassified" card,
-   * the same way the radar renders any instrument the Analyst hasn't scored yet. Empty when the
+   * active watchlist's symbols, in watchlist order (see `resolveSignals`). Empty when the
    * watchlist is empty, so the page falls back to the news-driven universe.
    */
   readonly watchlistSignals = computed<RadarSignal[]>(() => {
     const symbols = this.watchlistStore.symbols();
-    if (symbols.length === 0) {
-      return [];
-    }
+    return symbols.length === 0 ? [] : this.resolveSignals(symbols);
+  });
+
+  /**
+   * One summary per watchlist for the radar's "Mis listas" strip — the Analyst's read on each list
+   * plus an equal-weight price move, derived from `signals()` with no extra fetch.
+   *
+   * Reads `itemsByWatchlistId` rather than `symbols()` (which is the *active* list only) so every
+   * card is populated, not just the selected one. Members of non-active lists are enriched because
+   * `enrichmentSymbols` covers `allSymbols()`.
+   */
+  readonly watchlistSummaries = computed<WatchlistSummary[]>(() => {
+    const itemsById = this.watchlistStore.itemsByWatchlistId();
+    return this.watchlistStore.watchlists().map((watchlist) => {
+      const symbols = (itemsById.get(watchlist.id) ?? []).map((item) => item.symbol.toUpperCase());
+      return computeWatchlistSummary(watchlist, this.resolveSignals(symbols));
+    });
+  });
+
+  /**
+   * Resolves symbols to radar cards, one per symbol and in the given order. A symbol that already
+   * has a news-driven card reuses it (full news + signal enrichment); one without recent news is
+   * synthesized from instrument metadata plus any latest signal/quant stats, so it still appears —
+   * as an "unclassified" card, the same way the radar renders any instrument the Analyst hasn't
+   * scored yet.
+   *
+   * Reads signals internally, so callers must invoke it inside a `computed` for dependency
+   * tracking to work.
+   */
+  private resolveSignals(symbols: string[]): RadarSignal[] {
     const cards = this.signalCardBySymbol();
     const instrumentsBySymbol = new Map(
       this.instrumentsSignal().map(
@@ -212,7 +238,7 @@ export class RadarStore {
         marketStats,
       } satisfies RadarSignal;
     });
-  });
+  }
 
   readonly landscape = computed(() => computeRadarLandscape(this.signals()));
   readonly marketScore = computed((): MarketScore => {
@@ -526,9 +552,15 @@ export class RadarStore {
    * perfectly good signal was already stored. `signalsBySymbolSignal` is *replaced* on every
    * tick (unlike `marketStatsBySymbolSignal`, which merges), so a watchlisted symbol absent
    * from the feed was dropped from the map on each poll and could never recover.
+   *
+   * It covers `allSymbols()` — every list, not just the active one — because the "Mis listas"
+   * strip renders a card per list, and an unenriched member would make that card read entirely
+   * unclassified. This widens the tick's 2×N lookups to the union of all lists' symbols; that is
+   * bounded (they're the user's own curated lists) and enrichment is fire-and-forget — `init()`
+   * awaits only `loadNews()` — so cards paint immediately and their mix fills in as it lands.
    */
   private enrichmentSymbols(news: NewsItem[]): string[] {
-    return Array.from(new Set([...this.trackedSymbols(news), ...this.watchlistStore.symbols()]));
+    return Array.from(new Set([...this.trackedSymbols(news), ...this.watchlistStore.allSymbols()]));
   }
 
   private async loadInstruments(): Promise<void> {

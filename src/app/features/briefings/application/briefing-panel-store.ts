@@ -1,13 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { NotificationsStore } from '../../../core';
-import {
-  EnrichedInstrument,
-  Instrument,
-  InstrumentRepository,
-  MarketsRepository,
-  SignalRepository,
-} from '../../radar/domain';
+import { SignalRepository } from '../../radar/domain';
 import { downloadBlob } from '../../../shared';
 import {
   Briefing,
@@ -15,13 +9,8 @@ import {
   ReviewDecision,
   ReviewRepository,
   ReviewState,
-  Watchlist,
-  WatchlistItem,
-  WatchlistRepository,
 } from '../domain';
-
-/** Reason an "add symbol" attempt was rejected client-side, mapped to i18n by the UI. */
-export type AddSymbolError = 'unknown' | 'duplicate';
+import { WatchlistStore } from './watchlist-store';
 
 /** Progress of the pre-briefing Analyst pipeline run (issue #61). */
 export interface SignalPrepProgress {
@@ -30,34 +19,25 @@ export interface SignalPrepProgress {
 }
 
 /**
- * A watchlist item enriched for the preview with its instrument display name
- * plus the latest market quote (last price + % change). Quote fields are
- * `null` until the enriched-instruments fetch resolves or when the symbol has
- * no computed market data — the UI renders a neutral em dash rather than a
- * fabricated value (issue #66).
- */
-export interface WatchlistItemView {
-  id: string;
-  symbol: string;
-  name: string;
-  lastPrice: number | null;
-  priceDeltaPct: number | null;
-}
-
-/**
  * Signal-based state + facade for the briefing/review panel. Presentation
  * components read `watchlists`/`briefings`/`reviewHistoryFor(...)`/etc. and
  * call the `selectWatchlist`/`generateBriefing`/`submitReview` intents; they
- * never touch `WatchlistRepository`/`BriefingRepository`/`ReviewRepository`
- * directly.
+ * never touch `BriefingRepository`/`ReviewRepository` directly.
+ *
+ * Watchlists are **not** owned here — they are read straight off `WatchlistStore`, the app-wide
+ * source of truth. This store used to keep its own `watchlists`/`items` copy fetched from the same
+ * API, which made an edit on `/watchlists` invisible here (and vice versa) until a reload. Reports
+ * now only *consumes* a list: pick which one to report on and generate. Creating, renaming,
+ * deleting and adding symbols live solely on `/watchlists`.
  */
 @Injectable({ providedIn: 'root' })
 export class BriefingPanelStore {
-  private readonly watchlistsSignal = signal<Watchlist[]>([]);
-  private readonly selectedWatchlistIdSignal = signal<string | null>(null);
+  // `inject()` rather than a constructor parameter: the watchlist pass-throughs below are field
+  // initializers, and a parameter property is not assigned yet when those run.
+  private readonly watchlistStore = inject(WatchlistStore);
+
   private readonly briefingsSignal = signal<Briefing[]>([]);
   private readonly reviewHistorySignal = signal<Record<string, ReviewState[]>>({});
-  private readonly isLoadingWatchlistsSignal = signal(false);
   private readonly isLoadingBriefingsSignal = signal(false);
   private readonly isGeneratingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
@@ -65,257 +45,81 @@ export class BriefingPanelStore {
   private readonly submittingBriefingIdsSignal = signal<ReadonlySet<string>>(new Set());
   private readonly exportingBriefingIdSignal = signal<string | null>(null);
   private readonly exportErrorsSignal = signal<Record<string, string | null>>({});
-  private readonly watchlistItemsSignal = signal<WatchlistItem[]>([]);
-  private readonly isLoadingItemsSignal = signal(false);
-  private readonly isManagingWatchlistSignal = signal(false);
-  private readonly instrumentsSignal = signal<Instrument[]>([]);
-  private readonly enrichedInstrumentsSignal = signal<EnrichedInstrument[]>([]);
-  private readonly addSymbolErrorSignal = signal<AddSymbolError | null>(null);
   private readonly signalPrepProgressSignal = signal<SignalPrepProgress | null>(null);
   private sessionReady = false;
 
-  readonly watchlists = this.watchlistsSignal.asReadonly();
-  readonly watchlistItems = this.watchlistItemsSignal.asReadonly();
-  readonly isLoadingItems = this.isLoadingItemsSignal.asReadonly();
-  readonly isManagingWatchlist = this.isManagingWatchlistSignal.asReadonly();
-  readonly selectedWatchlistId = this.selectedWatchlistIdSignal.asReadonly();
   readonly briefings = this.briefingsSignal.asReadonly();
-  readonly isLoadingWatchlists = this.isLoadingWatchlistsSignal.asReadonly();
   readonly isLoadingBriefings = this.isLoadingBriefingsSignal.asReadonly();
   readonly isGenerating = this.isGeneratingSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
-  readonly instruments = this.instrumentsSignal.asReadonly();
-  readonly addSymbolError = this.addSymbolErrorSignal.asReadonly();
   readonly signalPrepProgress = this.signalPrepProgressSignal.asReadonly();
 
-  /** Uppercased set of every known instrument symbol, for O(1) validation/autocomplete. */
-  readonly knownSymbols = computed(
-    () => new Set(this.instrumentsSignal().map((instrument) => instrument.symbol.toUpperCase())),
-  );
-
-  /**
-   * Watchlist items enriched for the preview with their instrument display
-   * name and latest market quote (last price + % change). The quote is matched
-   * by symbol against the enriched-instruments fetch (issue #66); an unmatched
-   * symbol keeps `null` quote fields so the UI shows a neutral placeholder.
-   */
-  readonly watchlistItemViews = computed<WatchlistItemView[]>(() => {
-    const nameBySymbol = new Map(
-      this.instrumentsSignal().map((instrument) => [
-        instrument.symbol.toUpperCase(),
-        instrument.name,
-      ]),
-    );
-    const quoteBySymbol = new Map(
-      this.enrichedInstrumentsSignal().map((enriched) => [enriched.symbol.toUpperCase(), enriched]),
-    );
-    return this.watchlistItemsSignal().map((item) => {
-      const key = item.symbol.toUpperCase();
-      const quote = quoteBySymbol.get(key);
-      return {
-        id: item.id,
-        symbol: item.symbol,
-        name: nameBySymbol.get(key) ?? item.symbol,
-        lastPrice: quote?.lastPrice ?? null,
-        priceDeltaPct: quote?.priceDeltaPct ?? null,
-      };
-    });
-  });
-
-  readonly selectedWatchlist = computed<Watchlist | null>(
-    () =>
-      this.watchlistsSignal().find(
-        (watchlist) => watchlist.id === this.selectedWatchlistIdSignal(),
-      ) ?? null,
-  );
-
-  readonly hasWatchlists = computed(() => this.watchlistsSignal().length > 0);
+  // --- Watchlist reads, delegated to the app-wide WatchlistStore -------------------------------
+  // Deliberately thin pass-throughs rather than a second copy: the selected list here is the same
+  // active list the radar strip and /watchlists act on, so a change in any of them is reflected in
+  // all of them with no reload and no chance of divergence.
+  readonly watchlists = this.watchlistStore.watchlists;
+  readonly watchlistItems = this.watchlistStore.items;
+  readonly selectedWatchlistId = this.watchlistStore.activeWatchlistId;
+  readonly selectedWatchlist = this.watchlistStore.activeWatchlist;
+  readonly isLoadingWatchlists = this.watchlistStore.isLoading;
+  readonly isLoadingItems = this.watchlistStore.isLoading;
+  readonly hasWatchlists = computed(() => this.watchlistStore.watchlists().length > 0);
 
   readonly isEmpty = computed(
     () =>
-      this.selectedWatchlistIdSignal() !== null &&
+      this.selectedWatchlistId() !== null &&
       !this.isLoadingBriefingsSignal() &&
       !this.errorSignal() &&
       this.briefingsSignal().length === 0,
   );
 
   constructor(
-    private readonly watchlistRepository: WatchlistRepository,
     private readonly briefingRepository: BriefingRepository,
     private readonly reviewRepository: ReviewRepository,
     private readonly notifications: NotificationsStore,
-    private readonly instrumentRepository: InstrumentRepository,
     private readonly signalRepository: SignalRepository,
-    private readonly marketsRepository: MarketsRepository,
   ) {}
 
-  /** Loads the user's watchlists and auto-selects the first one, if any. */
+  /** Loads the user's watchlists (via `WatchlistStore`) and reports for the active one. */
   async init(): Promise<void> {
-    // The known-instrument universe backs the add-symbol autocomplete/validation and the
-    // enriched preview (issue #61); load it in the background — a failure just degrades to
-    // no autocomplete, never blocks the page. The enriched-instruments fetch (issue #66)
-    // then hangs the per-symbol live price + %change off it; both are best-effort.
-    void this.loadMarketData();
-
-    if (this.sessionReady && this.watchlistsSignal().length > 0) {
-      void this.loadWatchlists({ background: true });
+    if (this.sessionReady && this.hasWatchlists()) {
+      void this.watchlistStore.refresh();
       return;
     }
 
-    await this.loadWatchlists();
-    const first = this.watchlistsSignal()[0];
-    if (first) {
-      await this.selectWatchlist(first.id);
+    await this.watchlistStore.ensureLoaded();
+    const active = this.selectedWatchlistId();
+    if (active) {
+      await this.loadBriefingsFor(active);
     }
     this.sessionReady = true;
   }
 
   async retry(): Promise<void> {
-    if (this.selectedWatchlistIdSignal()) {
-      await this.selectWatchlist(this.selectedWatchlistIdSignal());
+    const active = this.selectedWatchlistId();
+    if (active) {
+      await this.selectWatchlist(active);
       return;
     }
-    await this.loadWatchlists();
+    await this.watchlistStore.refresh();
   }
 
+  /**
+   * Picks which list to report on. Delegates the selection itself to `WatchlistStore` — which the
+   * radar strip and `/watchlists` also drive — and owns only the briefing-side reset.
+   */
   async selectWatchlist(watchlistId: string | null): Promise<void> {
-    this.selectedWatchlistIdSignal.set(watchlistId);
     this.briefingsSignal.set([]);
     this.reviewHistorySignal.set({});
-    this.watchlistItemsSignal.set([]);
     this.errorSignal.set(null);
     if (!watchlistId) {
       return;
     }
-    await Promise.all([this.loadBriefings(watchlistId), this.loadWatchlistItems(watchlistId)]);
-  }
-
-  async createWatchlist(name: string): Promise<void> {
-    const trimmed = name.trim();
-    if (!trimmed || this.isManagingWatchlistSignal()) {
-      return;
-    }
-    this.isManagingWatchlistSignal.set(true);
-    this.errorSignal.set(null);
-    try {
-      const watchlist = await this.watchlistRepository.createWatchlist(trimmed);
-      this.watchlistsSignal.update((lists) => [...lists, watchlist]);
-      await this.selectWatchlist(watchlist.id);
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-    } finally {
-      this.isManagingWatchlistSignal.set(false);
-    }
-  }
-
-  async deleteWatchlist(watchlistId: string): Promise<void> {
-    if (this.isManagingWatchlistSignal()) {
-      return;
-    }
-    this.isManagingWatchlistSignal.set(true);
-    this.errorSignal.set(null);
-    try {
-      await this.watchlistRepository.deleteWatchlist(watchlistId);
-      this.watchlistsSignal.update((lists) => lists.filter((w) => w.id !== watchlistId));
-      if (this.selectedWatchlistIdSignal() === watchlistId) {
-        const next = this.watchlistsSignal()[0]?.id ?? null;
-        await this.selectWatchlist(next);
-      }
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-    } finally {
-      this.isManagingWatchlistSignal.set(false);
-    }
-  }
-
-  /**
-   * Reorders the user's watchlists to match `orderedIds` and persists the new
-   * order (issue #66). Updates the local order optimistically for an instant UI
-   * response, then calls `PATCH /api/v1/watchlists/reorder`; on failure the
-   * previous order is restored and the error surfaced. `orderedIds` must be a
-   * permutation of the current ids — a mismatch is ignored rather than risking
-   * dropping a list from the view.
-   */
-  async reorderWatchlists(orderedIds: string[]): Promise<void> {
-    if (this.isManagingWatchlistSignal()) {
-      return;
-    }
-    const previous = this.watchlistsSignal();
-    const byId = new Map(previous.map((watchlist) => [watchlist.id, watchlist]));
-    const next = orderedIds
-      .map((id) => byId.get(id))
-      .filter((watchlist): watchlist is Watchlist => watchlist !== undefined);
-    if (next.length !== previous.length) {
-      return;
-    }
-
-    this.watchlistsSignal.set(next);
-    this.isManagingWatchlistSignal.set(true);
-    this.errorSignal.set(null);
-    try {
-      await this.watchlistRepository.reorder(orderedIds);
-    } catch (error: unknown) {
-      this.watchlistsSignal.set(previous);
-      this.errorSignal.set(this.toErrorMessage(error));
-    } finally {
-      this.isManagingWatchlistSignal.set(false);
-    }
-  }
-
-  /** Clears the "add symbol" validation error (e.g. when the user edits the input). */
-  clearAddSymbolError(): void {
-    this.addSymbolErrorSignal.set(null);
-  }
-
-  async addWatchlistItem(symbol: string): Promise<void> {
-    const watchlistId = this.selectedWatchlistIdSignal();
-    const trimmed = symbol.trim().toUpperCase();
-    if (!watchlistId || !trimmed || this.isManagingWatchlistSignal()) {
-      return;
-    }
-
-    // Validate against the known-instrument universe (issue #61): reject unknown tickers
-    // like "APPPSDPSDP" up front instead of persisting garbage. Only enforced once the
-    // universe has actually loaded, so a failed instruments fetch degrades to "no
-    // client-side validation" rather than blocking every add.
-    const known = this.knownSymbols();
-    if (known.size > 0 && !known.has(trimmed)) {
-      this.addSymbolErrorSignal.set('unknown');
-      return;
-    }
-    if (this.watchlistItemsSignal().some((item) => item.symbol.toUpperCase() === trimmed)) {
-      this.addSymbolErrorSignal.set('duplicate');
-      return;
-    }
-
-    this.addSymbolErrorSignal.set(null);
-    this.isManagingWatchlistSignal.set(true);
-    this.errorSignal.set(null);
-    try {
-      const item = await this.watchlistRepository.addItem(watchlistId, trimmed);
-      this.watchlistItemsSignal.update((items) => [...items, item]);
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-    } finally {
-      this.isManagingWatchlistSignal.set(false);
-    }
-  }
-
-  async removeWatchlistItem(itemId: string): Promise<void> {
-    const watchlistId = this.selectedWatchlistIdSignal();
-    if (!watchlistId || this.isManagingWatchlistSignal()) {
-      return;
-    }
-    this.isManagingWatchlistSignal.set(true);
-    this.errorSignal.set(null);
-    try {
-      await this.watchlistRepository.removeItem(watchlistId, itemId);
-      this.watchlistItemsSignal.update((items) => items.filter((item) => item.id !== itemId));
-    } catch (error: unknown) {
-      this.errorSignal.set(this.toErrorMessage(error));
-    } finally {
-      this.isManagingWatchlistSignal.set(false);
-    }
+    await Promise.all([
+      this.loadBriefingsFor(watchlistId),
+      this.watchlistStore.selectWatchlist(watchlistId),
+    ]);
   }
 
   /**
@@ -328,7 +132,7 @@ export class BriefingPanelStore {
    * swallowed so one unanalyzable instrument doesn't block the whole briefing.
    */
   async generateBriefing(): Promise<void> {
-    const watchlistId = this.selectedWatchlistIdSignal();
+    const watchlistId = this.selectedWatchlistId();
     if (!watchlistId || this.isGeneratingSignal()) {
       return;
     }
@@ -351,7 +155,7 @@ export class BriefingPanelStore {
 
   /** Runs the Analyst pipeline for every selected-watchlist symbol missing signals. */
   private async ensureSignalsForWatchlist(): Promise<void> {
-    const symbols = this.watchlistItemsSignal().map((item) => item.symbol);
+    const symbols = this.watchlistItems().map((item) => item.symbol);
     if (symbols.length === 0) {
       return;
     }
@@ -446,92 +250,7 @@ export class BriefingPanelStore {
     }
   }
 
-  /**
-   * Loads the instrument universe, then the enriched market quotes for the
-   * live watchlist preview (issue #66). Sequenced so the enriched page can be
-   * sized to the universe and fetched once, matched by symbol in
-   * `watchlistItemViews`. Both steps are best-effort — a failure degrades the
-   * preview to name-only, never blocks the page.
-   */
-  private async loadMarketData(): Promise<void> {
-    await this.loadInstruments();
-    await this.loadEnrichedInstruments();
-  }
-
-  private async loadInstruments(): Promise<void> {
-    if (this.instrumentsSignal().length > 0) {
-      return;
-    }
-    try {
-      this.instrumentsSignal.set(await this.instrumentRepository.fetchInstruments());
-    } catch {
-      this.instrumentsSignal.set([]);
-    }
-  }
-
-  /**
-   * Fetches the enriched instruments (last price + % change) once and caches
-   * them for the watchlist preview. The page is sized to the loaded universe so
-   * a single request covers every symbol a watchlist could reference — no
-   * hardcoded page size and no per-symbol fan-out.
-   */
-  private async loadEnrichedInstruments(): Promise<void> {
-    if (this.enrichedInstrumentsSignal().length > 0) {
-      return;
-    }
-    const universeSize = this.instrumentsSignal().length;
-    if (universeSize === 0) {
-      return;
-    }
-    try {
-      const page = await this.marketsRepository.fetchEnrichedInstruments({
-        pageSize: universeSize,
-      });
-      this.enrichedInstrumentsSignal.set(page.items);
-    } catch {
-      this.enrichedInstrumentsSignal.set([]);
-    }
-  }
-
-  private async loadWatchlistItems(watchlistId: string): Promise<void> {
-    this.isLoadingItemsSignal.set(true);
-    try {
-      const items = await this.watchlistRepository.listItems(watchlistId);
-      this.watchlistItemsSignal.set(items);
-    } catch {
-      this.watchlistItemsSignal.set([]);
-    } finally {
-      this.isLoadingItemsSignal.set(false);
-    }
-  }
-
-  private async loadWatchlists(options?: { background?: boolean }): Promise<void> {
-    const background = options?.background ?? false;
-    if (!background && this.watchlistsSignal().length === 0) {
-      this.isLoadingWatchlistsSignal.set(true);
-    }
-    if (!background) {
-      this.errorSignal.set(null);
-    }
-    try {
-      const watchlists = await this.watchlistRepository.fetchWatchlists();
-      this.watchlistsSignal.set(watchlists);
-    } catch (error: unknown) {
-      // A background refresh must never destroy the last-known-good list: a
-      // transient failure (e.g. an intermittent 500) would otherwise empty the
-      // watchlist selector even though we already had a valid set loaded. Only
-      // a foreground load — where there is nothing to preserve — surfaces the
-      // error and reflects the empty result.
-      if (!background) {
-        this.errorSignal.set(this.toErrorMessage(error));
-        this.watchlistsSignal.set([]);
-      }
-    } finally {
-      this.isLoadingWatchlistsSignal.set(false);
-    }
-  }
-
-  private async loadBriefings(watchlistId: string): Promise<void> {
+  private async loadBriefingsFor(watchlistId: string): Promise<void> {
     this.isLoadingBriefingsSignal.set(true);
     this.errorSignal.set(null);
     try {
