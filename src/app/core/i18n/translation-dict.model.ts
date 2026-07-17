@@ -847,6 +847,7 @@ export interface TranslationDict {
   'briefings.card.linkedSignals.subtitle': string;
   'briefings.card.linkedSignals.empty': string;
   'briefings.card.linkedSignals.unresolved': string;
+  'briefings.card.linkedSignals.archived': string;
   'briefings.card.linkedSignals.confidenceAria': string;
   'briefings.card.linkedSignals.impact.positive': string;
   'briefings.card.linkedSignals.impact.negative': string;

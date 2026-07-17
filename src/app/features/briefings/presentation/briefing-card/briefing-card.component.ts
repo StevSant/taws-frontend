@@ -83,6 +83,16 @@ export class BriefingCardComponent {
     return signal.symbol === UNRESOLVED_SYMBOL;
   }
 
+  /**
+   * A linked signal whose source was pruned but whose symbol was recovered:
+   * the symbol resolves (so the chip stays a working /radar/:symbol link) but
+   * confidence and thesis are gone. Rendered without the confidence percent
+   * and impact dot — showing "0%" for a pruned signal would be misleading.
+   */
+  isArchived(signal: LinkedSignal): boolean {
+    return !this.isUnresolved(signal) && signal.confidence === 0 && signal.title === '';
+  }
+
   /** BEM modifier class carrying the impact accent color for a linked-signal chip. */
   impactClass(impact: SignalImpact): string {
     return linkedSignalImpactClass(impact);

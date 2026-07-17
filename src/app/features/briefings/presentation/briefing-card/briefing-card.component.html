@@ -50,7 +50,9 @@
       <!--
         Enriched evidence: each linked signal is an in-app link to its asset in
         the radar (`/radar/:symbol`). An unresolved signal (symbol "—") degrades
-        to a non-link, de-emphasized chip so we never mint a broken link.
+        to a non-link, de-emphasized chip so we never mint a broken link. An
+        archived signal (symbol resolved, but confidence/thesis pruned) keeps
+        the link but drops the confidence percent and impact dot.
       -->
       <ul class="briefing-card__signals">
         @for (signal of briefing.linkedSignals; track signal.signalId) {
@@ -68,6 +70,17 @@
                   {{ shortSignalId(signal.signalId) }}
                 </span>
               </span>
+            } @else if (isArchived(signal)) {
+              <a
+                class="briefing-card__signal briefing-card__signal--archived"
+                [routerLink]="['/radar', signal.symbol]"
+                [title]="signal.symbol"
+              >
+                <span class="briefing-card__signal-symbol">{{ signal.symbol }}</span>
+                <span class="briefing-card__signal-archived">
+                  {{ i18n.t('briefings.card.linkedSignals.archived') }}
+                </span>
+              </a>
             } @else {
               <a
                 class="briefing-card__signal"

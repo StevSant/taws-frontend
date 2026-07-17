@@ -350,12 +350,30 @@
   }
 
   &__signal-title {
+    // Let the thesis shrink first inside the chip so it always truncates with
+    // an ellipsis instead of pushing the symbol/confidence out of the pill.
+    flex: 0 1 auto;
+    min-width: 0;
     max-width: 22ch;
     font-size: 0.72rem;
     color: var(--color-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  // Archived (symbol resolved, confidence/thesis pruned): still a working
+  // radar link, but quiet — no impact accent, no confidence percent.
+  &__signal--archived {
+    border-style: dashed;
+    border-color: var(--color-border-hi);
+  }
+
+  &__signal-archived {
+    font-size: 0.68rem;
+    font-style: italic;
+    color: var(--color-text-muted);
+    white-space: nowrap;
   }
 
   // Unresolved (symbol "—"): a quiet, non-link chip — never a broken /radar/— link.
