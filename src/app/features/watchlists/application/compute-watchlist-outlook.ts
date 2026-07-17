@@ -11,6 +11,9 @@ import { WatchlistOutlook } from './watchlist-outlook.model';
  * with any forward median; `memberCount` is the full list size.
  */
 export function computeWatchlistOutlook(members: WatchlistDetailMember[]): WatchlistOutlook {
+  const forward1dValues = members
+    .map((member) => member.outlook?.forward1dMedianPct)
+    .filter(isPresent);
   const forward7dValues = members
     .map((member) => member.outlook?.forward7dMedianPct)
     .filter(isPresent);
@@ -20,11 +23,13 @@ export function computeWatchlistOutlook(members: WatchlistDetailMember[]): Watch
 
   const contributingCount = members.filter(
     (member) =>
+      isPresent(member.outlook?.forward1dMedianPct) ||
       isPresent(member.outlook?.forward7dMedianPct) ||
       isPresent(member.outlook?.forward30dMedianPct),
   ).length;
 
   return {
+    forward1dMedianPct: mean(forward1dValues),
     forward7dMedianPct: mean(forward7dValues),
     forward30dMedianPct: mean(forward30dValues),
     contributingCount,

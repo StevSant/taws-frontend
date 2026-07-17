@@ -1,7 +1,7 @@
 import { TranslationKey } from '../i18n';
 
 /** Where an in-app notification originated — drives icon/styling if needed later. */
-export type NotificationSource = 'radar' | 'briefing' | 'auth';
+export type NotificationSource = 'radar' | 'briefing' | 'auth' | 'scenario';
 
 /** In-app route the bell navigates to when the notification is opened. */
 export interface NotificationLink {

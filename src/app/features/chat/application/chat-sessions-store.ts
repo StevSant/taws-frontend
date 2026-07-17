@@ -76,6 +76,16 @@ export class ChatSessionsStore {
   readonly activeMessages = computed(() => this.activeSession()?.messages ?? []);
 
   /**
+   * Non-reactive snapshot of a specific thread's messages by id. The streaming store reads the
+   * ORIGINATING thread through this (not `activeMessages`) so a mid-stream sidebar switch — which
+   * changes the active session without destroying the page store — can't retarget the turn's
+   * writes onto whatever thread is now active. Empty array when the thread no longer exists.
+   */
+  messagesOf(sessionId: string): ChatMessage[] {
+    return this.sessionsSignal().find((session) => session.id === sessionId)?.messages ?? [];
+  }
+
+  /**
    * Loads the user's conversations from the server. A failure (offline, 5xx) degrades to
    * an empty sidebar rather than blocking the page: the user can still start a new chat,
    * and their history reappears on the next successful load.
@@ -243,17 +253,26 @@ export class ChatSessionsStore {
 
   /** Settles the active thread at the end of a turn, and asks the backend for a title. */
   replaceActiveMessages(messages: ChatMessage[]): void {
-    const activeId = this.ensureActiveSession();
+    this.replaceSessionMessages(this.ensureActiveSession(), messages);
+  }
+
+  /**
+   * Settles a SPECIFIC thread at the end of a turn (by id), then asks the backend for a title.
+   * The streaming store settles the originating thread through this so a mid-stream session
+   * switch can't settle the wrong one. No-op if that thread was deleted while streaming — a
+   * settle must never resurrect a gone thread.
+   */
+  replaceSessionMessages(sessionId: string, messages: ChatMessage[]): void {
     const settled = messages.map((message) => ({ ...message, pending: false }));
 
-    this.patchSession(activeId, (session) => ({
+    this.patchSession(sessionId, (session) => ({
       ...session,
       messages: settled,
       title: this.deriveTitle(session.title, settled),
       updatedAt: new Date().toISOString(),
     }));
 
-    void this.ensureServerTitle(activeId);
+    void this.ensureServerTitle(sessionId);
   }
 
   /**
@@ -352,9 +371,17 @@ export class ChatSessionsStore {
    * write of any kind on this path.
    */
   syncActiveMessages(messages: ChatMessage[]): void {
-    const activeId = this.ensureActiveSession();
+    this.syncSessionMessages(this.ensureActiveSession(), messages);
+  }
 
-    this.patchSession(activeId, (session) => ({
+  /**
+   * Live in-memory update for a SPECIFIC thread by id — the streaming path routes every token
+   * (and chart/citations) here against the ORIGINATING thread, so a mid-stream sidebar switch
+   * can't append the reply to whatever session is now active. No-op if the thread was deleted
+   * while streaming, since `patchSession` only touches a matching id. Signals only — no persist.
+   */
+  syncSessionMessages(sessionId: string, messages: ChatMessage[]): void {
+    this.patchSession(sessionId, (session) => ({
       ...session,
       messages,
       title: this.deriveTitle(session.title, messages),

@@ -6,12 +6,13 @@ import {
   RealtimeNotAvailableError,
   RealtimePermissionDeniedError,
   RealtimeSessionProvider,
+  RealtimeTranscriptEntry,
   RealtimeTurn,
 } from '../domain';
 
 /**
  * Signal-based state + facade for the realtime voice agent. Presentation
- * components read `connectionState`/`liveTranscript`/`activeToolCall`/
+ * components read `connectionState`/`transcriptEntries`/`activeToolCall`/
  * `isModelSpeaking`/`error` and call `start()` / `stop()`; they never touch the
  * WebRTC transport directly.
  *
@@ -34,11 +35,26 @@ export class RealtimeStore {
   private readonly permissionDeniedSignal = signal(false);
   private readonly notAvailableSignal = signal(false);
   private readonly conversationIdSignal = signal<string | null>(null);
-  private completedTurns: RealtimeTurn[] = [];
+  private readonly completedTurnsSignal = signal<RealtimeTurn[]>([]);
   private pendingCharts: ChartSpec[] = [];
 
   readonly connectionState = this.connectionStateSignal.asReadonly();
   readonly liveTranscript = this.liveTranscriptSignal.asReadonly();
+  /**
+   * The transcript as an ordered, role-tagged list the UI renders one row per turn:
+   * every completed turn, plus — while an assistant turn is still streaming — a trailing
+   * `pending` assistant entry holding the live partial. `liveTranscript` only ever carries
+   * the currently-streaming assistant turn (it's cleared when that turn completes), so a
+   * turn is never double-rendered here.
+   */
+  readonly transcriptEntries = computed<RealtimeTranscriptEntry[]>(() => {
+    const completed = this.completedTurnsSignal();
+    const partial = this.liveTranscriptSignal().trim();
+    if (!partial) {
+      return completed;
+    }
+    return [...completed, { role: 'assistant', content: partial, pending: true }];
+  });
   readonly activeToolCall = computed(() => this.activeToolCallsSignal().at(-1) ?? null);
   readonly activeChart = this.activeChartSignal.asReadonly();
   readonly isModelSpeaking = this.isModelSpeakingSignal.asReadonly();
@@ -100,7 +116,7 @@ export class RealtimeStore {
   /** Ends the session and returns a snapshot of its completed turns before resetting. */
   stop(): RealtimeTurn[] {
     this.provider.stop();
-    const completedTurns = this.completedTurns.map((turn) => ({
+    const completedTurns = this.completedTurnsSignal().map((turn) => ({
       ...turn,
       ...(turn.charts ? { charts: [...turn.charts] } : {}),
     }));
@@ -130,16 +146,20 @@ export class RealtimeStore {
           event.turn.role === 'assistant' && this.pendingCharts.length > 0
             ? [...this.pendingCharts]
             : undefined;
-        this.completedTurns = [
-          ...this.completedTurns,
+        this.completedTurnsSignal.update((turns) => [
+          ...turns,
           {
             role: event.turn.role,
             content,
             ...(charts ? { charts } : {}),
           },
-        ];
+        ]);
         if (event.turn.role === 'assistant') {
           this.pendingCharts = [];
+          // The streaming assistant turn just finalized into a completed entry — clear the
+          // flat live string so `transcriptEntries` stops emitting a trailing pending row
+          // and the next assistant turn starts streaming from empty.
+          this.liveTranscriptSignal.set('');
         }
         return;
       }
@@ -182,7 +202,7 @@ export class RealtimeStore {
     this.permissionDeniedSignal.set(false);
     this.notAvailableSignal.set(false);
     this.conversationIdSignal.set(null);
-    this.completedTurns = [];
+    this.completedTurnsSignal.set([]);
     this.pendingCharts = [];
   }
 

@@ -4,16 +4,8 @@
   @if (hasData()) {
     <div class="outlook__horizons">
       <div class="outlook__horizon">
-        <span class="outlook__horizon-label">{{
-          i18n.t('watchlists.detail.outlook.forward7d')
-        }}</span>
-        <app-price-delta-chip [value]="outlook().forward7dMedianPct" />
-      </div>
-      <div class="outlook__horizon">
-        <span class="outlook__horizon-label">{{
-          i18n.t('watchlists.detail.outlook.forward30d')
-        }}</span>
-        <app-price-delta-chip [value]="outlook().forward30dMedianPct" />
+        <span class="outlook__horizon-label">{{ i18n.t(horizonLabelKey()) }}</span>
+        <app-price-delta-chip [value]="value()" />
       </div>
     </div>
 

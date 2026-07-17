@@ -1,0 +1,53 @@
+<section class="top-movers feature-panel">
+  <header class="top-movers__header">
+    <div class="top-movers__copy">
+      <h2 class="top-movers__title">{{ i18n.t('radar.movers.title') }}</h2>
+      <p class="top-movers__subtitle">{{ i18n.t('radar.movers.subtitle') }}</p>
+    </div>
+    <a class="top-movers__link" routerLink="/radar/explore">
+      {{ i18n.t('radar.timeline.viewAll') }}
+    </a>
+  </header>
+
+  @if (!hasMovers() && isLoading()) {
+    <p class="top-movers__status" aria-live="polite">{{ i18n.t('radar.movers.loading') }}</p>
+  } @else if (!hasMovers()) {
+    <p class="top-movers__status">{{ i18n.t('radar.movers.empty') }}</p>
+  } @else {
+    <div class="top-movers__columns">
+      @for (column of columns(); track column.key) {
+        <div class="top-movers__col">
+          <h3
+            class="top-movers__col-title"
+            [class.top-movers__col-title--up]="column.tone === 'up'"
+            [class.top-movers__col-title--down]="column.tone === 'down'"
+          >
+            {{ i18n.t(column.titleKey) }}
+          </h3>
+
+          @if (column.rows.length === 0) {
+            <p class="top-movers__col-empty">{{ i18n.t('radar.movers.empty') }}</p>
+          } @else {
+            <ul class="top-movers__list" role="list">
+              @for (row of column.rows; track row.symbol) {
+                <li>
+                  <a class="top-movers__row" [routerLink]="['/radar', row.symbol]">
+                    <app-instrument-ticker-badge [symbol]="row.symbol" size="sm" />
+                    <span class="top-movers__symbol">{{ row.symbol }}</span>
+                    <span class="top-movers__price">{{ price(row) }}</span>
+                    <app-markets-sparkline
+                      class="top-movers__trend"
+                      [points]="row.sparkline"
+                      [positive]="direction(row)"
+                    />
+                    <app-price-delta-chip [value]="row.priceDeltaPct" />
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

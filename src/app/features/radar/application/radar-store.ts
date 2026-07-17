@@ -65,6 +65,13 @@ export interface RadarKpiSummary {
 }
 
 /**
+ * News scope for the radar's Catalizadores + Timeline sections: `mine` filters the global feed to
+ * the union of the user's watchlist symbols, `market` passes it through. Default is `mine`; a user
+ * with nothing to scope by (anonymous, or empty lists) is pinned to `market` — see `effectiveNewsScope`.
+ */
+export type NewsScope = 'mine' | 'market';
+
+/**
  * Signal-based state + facade for the radar feature. Presentation components
  * read `signals`/`isLoading`/`error`/`filters`/`instrumentOptions` and call
  * the `setXxx`/`retry` intents; they never touch `NewsRepository` or
@@ -103,10 +110,13 @@ export class RadarStore {
   private readonly reviewHistorySignal = signal<Record<string, ReviewState[]>>({});
   private readonly reviewErrorsSignal = signal<Record<string, string | null>>({});
   private readonly submittingSignalIdsSignal = signal<ReadonlySet<string>>(new Set());
+  private readonly newsScopeSignal = signal<NewsScope>('mine');
   private pollSubscription: Subscription | null = null;
   private sessionReady = false;
 
   readonly filters = this.filtersSignal.asReadonly();
+  /** User-chosen news scope (before pinning). Read `effectiveNewsScope` for what actually applies. */
+  readonly newsScope = this.newsScopeSignal.asReadonly();
   readonly isLoading = this.loadingSignal.asReadonly();
   readonly isEnriching = this.isEnrichingSignal.asReadonly();
   readonly macroState = this.macroStateSignal.asReadonly();
@@ -284,6 +294,51 @@ export class RadarStore {
         new Date(right.news.publishedAt).getTime() - new Date(left.news.publishedAt).getTime(),
     );
   });
+  /** Deduped uppercase union of every watchlist's symbols — the "mine" news filter set. */
+  readonly watchlistUnionSymbols = computed<ReadonlySet<string>>(
+    () => new Set(this.watchlistStore.allSymbols().map((symbol) => symbol.toUpperCase())),
+  );
+
+  /** Whether the mine/market toggle can be used — there has to be a watchlist union to scope by. */
+  readonly newsScopeAvailable = computed(() => this.watchlistUnionSymbols().size > 0);
+
+  /**
+   * The scope actually applied to the news sections. A user with no watchlisted symbols has
+   * nothing to scope by, so the feed is pinned to `market` regardless of the stored toggle.
+   */
+  readonly effectiveNewsScope = computed<NewsScope>(() =>
+    this.newsScopeAvailable() ? this.newsScopeSignal() : 'market',
+  );
+
+  /**
+   * `newsTimeline()` filtered by the active scope: in `mine`, only articles that reference one of
+   * the user's watchlisted symbols; in `market`, the full feed. Feeds both Catalizadores (sliced)
+   * and the Timeline, so the shared toggle governs both.
+   */
+  readonly scopedNewsTimeline = computed<NewsTimelineEntry[]>(() => {
+    const timeline = this.newsTimeline();
+    if (this.effectiveNewsScope() === 'market') {
+      return timeline;
+    }
+    const union = this.watchlistUnionSymbols();
+    return timeline.filter((entry) => this.entryTouchesUnion(entry, union));
+  });
+
+  /**
+   * News-item count for the "Noticias" KPI, following the active scope so the header number agrees
+   * with the scoped list below it. `market` keeps the full universe total; `mine` sums only the
+   * news attached to the user's watchlisted instruments.
+   */
+  readonly scopedNewsCount = computed<number>(() => {
+    if (this.effectiveNewsScope() === 'market') {
+      return this.landscape().totalNewsItems;
+    }
+    const union = this.watchlistUnionSymbols();
+    return this.signals()
+      .filter((signal) => union.has(signal.symbol.toUpperCase()))
+      .reduce((total, signal) => total + signal.news.length, 0);
+  });
+
   readonly kpiSummary = computed((): RadarKpiSummary => {
     const landscape = this.landscape();
     const sinceHours = this.filtersSignal().sinceHours;
@@ -300,13 +355,21 @@ export class RadarStore {
     }
 
     return {
-      newsDetected: landscape.totalNewsItems,
+      newsDetected: this.scopedNewsCount(),
       pendingReview: this.unclassifiedCount(),
       instruments: landscape.totalInstruments,
       activeAlerts: this.unclassifiedCount(),
       newsTrend: recentHalf - olderHalf,
     };
   });
+
+  /** True when a timeline article references any symbol in the user's watchlist union. */
+  private entryTouchesUnion(entry: NewsTimelineEntry, union: ReadonlySet<string>): boolean {
+    if (entry.symbols.some((related) => union.has(related.symbol.toUpperCase()))) {
+      return true;
+    }
+    return (entry.news.relatedSymbols ?? []).some((symbol) => union.has(symbol.toUpperCase()));
+  }
   /** News items fetched but not linked to any instrument — surfaced, not dropped silently. */
   readonly unlinkedNewsCount = computed(() => this.grouped().unlinkedCount);
   /**
@@ -413,6 +476,11 @@ export class RadarStore {
     }
     this.filtersSignal.update((filters) => ({ ...filters, sinceHours }));
     await this.loadNews({ forceLoading: true });
+  }
+
+  /** Switches the news scope for Catalizadores + Timeline. Pure view state — never refetches. */
+  setNewsScope(scope: NewsScope): void {
+    this.newsScopeSignal.set(scope);
   }
 
   isGeneratingFor(symbol: string): boolean {

@@ -1,0 +1,31 @@
+<div class="feature-page watchlists-overview">
+  <app-feature-page-header
+    [title]="i18n.t('watchlists.page.title')"
+    [description]="i18n.t('watchlists.overview.subtitle')"
+  />
+
+  @if (!store.available()) {
+    <p class="watchlists-overview__auth">{{ i18n.t('watchlists.authRequired') }}</p>
+  } @else if (store.summaries().length === 0) {
+    <app-empty-state
+      [title]="i18n.t('watchlists.overview.empty.title')"
+      [description]="i18n.t('watchlists.overview.empty.description')"
+    />
+    <a class="watchlists-overview__create-cta" routerLink="/watchlists/new">
+      {{ i18n.t('watchlists.overview.empty.cta') }}
+    </a>
+  } @else {
+    <div class="watchlists-overview__grid">
+      @for (summary of store.summaries(); track summary.id) {
+        <app-watchlist-summary-card class="watchlists-overview__card" [summary]="summary" />
+      }
+
+      <a class="watchlists-overview__create" routerLink="/watchlists/new">
+        <span class="watchlists-overview__create-plus" aria-hidden="true">+</span>
+        <span class="watchlists-overview__create-label">{{
+          i18n.t('watchlists.overview.create')
+        }}</span>
+      </a>
+    </div>
+  }
+</div>

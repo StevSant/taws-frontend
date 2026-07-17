@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { PriceDeltaChipComponent } from '../../../../shared/price';
@@ -32,9 +32,10 @@ interface MixEntry {
 }
 
 /**
- * One watchlist as a card in the radar's "Mis listas" strip. Leads with the Analyst's read on the
- * list, not a price move: Midas scores instruments, and the strip's job is to show which of the
- * user's lists the agent is flagging.
+ * One watchlist as a card in the radar's "Mis listas" strip (and the watchlists overview grid).
+ * Leads with the Analyst's read on the list, not a price move: Midas scores instruments, and the
+ * card's job is to show which of the user's lists the agent is flagging. The whole card body
+ * navigates to that list's detail (`/watchlists/:id`) — that is its only interaction.
  */
 @Component({
   selector: 'app-watchlist-summary-card',
@@ -46,8 +47,6 @@ interface MixEntry {
 })
 export class WatchlistSummaryCardComponent {
   readonly summary = input.required<WatchlistSummary>();
-  readonly active = input(false);
-  readonly select = output<string>();
 
   constructor(readonly i18n: TranslationService) {}
 

@@ -15,7 +15,7 @@ import { TranslationService } from '../../../core';
 import { ChartComponent, ChartSpec } from '../../../shared/charts';
 import { GoldenPolyhedronComponent, MidasLogoComponent } from '../../../shared';
 import { PolyhedronActivity } from '../../../shared/golden-polyhedron/polyhedron-activity.model';
-import { RealtimeConnectionState } from '../domain';
+import { RealtimeConnectionState, RealtimeTranscriptEntry } from '../domain';
 
 const ORB_SIZE = 240;
 
@@ -48,7 +48,7 @@ export class VoiceModeOverlayComponent implements AfterViewInit, OnDestroy {
   private readonly host = inject(ElementRef);
 
   readonly connectionState = input.required<RealtimeConnectionState>();
-  readonly liveTranscript = input('');
+  readonly transcriptEntries = input<RealtimeTranscriptEntry[]>([]);
   readonly isModelSpeaking = input(false);
   readonly activeToolCall = input<string | null>(null);
   readonly activeChart = input<ChartSpec | null>(null);
@@ -125,9 +125,9 @@ export class VoiceModeOverlayComponent implements AfterViewInit, OnDestroy {
     });
 
     effect(() => {
-      const transcript = this.liveTranscript();
+      const entries = this.transcriptEntries();
       const viewport = this.transcriptViewport();
-      if (!transcript || !viewport) {
+      if (entries.length === 0 || !viewport) {
         return;
       }
 
@@ -135,6 +135,13 @@ export class VoiceModeOverlayComponent implements AfterViewInit, OnDestroy {
         viewport.nativeElement.scrollTop = viewport.nativeElement.scrollHeight;
       });
     });
+  }
+
+  /** Role caption for a transcript row: the user vs Midas. */
+  roleLabel(role: RealtimeTranscriptEntry['role']): string {
+    return role === 'user'
+      ? this.i18n.t('chat.realtime.roleUser')
+      : this.i18n.t('chat.realtime.roleAssistant');
   }
 
   ngAfterViewInit(): void {

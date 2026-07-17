@@ -22,4 +22,5 @@ export type {
 } from './models/scenario-consensus.model';
 export type { ScenarioIntake } from './models/scenario-intake.model';
 export type { ScenarioMonitor } from './models/scenario-monitor.model';
+export type { ScenarioMonitorSnapshot } from './models/scenario-monitor-snapshot.model';
 export type { ScenarioMonitorStatus } from './models/scenario-monitor-status.model';

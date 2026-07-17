@@ -1,0 +1,106 @@
+<div class="feature-page watchlist-form">
+  <a class="watchlist-form__back" routerLink="/watchlists"
+    >&#8592; {{ i18n.t('watchlists.form.back') }}</a
+  >
+
+  @if (!store.available()) {
+    <p class="watchlist-form__auth">{{ i18n.t('watchlists.authRequired') }}</p>
+  } @else {
+    <header class="watchlist-form__header">
+      <h1 class="watchlist-form__title">{{ i18n.t(titleKey()) }}</h1>
+    </header>
+
+    <section class="watchlist-form__panel feature-panel">
+      <label class="watchlist-form__field">
+        <span class="watchlist-form__field-label">{{ i18n.t('watchlists.form.nameLabel') }}</span>
+        <input
+          class="feature-input"
+          type="text"
+          name="watchlistName"
+          [placeholder]="i18n.t('watchlists.form.namePlaceholder')"
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)"
+          (blur)="onNameCommit()"
+        />
+      </label>
+
+      <div class="watchlist-form__picker">
+        <span class="watchlist-form__field-label">{{ i18n.t('watchlists.form.instruments') }}</span>
+        <input
+          type="search"
+          class="feature-input"
+          [placeholder]="i18n.t('radar.addInstrument.search')"
+          [value]="picker.query()"
+          (input)="onSearch($any($event.target).value)"
+          [attr.aria-label]="i18n.t('radar.addInstrument.search')"
+        />
+        @if (picker.results().length === 0) {
+          <p class="watchlist-form__hint">{{ i18n.t('radar.addInstrument.empty') }}</p>
+        } @else {
+          <ul class="watchlist-form__results" role="listbox">
+            @for (result of picker.results(); track result.instrument.symbol) {
+              <li>
+                <button
+                  type="button"
+                  class="watchlist-form__result"
+                  [disabled]="
+                    isPicked(result.instrument.symbol) ||
+                    picker.busySymbol() === result.instrument.symbol
+                  "
+                  (click)="onToggle(result.instrument)"
+                >
+                  <span class="watchlist-form__result-symbol">{{ result.instrument.symbol }}</span>
+                  <span class="watchlist-form__result-name">{{ result.instrument.name }}</span>
+                  <span class="watchlist-form__result-state">
+                    {{
+                      isPicked(result.instrument.symbol) ? i18n.t('radar.addInstrument.added') : '+'
+                    }}
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      @if (chips().length === 0) {
+        <p class="watchlist-form__hint">{{ i18n.t('watchlists.form.empty') }}</p>
+      } @else {
+        <ul class="watchlist-form__chips" [attr.aria-label]="i18n.t('watchlists.form.instruments')">
+          @for (chip of chips(); track chip.symbol) {
+            <li class="watchlist-form__chip">
+              <span>{{ chip.symbol }}</span>
+              <button
+                type="button"
+                class="watchlist-form__chip-remove"
+                [disabled]="picker.busySymbol() === chip.symbol"
+                [attr.aria-label]="i18n.t('radar.addInstrument.remove') + ' ' + chip.symbol"
+                (click)="onRemoveChip(chip)"
+              >
+                ×
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (store.error(); as error) {
+        <p class="watchlist-form__error" role="alert">{{ error }}</p>
+      }
+
+      <div class="watchlist-form__actions">
+        <app-button
+          [label]="
+            isEdit()
+              ? i18n.t('watchlists.form.done')
+              : submitting()
+                ? i18n.t('watchlists.form.creating')
+                : i18n.t('watchlists.form.create')
+          "
+          [disabled]="(!isEdit() && !name().trim()) || submitting()"
+          (pressed)="onSubmit()"
+        />
+      </div>
+    </section>
+  }
+</div>

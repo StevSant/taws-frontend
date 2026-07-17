@@ -29,7 +29,15 @@
   color: var(--color-text-muted);
 }
 
-.watchlist-strip__manage {
+.watchlist-strip__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.watchlist-strip__manage,
+.watchlist-strip__view-all {
   flex: none;
   font-size: 0.78rem;
   color: var(--color-gold);
@@ -38,6 +46,10 @@
   &:hover {
     text-decoration: underline;
   }
+}
+
+.watchlist-strip__view-all {
+  font-weight: 700;
 }
 
 .watchlist-strip__scroller {

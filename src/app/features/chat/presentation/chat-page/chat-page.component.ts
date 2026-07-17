@@ -37,6 +37,9 @@ import {
   ChatNewsQuestion,
   RoutingHop,
   ToolHopSnapshot,
+  Verdict,
+  buildBoardroom,
+  buildVerdict,
   formatToolName,
   resolveAgentGlyph,
   resolveRespondingAgent,
@@ -72,6 +75,10 @@ import { ChatReferenceChipComponent } from '../chat-reference-chip/chat-referenc
 import { ChatCitationsPanelComponent } from '../chat-citations-panel/chat-citations-panel.component';
 
 import { ChatQuickActionsComponent } from '../chat-quick-actions/chat-quick-actions.component';
+
+import { BoardroomComponent } from '../boardroom/boardroom.component';
+
+import { VerdictMeterComponent } from '../verdict-meter/verdict-meter.component';
 
 const HERO_SIZE_IDLE = 136;
 const AVATAR_SIZE = 48;
@@ -142,6 +149,10 @@ const DICTATION_ERROR_KEYS: Record<DictationErrorReason, TranslationKey> = {
     ChatCitationsPanelComponent,
 
     ChatQuickActionsComponent,
+
+    BoardroomComponent,
+
+    VerdictMeterComponent,
 
     ChartComponent,
 
@@ -314,6 +325,22 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
     return agent ? this.agentLabel(agent) : this.i18n.t('chat.role.assistant');
   });
+
+  /**
+   * Boardroom cards for the live turn, derived from the same routing + tool hops the
+   * single-avatar path already reads. Only rendered when the supervisor fanned out to
+   * >=2 specialists (see `showBoardroom`); a single-route turn keeps its lone avatar.
+   */
+  readonly boardroomAgents = computed(() =>
+    buildBoardroom(this.store.routingHops(), this.store.toolHops()),
+  );
+
+  /**
+   * Bull/bear verdict for the live turn, collapsed from the per-specialist contributions
+   * the synthesizer streams once. Empty (no agents) on single-route turns — the meter
+   * (and `showVerdict`) stays hidden then.
+   */
+  readonly verdict = computed<Verdict>(() => buildVerdict(this.store.contributions()));
 
   /** Live status line while the backend routes agents or streams tokens. */
   readonly thinkingStatusLabel = computed(() => {
@@ -498,6 +525,32 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     return [];
   }
 
+  /**
+   * The Boardroom stands in for the single-avatar routing pills, but only for the latest
+   * (in-flight or just-finished) turn where the supervisor fanned out to >=2 specialists.
+   * Older turns and single-route turns fall back to the existing per-message rendering.
+   */
+  showBoardroom(message: ChatMessage): boolean {
+    return (
+      message.role === 'assistant' &&
+      this.isLatestAssistant(message.id) &&
+      this.boardroomAgents().length >= 2
+    );
+  }
+
+  /**
+   * The verdict meter rides beneath the Boardroom for the latest turn, but only when the
+   * synthesizer streamed contributions (multi-specialist turns). Single-route turns leave
+   * `contributions` empty, so the verdict has no agents and the meter stays hidden.
+   */
+  showVerdict(message: ChatMessage): boolean {
+    return (
+      message.role === 'assistant' &&
+      this.isLatestAssistant(message.id) &&
+      this.verdict().agents.length > 0
+    );
+  }
+
   messageTools(message: ChatMessage): ToolHopSnapshot[] {
     if (message.pending && this.isLatestAssistant(message.id)) {
       return this.store.toolHops().map(({ name, status }) => ({ name, status }));
@@ -522,14 +575,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       return false;
     }
     return pending || this.store.isStreaming();
-  }
-
-  avatarActivity(messageId: string, pending: boolean): PolyhedronActivity {
-    if (pending && this.isLatestAssistant(messageId)) {
-      return this.oracleActivity();
-    }
-
-    return 'frozen';
   }
 
   openSessionsPanel(): void {

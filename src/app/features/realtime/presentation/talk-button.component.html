@@ -21,7 +21,7 @@
   @if (overlayOpen()) {
     <app-voice-mode-overlay
       [connectionState]="connectionState()"
-      [liveTranscript]="liveTranscript()"
+      [transcriptEntries]="transcriptEntries()"
       [isModelSpeaking]="isModelSpeaking()"
       [activeToolCall]="activeToolCall()"
       [activeChart]="activeChart()"

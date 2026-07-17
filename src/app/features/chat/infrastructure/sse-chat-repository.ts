@@ -60,6 +60,10 @@ export class SseChatRepository {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
+    // The backend ALWAYS emits a terminal `{"done": true}` frame last. If the reader ends
+    // without one, an intermediary (proxy/edge/idle timeout) cut the body mid-turn, so the
+    // reply is truncated — we surface an error below rather than settle it as complete.
+    let sawDoneFrame = false;
 
     try {
       while (true) {
@@ -79,6 +83,7 @@ export class SseChatRepository {
           }
 
           if (frame.done) {
+            // Clean terminal frame — the reply arrived in full, nothing was truncated.
             return;
           }
           const event = mapChatStreamFrame(frame);
@@ -91,13 +96,25 @@ export class SseChatRepository {
 
       // Flush the tail: a final frame that arrived without a trailing newline is still
       // sitting in `buffer` when the reader signals done, so its token/event would be
-      // dropped without this.
+      // dropped without this. A terminal done frame can also land here without a newline.
       const tail = this.parseDataLine(buffer);
-      if (tail !== null && !tail.done) {
-        const event = mapChatStreamFrame(tail);
-        if (event !== null) {
-          yield event;
+      if (tail !== null) {
+        if (tail.done) {
+          sawDoneFrame = true;
+        } else {
+          const event = mapChatStreamFrame(tail);
+          if (event !== null) {
+            yield event;
+            if (event.kind === 'error') return;
+          }
         }
+      }
+
+      // Reached the end of the body without the backend's terminal done frame: the stream was
+      // cut short. Emit an error (reusing the existing error event shape) so the store marks the
+      // turn as failed instead of presenting the partial reply as a finished answer.
+      if (!sawDoneFrame) {
+        yield { kind: 'error', message: this.translation.t('errors.network') };
       }
     } catch (error: unknown) {
       if (!this.isAbortError(error)) {

@@ -63,6 +63,19 @@ export const environment = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dmFvZ3Zzampwc3B5cG1ud2dtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NDE1NjgsImV4cCI6MjA5OTMxNzU2OH0.NYiyrK0kzxfb5S4YBCCJUVYjOsNLyjCSYYPaP4acS3E',
   /** How often the radar page re-polls `/api/v1/news` for new signals, in ms. */
   radarPollIntervalMs: 60_000,
+  /**
+   * How often the shell re-polls `/api/v1/scenarios/monitors` so an armed Scenario
+   * Monitor's `armed`->`matched` breach surfaces in the in-app bell (issue #18 / C3).
+   * Shorter than the radar poll so a demo breach shows up promptly without waiting a
+   * full minute; the "Run watchdog now" dev trigger also forces an immediate poll.
+   */
+  scenarioMonitorPollIntervalMs: 20_000,
+  /**
+   * Gates dev-only affordances (e.g. the Scenario Lab "Run watchdog now" trigger).
+   * `true` in dev builds so a breach can be fired on demand for a deterministic demo;
+   * shipped `false` in production (see environment.prod.ts).
+   */
+  showDevTools: true,
   /** In-memory GET cache TTLs (ms) — avoids refetching on every route revisit. */
   instrumentsCacheTtlMs: 5 * 60_000,
   newsCacheTtlMs: 30_000,

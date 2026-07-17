@@ -4,20 +4,23 @@
       <h2 class="watchlist-strip__title">{{ i18n.t('radar.watchlists.title') }}</h2>
       <p class="watchlist-strip__subtitle">{{ i18n.t('radar.watchlists.subtitle') }}</p>
     </div>
-    <a class="watchlist-strip__manage" routerLink="/watchlists">{{
-      i18n.t('radar.watchlists.manage')
-    }}</a>
+    <div class="watchlist-strip__actions">
+      @if (showViewAll()) {
+        <a class="watchlist-strip__view-all" routerLink="/watchlists">{{
+          i18n.t('radar.watchlists.viewAll')
+        }}</a>
+      }
+      <a class="watchlist-strip__manage" routerLink="/watchlists">{{
+        i18n.t('radar.watchlists.manage')
+      }}</a>
+    </div>
   </header>
 
   <div class="watchlist-strip__scroller">
     <ul class="watchlist-strip__list" [attr.aria-label]="i18n.t('radar.watchlists.title')">
       @for (summary of summaries(); track summary.id) {
         <li class="watchlist-strip__item">
-          <app-watchlist-summary-card
-            [summary]="summary"
-            [active]="summary.id === activeId()"
-            (select)="select.emit($event)"
-          />
+          <app-watchlist-summary-card [summary]="summary" />
         </li>
       }
 

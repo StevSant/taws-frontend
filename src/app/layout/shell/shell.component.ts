@@ -22,6 +22,7 @@ import { AuthStore } from '../../features/auth/application';
 import { AnnotationDrawerComponent } from '../../features/notes/presentation';
 import { RadarStore } from '../../features/radar/application';
 import { RadarNewsNotificationPoller } from '../../features/radar/application/radar-news-notification-poller.service';
+import { ScenarioMonitorPoller } from '../../features/scenarios/application';
 import {
   LanguageToggleComponent,
   MidasLogoComponent,
@@ -70,6 +71,7 @@ export class ShellComponent {
   private readonly router = inject(Router);
   private readonly radarStore = inject(RadarStore);
   private readonly newsNotificationPoller = inject(RadarNewsNotificationPoller);
+  private readonly scenarioMonitorPoller = inject(ScenarioMonitorPoller);
 
   readonly usesCustomLayout = signal(this.hasFeatureOwnedSidebar(this.router.url));
   readonly routeTransition = signal<ShellRouteTransition>('neutral');
@@ -87,6 +89,7 @@ export class ShellComponent {
 
   constructor() {
     this.newsNotificationPoller.start();
+    this.scenarioMonitorPoller.start();
     void this.search.ensureInstrumentsLoaded();
 
     this.router.events

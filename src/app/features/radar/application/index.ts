@@ -11,6 +11,8 @@ export { MacroDetailStore } from './macro-detail-store';
 export { CompositionInstrumentsStore } from './composition-instruments-store';
 export type { ClassInstruments } from './composition-instruments-store';
 export { computeClassTrend } from './compute-class-trend';
+export { computeTopMovers } from './compute-top-movers';
+export type { TopMovers } from './top-movers.model';
 export { computeWatchlistSummary } from './compute-watchlist-summary';
 export { mapInBatches } from './map-in-batches';
 export type { WatchlistSummary } from './watchlist-summary.model';

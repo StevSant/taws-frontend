@@ -1,64 +1,58 @@
-<button
-  type="button"
+<div
   class="watchlist-card"
-  [class.watchlist-card--active]="active()"
   [class.watchlist-card--bullish]="!isUnscored() && summary().score.label === 'bullish'"
   [class.watchlist-card--bearish]="!isUnscored() && summary().score.label === 'bearish'"
-  [attr.aria-pressed]="active()"
-  (click)="select.emit(summary().id)"
 >
-  <span class="watchlist-card__head">
-    <span class="watchlist-card__name">{{ summary().name }}</span>
-    <span class="watchlist-card__count">{{ countLabel() }}</span>
-  </span>
-
-  @if (isUnscored()) {
-    <span class="watchlist-card__read watchlist-card__read--unscored">
-      {{ i18n.t('radar.watchlists.unscored') }}
+  <a class="watchlist-card__body" [routerLink]="['/watchlists', summary().id]">
+    <span class="watchlist-card__head">
+      <span class="watchlist-card__name">{{ summary().name }}</span>
+      <span class="watchlist-card__count">{{ countLabel() }}</span>
     </span>
-  } @else {
-    <span class="watchlist-card__read">{{ i18n.t(scoreLabelKey()) }}</span>
-    <span class="watchlist-card__mix">
-      @for (entry of mix(); track entry.key) {
-        <span class="watchlist-card__mix-item" [class]="'watchlist-card__mix-item--' + entry.key">
-          <span class="watchlist-card__mix-dot" aria-hidden="true"></span>
-          {{ entry.count }} {{ i18n.t(entry.labelKey) }}
+
+    @if (isUnscored()) {
+      <span class="watchlist-card__read watchlist-card__read--unscored">
+        {{ i18n.t('radar.watchlists.unscored') }}
+      </span>
+    } @else {
+      <span class="watchlist-card__read">{{ i18n.t(scoreLabelKey()) }}</span>
+      <span class="watchlist-card__mix">
+        @for (entry of mix(); track entry.key) {
+          <span class="watchlist-card__mix-item" [class]="'watchlist-card__mix-item--' + entry.key">
+            <span class="watchlist-card__mix-dot" aria-hidden="true"></span>
+            {{ entry.count }} {{ i18n.t(entry.labelKey) }}
+          </span>
+        }
+      </span>
+      @if (confidencePct() !== null) {
+        <span class="watchlist-card__confidence">
+          {{ i18n.t('radar.watchlists.confidence') }} {{ confidencePct() }}%
         </span>
       }
+    }
+
+    <span class="watchlist-card__average">
+      <span class="watchlist-card__average-label">{{ i18n.t('radar.watchlists.average') }}</span>
+      <app-price-delta-chip [value]="summary().averageDeltaPct" />
     </span>
-    @if (confidencePct() !== null) {
-      <span class="watchlist-card__confidence">
-        {{ i18n.t('radar.watchlists.confidence') }} {{ confidencePct() }}%
+
+    @if (visibleMembers().length > 0) {
+      <span class="watchlist-card__members">
+        @for (member of visibleMembers(); track member.symbol) {
+          <span class="watchlist-card__member">
+            <span class="watchlist-card__member-symbol">{{ member.symbol }}</span>
+            <app-price-delta-chip [value]="member.deltaPct" />
+          </span>
+        }
+        @if (hiddenCount() > 0) {
+          <span class="watchlist-card__more"
+            >+{{ hiddenCount() }} {{ i18n.t('radar.watchlists.more') }}</span
+          >
+        }
+      </span>
+    } @else {
+      <span class="watchlist-card__members watchlist-card__members--empty">
+        {{ i18n.t('radar.watchlists.noInstruments') }}
       </span>
     }
-  }
-
-  <span class="watchlist-card__average">
-    <span class="watchlist-card__average-label">{{ i18n.t('radar.watchlists.average') }}</span>
-    <app-price-delta-chip [value]="summary().averageDeltaPct" />
-  </span>
-
-  @if (visibleMembers().length > 0) {
-    <span class="watchlist-card__members">
-      @for (member of visibleMembers(); track member.symbol) {
-        <span class="watchlist-card__member">
-          <span class="watchlist-card__member-symbol">{{ member.symbol }}</span>
-          <app-price-delta-chip [value]="member.deltaPct" />
-        </span>
-      }
-      @if (hiddenCount() > 0) {
-        <span class="watchlist-card__more"
-          >+{{ hiddenCount() }} {{ i18n.t('radar.watchlists.more') }}</span
-        >
-      }
-    </span>
-  } @else {
-    <span class="watchlist-card__members watchlist-card__members--empty">
-      {{ i18n.t('radar.watchlists.noInstruments') }}
-    </span>
-  }
-</button>
-
-<a class="watchlist-card__detail-link" [routerLink]="['/watchlists', summary().id]"
-  >{{ i18n.t('radar.watchlists.viewDetail') }} &#8594;</a
->
+  </a>
+</div>

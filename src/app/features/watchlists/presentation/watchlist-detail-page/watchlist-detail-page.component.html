@@ -38,9 +38,28 @@
             <h1 class="watchlist-detail__name">{{ heroName(summary) }}</h1>
             <p class="watchlist-detail__count">{{ countLabel() }}</p>
           </div>
-          <a class="watchlist-detail__manage" routerLink="/watchlists">{{
-            i18n.t('watchlists.detail.manage')
-          }}</a>
+          <div class="watchlist-detail__hero-actions">
+            <a
+              class="watchlist-detail__edit"
+              [routerLink]="['/watchlists', store.watchlistId(), 'edit']"
+              >{{ i18n.t('watchlists.detail.edit') }}</a
+            >
+            @if (confirmingDelete()) {
+              <span class="watchlist-detail__delete-confirm">
+                <span>{{ i18n.t('watchlists.detail.delete.confirm') }}</span>
+                <button type="button" class="watchlist-detail__delete-yes" (click)="onDelete()">
+                  {{ i18n.t('watchlists.detail.delete.confirmCta') }}
+                </button>
+                <button type="button" class="watchlist-detail__delete-no" (click)="cancelDelete()">
+                  {{ i18n.t('watchlists.detail.delete.cancel') }}
+                </button>
+              </span>
+            } @else {
+              <button type="button" class="watchlist-detail__delete" (click)="onDelete()">
+                {{ i18n.t('watchlists.detail.delete') }}
+              </button>
+            }
+          </div>
         </div>
 
         @if (isUnscored()) {
@@ -81,8 +100,22 @@
       </header>
 
       @if (store.members().length > 0) {
+        <div class="watchlist-detail__window" role="group" aria-label="24h / 7d / 30d">
+          @for (option of windowOptions; track option) {
+            <button
+              type="button"
+              class="watchlist-detail__window-btn"
+              [class.watchlist-detail__window-btn--active]="window() === option"
+              [attr.aria-pressed]="window() === option"
+              (click)="setWindow(option)"
+            >
+              {{ i18n.t(windowLabelKey(option)) }}
+            </button>
+          }
+        </div>
+
         @if (store.outlook(); as outlook) {
-          <app-watchlist-outlook-panel [outlook]="outlook" />
+          <app-watchlist-outlook-panel [outlook]="outlook" [horizon]="window()" />
         }
 
         <section class="watchlist-detail__instruments feature-panel">
@@ -92,7 +125,7 @@
           <ul class="watchlist-detail__members">
             @for (member of store.members(); track member.symbol) {
               <li class="watchlist-detail__member">
-                <app-watchlist-detail-member-row [member]="member" />
+                <app-watchlist-detail-member-row [member]="member" [horizon]="window()" />
               </li>
             }
           </ul>

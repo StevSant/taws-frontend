@@ -1,5 +1,6 @@
 import { ScenarioIntake } from './models/scenario-intake.model';
 import { ScenarioMonitor } from './models/scenario-monitor.model';
+import { ScenarioMonitorSnapshot } from './models/scenario-monitor-snapshot.model';
 import { ScenarioPreset } from './models/scenario-preset.model';
 import { ScenarioResult } from './models/scenario-result.model';
 
@@ -36,6 +37,14 @@ export abstract class ScenarioRepository {
    * Idempotent — a no-op if the user never armed it or already disarmed it.
    */
   abstract disarmMonitor(scenarioId: string): Promise<void>;
+
+  /**
+   * Lists the current user's armed Scenario Monitors with their live status
+   * (issue #18 / C3). Authenticated — the backend scopes the rows to the
+   * requesting user. Backs {@link ScenarioMonitorPoller}, which diffs the
+   * result on an interval to raise an `armed`->`matched` breach in the bell.
+   */
+  abstract listMonitors(): Promise<ScenarioMonitorSnapshot[]>;
 
   /** Lists recently persisted scenario results (newest first). */
   abstract listRecentScenarios(limit?: number): Promise<ScenarioResult[]>;

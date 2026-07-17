@@ -90,9 +90,13 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
   private toolCallsThisTurn = 0;
   /** Hard cap on tool calls per user turn: a runaway-loop backstop for the realtime path. */
   private readonly maxToolCallsPerTurn = 8;
+  /** Grace period before re-opening the mic after Midas stops speaking (echo-tail guard). */
+  private readonly micReenableCooldownMs = 250;
   private visualRequestPending = false;
   private lastDirectChartRequest: { key: string; at: number } | null = null;
   private assistantTranscriptBuffer = '';
+  /** Pending mic re-enable after playback (half-duplex gating); cleared on teardown/new speech. */
+  private micReenableTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * Bumped by every `stop()`. `start()` captures the value it began with and,
@@ -224,6 +228,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
     this.visualRequestPending = false;
     this.lastDirectChartRequest = null;
     this.assistantTranscriptBuffer = '';
+    this.clearMicReenableTimer();
     if (this.dataChannel) {
       this.dataChannel.onopen = null;
       this.dataChannel.onmessage = null;
@@ -347,11 +352,15 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
       case OAI_EVENT.transcriptDelta: {
         const delta = parsed['delta'];
         if (typeof delta === 'string') {
+          // This is the ASSISTANT's OWN output transcript — buffer + emit it for DISPLAY only.
+          // It must NEVER be fed into handleInputTranscript: that handler is the USER-input path,
+          // and driving it from Midas's own words self-triggers render_* tool calls and a
+          // forced-continuation filler loop (the voice self-talking bug). The chart-intent
+          // shortcut runs solely on the user's finalized transcript (inputTranscriptDone below).
           this.emit({ kind: 'transcript-delta', delta });
           this.assistantTranscriptBuffer = `${this.assistantTranscriptBuffer}${delta}`.slice(
             -2_000,
           );
-          void this.handleInputTranscript(this.assistantTranscriptBuffer);
         }
         return;
       }
@@ -365,9 +374,14 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         return;
       }
       case OAI_EVENT.audioStarted:
+        // Half-duplex: silence the mic while Midas speaks so its own voice can't leak back
+        // into the server as a "user" turn and start the self-talk loop (echoCancellation
+        // alone is unreliable on external speakers — see silenceMicrophoneWhileSpeaking).
+        this.silenceMicrophoneWhileSpeaking();
         this.emit({ kind: 'speaking-changed', speaking: true });
         return;
       case OAI_EVENT.audioDone:
+        this.reopenMicrophoneAfterSpeaking();
         this.emit({ kind: 'speaking-changed', speaking: false });
         return;
       case OAI_EVENT.functionCallDone:
@@ -552,6 +566,50 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         this.audioElement.srcObject = event.streams[0] ?? null;
       }
     };
+  }
+
+  /**
+   * Half-duplex mic gating — the fix for the voice self-talk loop. `echoCancellation: true`
+   * (see acquireMicrophone) is unreliable on external laptop speakers, so Midas's own voice
+   * leaks into the mic, the server VAD transcribes it as a NEW user turn, and Midas answers
+   * itself indefinitely. Hard-silencing the local track while Midas speaks removes the echo at
+   * the source: a disabled track transmits silence, so the server never hears the playback.
+   * The cost is no barge-in during playback — an acceptable trade to stop the loop.
+   */
+  private silenceMicrophoneWhileSpeaking(): void {
+    this.clearMicReenableTimer();
+    this.setMicrophoneTracksEnabled(false);
+  }
+
+  /**
+   * Re-open the mic a short beat after playback ends, not instantly: the speaker's audio tail
+   * can linger in the room just after `audioDone`, and catching it would re-arm the very loop
+   * this guards against. A new `audioStarted` within the cooldown cancels this pending
+   * re-enable (via silenceMicrophoneWhileSpeaking), keeping the mic shut across back-to-back
+   * assistant utterances.
+   */
+  private reopenMicrophoneAfterSpeaking(): void {
+    this.clearMicReenableTimer();
+    this.micReenableTimer = setTimeout(() => {
+      this.micReenableTimer = null;
+      this.setMicrophoneTracksEnabled(true);
+    }, this.micReenableCooldownMs);
+  }
+
+  private clearMicReenableTimer(): void {
+    if (this.micReenableTimer !== null) {
+      clearTimeout(this.micReenableTimer);
+      this.micReenableTimer = null;
+    }
+  }
+
+  private setMicrophoneTracksEnabled(enabled: boolean): void {
+    if (!this.micStream) {
+      return;
+    }
+    for (const track of this.micStream.getAudioTracks()) {
+      track.enabled = enabled;
+    }
   }
 
   private send(payload: Record<string, unknown>): void {

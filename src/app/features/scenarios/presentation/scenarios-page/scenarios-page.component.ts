@@ -1,8 +1,17 @@
 import { DatePipe } from '@angular/common';
-import { Component, ElementRef, OnInit, computed, effect, inject, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { TranslationService } from '../../../../core';
+import { AppConfigService, TranslationService } from '../../../../core';
 import {
   ActivityFeedComponent,
   ActivityFeedItem,
@@ -12,7 +21,12 @@ import {
   FeaturePageHeaderComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
-import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
+import {
+  ScenarioIntakeMode,
+  ScenarioLabStore,
+  ScenarioMonitorPoller,
+  WatchdogScenarioTrigger,
+} from '../../application';
 import { PresetPickerComponent } from '../preset-picker/preset-picker.component';
 import { ScenarioProgressPipelineComponent } from '../scenario-progress-pipeline/scenario-progress-pipeline.component';
 
@@ -96,6 +110,14 @@ export class ScenariosPageComponent implements OnInit {
   readonly executeAction = viewChild<ElementRef<HTMLElement>>('executeAction');
 
   private readonly router = inject(Router);
+
+  /** Dev-only "Run watchdog now" trigger (gated by `AppConfigService.showDevTools`) so a
+   * Scenario Monitor breach can be fired on demand for a deterministic demo (issue #18 / C3). */
+  readonly showDevTools = inject(AppConfigService).showDevTools;
+  readonly isRunningWatchdog = signal(false);
+  private readonly watchdogTrigger = inject(WatchdogScenarioTrigger);
+  private readonly scenarioMonitorPoller = inject(ScenarioMonitorPoller);
+
   /** Tracks the previous `canGenerate` value so we only reveal on the false->true edge,
    * not on every recompute (e.g. typing more free-text keeps it true). */
   private wasReady = false;
@@ -164,5 +186,22 @@ export class ScenariosPageComponent implements OnInit {
 
   onLoadScenario(scenarioId: string): void {
     void this.router.navigate(['/scenarios', scenarioId]);
+  }
+
+  /** Fires one Watchdog scenario-evaluation pass, then forces an immediate monitor poll so a
+   * resulting `matched` breach lands in the bell without waiting for the poll interval. */
+  async onRunWatchdog(): Promise<void> {
+    if (this.isRunningWatchdog()) {
+      return;
+    }
+    this.isRunningWatchdog.set(true);
+    try {
+      await this.watchdogTrigger.evaluate();
+      await this.scenarioMonitorPoller.pollNow();
+    } catch {
+      // Dev-only affordance — swallow so a failed manual trigger never breaks the page.
+    } finally {
+      this.isRunningWatchdog.set(false);
+    }
   }
 }

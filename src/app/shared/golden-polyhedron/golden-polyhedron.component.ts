@@ -109,6 +109,9 @@ export class GoldenPolyhedronComponent implements AfterViewInit, OnDestroy {
     this.geometry?.dispose();
     this.material?.dispose();
     this.environmentMap?.dispose();
+    // Force the GL context to be released synchronously instead of leaking until GC. Browsers
+    // cap ~16 live WebGL contexts; a lingering one would force-lose an older canvas.
+    this.renderer?.forceContextLoss();
     this.renderer?.dispose();
   }
 

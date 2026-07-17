@@ -7,6 +7,8 @@
  * base-rate, not a forecast** — the UI frames it with an explicit not-advice disclaimer.
  */
 export interface WatchlistOutlook {
+  /** Equal-weight typical 24h (1d) move; `undefined` when no member carries it. */
+  forward1dMedianPct?: number;
   forward7dMedianPct?: number;
   forward30dMedianPct?: number;
   /** How many members contributed at least one forward median. */

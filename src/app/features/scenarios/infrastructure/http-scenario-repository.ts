@@ -10,15 +10,18 @@ import {
 import {
   ScenarioIntake,
   ScenarioMonitor,
+  ScenarioMonitorSnapshot,
   ScenarioPreset,
   ScenarioRepository,
   ScenarioResult,
 } from '../domain';
 import { GenerateScenarioRequestDto } from './generate-scenario-request-dto';
 import { mapScenarioMonitorDto } from './map-scenario-monitor-dto';
+import { mapScenarioMonitorSnapshotDto } from './map-scenario-monitor-snapshot-dto';
 import { mapScenarioPresetDto } from './map-scenario-preset-dto';
 import { mapScenarioResultDto } from './map-scenario-result-dto';
 import { ScenarioMonitorDto } from './scenario-monitor-dto';
+import { ScenarioMonitorSnapshotDto } from './scenario-monitor-snapshot-dto';
 import { ScenarioPresetDto } from './scenario-preset-dto';
 import { ScenarioResultDto } from './scenario-result-dto';
 
@@ -89,6 +92,15 @@ export class HttpScenarioRepository extends ScenarioRepository {
     await firstValueFrom(
       this.http.delete<void>(`${this.config.apiBaseUrl}${this.armPath(scenarioId)}`),
     );
+  }
+
+  async listMonitors(): Promise<ScenarioMonitorSnapshot[]> {
+    const dtos = await firstValueFrom(
+      this.http.get<ScenarioMonitorSnapshotDto[]>(
+        `${this.config.apiBaseUrl}${SCENARIOS_PATH}/monitors`,
+      ),
+    );
+    return dtos.map(mapScenarioMonitorSnapshotDto);
   }
 
   async listRecentScenarios(limit = 12): Promise<ScenarioResult[]> {

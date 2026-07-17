@@ -7,6 +7,7 @@ import {
   ChatReference,
   ChatRepository,
   ChatStreamEvent,
+  Contribution,
   ToolCall,
   buildRoutingHops,
   buildToolHops,
@@ -34,16 +35,23 @@ export class ChatStore {
 
   /**
    * Coalesces streamed tokens: every token is buffered and flushed at most once per
-   * animation frame into a single `syncActiveMessages` call, so a fast stream no longer
+   * animation frame into a single `syncSessionMessages` call, so a fast stream no longer
    * rebuilds the messages array (and re-runs change detection) on every token.
    */
   private tokenBuffer = '';
   private tokenTargetId: string | null = null;
+  /**
+   * The session that owns the buffered tokens — captured at `send()` and carried here so a
+   * deferred (rAF) flush writes to the ORIGINATING thread even if the user switched the active
+   * session mid-stream. Without it the flush would fall back to the now-active session.
+   */
+  private tokenTargetSessionId: string | null = null;
   private flushHandle: number | null = null;
 
   private readonly streamingSignal = signal(false);
   private readonly tracesSignal = signal<AgentTrace[]>([]);
   private readonly toolCallsSignal = signal<ToolCall[]>([]);
+  private readonly contributionsSignal = signal<Contribution[]>([]);
   private readonly errorSignal = signal<string | null>(null);
   private readonly pendingReferenceSignal = signal<ChatReference | null>(null);
 
@@ -51,6 +59,12 @@ export class ChatStore {
   readonly isStreaming = this.streamingSignal.asReadonly();
   readonly traces = this.tracesSignal.asReadonly();
   readonly toolCalls = this.toolCallsSignal.asReadonly();
+  /**
+   * Per-specialist stances for the live turn, streamed once at synthesizer entry
+   * on a multi-agent turn. Reset each `send()` (like traces/tools); empty on
+   * single-route turns. The chat page collapses it into the bull/bear verdict meter.
+   */
+  readonly contributions = this.contributionsSignal.asReadonly();
   readonly routingHops = computed(() => buildRoutingHops(this.tracesSignal()));
   readonly toolHops = computed(() => buildToolHops(this.toolCallsSignal()));
   readonly error = this.errorSignal.asReadonly();
@@ -84,6 +98,9 @@ export class ChatStore {
     }
 
     const reference = this.pendingReferenceSignal();
+    // Capture the originating thread once. Every write for this turn targets THIS id — not the
+    // active session — so clicking another conversation in the sidebar mid-stream (which changes
+    // the active session without destroying this page-scoped store) can't redirect the reply.
     const threadId = this.sessionsStore.ensureActiveSession();
     const userMessage: ChatMessage = {
       id: this.nextId(),
@@ -91,15 +108,16 @@ export class ChatStore {
       content: trimmed,
       ...(reference ? { reference } : {}),
     };
-    this.appendMessage(userMessage);
+    this.appendMessage(threadId, userMessage);
     this.clearReference();
     this.errorSignal.set(null);
     this.streamingSignal.set(true);
 
     const assistantId = this.nextId();
-    this.appendMessage({ id: assistantId, role: ASSISTANT_ROLE, content: '', pending: true });
+    this.appendMessage(threadId, { id: assistantId, role: ASSISTANT_ROLE, content: '', pending: true });
     this.tracesSignal.set([]);
     this.toolCallsSignal.set([]);
+    this.contributionsSignal.set([]);
 
     const controller = this.createAbortController();
     this.abortController = controller;
@@ -111,7 +129,7 @@ export class ChatStore {
         reference ?? undefined,
         controller?.signal,
       )) {
-        this.applyStreamEvent(assistantId, event);
+        this.applyStreamEvent(threadId, assistantId, event);
       }
     } catch (error: unknown) {
       if (!this.isAbortError(error)) {
@@ -129,13 +147,13 @@ export class ChatStore {
       if (controller?.signal.aborted ?? false) {
         this.sessionsStore.settlePendingMessages(threadId);
       } else {
-        this.settleTurn(assistantId);
+        this.settleTurn(threadId, assistantId);
       }
       this.streamingSignal.set(false);
     }
   }
 
-  private applyStreamEvent(assistantId: string, event: ChatStreamEvent): void {
+  private applyStreamEvent(sessionId: string, assistantId: string, event: ChatStreamEvent): void {
     // Every non-token event (chart, citations, trace, tool, error) must land after the
     // tokens that preceded it, so flush the pending buffer first to preserve ordering.
     if (event.kind !== 'token') {
@@ -143,7 +161,7 @@ export class ChatStore {
     }
     switch (event.kind) {
       case 'token':
-        this.appendToken(assistantId, event.text);
+        this.appendToken(sessionId, assistantId, event.text);
         break;
       case 'trace':
         this.tracesSignal.update((traces) => [...traces, event.trace]);
@@ -152,10 +170,13 @@ export class ChatStore {
         this.toolCallsSignal.update((calls) => [...calls, event.tool]);
         break;
       case 'chart':
-        this.appendChart(assistantId, event.chart);
+        this.appendChart(sessionId, assistantId, event.chart);
         break;
       case 'citations':
-        this.setCitations(assistantId, event.citations);
+        this.setCitations(sessionId, assistantId, event.citations);
+        break;
+      case 'contributions':
+        this.contributionsSignal.set(event.contributions);
         break;
       case 'error':
         this.errorSignal.set(event.message);
@@ -163,11 +184,15 @@ export class ChatStore {
     }
   }
 
-  private appendMessage(message: ChatMessage): void {
-    this.sessionsStore.syncActiveMessages([...this.messages(), message]);
+  private appendMessage(sessionId: string, message: ChatMessage): void {
+    this.sessionsStore.syncSessionMessages(sessionId, [
+      ...this.sessionsStore.messagesOf(sessionId),
+      message,
+    ]);
   }
 
-  private appendToken(messageId: string, token: string): void {
+  private appendToken(sessionId: string, messageId: string, token: string): void {
+    this.tokenTargetSessionId = sessionId;
     this.tokenTargetId = messageId;
     this.tokenBuffer += token;
     this.scheduleFlush();
@@ -195,18 +220,23 @@ export class ChatStore {
     }
     this.flushHandle = null;
 
-    if (!this.tokenBuffer || this.tokenTargetId === null) {
+    if (!this.tokenBuffer || this.tokenTargetId === null || this.tokenTargetSessionId === null) {
       return;
     }
+    const sessionId = this.tokenTargetSessionId;
     const messageId = this.tokenTargetId;
     const chunk = this.tokenBuffer;
     this.tokenBuffer = '';
     this.tokenTargetId = null;
+    this.tokenTargetSessionId = null;
 
-    this.sessionsStore.syncActiveMessages(
-      this.messages().map((message) =>
-        message.id === messageId ? { ...message, content: message.content + chunk } : message,
-      ),
+    this.sessionsStore.syncSessionMessages(
+      sessionId,
+      this.sessionsStore
+        .messagesOf(sessionId)
+        .map((message) =>
+          message.id === messageId ? { ...message, content: message.content + chunk } : message,
+        ),
     );
   }
 
@@ -218,39 +248,51 @@ export class ChatStore {
     this.flushHandle = null;
     this.tokenBuffer = '';
     this.tokenTargetId = null;
+    this.tokenTargetSessionId = null;
   }
 
-  private appendChart(messageId: string, chart: ChartSpec): void {
-    this.sessionsStore.syncActiveMessages(
-      this.messages().map((message) =>
-        message.id === messageId
-          ? { ...message, charts: [...(message.charts ?? []), chart] }
-          : message,
-      ),
+  private appendChart(sessionId: string, messageId: string, chart: ChartSpec): void {
+    this.sessionsStore.syncSessionMessages(
+      sessionId,
+      this.sessionsStore
+        .messagesOf(sessionId)
+        .map((message) =>
+          message.id === messageId
+            ? { ...message, charts: [...(message.charts ?? []), chart] }
+            : message,
+        ),
     );
   }
 
-  private setCitations(messageId: string, citations: ChatMessage['citations']): void {
-    this.sessionsStore.syncActiveMessages(
-      this.messages().map((message) =>
-        message.id === messageId ? { ...message, citations: citations ?? [] } : message,
-      ),
+  private setCitations(
+    sessionId: string,
+    messageId: string,
+    citations: ChatMessage['citations'],
+  ): void {
+    this.sessionsStore.syncSessionMessages(
+      sessionId,
+      this.sessionsStore
+        .messagesOf(sessionId)
+        .map((message) =>
+          message.id === messageId ? { ...message, citations: citations ?? [] } : message,
+        ),
     );
   }
 
   /**
    * Settles the turn in a SINGLE messages write: enriches the assistant message with the
-   * resolved agent/routing/tools, then hands the full array to `replaceActiveMessages`,
+   * resolved agent/routing/tools, then hands the full array to `replaceSessionMessages`,
    * which clears the pending flags, refreshes the title, and triggers server-side titling.
-   * Previously this was two writes (a `syncActiveMessages` here plus a `replaceActiveMessages`
-   * in the caller) — two change-detection passes at the end of every stream.
+   * Targets the originating thread by id (not the active session) so a mid-stream session
+   * switch settles the correct thread. Previously this was two writes (a `syncSessionMessages`
+   * here plus a settle in the caller) — two change-detection passes at the end of every stream.
    */
-  private settleTurn(messageId: string): void {
+  private settleTurn(sessionId: string, messageId: string): void {
     const agent = resolveRespondingAgent(this.routingHops());
     const routingHops = snapshotRoutingHops(this.routingHops());
     const tools = snapshotToolHops(this.toolHops());
 
-    const settled = this.messages().map((message) =>
+    const settled = this.sessionsStore.messagesOf(sessionId).map((message) =>
       message.id === messageId
         ? {
             ...message,
@@ -262,7 +304,7 @@ export class ChatStore {
         : message,
     );
 
-    this.sessionsStore.replaceActiveMessages(settled);
+    this.sessionsStore.replaceSessionMessages(sessionId, settled);
   }
 
   private createAbortController(): AbortController | null {

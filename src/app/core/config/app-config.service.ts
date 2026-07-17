@@ -27,6 +27,13 @@ export class AppConfigService {
   readonly supabaseAnonKey: string = environment.supabaseAnonKey;
   /** How often the radar page re-polls for new signals, in ms (see radar-store.ts). */
   readonly radarPollIntervalMs: number = environment.radarPollIntervalMs;
+  /**
+   * How often the shell re-polls `/api/v1/scenarios/monitors`, in ms — drives the
+   * in-app breach notification (see scenario-monitor-poller.service.ts).
+   */
+  readonly scenarioMonitorPollIntervalMs: number = environment.scenarioMonitorPollIntervalMs;
+  /** Whether dev-only affordances (e.g. the Scenario Lab "Run watchdog now" trigger) render. */
+  readonly showDevTools: boolean = environment.showDevTools;
   readonly instrumentsCacheTtlMs: number = environment.instrumentsCacheTtlMs;
   readonly newsCacheTtlMs: number = environment.newsCacheTtlMs;
   readonly signalsCacheTtlMs: number = environment.signalsCacheTtlMs;

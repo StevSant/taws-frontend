@@ -106,17 +106,32 @@
           <div
             #transcriptViewport
             class="voice-mode__transcript-wrap"
-            [class.voice-mode__transcript-wrap--history]="liveTranscript().length > 180"
+            [class.voice-mode__transcript-wrap--history]="transcriptEntries().length > 2"
           >
-            <p
-              class="voice-mode__transcript"
-              [class.voice-mode__transcript--empty]="!liveTranscript()"
-              [attr.aria-label]="i18n.t('chat.realtime.transcriptLabel')"
-              aria-live="polite"
-              aria-atomic="false"
-            >
-              {{ liveTranscript() || i18n.t('chat.realtime.transcriptEmpty') }}
-            </p>
+            @if (transcriptEntries().length === 0) {
+              <p class="voice-mode__transcript-empty" role="status" aria-live="polite">
+                {{ i18n.t('chat.realtime.transcriptEmpty') }}
+              </p>
+            } @else {
+              <ul
+                class="voice-mode__transcript"
+                [attr.aria-label]="i18n.t('chat.realtime.transcriptLabel')"
+                aria-live="polite"
+                aria-atomic="false"
+              >
+                @for (entry of transcriptEntries(); track $index) {
+                  <li
+                    class="voice-mode__turn"
+                    [class.voice-mode__turn--user]="entry.role === 'user'"
+                    [class.voice-mode__turn--assistant]="entry.role === 'assistant'"
+                    [class.voice-mode__turn--pending]="entry.pending"
+                  >
+                    <span class="voice-mode__turn-role">{{ roleLabel(entry.role) }}</span>
+                    <span class="voice-mode__turn-text">{{ entry.content }}</span>
+                  </li>
+                }
+              </ul>
+            }
           </div>
         }
 

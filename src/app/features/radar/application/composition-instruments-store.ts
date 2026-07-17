@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AssetClass, EnrichedInstrument, MarketsRepository } from '../domain';
+import { AssetClass, EnrichedInstrument, InstrumentHighlights, MarketsRepository } from '../domain';
 import { computeClassTrend } from './compute-class-trend';
 
 /** One class's expandable instrument list — the enriched rows + a mini-trend shape. */
@@ -11,6 +11,14 @@ export interface ClassInstruments {
 
 /** Single page over the small curated universe is enough for the per-class drill-downs. */
 const UNIVERSE_PAGE_SIZE = 100;
+
+/** Empty leaderboards until the enriched page resolves — never fabricated rows. */
+const EMPTY_HIGHLIGHTS: InstrumentHighlights = {
+  topGainers: [],
+  topLosers: [],
+  mostVolatile: [],
+  trending: [],
+};
 
 /**
  * Loads the enriched instrument universe once (`GET /api/v1/instruments/enriched`) and
@@ -24,12 +32,20 @@ const UNIVERSE_PAGE_SIZE = 100;
 @Injectable({ providedIn: 'root' })
 export class CompositionInstrumentsStore {
   private readonly byClassSignal = signal<ReadonlyMap<AssetClass, EnrichedInstrument[]>>(new Map());
+  private readonly highlightsSignal = signal<InstrumentHighlights>(EMPTY_HIGHLIGHTS);
   private readonly loadingSignal = signal(false);
   private readonly errorSignal = signal<string | null>(null);
   private loaded = false;
 
   readonly isLoading = this.loadingSignal.asReadonly();
   readonly error = this.errorSignal.asReadonly();
+
+  /**
+   * Market-wide gainers/losers/volatile/trending leaderboards from the same enriched page the
+   * per-class grouping is built from — the radar's Top-movers section reads this slice, so no
+   * extra request is made for it.
+   */
+  readonly highlights = this.highlightsSignal.asReadonly();
 
   /** Per-class enriched rows + mini-trend, recomputed when the grouping changes. */
   readonly byClass = computed<ReadonlyMap<AssetClass, ClassInstruments>>(() => {
@@ -64,6 +80,7 @@ export class CompositionInstrumentsStore {
         grouped.set(instrument.assetClass, existing);
       }
       this.byClassSignal.set(grouped);
+      this.highlightsSignal.set(page.highlights);
       this.loaded = true;
     } catch (error: unknown) {
       this.errorSignal.set(

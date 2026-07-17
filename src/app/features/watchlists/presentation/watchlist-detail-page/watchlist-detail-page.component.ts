@@ -1,12 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { ButtonComponent, EmptyStateComponent, SpinnerComponent } from '../../../../shared';
 import { PriceDeltaChipComponent } from '../../../../shared/price';
+import { WatchlistStore } from '../../../briefings/application';
 import { WatchlistSummary } from '../../../radar/application';
 import { ImpactClass } from '../../../radar/domain';
-import { WatchlistDetailStore } from '../../application';
+import { OutlookHorizon, WatchlistDetailStore } from '../../application';
+
+/** Frontend-only outlook window options; each maps to a forward-median field. */
+const WINDOW_LABELS: Record<OutlookHorizon, TranslationKey> = {
+  '24h': 'watchlists.detail.window.24h',
+  '7d': 'watchlists.detail.window.7d',
+  '30d': 'watchlists.detail.window.30d',
+};
 import { WatchlistDetailMemberRowComponent } from '../watchlist-detail-member-row/watchlist-detail-member-row.component';
 import { WatchlistOutlookPanelComponent } from '../watchlist-outlook-panel/watchlist-outlook-panel.component';
 
@@ -67,7 +75,14 @@ export class WatchlistDetailPageComponent {
   readonly store = inject(WatchlistDetailStore);
   readonly i18n = inject(TranslationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly watchlistStore = inject(WatchlistStore);
+  private readonly router = inject(Router);
   private currentId: string | null = null;
+
+  /** Frontend-only outlook window; drives the member rows + outlook panel, no refetch. */
+  readonly window = signal<OutlookHorizon>('7d');
+  readonly confirmingDelete = signal(false);
+  readonly windowOptions: OutlookHorizon[] = ['24h', '7d', '30d'];
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -124,5 +139,30 @@ export class WatchlistDetailPageComponent {
 
   onRetry(): void {
     void this.store.retry();
+  }
+
+  windowLabelKey(option: OutlookHorizon): TranslationKey {
+    return WINDOW_LABELS[option];
+  }
+
+  setWindow(option: OutlookHorizon): void {
+    this.window.set(option);
+  }
+
+  /** First click arms the confirm step; the second deletes the list and returns to the overview. */
+  onDelete(): void {
+    if (!this.confirmingDelete()) {
+      this.confirmingDelete.set(true);
+      return;
+    }
+    const id = this.store.watchlistId();
+    if (!id) {
+      return;
+    }
+    void this.watchlistStore.deleteWatchlist(id).then(() => this.router.navigate(['/watchlists']));
+  }
+
+  cancelDelete(): void {
+    this.confirmingDelete.set(false);
   }
 }

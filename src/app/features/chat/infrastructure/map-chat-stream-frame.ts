@@ -11,6 +11,9 @@ export function mapChatStreamFrame(frame: ChatStreamFrame): ChatStreamEvent | nu
   if (frame.citations !== undefined) {
     return { kind: 'citations', citations: frame.citations.map(mapChatCitationDto) };
   }
+  if (frame.contributions !== undefined) {
+    return { kind: 'contributions', contributions: frame.contributions };
+  }
   if (frame.t !== undefined) return { kind: 'token', text: frame.t };
   return null;
 }

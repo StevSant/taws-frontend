@@ -12,9 +12,12 @@ export type { ChatStreamEvent } from './models/chat-stream-event.model';
 export type { RoutingHop, RoutingHopStatus } from './models/routing-hop.model';
 export type { ToolCall, ToolHop, ToolHopSnapshot } from './models/tool-call.model';
 export type { BoardroomAgent, BoardroomAgentStatus } from './models/boardroom-agent.model';
+export type { Contribution } from './models/contribution.model';
+export type { Verdict, VerdictAgent, VerdictLabel } from './models/verdict.model';
 export { buildRoutingHops } from './build-routing-hops';
 export { buildToolHops, snapshotToolHops } from './build-tool-hops';
 export { buildBoardroom } from './build-boardroom';
+export { buildVerdict } from './build-verdict';
 export {
   formatToolName,
   isKnownAgent,

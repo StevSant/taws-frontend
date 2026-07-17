@@ -19,7 +19,9 @@ export class RadarKpiRowComponent {
     if (this.kpis.newsDetected === 0) {
       return '0%';
     }
-    const pct = Math.round((this.kpis.pendingReview / this.kpis.newsDetected) * 100);
+    // Clamp: `newsDetected` follows the news scope and can drop below the (unscoped) pending count
+    // under "Mis instrumentos", which would otherwise read as a nonsensical >100%.
+    const pct = Math.min(100, Math.round((this.kpis.pendingReview / this.kpis.newsDetected) * 100));
     return `${pct}%`;
   }
 

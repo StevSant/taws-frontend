@@ -71,12 +71,12 @@
       [sinceHours]="store.filters().sinceHours"
     />
 
+    <app-radar-top-movers class="radar-page__movers" [selectedClass]="selectedClass()" />
+
     @if (watchlistStore.available()) {
       <app-watchlist-strip
         class="radar-page__watchlists"
         [summaries]="store.watchlistSummaries()"
-        [activeId]="watchlistStore.activeWatchlistId()"
-        (select)="onSelectWatchlist($event)"
       />
     }
 
@@ -120,37 +120,81 @@
             {{ i18n.t('radar.catalysts.subtitle') }}
           </p>
         </div>
-        <a class="radar-page__catalysts-link" routerLink="/radar/news">
-          {{ i18n.t('radar.timeline.viewAll') }}
-        </a>
+
+        <div class="radar-page__news-controls">
+          @if (store.newsScopeAvailable()) {
+            <div
+              class="radar-page__news-scope"
+              role="group"
+              [attr.aria-label]="i18n.t('radar.news.scope.label')"
+            >
+              <button
+                type="button"
+                class="radar-page__news-scope-btn"
+                [class.radar-page__news-scope-btn--active]="store.effectiveNewsScope() === 'mine'"
+                [attr.aria-pressed]="store.effectiveNewsScope() === 'mine'"
+                (click)="store.setNewsScope('mine')"
+              >
+                {{ i18n.t('radar.news.scope.mine') }}
+              </button>
+              <button
+                type="button"
+                class="radar-page__news-scope-btn"
+                [class.radar-page__news-scope-btn--active]="store.effectiveNewsScope() === 'market'"
+                [attr.aria-pressed]="store.effectiveNewsScope() === 'market'"
+                (click)="store.setNewsScope('market')"
+              >
+                {{ i18n.t('radar.news.scope.market') }}
+              </button>
+            </div>
+          }
+          <a class="radar-page__catalysts-link" routerLink="/radar/news">
+            {{ i18n.t('radar.timeline.viewAll') }}
+          </a>
+        </div>
       </header>
 
-      <ul class="radar-page__catalysts-list">
-        @for (entry of recentCatalysts(); track entry.news.id) {
-          <li class="radar-page__catalyst">
-            <div class="radar-page__catalyst-copy">
-              <a class="radar-page__catalyst-title" [routerLink]="['/radar/news', entry.news.id]">
-                {{ entry.news.title }}
-              </a>
-              <span class="radar-page__catalyst-source">{{ entry.news.source }}</span>
-            </div>
-            <div class="radar-page__catalyst-symbols">
-              @for (related of entry.symbols.slice(0, 3); track related.symbol) {
-                <span
-                  class="radar-page__catalyst-pill"
-                  [class.radar-page__catalyst-pill--positive]="related.impactClass === 'positive'"
-                  [class.radar-page__catalyst-pill--negative]="related.impactClass === 'negative'"
-                  [class.radar-page__catalyst-pill--neutral]="related.impactClass === 'neutral'"
-                  [class.radar-page__catalyst-pill--uncertain]="related.impactClass === 'uncertain'"
-                >
-                  <strong>{{ related.symbol }}</strong>
-                  {{ impactLabel(related.impactClass) }}
-                </span>
-              }
-            </div>
-          </li>
-        }
-      </ul>
+      @if (recentCatalysts().length > 0) {
+        <ul class="radar-page__catalysts-list">
+          @for (entry of recentCatalysts(); track entry.news.id) {
+            <li class="radar-page__catalyst">
+              <div class="radar-page__catalyst-copy">
+                <a class="radar-page__catalyst-title" [routerLink]="['/radar/news', entry.news.id]">
+                  {{ entry.news.title }}
+                </a>
+                <span class="radar-page__catalyst-source">{{ entry.news.source }}</span>
+              </div>
+              <div class="radar-page__catalyst-symbols">
+                @for (related of entry.symbols.slice(0, 3); track related.symbol) {
+                  <span
+                    class="radar-page__catalyst-pill"
+                    [class.radar-page__catalyst-pill--positive]="related.impactClass === 'positive'"
+                    [class.radar-page__catalyst-pill--negative]="related.impactClass === 'negative'"
+                    [class.radar-page__catalyst-pill--neutral]="related.impactClass === 'neutral'"
+                    [class.radar-page__catalyst-pill--uncertain]="
+                      related.impactClass === 'uncertain'
+                    "
+                  >
+                    <strong>{{ related.symbol }}</strong>
+                    {{ impactLabel(related.impactClass) }}
+                  </span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      } @else if (store.effectiveNewsScope() === 'mine') {
+        <p class="radar-page__news-empty">
+          <span>{{ i18n.t('radar.news.scope.empty') }}</span>
+          <button
+            type="button"
+            class="radar-page__news-empty-action"
+            (click)="store.setNewsScope('market')"
+          >
+            {{ i18n.t('radar.news.scope.showMarket') }}
+          </button>
+        </p>
+      }
     </section>
 
     @if (store.isEnriching()) {
@@ -159,51 +203,6 @@
       </p>
     }
 
-    <section id="instruments" class="radar-page__instruments feature-panel">
-      <header class="radar-page__instruments-header">
-        <div class="radar-page__instruments-copy">
-          <h2 class="radar-page__instruments-title">
-            {{ instrumentsTitle() }}
-            <span class="radar-page__instruments-count">· {{ instrumentsCountLabel() }}</span>
-          </h2>
-          <p class="radar-page__instruments-subtitle">
-            {{ i18n.t('radar.instruments.subtitle') }}
-          </p>
-        </div>
-        <div class="radar-page__instruments-action">
-          @if (store.unclassifiedCount() > 0) {
-            <app-button
-              [label]="
-                store.isGeneratingAny()
-                  ? i18n.t('radar.generate.allRunning')
-                  : i18n.t('radar.generate.all') + ' (' + store.unclassifiedCount() + ')'
-              "
-              [disabled]="store.isGeneratingAny()"
-              (pressed)="onAnalyzeAll()"
-            />
-          }
-          <a class="radar-page__view-all-btn" routerLink="/radar/explore">
-            {{ i18n.t('radar.instruments.viewAll') }}
-          </a>
-        </div>
-      </header>
-
-      <div class="radar-page__list-head" aria-hidden="true">
-        <span>{{ i18n.t('radar.instruments.col.asset') }}</span>
-        <span>{{ i18n.t('radar.instruments.col.trend') }}</span>
-        <span>{{ i18n.t('radar.instruments.col.price') }}</span>
-        <span>{{ i18n.t('radar.instruments.col.signal') }}</span>
-        <span>{{ i18n.t('radar.instruments.col.news') }}</span>
-      </div>
-
-      <div class="radar-page__instrument-list" role="list">
-        @for (signal of visibleSignals(); track signal.symbol) {
-          <app-instrument-card-compact role="listitem" [signal]="signal" />
-        }
-        <app-radar-add-instrument-card />
-      </div>
-    </section>
-
-    <app-news-timeline class="radar-page__timeline" [entries]="store.newsTimeline()" />
+    <app-news-timeline class="radar-page__timeline" [entries]="store.scopedNewsTimeline()" />
   }
 </div>

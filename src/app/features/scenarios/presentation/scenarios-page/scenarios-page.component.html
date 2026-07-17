@@ -4,6 +4,20 @@
     [description]="i18n.t('scenarios.description')"
   />
 
+  @if (showDevTools) {
+    <div class="scenarios-page__dev-tools" role="group">
+      <app-button
+        [label]="
+          isRunningWatchdog()
+            ? i18n.t('scenarios.dev.runningWatchdog')
+            : i18n.t('scenarios.dev.runWatchdog')
+        "
+        [disabled]="isRunningWatchdog()"
+        (pressed)="onRunWatchdog()"
+      />
+    </div>
+  }
+
   <app-feature-guide [title]="i18n.t('scenarios.guide.title')" [steps]="guideSteps()" />
 
   <div class="scenarios-page__layout">

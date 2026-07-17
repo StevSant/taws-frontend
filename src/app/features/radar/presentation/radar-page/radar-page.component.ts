@@ -15,11 +15,9 @@ import { RadarCompositionOverviewComponent } from '../radar-composition-overview
 import { RadarMarketPulseComponent } from '../radar-market-pulse/radar-market-pulse.component';
 import { RadarMarketScoreComponent } from '../radar-market-score/radar-market-score.component';
 import { NewsTimelineComponent } from '../news-timeline/news-timeline.component';
-import { InstrumentCardCompactComponent } from '../instrument-card-compact/instrument-card-compact.component';
-import { RadarAddInstrumentCardComponent } from '../radar-add-instrument-card/radar-add-instrument-card.component';
+import { RadarTopMoversComponent } from '../radar-top-movers/radar-top-movers.component';
 import { WatchlistStripComponent } from '../watchlist-strip/watchlist-strip.component';
 import { RadarSubNavComponent } from '../radar-sub-nav/radar-sub-nav.component';
-import { instrumentCountLabel } from '../instrument-count-label';
 
 const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
   positive: 'radar.card.impact.positive',
@@ -34,6 +32,7 @@ const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
   imports: [
     RadarFiltersComponent,
     RadarKpiRowComponent,
+    RadarTopMoversComponent,
     RadarMacroCardsComponent,
     RadarMacroIndicatorsComponent,
     RadarAssetClassTabsComponent,
@@ -41,8 +40,6 @@ const IMPACT_LABEL_KEYS: Record<ImpactClass, TranslationKey> = {
     RadarMarketPulseComponent,
     RadarMarketScoreComponent,
     NewsTimelineComponent,
-    InstrumentCardCompactComponent,
-    RadarAddInstrumentCardComponent,
     WatchlistStripComponent,
     RadarSubNavComponent,
     ButtonComponent,
@@ -59,9 +56,9 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   /**
    * Client-side dashboard segmentation (issue #41). `null` = the "Todos"
-   * composition overview; a class scopes the aggregates and instrument grid to
-   * that asset class. This is pure view state derived off `RadarStore` signals
-   * — it never refetches.
+   * composition overview; a class scopes the aggregates, the composition view
+   * and the Top-movers columns to that asset class. This is pure view state
+   * derived off `RadarStore` signals — it never refetches.
    */
   private readonly selectedClassSignal = signal<AssetClass | null>(null);
 
@@ -90,23 +87,6 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     );
   });
 
-  /**
-   * Instruments shown in the "en seguimiento" section, sorted by urgency:
-   * - an active asset-class tab → that segment (explicit drill into the market universe);
-   * - otherwise the user's watchlist when it is non-empty (issue #16);
-   * - else the default news-driven universe.
-   */
-  readonly visibleSignals = computed(() => {
-    const segment = this.activeSegment();
-    const watchlist = this.store.watchlistSignals();
-    const signals = segment
-      ? segment.signals
-      : watchlist.length > 0
-        ? watchlist
-        : this.store.signals();
-    return [...signals].sort((a, b) => this.signalPriority(b) - this.signalPriority(a));
-  });
-
   readonly summaryText = computed(() => {
     const kpis = this.store.kpiSummary();
     const hours = this.store.filters().sinceHours;
@@ -114,27 +94,8 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     return `${this.i18n.t('radar.summary.prefix')} ${kpis.newsDetected} ${this.i18n.t('radar.summary.events')} ${windowLabel}. ${kpis.pendingReview} ${this.i18n.t('radar.summary.pending')}`;
   });
 
-  /**
-   * Names whatever is actually driving the instruments section. Previously it was hardcoded to
-   * "Instrumentos en seguimiento" while the KPI row above it read "En seguimiento: N" over the
-   * *whole* universe — the same words for two different sets on one screen (10 vs 3). When a
-   * watchlist is driving the section it now carries that list's name; otherwise the section is
-   * the news-driven universe and says so.
-   */
-  readonly instrumentsTitle = computed(() => {
-    const activeWatchlist = this.watchlistStore.activeWatchlist();
-    const drivenByWatchlist =
-      this.activeSegment() === null && this.store.watchlistSignals().length > 0;
-    return drivenByWatchlist && activeWatchlist
-      ? activeWatchlist.name
-      : this.i18n.t('radar.instruments.titleFallback');
-  });
-
-  readonly instrumentsCountLabel = computed(() =>
-    instrumentCountLabel(this.visibleSignals().length, this.i18n),
-  );
-
-  readonly recentCatalysts = computed(() => this.store.newsTimeline().slice(0, 4));
+  /** Catalizadores: the top of the scope-filtered news timeline (mine/market — see `RadarStore`). */
+  readonly recentCatalysts = computed(() => this.store.scopedNewsTimeline().slice(0, 4));
   readonly overviewDistribution = computed(
     () => this.activeSegment()?.landscape.distribution ?? this.store.landscape().distribution,
   );
@@ -157,18 +118,6 @@ export class RadarPageComponent implements OnInit, OnDestroy {
 
   onSelectClass(assetClass: AssetClass | null): void {
     this.selectedClassSignal.set(assetClass);
-  }
-
-  /**
-   * Switches which list drives the instruments section.
-   *
-   * Clearing the asset-class tab is load-bearing, not tidiness: `visibleSignals()` gives an active
-   * segment priority over the watchlist, so picking a list while a tab was active would select it
-   * and visibly change nothing.
-   */
-  onSelectWatchlist(watchlistId: string): void {
-    this.selectedClassSignal.set(null);
-    void this.watchlistStore.selectWatchlist(watchlistId);
   }
 
   /**
@@ -200,30 +149,10 @@ export class RadarPageComponent implements OnInit, OnDestroy {
     void this.store.retryNews();
   }
 
-  onAnalyzeAll(): void {
-    void this.store.generateAllUnclassified();
-  }
-
   impactLabel(impact?: ImpactClass): string {
     return impact
       ? this.i18n.t(IMPACT_LABEL_KEYS[impact])
       : this.i18n.t('radar.landscape.unclassified');
-  }
-
-  private signalPriority(signal: {
-    impactClass?: string;
-    confidence?: number;
-    news: unknown[];
-  }): number {
-    const impactWeight: Record<string, number> = {
-      negative: 4,
-      positive: 3,
-      uncertain: 2,
-      neutral: 1,
-    };
-    const impact = signal.impactClass ? (impactWeight[signal.impactClass] ?? 0) : 5;
-    const confidence = signal.confidence ?? 0;
-    return impact * 100 + confidence * 10 + signal.news.length;
   }
 
   private recencyLabel(hours: number): string {

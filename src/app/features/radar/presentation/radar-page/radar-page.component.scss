@@ -290,111 +290,86 @@
     color: var(--color-text-secondary);
   }
 
-  &__instruments {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    min-width: 0;
+  &__movers {
+    display: block;
+    width: 100%;
   }
 
-  &__instruments-header {
+  // Shared news controls (scope toggle + "Ver todas") live in the Catalizadores header.
+  &__news-controls {
     display: flex;
+    flex: none;
     flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: space-between;
+    align-items: center;
     gap: var(--space-3);
   }
 
-  &__instruments-copy {
-    flex: 1 1 12rem;
-    min-width: 0;
+  &__news-scope {
+    display: inline-flex;
+    padding: 0.15rem;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
   }
 
-  &__view-all-btn {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.45rem 0.9rem;
-    border: 1px solid var(--color-gold);
-    border-radius: var(--radius-md);
-    font-size: 0.8rem;
-    font-weight: 700;
-    white-space: nowrap;
-    color: var(--color-gold);
-    text-decoration: none;
+  &__news-scope-btn {
+    padding: 0.25rem 0.6rem;
+    font: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
     transition:
-      background 0.15s ease,
-      color 0.15s ease;
+      color 0.15s ease,
+      background 0.15s ease;
 
     &:hover {
-      background: var(--color-gold);
+      color: var(--color-text-primary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-gold);
+      outline-offset: 2px;
+    }
+
+    &--active {
       color: var(--color-background);
+      background: var(--color-gold);
     }
   }
 
-  &__instruments-action {
-    flex: 0 1 auto;
-    max-width: 100%;
+  &__news-empty {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-3);
-
-    ::ng-deep .app-button {
-      white-space: nowrap;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-
-  &__instruments-title {
+    gap: var(--space-2);
     margin: 0;
-    font-size: 1.05rem;
-    font-weight: 750;
-    letter-spacing: -0.02em;
-  }
-
-  // The count is what disambiguates this section from the KPI row's "En seguimiento",
-  // so it has to stay legible rather than read as decoration.
-  &__instruments-count {
+    padding: var(--space-3) 0;
     font-size: 0.8rem;
-    font-weight: 500;
-    letter-spacing: 0;
     color: var(--color-text-muted);
   }
 
-  &__instruments-subtitle {
-    margin: 0.3rem 0 0;
-    font-size: 0.76rem;
-    line-height: 1.45;
-    color: var(--color-text-muted);
-  }
+  &__news-empty-action {
+    padding: 0;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    background: transparent;
+    border: none;
+    cursor: pointer;
 
-  &__list-head {
-    display: grid;
-    grid-template-columns:
-      minmax(9rem, 1.2fr)
-      minmax(5.5rem, 0.9fr)
-      minmax(4.5rem, 0.7fr)
-      minmax(6.5rem, 0.9fr)
-      minmax(5rem, 0.7fr);
-    gap: var(--space-3);
-    padding: 0 0.9rem 0.35rem;
-    font-size: 0.62rem;
-    font-weight: 650;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-
-    span:nth-child(3),
-    span:nth-child(5) {
-      text-align: right;
+    &:hover {
+      text-decoration: underline;
     }
-  }
 
-  &__instrument-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
+    &:focus-visible {
+      outline: 2px solid var(--color-gold);
+      outline-offset: 2px;
+    }
   }
 
   &__timeline {
@@ -430,10 +405,6 @@
   .radar-page__overview-insights {
     grid-template-columns: 1fr;
   }
-
-  .radar-page__list-head {
-    display: none;
-  }
 }
 
 @media (max-width: 720px) {
@@ -450,18 +421,6 @@
     width: 100%;
   }
 
-  .radar-page__instruments-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  // Same axis trap as the shared feature-page-header: the base `flex: 1 1 12rem` is a *width*
-  // floor for the row layout, but this query flips the axis, turning it into a 12rem (192px)
-  // *height* floor under a ~60px title+subtitle. Reset it to content height.
-  .radar-page__instruments-copy {
-    flex: 0 1 auto;
-  }
-
   .radar-page__catalyst {
     grid-template-columns: 1fr;
   }
@@ -473,18 +432,6 @@
 
   .radar-page__catalysts--strip .radar-page__catalysts-list {
     grid-template-columns: 1fr;
-  }
-
-  .radar-page__instruments-action {
-    width: 100%;
-
-    ::ng-deep .app-button {
-      width: 100%;
-    }
-  }
-
-  .radar-page__list-head {
-    display: none;
   }
 
   .radar-page__skeletons {

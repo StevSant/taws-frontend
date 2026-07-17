@@ -148,9 +148,10 @@
                             <span class="chat-page__avatar-corona-ring"></span>
                           </div>
                         }
-                        <app-golden-polyhedron
+                        <app-midas-glyph
+                          glyph="brand-icosahedron"
                           [size]="avatarSize"
-                          [activity]="avatarActivity(message.id, !!message.pending)"
+                          [animated]="!!(message.pending && isLatestAssistant(message.id))"
                         />
                       </div>
 
@@ -170,7 +171,7 @@
                               i18n.t('chat.role.assistant')
                             }}</span>
                           </div>
-                          @if (messageRoutingHops(message).length > 0) {
+                          @if (!showBoardroom(message) && messageRoutingHops(message).length > 0) {
                             <div
                               class="chat-page__route-pills"
                               [attr.aria-label]="i18n.t('chat.trace.title')"
@@ -198,6 +199,17 @@
                             </div>
                           }
                         </header>
+
+                        @if (showBoardroom(message)) {
+                          <app-boardroom
+                            class="chat-page__boardroom"
+                            [agents]="boardroomAgents()"
+                          />
+                        }
+
+                        @if (showVerdict(message)) {
+                          <app-verdict-meter class="chat-page__verdict" [verdict]="verdict()" />
+                        }
 
                         @if (messageTools(message).length > 0) {
                           <div

@@ -60,7 +60,7 @@ export class TalkButtonComponent implements OnDestroy {
   readonly reducedMotion = signal(this.reducedMotionValue);
 
   readonly connectionState = this.store.connectionState;
-  readonly liveTranscript = this.store.liveTranscript;
+  readonly transcriptEntries = this.store.transcriptEntries;
   readonly activeToolCall = this.store.activeToolCall;
   readonly activeChart = this.store.activeChart;
   readonly isModelSpeaking = this.store.isModelSpeaking;

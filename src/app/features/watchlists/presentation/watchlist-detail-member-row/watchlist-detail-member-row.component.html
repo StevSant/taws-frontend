@@ -29,8 +29,8 @@
     <p class="member-row__outlook">
       <span class="member-row__outlook-lead">{{ similarMovesLabel() }}</span>
       <span class="member-row__outlook-metric">
-        {{ i18n.t('watchlists.detail.member.forward7dLabel') }}
-        <app-price-delta-chip [value]="outlook.forward7dMedianPct" />
+        {{ i18n.t(horizonLabelKey()) }}
+        <app-price-delta-chip [value]="outlookValue()" />
       </span>
       @if (outlook.minReturnPct !== null && outlook.maxReturnPct !== null) {
         <span class="member-row__outlook-metric">
