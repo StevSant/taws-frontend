@@ -14,27 +14,19 @@
 }
 
 // ---------------------------------------------------------------------------
-// CONDENSED HOME — lead grid: the user's lists + their reports lead the page.
+// CONDENSED HOME — reports lead the page. Watchlist CRUD lives on /watchlists;
+// this page only picks which list to report on (selector in the reports bar).
 // ---------------------------------------------------------------------------
 .briefings-home {
-  display: grid;
-  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: var(--space-5);
-  align-items: start;
-
-  &__lists {
-    position: sticky;
-    // Clear the sticky shell header so the pinned column never slides under it.
-    top: calc(var(--shell-header-height) + var(--space-4));
-    // Cap to the viewport below the header and scroll internally when the
-    // watchlist manager is taller than the space — avoids overlap/detachment.
-    max-height: calc(100dvh - var(--shell-header-height) - var(--space-5));
-    overflow-y: auto;
-    min-width: 0;
-  }
+  min-width: 0;
+  width: 100%;
 
   &__reports {
     min-width: 0;
+    width: 100%;
   }
 }
 
@@ -192,22 +184,8 @@
 }
 
 // ---------------------------------------------------------------------------
-// Responsive: collapse the lead grid to a single column, unsticky the lists.
+// Responsive
 // ---------------------------------------------------------------------------
-@media (max-width: 900px) {
-  .briefings-home {
-    grid-template-columns: 1fr;
-  }
-
-  .briefings-home__lists {
-    position: static;
-    top: auto;
-    // Drop the sticky viewport cap once the column is full-width and stacked.
-    max-height: none;
-    overflow-y: visible;
-  }
-}
-
 @media (max-width: 768px) {
   .briefings-reports {
     padding: var(--space-4);
