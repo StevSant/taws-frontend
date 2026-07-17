@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslationKey, TranslationService } from '../../../../core';
 import { PriceDeltaChipComponent } from '../../../../shared/price';
 import { MarketScore } from '../../application/compute-market-score';
@@ -38,7 +39,7 @@ interface MixEntry {
 @Component({
   selector: 'app-watchlist-summary-card',
   standalone: true,
-  imports: [PriceDeltaChipComponent],
+  imports: [RouterLink, PriceDeltaChipComponent],
   templateUrl: './watchlist-summary-card.component.html',
   styleUrl: './watchlist-summary-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

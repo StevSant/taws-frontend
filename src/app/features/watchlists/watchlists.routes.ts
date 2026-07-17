@@ -1,11 +1,10 @@
 import { Routes } from '@angular/router';
-import { WatchlistsPageComponent } from './presentation';
+import { WatchlistDetailPageComponent, WatchlistsPageComponent } from './presentation';
 
 export const WATCHLISTS_ROUTES: Routes = [
   { path: '', component: WatchlistsPageComponent },
-  // `watchlists/:id` has no dedicated detail page, but Watchdog alerts and daily-briefing
-  // notifications have been composing `/watchlists/{id}?signal={id}` link-backs since they
-  // shipped — with no route to match, those landed on a blank screen. Rendering the list
-  // page here keeps every already-delivered Telegram link working instead of white-paging.
-  { path: ':id', component: WatchlistsPageComponent },
+  // `watchlists/:id` renders a real per-list detail page (hero read + historical outlook + every
+  // member). This also serves the Watchdog-alert and daily-briefing link-backs
+  // (`/watchlists/{id}?signal={id}`), which previously fell through to the manage page.
+  { path: ':id', component: WatchlistDetailPageComponent },
 ];

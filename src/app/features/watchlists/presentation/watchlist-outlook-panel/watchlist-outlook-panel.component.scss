@@ -1,0 +1,38 @@
+.outlook {
+  &__title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  &__horizons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-5);
+  }
+
+  &__horizon {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__horizon-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  &__contributing {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__empty {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+}

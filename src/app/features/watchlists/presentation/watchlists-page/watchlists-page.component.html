@@ -65,6 +65,9 @@
                     {{ list.name }}
                   </button>
                   <span class="watchlists-page__row-actions">
+                    <a class="watchlists-page__detail-link" [routerLink]="['/watchlists', list.id]">
+                      {{ i18n.t('watchlists.detail.viewLink') }}
+                    </a>
                     <button type="button" (click)="startRename(list)" [disabled]="store.isBusy()">
                       {{ i18n.t('watchlists.rename') }}
                     </button>

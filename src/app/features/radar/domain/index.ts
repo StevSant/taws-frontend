@@ -33,6 +33,8 @@ export { DEFAULT_RADAR_FILTERS, RECENCY_OPTIONS_HOURS } from './models/radar-fil
 export type { RadarSignal } from './models/radar-signal.model';
 export type { Signal } from './models/signal.model';
 export type { MarketStats } from './models/market-stats.model';
+export type { EventStudyEvent } from './models/event-study-event.model';
+export type { EventStudyStats } from './models/event-study-stats.model';
 export type { MacroObservation, MacroState, VolatilityRegime } from './models/macro-state.model';
 export type { MacroSeries } from './models/macro-series.model';
 export type { MacroIndicator } from './models/macro-indicator.model';

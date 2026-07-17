@@ -1,0 +1,27 @@
+<section class="outlook feature-panel">
+  <h2 class="outlook__title">{{ i18n.t('watchlists.detail.outlook.title') }}</h2>
+
+  @if (hasData()) {
+    <div class="outlook__horizons">
+      <div class="outlook__horizon">
+        <span class="outlook__horizon-label">{{
+          i18n.t('watchlists.detail.outlook.forward7d')
+        }}</span>
+        <app-price-delta-chip [value]="outlook().forward7dMedianPct" />
+      </div>
+      <div class="outlook__horizon">
+        <span class="outlook__horizon-label">{{
+          i18n.t('watchlists.detail.outlook.forward30d')
+        }}</span>
+        <app-price-delta-chip [value]="outlook().forward30dMedianPct" />
+      </div>
+    </div>
+
+    <p class="outlook__contributing">{{ contributingLabel() }}</p>
+
+    <p class="feature-disclaimer">{{ i18n.t('watchlists.detail.outlook.disclaimer') }}</p>
+  } @else {
+    <p class="outlook__empty">{{ i18n.t('watchlists.detail.outlook.empty') }}</p>
+    <p class="feature-disclaimer">{{ i18n.t('watchlists.detail.outlook.disclaimer') }}</p>
+  }
+</section>

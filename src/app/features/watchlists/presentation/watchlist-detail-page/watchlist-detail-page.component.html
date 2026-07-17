@@ -1,0 +1,108 @@
+<div class="feature-page watchlist-detail">
+  <a class="watchlist-detail__back" routerLink="/watchlists"
+    >&#8592; {{ i18n.t('watchlists.detail.back') }}</a
+  >
+
+  @if (!store.available()) {
+    <p class="watchlist-detail__auth">{{ i18n.t('watchlists.authRequired') }}</p>
+  } @else {
+    @if (store.isLoading()) {
+      <div class="watchlist-detail__state" aria-busy="true">
+        <app-spinner />
+        <span>{{ i18n.t('watchlists.detail.loading') }}</span>
+      </div>
+    }
+
+    @if (store.error(); as error) {
+      <div class="feature-error" role="alert">
+        <span>{{ i18n.t('radar.error.banner') }}{{ error }}</span>
+        <app-button [label]="i18n.t('radar.error.retry')" (pressed)="onRetry()" />
+      </div>
+    }
+
+    @if (store.isNotFound()) {
+      <app-empty-state
+        [title]="i18n.t('watchlists.detail.notFound.title')"
+        [description]="i18n.t('watchlists.detail.notFound.description')"
+      />
+    }
+
+    @if (store.summary(); as summary) {
+      <header
+        class="watchlist-detail__hero"
+        [class.watchlist-detail__hero--bullish]="!isUnscored() && summary.score.label === 'bullish'"
+        [class.watchlist-detail__hero--bearish]="!isUnscored() && summary.score.label === 'bearish'"
+      >
+        <div class="watchlist-detail__hero-head">
+          <div>
+            <h1 class="watchlist-detail__name">{{ heroName(summary) }}</h1>
+            <p class="watchlist-detail__count">{{ countLabel() }}</p>
+          </div>
+          <a class="watchlist-detail__manage" routerLink="/watchlists">{{
+            i18n.t('watchlists.detail.manage')
+          }}</a>
+        </div>
+
+        @if (isUnscored()) {
+          <span class="watchlist-detail__read watchlist-detail__read--unscored">
+            {{ i18n.t('radar.watchlists.unscored') }}
+          </span>
+        } @else {
+          <span class="watchlist-detail__read">{{ i18n.t(scoreLabelKey()) }}</span>
+          <span class="watchlist-detail__mix">
+            @for (entry of heroMix(); track entry.key) {
+              <span
+                class="watchlist-detail__mix-item"
+                [class]="'watchlist-detail__mix-item--' + entry.key"
+              >
+                <span class="watchlist-detail__mix-dot" aria-hidden="true"></span>
+                {{ entry.count }} {{ i18n.t(entry.labelKey) }}
+              </span>
+            }
+          </span>
+        }
+
+        <div class="watchlist-detail__aggregates">
+          @if (confidencePct() !== null) {
+            <span class="watchlist-detail__aggregate">
+              <span class="watchlist-detail__aggregate-label">{{
+                i18n.t('radar.watchlists.confidence')
+              }}</span>
+              <span class="watchlist-detail__aggregate-value">{{ confidencePct() }}%</span>
+            </span>
+          }
+          <span class="watchlist-detail__aggregate">
+            <span class="watchlist-detail__aggregate-label">{{
+              i18n.t('radar.watchlists.average')
+            }}</span>
+            <app-price-delta-chip [value]="summary.averageDeltaPct" />
+          </span>
+        </div>
+      </header>
+
+      @if (store.members().length > 0) {
+        @if (store.outlook(); as outlook) {
+          <app-watchlist-outlook-panel [outlook]="outlook" />
+        }
+
+        <section class="watchlist-detail__instruments feature-panel">
+          <h2 class="watchlist-detail__section-title">
+            {{ i18n.t('watchlists.detail.instruments') }}
+          </h2>
+          <ul class="watchlist-detail__members">
+            @for (member of store.members(); track member.symbol) {
+              <li class="watchlist-detail__member">
+                <app-watchlist-detail-member-row [member]="member" />
+              </li>
+            }
+          </ul>
+        </section>
+      } @else {
+        <app-empty-state
+          [title]="i18n.t('watchlists.detail.empty.title')"
+          [description]="i18n.t('watchlists.detail.empty.description')"
+        />
+      }
+    }
+  }
+</div>

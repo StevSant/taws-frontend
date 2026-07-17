@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import {
   ButtonComponent,
@@ -24,7 +25,13 @@ import { Instrument } from '../../../radar/domain';
 @Component({
   selector: 'app-watchlists-page',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, EmptyStateComponent, FeaturePageHeaderComponent],
+  imports: [
+    FormsModule,
+    RouterLink,
+    ButtonComponent,
+    EmptyStateComponent,
+    FeaturePageHeaderComponent,
+  ],
   providers: [AddInstrumentStore],
   templateUrl: './watchlists-page.component.html',
   styleUrl: './watchlists-page.component.scss',

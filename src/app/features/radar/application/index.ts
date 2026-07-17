@@ -12,6 +12,7 @@ export { CompositionInstrumentsStore } from './composition-instruments-store';
 export type { ClassInstruments } from './composition-instruments-store';
 export { computeClassTrend } from './compute-class-trend';
 export { computeWatchlistSummary } from './compute-watchlist-summary';
+export { mapInBatches } from './map-in-batches';
 export type { WatchlistSummary } from './watchlist-summary.model';
 export type { WatchlistSummaryMember } from './watchlist-summary-member.model';
 export { buildMacroLineSpec } from './build-macro-line-spec';

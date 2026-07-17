@@ -1,5 +1,6 @@
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 .watchlist-card {
@@ -167,4 +168,23 @@
 .watchlist-card__more {
   font-size: 0.7rem;
   color: var(--color-text-faint);
+}
+
+.watchlist-card__detail-link {
+  align-self: flex-start;
+  margin-top: var(--space-2);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--color-gold);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
 }

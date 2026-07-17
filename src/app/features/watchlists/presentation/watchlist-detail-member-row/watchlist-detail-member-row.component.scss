@@ -1,0 +1,117 @@
+:host {
+  display: block;
+}
+
+.member-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-border-hi);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 2px;
+  }
+
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  &__names {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 0;
+  }
+
+  &__symbol {
+    font-family: var(--font-family-mono);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  &__name {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__read {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  &__impact {
+    font-family: var(--font-family-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+
+    &--positive {
+      color: var(--color-signal-positive);
+    }
+
+    &--negative {
+      color: var(--color-signal-negative);
+    }
+
+    &--neutral {
+      color: var(--color-signal-neutral);
+    }
+
+    &--uncertain {
+      color: var(--color-signal-uncertain);
+    }
+  }
+
+  &__confidence {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+  }
+
+  &__outlook {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+  }
+
+  &__outlook-lead {
+    color: var(--color-text-muted);
+  }
+
+  &__outlook-metric {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+}

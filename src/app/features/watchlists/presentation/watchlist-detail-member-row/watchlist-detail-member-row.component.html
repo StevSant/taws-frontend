@@ -1,0 +1,51 @@
+@let outlook = member().outlook;
+
+<a class="member-row" [routerLink]="['/radar', member().symbol]">
+  <div class="member-row__identity">
+    <app-instrument-ticker-badge [symbol]="member().symbol" size="sm" />
+    <div class="member-row__names">
+      <span class="member-row__symbol">{{ member().symbol }}</span>
+      @if (member().name) {
+        <span class="member-row__name">{{ member().name }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="member-row__read">
+    @if (member().impactClass; as impact) {
+      <span class="member-row__impact" [class]="'member-row__impact--' + impact">{{
+        impactLabel(impact)
+      }}</span>
+    }
+    @if (confidencePct() !== null) {
+      <span class="member-row__confidence">
+        {{ i18n.t('watchlists.detail.member.confidence') }} {{ confidencePct() }}%
+      </span>
+    }
+    <app-price-delta-chip [value]="member().deltaPct" />
+  </div>
+
+  @if (hasOutlook() && outlook) {
+    <p class="member-row__outlook">
+      <span class="member-row__outlook-lead">{{ similarMovesLabel() }}</span>
+      <span class="member-row__outlook-metric">
+        {{ i18n.t('watchlists.detail.member.forward7dLabel') }}
+        <app-price-delta-chip [value]="outlook.forward7dMedianPct" />
+      </span>
+      @if (outlook.minReturnPct !== null && outlook.maxReturnPct !== null) {
+        <span class="member-row__outlook-metric">
+          {{ i18n.t('watchlists.detail.member.range') }}
+          <app-price-delta-chip [value]="outlook.minReturnPct" />
+          <span aria-hidden="true">…</span>
+          <app-price-delta-chip [value]="outlook.maxReturnPct" />
+        </span>
+      }
+      @if (outlook.scenarioProbabilityPct !== null) {
+        <span class="member-row__outlook-metric">
+          {{ i18n.t('watchlists.detail.member.probability') }}
+          {{ outlook.scenarioProbabilityPct | number: '1.0-1' }}%
+        </span>
+      }
+    </p>
+  }
+</a>
