@@ -1,5 +1,5 @@
 import type { EChartsOption } from 'echarts';
-import { ChartSpec } from '../domain/chart-spec.model';
+import { ChartAxis, ChartSpec } from '../domain/chart-spec.model';
 import { createTimeAxisFormatter } from './create-time-axis-formatter';
 import { ChartTheme } from './read-chart-theme';
 
@@ -7,7 +7,8 @@ import { ChartTheme } from './read-chart-theme';
  * Map a library-agnostic `ChartSpec` to an ECharts option. This is the ONLY file in the
  * app that knows ECharts option shapes — every other layer speaks `ChartSpec`. Phase 1
  * handles `candlestick` and `line`; Phase 2 extends with `comparison`, `distribution`,
- * `drawdown`, and `gauge`.
+ * `drawdown`, and `gauge`; Phase 3 adds the categorical `bar` (movers) and `heatmap`
+ * (watchlist) visuals.
  *
  * `locale` drives the shared date-axis formatter so every date-bearing axis renders
  * locale-formatted labels (`29 jun`) instead of raw ISO timestamps.
@@ -50,6 +51,10 @@ export function mapChartSpecToOption(
       return { ...base, ...drawdownOption(spec, theme, formatDate) };
     case 'gauge':
       return gaugeOption(spec, theme);
+    case 'bar':
+      return { ...base, ...barOption(spec, theme) };
+    case 'heatmap':
+      return { ...base, ...heatmapOption(spec, theme) };
     default:
       // Unhandled type until a later phase — render an empty axis rather than crash.
       return base;
@@ -356,4 +361,137 @@ function gaugeOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
       },
     ],
   };
+}
+
+/**
+ * Horizontal categorical bar (market movers): symbols on the category axis, % change on the
+ * value axis, each bar shaded by the sign of its value (gain green / loss red). Reuses
+ * `series[0].points`, where `x` is the symbol string and `y` the change.
+ */
+function barOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+  const series = spec.series[0];
+  if (!series || series.points.length === 0) {
+    return {};
+  }
+  const formatValue = createValueFormatter(spec.yAxis.format ?? spec.xAxis.format);
+  // ECharts' category y-axis reads bottom-up; reverse so the backend's top-ranked mover
+  // sits at the top of the chart.
+  const points = [...series.points].reverse();
+  return {
+    grid: { left: 72, right: 56, top: 44, bottom: 32 },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      valueFormatter: (value) => formatValue(Number(value)),
+    },
+    xAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { color: theme.grid, opacity: 0.15 } },
+      axisLabel: { color: theme.textSecondary, formatter: (value: number) => formatValue(value) },
+    },
+    yAxis: {
+      type: 'category',
+      data: points.map((point) => String(point.x)),
+      axisLine: { lineStyle: { color: theme.grid } },
+      axisLabel: { color: theme.textSecondary },
+    },
+    series: [
+      {
+        type: 'bar',
+        name: series.name,
+        data: points.map((point) => ({
+          value: point.y,
+          itemStyle: {
+            color: point.y > 0 ? theme.gain : point.y < 0 ? theme.loss : theme.textSecondary,
+          },
+        })),
+        label: {
+          show: true,
+          position: 'right',
+          color: theme.textSecondary,
+          formatter: (params) => formatValue(Number(params.value)),
+        },
+      },
+    ],
+  };
+}
+
+/**
+ * Watchlist heatmap: `spec.cells` laid out as a near-square grid of labeled tiles, each
+ * shaded on a diverging loss → neutral → gain scale centered on zero. Tiles carry the
+ * symbol and its value; the axes are hidden since position is not meaningful.
+ */
+function heatmapOption(spec: ChartSpec, theme: ChartTheme): EChartsOption {
+  const cells = spec.cells ?? [];
+  if (cells.length === 0) {
+    return {};
+  }
+  const formatValue = createValueFormatter(spec.yAxis.format);
+  const columns = Math.ceil(Math.sqrt(cells.length));
+  const rows = Math.ceil(cells.length / columns);
+  const data = cells.map((cell, index) => ({
+    // Fill the top row first so reading order follows the backend ranking.
+    value: [index % columns, rows - 1 - Math.floor(index / columns), cell.value] as [
+      number,
+      number,
+      number,
+    ],
+    name: cell.label,
+  }));
+  const maxAbs = Math.max(...cells.map((cell) => Math.abs(cell.value)), Number.EPSILON);
+  return {
+    grid: { left: 8, right: 8, top: 44, bottom: 8 },
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => {
+        const item = Array.isArray(params) ? params[0] : params;
+        const value = (item.value as number[])[2];
+        return `${item.name}: ${formatValue(value)}`;
+      },
+    },
+    xAxis: { type: 'category', show: false, data: range(columns) },
+    yAxis: { type: 'category', show: false, data: range(rows) },
+    visualMap: {
+      show: false,
+      dimension: 2,
+      min: -maxAbs,
+      max: maxAbs,
+      calculable: false,
+      inRange: { color: [theme.loss, theme.surface, theme.gain] },
+    },
+    series: [
+      {
+        type: 'heatmap',
+        data,
+        label: {
+          show: true,
+          color: theme.textPrimary,
+          formatter: (params) => `${params.name}\n${formatValue((params.value as number[])[2])}`,
+        },
+        itemStyle: { borderColor: theme.surface, borderWidth: 3, borderRadius: 6 },
+      },
+    ],
+  };
+}
+
+/**
+ * Builds a signed value-label formatter for the categorical charts. A `percent`-formatted
+ * axis carries fractions (`0.052` ⇒ `+5.2%`), matching the distribution chart's convention;
+ * anything else renders as a signed number. The sign is always shown so movers/heatmaps read
+ * at a glance.
+ */
+function createValueFormatter(format: ChartAxis['format']): (value: number) => string {
+  if (format === 'percent') {
+    return (value) => `${signed(value * 100)}%`;
+  }
+  return (value) => signed(value);
+}
+
+function signed(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  return rounded > 0 ? `+${rounded}` : String(rounded);
+}
+
+function range(count: number): number[] {
+  return Array.from({ length: count }, (_, index) => index);
 }

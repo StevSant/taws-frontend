@@ -138,7 +138,10 @@ function toIsoDate(timestamp: string): string {
   return timestamp.slice(0, 10);
 }
 
-/** True when the spec carries at least one series with data (line points or OHLC bars). */
+/** True when the spec carries plottable data — series (points/bars) or heatmap cells. */
 function hasPlottableSeries(spec: ChartSpec): boolean {
+  if (spec.type === 'heatmap') {
+    return (spec.cells?.length ?? 0) > 0;
+  }
   return spec.series.some((series) => series.points.length > 0 || series.bars.length > 0);
 }

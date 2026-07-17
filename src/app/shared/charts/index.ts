@@ -1,5 +1,6 @@
 export type {
   ChartAxis,
+  ChartCell,
   ChartMeta,
   ChartPoint,
   ChartSeries,

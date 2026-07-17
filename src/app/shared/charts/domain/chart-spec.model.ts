@@ -1,11 +1,25 @@
 import { ChartRequest } from './chart-request.model';
 
 export type ChartType =
-  'line' | 'candlestick' | 'comparison' | 'area' | 'distribution' | 'drawdown' | 'gauge';
+  | 'line'
+  | 'candlestick'
+  | 'comparison'
+  | 'area'
+  | 'distribution'
+  | 'drawdown'
+  | 'gauge'
+  | 'bar'
+  | 'heatmap';
 
 export interface ChartPoint {
   x: string | number;
   y: number;
+}
+
+/** One labeled tile in a `heatmap` chart (e.g. a watchlist symbol and its % change). */
+export interface ChartCell {
+  label: string;
+  value: number;
 }
 
 export interface OhlcBar {
@@ -49,4 +63,6 @@ export interface ChartSpec {
   xAxis: ChartAxis;
   yAxis: ChartAxis;
   meta: ChartMeta;
+  /** Labeled tiles for a `heatmap` chart; absent for series-based chart types. */
+  cells?: ChartCell[];
 }
