@@ -35,7 +35,6 @@ export { FeatureGuideComponent } from './feature-guide/feature-guide.component';
 export { PlanUsageWidgetComponent } from './plan-usage-widget/plan-usage-widget.component';
 export { UserProfileChipComponent } from './user-profile-chip/user-profile-chip.component';
 export { UserMenuComponent } from './user-menu/user-menu.component';
-export { GuideNotesTabsComponent } from './guide-notes-tabs/guide-notes-tabs.component';
 export { ActivityFeedComponent } from './activity-feed/activity-feed.component';
 export type { ActivityFeedItem } from './activity-feed/activity-feed.component';
 export { FearGreedArcGaugeComponent } from './fear-greed-arc-gauge/fear-greed-arc-gauge.component';

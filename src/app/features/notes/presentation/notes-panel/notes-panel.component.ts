@@ -8,8 +8,9 @@ import { Note } from '../../domain';
 const NOTE_MAX_LENGTH = 2000;
 
 /**
- * Functional notes panel (issue #62): add/edit/delete per-user notes, projected into the
- * shared `app-guide-notes-tabs` "Notas" tab on both the Briefings and Scenario Lab pages.
+ * Functional notes panel (issue #62): add/edit/delete per-user notes. Rendered by the
+ * dedicated Notes page (`/notes`) — notes are one global per-user list, not tied to any
+ * scenario or report.
  *
  * Loads reactively once a session exists (an `effect` on `AuthStore.isAuthenticated`, so it
  * survives the async auth bootstrap); when unauthenticated it shows a sign-in prompt instead

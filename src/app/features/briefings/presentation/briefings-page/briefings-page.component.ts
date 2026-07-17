@@ -8,12 +8,11 @@ import {
   ActivityFeedItem,
   ButtonComponent,
   EmptyStateComponent,
+  FeatureGuideComponent,
   FeaturePageHeaderComponent,
   FeaturePageStat,
-  GuideNotesTabsComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
-import { NotesPanelComponent } from '../../../notes/presentation';
 import { BriefingPanelStore, RelevantNewsStore } from '../../application';
 import { RelevantNewsRepository } from '../../domain';
 import { HttpRelevantNewsRepository } from '../../infrastructure';
@@ -32,13 +31,12 @@ const ACTIVITY_FEED_LIMIT = 8;
     FormsModule,
     RouterLink,
     ButtonComponent,
+    FeatureGuideComponent,
     FeaturePageHeaderComponent,
-    GuideNotesTabsComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
     ActivityFeedComponent,
     BriefingCardComponent,
-    NotesPanelComponent,
     GenerationFocusComponent,
     NewsStripComponent,
   ],

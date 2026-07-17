@@ -1,0 +1,7 @@
+.notes-page {
+  // Notes are single-column reading/writing content: cap the panel width so lines
+  // stay comfortable on wide screens instead of stretching edge to edge.
+  &__panel {
+    max-width: 48rem;
+  }
+}

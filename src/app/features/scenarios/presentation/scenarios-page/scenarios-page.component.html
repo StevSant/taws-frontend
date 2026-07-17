@@ -4,15 +4,7 @@
     [description]="i18n.t('scenarios.description')"
   />
 
-  <app-guide-notes-tabs
-    [guideTitle]="i18n.t('scenarios.guide.title')"
-    [guideSteps]="guideSteps()"
-    [notesTitle]="i18n.t('scenarios.notes.title')"
-    [guideTabLabel]="i18n.t('scenarios.guide.tabLabel')"
-    [notesTabLabel]="i18n.t('scenarios.notes.tabLabel')"
-  >
-    <app-notes-panel notesPanel />
-  </app-guide-notes-tabs>
+  <app-feature-guide [title]="i18n.t('scenarios.guide.title')" [steps]="guideSteps()" />
 
   <div class="scenarios-page__layout">
     <div class="scenarios-page__main">

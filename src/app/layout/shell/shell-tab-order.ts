@@ -9,6 +9,7 @@ const SHELL_TAB_PREFIXES = [
   '/scenarios',
   '/briefings',
   '/watchlists',
+  '/notes',
   '/brand-lab',
 ] as const;
 

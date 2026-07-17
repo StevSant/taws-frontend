@@ -1,0 +1,10 @@
+<div class="feature-page notes-page">
+  <app-feature-page-header
+    [title]="i18n.t('notes.page.title')"
+    [description]="i18n.t('notes.page.subtitle')"
+  />
+
+  <section class="notes-page__panel feature-panel" [attr.aria-label]="i18n.t('notes.page.title')">
+    <app-notes-panel />
+  </section>
+</div>

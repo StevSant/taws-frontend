@@ -48,6 +48,13 @@ export const routes: Routes = [
           import('./features/watchlists/watchlists.routes').then((m) => m.WATCHLISTS_ROUTES),
       },
       {
+        // Guarded: /api/v1/notes is per-user (RLS on the backend), same auth model as
+        // briefings/watchlists. One global notepad, not tied to any scenario or report.
+        path: 'notes',
+        canActivate: [authGuard],
+        loadChildren: () => import('./features/notes/notes.routes').then((m) => m.NOTES_ROUTES),
+      },
+      {
         path: 'brand-lab',
         loadChildren: () =>
           import('./features/brand-lab/brand-lab.routes').then((m) => m.BRAND_LAB_ROUTES),

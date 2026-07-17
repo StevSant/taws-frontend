@@ -4,8 +4,9 @@ import { AuthStore } from '../../auth/application';
 import { Note, NoteRepository } from '../domain';
 
 /**
- * Signal facade over the per-user notes API (issue #62). App-scoped so the same notes are
- * shared by the Briefings and Scenario Lab pages. Every mutation updates the local list
+ * Signal facade over the per-user notes API (issue #62). App-scoped (root-provided) so
+ * state survives navigation; notes are a single global per-user list surfaced on the
+ * dedicated /notes page. Every mutation updates the local list
  * optimistically-after-confirm (the repository call resolves first, then the signal is
  * patched) so the panel stays in sync without a full reload.
  *

@@ -8,11 +8,10 @@ import {
   ActivityFeedItem,
   ButtonComponent,
   EmptyStateComponent,
+  FeatureGuideComponent,
   FeaturePageHeaderComponent,
-  GuideNotesTabsComponent,
   SkeletonCardComponent,
 } from '../../../../shared';
-import { NotesPanelComponent } from '../../../notes/presentation';
 import { ScenarioIntakeMode, ScenarioLabStore } from '../../application';
 import { PresetPickerComponent } from '../preset-picker/preset-picker.component';
 import { ScenarioProgressPipelineComponent } from '../scenario-progress-pipeline/scenario-progress-pipeline.component';
@@ -49,13 +48,12 @@ const FREE_TEXT_MAX_LENGTH = 1000;
     FormsModule,
     ActivityFeedComponent,
     ButtonComponent,
+    FeatureGuideComponent,
     FeaturePageHeaderComponent,
-    GuideNotesTabsComponent,
     SkeletonCardComponent,
     EmptyStateComponent,
     PresetPickerComponent,
     ScenarioProgressPipelineComponent,
-    NotesPanelComponent,
   ],
   providers: [DatePipe],
   templateUrl: './scenarios-page.component.html',

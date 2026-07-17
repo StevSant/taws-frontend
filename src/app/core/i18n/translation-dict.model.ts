@@ -25,6 +25,8 @@ export interface TranslationDict {
   'shell.nav.briefings.hint': string;
   'shell.nav.watchlists': string;
   'shell.nav.watchlists.hint': string;
+  'shell.nav.notes': string;
+  'shell.nav.notes.hint': string;
   'shell.sidebar.label': string;
   'shell.sidebar.radar': string;
   'shell.sidebar.news': string;
@@ -797,10 +799,8 @@ export interface TranslationDict {
   'scenarios.nav.templates': string;
   'scenarios.nav.variables': string;
   'scenarios.nav.history': string;
-  'scenarios.guide.tabLabel': string;
-  'scenarios.notes.tabLabel': string;
-  'scenarios.notes.title': string;
-  'scenarios.notes.empty': string;
+  'notes.page.title': string;
+  'notes.page.subtitle': string;
   'notes.panel.addPlaceholder': string;
   'notes.panel.add': string;
   'notes.panel.save': string;
@@ -876,10 +876,6 @@ export interface TranslationDict {
   'briefings.nav.variables': string;
   'briefings.nav.history': string;
   'briefings.profile.role': string;
-  'briefings.guide.tab.guide': string;
-  'briefings.guide.tab.notes': string;
-  'briefings.notes.title': string;
-  'briefings.notes.empty': string;
   'briefings.activity.title': string;
   'briefings.activity.empty': string;
   'briefings.activity.generated': string;

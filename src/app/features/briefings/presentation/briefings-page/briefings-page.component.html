@@ -136,19 +136,11 @@
         </section>
       }
 
-      <!-- DEMOTED: guide + notes, collapsed by default. -->
+      <!-- DEMOTED: guide, collapsed by default. Notes moved to the dedicated /notes page. -->
       <details class="briefings-aside">
         <summary class="briefings-aside__summary">{{ i18n.t('briefings.guide.toggle') }}</summary>
         <div class="briefings-aside__body">
-          <app-guide-notes-tabs
-            [guideTitle]="i18n.t('briefings.guide.title')"
-            [guideSteps]="guideSteps()"
-            [notesTitle]="i18n.t('briefings.notes.title')"
-            [guideTabLabel]="i18n.t('briefings.guide.tab.guide')"
-            [notesTabLabel]="i18n.t('briefings.guide.tab.notes')"
-          >
-            <app-notes-panel notesPanel />
-          </app-guide-notes-tabs>
+          <app-feature-guide [title]="i18n.t('briefings.guide.title')" [steps]="guideSteps()" />
         </div>
       </details>
 
