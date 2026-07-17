@@ -1,3 +1,4 @@
+export { AnnotationDrawerComponent } from './annotation-drawer/annotation-drawer.component';
 export { NoteContextChipComponent } from './note-context-chip/note-context-chip.component';
 export { NotesPageComponent } from './notes-page/notes-page.component';
 export { NotesPanelComponent } from './notes-panel/notes-panel.component';

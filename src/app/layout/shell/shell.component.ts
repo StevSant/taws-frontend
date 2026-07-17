@@ -19,6 +19,7 @@ import {
 } from '../../core';
 import { resolveNotificationLink } from '../../core/notifications/resolve-notification-link';
 import { AuthStore } from '../../features/auth/application';
+import { AnnotationDrawerComponent } from '../../features/notes/presentation';
 import { RadarStore } from '../../features/radar/application';
 import { RadarNewsNotificationPoller } from '../../features/radar/application/radar-news-notification-poller.service';
 import {
@@ -49,6 +50,7 @@ const CUSTOM_LAYOUT_ROUTE_PREFIXES = [
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
+    AnnotationDrawerComponent,
     NotificationBellComponent,
     MidasLogoComponent,
     ThemeToggleComponent,

@@ -169,6 +169,10 @@
       <router-outlet></router-outlet>
     </main>
 
+    <!-- Mounted once for the whole app: pages declare a target and open this, rather than
+         each owning its own add-note form. Position: fixed, so it can live anywhere here. -->
+    <app-annotation-drawer />
+
     @if (!usesCustomLayout()) {
       <footer class="app-shell__footer">
         <span class="app-shell__disclaimer">{{ i18n.t('shell.footer.disclaimer') }}</span>

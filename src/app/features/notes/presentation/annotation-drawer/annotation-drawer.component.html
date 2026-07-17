@@ -1,0 +1,24 @@
+<app-drawer
+  [open]="drawer.isOpen()"
+  [ariaLabel]="i18n.t('notes.drawer.about')"
+  (closed)="drawer.close()"
+>
+  @if (drawer.target(); as target) {
+    <header class="annotation-drawer__header">
+      <div class="annotation-drawer__identity">
+        <span class="annotation-drawer__eyebrow">{{ i18n.t('notes.drawer.about') }}</span>
+        <h2 class="annotation-drawer__title">{{ target.label }}</h2>
+      </div>
+      <button
+        type="button"
+        class="annotation-drawer__close"
+        [attr.aria-label]="i18n.t('notes.drawer.close')"
+        (click)="drawer.close()"
+      >
+        ✕
+      </button>
+    </header>
+
+    <app-notes-panel [target]="target" />
+  }
+</app-drawer>

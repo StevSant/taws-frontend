@@ -11,6 +11,7 @@
         [ngModelOptions]="{ standalone: true }"
         [maxlength]="maxLength"
         [placeholder]="i18n.t('notes.panel.addPlaceholder')"
+        [attr.autofocus]="target() ? '' : null"
       ></textarea>
       <button
         type="submit"
@@ -21,17 +22,23 @@
       </button>
     </form>
 
-    @if (store.error()) {
-      <p class="notes-panel__error" role="alert">{{ i18n.t('notes.panel.error') }}</p>
+    @if (store.error(); as error) {
+      <p class="notes-panel__error" role="alert">
+        {{
+          error === 'target-gone'
+            ? i18n.t('notes.panel.errorTargetGone')
+            : i18n.t('notes.panel.error')
+        }}
+      </p>
     }
 
     @if (store.isLoading()) {
       <p class="notes-panel__status" role="status">{{ i18n.t('notes.panel.loading') }}</p>
-    } @else if (store.isEmpty()) {
+    } @else if (isEmpty()) {
       <p class="notes-panel__empty">{{ i18n.t('notes.panel.empty') }}</p>
     } @else {
       <ul class="notes-panel__list">
-        @for (note of store.notes(); track note.id) {
+        @for (note of visibleNotes(); track note.id) {
           <li class="notes-panel__item">
             @if (editingId() === note.id) {
               <textarea
@@ -56,6 +63,9 @@
                 </button>
               </div>
             } @else {
+              @if (showContext()) {
+                <app-note-context-chip [target]="note.target" />
+              }
               <p class="notes-panel__body">{{ note.body }}</p>
               <div class="notes-panel__item-actions">
                 <button type="button" class="notes-panel__btn" (click)="startEdit(note)">
