@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { AuthStore } from '../../auth/application';
-import { Note, NoteRepository } from '../domain';
+import { Note, NoteRepository, NoteTarget, NoteTargetRef } from '../domain';
 
 /**
  * Signal facade over the per-user notes API (issue #62). App-scoped (root-provided) so
@@ -53,7 +53,7 @@ export class NotesStore {
     }
   }
 
-  async add(body: string): Promise<boolean> {
+  async add(body: string, target?: NoteTargetRef): Promise<boolean> {
     const trimmed = body.trim();
     if (!trimmed || this.isSavingSignal()) {
       return false;
@@ -61,7 +61,7 @@ export class NotesStore {
     this.isSavingSignal.set(true);
     this.errorSignal.set(null);
     try {
-      const note = await this.repository.create(trimmed);
+      const note = await this.repository.create(trimmed, target);
       this.notesSignal.update((notes) => [note, ...notes]);
       return true;
     } catch (error: unknown) {
@@ -70,6 +70,20 @@ export class NotesStore {
     } finally {
       this.isSavingSignal.set(false);
     }
+  }
+
+  /**
+   * The notes about one target, newest first.
+   *
+   * Filtered client-side against the single root-scoped list rather than refetched: notes
+   * are a small per-user set, so one load serves both the drawer and the `/notes` inbox —
+   * which is what makes a note written in the drawer appear in the inbox with no refetch.
+   * Reads the signal, so callers wrapping this in a `computed` stay reactive.
+   */
+  notesFor(target: NoteTarget): Note[] {
+    return this.notesSignal().filter(
+      (note) => note.target?.kind === target.kind && note.target?.targetId === target.targetId,
+    );
   }
 
   async edit(id: string, body: string): Promise<boolean> {
@@ -104,6 +118,11 @@ export class NotesStore {
   private toErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse && error.status === 0) {
       return 'network';
+    }
+    // 422 from POST /notes means the target vanished between opening the drawer and
+    // submitting — the note was never created, and the draft is still in the textarea.
+    if (error instanceof HttpErrorResponse && error.status === 422) {
+      return 'target-gone';
     }
     return error instanceof Error ? error.message : 'unknown';
   }
