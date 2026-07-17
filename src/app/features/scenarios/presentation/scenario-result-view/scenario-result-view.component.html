@@ -5,6 +5,7 @@
       <div class="scenario-result__meta">
         <span class="scenario-result__badge">{{ magnitudeLabel(result.spec.magnitude) }}</span>
         <span class="scenario-result__badge">{{ horizonLabel(result.spec.horizon) }}</span>
+        <app-notes-trigger-chip kind="scenario" [targetId]="result.id" [label]="result.title" />
       </div>
     </div>
     <h2 class="scenario-result__title">{{ result.title }}</h2>

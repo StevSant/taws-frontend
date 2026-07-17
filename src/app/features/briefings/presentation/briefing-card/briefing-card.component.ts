@@ -9,6 +9,7 @@ import {
   ReviewPanelComponent,
 } from '../review-panel/review-panel.component';
 import { ReviewHistoryComponent } from '../review-history/review-history.component';
+import { NotesTriggerChipComponent } from '../../../notes/presentation';
 import { linkedSignalImpactClass } from './linked-signal-impact-class';
 
 const DECISION_LABELS: Record<ReviewDecision, TranslationKey> = {
@@ -42,7 +43,14 @@ const SIGNAL_ID_HEAD = 8;
 @Component({
   selector: 'app-briefing-card',
   standalone: true,
-  imports: [DatePipe, RouterLink, ReviewPanelComponent, ReviewHistoryComponent, ButtonComponent],
+  imports: [
+    DatePipe,
+    RouterLink,
+    ReviewPanelComponent,
+    ReviewHistoryComponent,
+    ButtonComponent,
+    NotesTriggerChipComponent,
+  ],
   templateUrl: './briefing-card.component.html',
   styleUrl: './briefing-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

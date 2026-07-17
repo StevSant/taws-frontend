@@ -24,6 +24,13 @@
         {{ statusLabel(status) }}
       </span>
     </div>
+
+    <app-notes-trigger-chip
+      kind="briefing"
+      [targetId]="briefing.id"
+      [label]="'#' + briefing.id.slice(0, 8)"
+      [watchlistId]="briefing.watchlistId"
+    />
   </header>
 
   <!-- Summary: the report body, read as comfortable prose. -->

@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
@@ -6,7 +6,21 @@ import { TranslationService } from '../../../../core';
 import { EN_TRANSLATIONS } from '../../../../core/i18n/translations/en';
 import { TranslationKey } from '../../../../core/i18n/translation-dict.model';
 import { Briefing, LinkedSignal } from '../../domain';
+import { NotesTriggerChipComponent } from '../../../notes/presentation';
 import { BriefingCardComponent } from './briefing-card.component';
+
+/**
+ * The real trigger chip pulls in NotesStore/AuthStore (and their repositories) — DI that is
+ * irrelevant to the card's signal-chip logic this suite checks. Stub it by selector so the card
+ * renders without the notes graph.
+ */
+@Component({ selector: 'app-notes-trigger-chip', standalone: true, template: '' })
+class NotesTriggerChipStub {
+  readonly kind = input<string>();
+  readonly targetId = input<string>();
+  readonly label = input<string>();
+  readonly watchlistId = input<string | null>(null);
+}
 
 /**
  * The real TranslationService reads localStorage at construction, which the
@@ -56,6 +70,10 @@ function createFixture() {
   TestBed.configureTestingModule({
     imports: [BriefingCardComponent],
     providers: [provideRouter([]), { provide: TranslationService, useValue: I18N_STUB }],
+  });
+  TestBed.overrideComponent(BriefingCardComponent, {
+    remove: { imports: [NotesTriggerChipComponent] },
+    add: { imports: [NotesTriggerChipStub] },
   });
 
   const fixture = TestBed.createComponent(BriefingCardComponent);

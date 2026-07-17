@@ -5,7 +5,7 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideLucideConfig } from '@lucide/angular';
 
 import { routes } from './app.routes';
@@ -61,7 +61,10 @@ import { ChartRepository, HttpChartRepository } from './shared/charts';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    // anchorScrolling lets a note's context chip jump to the exact briefing card it is about
+    // (/briefings#briefing-card-<id>). Deliberately NOT enabling scrollPositionRestoration —
+    // that would change navigation behaviour app-wide.
+    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled' })),
     provideLucideConfig({ strokeWidth: 1.75 }),
     // `authErrorInterceptor` is registered first (outermost) so its 401 retry
     // replays through `authInterceptor` and re-attaches the refreshed token.

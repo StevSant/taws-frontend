@@ -41,6 +41,11 @@
       </div>
 
       <div class="asset-detail__actions">
+        <app-notes-trigger-chip
+          kind="instrument"
+          [targetId]="instrument.symbol"
+          [label]="instrument.name"
+        />
         <a
           class="asset-detail__source-link"
           [href]="source.url"

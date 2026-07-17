@@ -18,6 +18,7 @@ import { VolatilityRegimeLevel } from '../../domain/models/market-stats.model';
 import { AssetPriceChartComponent } from '../asset-price-chart/asset-price-chart.component';
 import { NewsCardComponent } from '../news-card/news-card.component';
 import { SignalAnalysisComponent } from '../signal-analysis/signal-analysis.component';
+import { NotesTriggerChipComponent } from '../../../notes/presentation';
 import { navigateDetailBack } from '../navigate-detail-back';
 
 const IMPACT_LABELS: Record<ImpactClass, TranslationKey> = {
@@ -64,6 +65,7 @@ const PERCENT_MULTIPLIER = 100;
     SignalAnalysisComponent,
     NewsCardComponent,
     PaginationComponent,
+    NotesTriggerChipComponent,
   ],
   templateUrl: './asset-detail-page.component.html',
   styleUrl: './asset-detail-page.component.scss',

@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, computed } from '@angular/core';
+import { Component, OnInit, computed, effect, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslationService } from '../../../../core';
 import {
   ActivityFeedComponent,
@@ -109,11 +110,35 @@ export class BriefingsPageComponent implements OnInit {
       .map(({ id, title, meta }) => ({ id, title, meta }));
   });
 
+  private readonly route = inject(ActivatedRoute);
+
   constructor(
     readonly store: BriefingPanelStore,
     readonly i18n: TranslationService,
     private readonly datePipe: DatePipe,
-  ) {}
+  ) {
+    // A note's context chip links here with the report's watchlist, because this page only
+    // renders the ACTIVE watchlist's reports — without this the link would land on a list that
+    // does not contain the report and silently do nothing.
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const watchlistId = params.get('watchlist');
+      if (watchlistId && watchlistId !== this.store.selectedWatchlistId()) {
+        this.onWatchlistChange(watchlistId);
+      }
+    });
+
+    // The cards render after their watchlist's briefings load, so the router's own anchor scroll
+    // fires too early. Scroll once the target card actually exists.
+    effect(() => {
+      const fragment = this.route.snapshot.fragment;
+      if (!fragment || this.store.isLoadingBriefings() || this.store.briefings().length === 0) {
+        return;
+      }
+      queueMicrotask(() => {
+        document.getElementById(fragment)?.scrollIntoView({ block: 'center' });
+      });
+    });
+  }
 
   ngOnInit(): void {
     void this.store.init();
