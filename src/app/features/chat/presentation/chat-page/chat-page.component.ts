@@ -278,13 +278,28 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   readonly canCompose = computed(() => this.auth.isAuthenticated() && !this.store.isStreaming());
 
+  /**
+   * True once the assistant reply has begun emitting tokens. Distinguishes "generating"
+   * (streaming — tokens flowing) from "thinking" (composing — the supervisor is routing or a
+   * tool is running but no text has arrived yet), which drives the two distinct gem profiles.
+   */
+  private readonly hasStreamingTokens = computed(() => {
+    if (!this.store.isStreaming()) {
+      return false;
+    }
+    const latestAssistant = [...this.store.messages()]
+      .reverse()
+      .find((message) => message.role === 'assistant');
+    return !!latestAssistant?.content.trim();
+  });
+
   readonly oracleActivity = computed<OracleActivity>(() => {
     if (this.isListening()) {
       return 'listening';
     }
 
     if (this.store.isStreaming()) {
-      return 'streaming';
+      return this.hasStreamingTokens() ? 'streaming' : 'composing';
     }
 
     return 'idle';

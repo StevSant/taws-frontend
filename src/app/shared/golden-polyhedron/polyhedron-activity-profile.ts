@@ -27,21 +27,25 @@ export const POLYHEDRON_ACTIVITY_PROFILES: Record<PolyhedronActivity, Polyhedron
     emissive: 0xf5c842,
     emissiveIntensity: 0.28,
   },
+  // "Thinking": routing/tools are active but no tokens have arrived yet — deliberate and
+  // steady, a warm amber glow that reads as focus rather than the brighter generating burst.
   composing: {
-    rotationSpeed: 0.85,
-    wobble: 0.18,
-    pulseHz: 1.8,
-    pulseAmp: 0.06,
-    emissive: 0xe6b422,
-    emissiveIntensity: 0.22,
+    rotationSpeed: 1.0,
+    wobble: 0.2,
+    pulseHz: 2.0,
+    pulseAmp: 0.07,
+    emissive: 0xe0a020,
+    emissiveIntensity: 0.42,
   },
+  // "Generating": tokens are streaming — the gem comes alive with the fastest spin, the
+  // strongest pulse and a bright, distinct generating gold so the moment reads as creation.
   streaming: {
-    rotationSpeed: 1.35,
-    wobble: 0.24,
-    pulseHz: 2.4,
-    pulseAmp: 0.09,
-    emissive: 0xf5c842,
-    emissiveIntensity: 0.48,
+    rotationSpeed: 1.7,
+    wobble: 0.28,
+    pulseHz: 2.8,
+    pulseAmp: 0.11,
+    emissive: 0xffd34d,
+    emissiveIntensity: 0.85,
   },
   frozen: {
     rotationSpeed: 0,
