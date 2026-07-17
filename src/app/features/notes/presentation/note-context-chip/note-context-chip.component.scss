@@ -1,0 +1,49 @@
+.note-context-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: 0.15rem var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-decoration: none;
+
+  &__kind {
+    flex: none;
+    color: var(--color-text-muted);
+    font-family: var(--font-family-mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &--link {
+    color: var(--color-text-secondary);
+
+    &:hover {
+      border-color: var(--color-gold-border);
+      color: var(--color-gold);
+    }
+  }
+
+  &--gone,
+  &--none {
+    color: var(--color-text-muted);
+    border-style: dashed;
+    cursor: default;
+  }
+
+  &__gone {
+    flex: none;
+    font-style: italic;
+  }
+}

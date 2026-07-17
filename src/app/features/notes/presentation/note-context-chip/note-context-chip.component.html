@@ -1,0 +1,21 @@
+@if (target(); as noteTarget) {
+  @if (link(); as targetLink) {
+    <a
+      class="note-context-chip note-context-chip--link"
+      [routerLink]="targetLink.commands"
+      [queryParams]="targetLink.queryParams"
+      [fragment]="targetLink.fragment"
+    >
+      <span class="note-context-chip__kind">{{ kindLabel() }}</span>
+      <span class="note-context-chip__label">{{ noteTarget.label }}</span>
+    </a>
+  } @else {
+    <span class="note-context-chip note-context-chip--gone">
+      <span class="note-context-chip__kind">{{ kindLabel() }}</span>
+      <span class="note-context-chip__label">{{ noteTarget.label }}</span>
+      <span class="note-context-chip__gone">· {{ i18n.t('notes.target.unavailable') }}</span>
+    </span>
+  }
+} @else {
+  <span class="note-context-chip note-context-chip--none">{{ i18n.t('notes.target.none') }}</span>
+}
