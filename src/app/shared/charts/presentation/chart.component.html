@@ -22,4 +22,7 @@
     role="img"
     [attr.aria-label]="current()?.meta?.title ?? ''"
   ></div>
+  @if (current()?.meta?.source; as source) {
+    <figcaption class="taws-chart__source">Source: {{ source }}</figcaption>
+  }
 </figure>

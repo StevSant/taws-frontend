@@ -7,6 +7,14 @@
     height: 320px;
   }
 
+  &__source {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    color: var(--color-text-secondary);
+    opacity: 0.75;
+  }
+
   &__timeframes {
     display: flex;
     gap: 0.25rem;
