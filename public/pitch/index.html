@@ -4,382 +4,224 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#050505">
-  <title>Midas — Pitch cinematográfico</title>
+  <title>Midas — Pitch competitivo</title>
+  <link rel="preload" as="image" href="./midas-cinematic-morning.png">
+  <link rel="preload" as="image" href="./midas-cinematic-overload.png">
+  <link rel="preload" as="image" href="./midas-cinematic-alert.png">
   <style>
-    :root {
-      color-scheme: dark;
-      --black:#050505;
-      --white:#f3f0e8;
-      --muted:#aaa69d;
-      --gold:#e1ae26;
-      --gold-hi:#ffd869;
-      --red:#f45e63;
-      --green:#68cf99;
-      --line:rgba(255,255,255,.14);
-      --serif:Georgia,'Times New Roman',serif;
-      --sans:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
-    }
-    *{box-sizing:border-box}
-    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--black);color:var(--white);font-family:var(--sans)}
-    button{font:inherit}
-    .deck{position:relative;width:100%;height:100%;isolation:isolate}
-    .grain{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.045;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-    .scene{position:absolute;inset:0;z-index:1;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(1.25rem,4vw,4rem) clamp(1.25rem,6vw,7rem);opacity:0;visibility:hidden;transform:scale(1.025);filter:blur(10px);transition:opacity .7s ease,transform 1.1s cubic-bezier(.16,1,.3,1),filter .7s ease,visibility 0s .8s}
-    .scene.active{z-index:3;opacity:1;visibility:visible;transform:scale(1);filter:none;transition-delay:0s}
-    .scene.past{transform:scale(.96)}
-    .scene-bg{position:absolute;inset:-3%;z-index:-2;width:106%;height:106%;object-fit:cover;opacity:.72;transform:scale(1.08)}
-    .active .scene-bg{animation:kenBurns 12s ease-out forwards}
-    .veil{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.96) 0%,rgba(5,5,5,.75) 38%,rgba(5,5,5,.2) 72%,rgba(5,5,5,.45) 100%)}
-    .veil--right{background:linear-gradient(90deg,rgba(5,5,5,.2),rgba(5,5,5,.72) 60%,rgba(5,5,5,.94))}
-    .veil--center{background:radial-gradient(circle at 50% 50%,rgba(5,5,5,.1),rgba(5,5,5,.8) 80%)}
-    .scene-head,.scene-foot{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;color:rgba(255,255,255,.55);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase}
-    .scene-head img,.scene-foot img{width:24px;height:24px}
-    .scene-body{display:grid;align-items:center;min-height:0}
-    h1,h2,p{margin-top:0}
-    h1,h2{margin-bottom:1rem;font-family:var(--serif);font-weight:400;letter-spacing:-.055em;text-wrap:balance}
-    h1{font-size:clamp(4.2rem,10vw,10.5rem);line-height:.84}
-    h2{max-width:13ch;font-size:clamp(3.1rem,7vw,7.4rem);line-height:.91}
-    .gold{color:var(--gold-hi)}
-    .red{color:var(--red)}
-    .lead{max-width:52ch;margin-bottom:0;color:#d0cbc0;font-size:clamp(1rem,1.65vw,1.35rem);line-height:1.58}
-    .reveal{overflow:hidden}
-    .reveal>*{display:block;transform:translateY(115%)}
-    .active .reveal:nth-child(1)>*{animation:rise .9s .12s cubic-bezier(.16,1,.3,1) forwards}
-    .active .reveal:nth-child(2)>*{animation:rise .9s .34s cubic-bezier(.16,1,.3,1) forwards}
-    .active .reveal:nth-child(3)>*{animation:rise .9s .56s cubic-bezier(.16,1,.3,1) forwards}
+    :root{color-scheme:dark;--black:#050505;--white:#f4f1e9;--muted:#aaa69c;--gold:#dfa91d;--gold-hi:#ffd867;--red:#f45e63;--green:#69d39c;--line:rgba(255,255,255,.14);--serif:Georgia,'Times New Roman',serif;--sans:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif}
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--black);color:var(--white);font-family:var(--sans)}button{font:inherit}
+    .deck{position:relative;width:100%;height:100%;isolation:isolate}.grain{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+    .scene{position:absolute;inset:0;z-index:1;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(1.2rem,4vw,4rem) clamp(1.2rem,6vw,7rem);opacity:0;visibility:hidden;transform:scale(1.025);filter:blur(10px);transition:opacity .65s ease,transform 1s cubic-bezier(.16,1,.3,1),filter .65s ease,visibility 0s .75s}
+    .scene.active{z-index:3;opacity:1;visibility:visible;transform:scale(1);filter:none;transition-delay:0s}.scene.past{transform:scale(.96)}
+    .scene-bg{position:absolute;inset:-3%;z-index:-2;width:106%;height:106%;object-fit:cover;opacity:.7;transform:scale(1.08)}.active .scene-bg{animation:kenBurns 12s ease-out forwards}
+    .veil{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(5,5,5,.97),rgba(5,5,5,.74) 40%,rgba(5,5,5,.2) 75%,rgba(5,5,5,.5))}.veil--right{background:linear-gradient(90deg,rgba(5,5,5,.25),rgba(5,5,5,.76) 58%,rgba(5,5,5,.96))}
+    .scene-head,.scene-foot{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;color:rgba(255,255,255,.55);font-size:.64rem;letter-spacing:.16em;text-transform:uppercase}.scene-head img,.scene-foot img{width:24px;height:24px}.scene-body{display:grid;align-items:center;min-height:0}
+    h1,h2,p{margin-top:0}h1,h2{margin-bottom:1rem;font-family:var(--serif);font-weight:400;letter-spacing:-.055em;text-wrap:balance}h1{font-size:clamp(4.2rem,10vw,10.5rem);line-height:.84}h2{max-width:14ch;font-size:clamp(3rem,6.5vw,7rem);line-height:.92}.gold{color:var(--gold-hi)}.red{color:var(--red)}.lead{max-width:54ch;margin-bottom:0;color:#d1ccc0;font-size:clamp(1rem,1.65vw,1.35rem);line-height:1.58}
+    .reveal{display:block;overflow:hidden;padding-bottom:.18em;margin-bottom:-.18em}.reveal>span{display:block;transform:translateY(115%)}.active .reveal:nth-child(1)>span{animation:rise .85s .12s cubic-bezier(.16,1,.3,1) forwards}.active .reveal:nth-child(2)>span{animation:rise .85s .34s cubic-bezier(.16,1,.3,1) forwards}.active .reveal:nth-child(3)>span{animation:rise .85s .56s cubic-bezier(.16,1,.3,1) forwards}
+    .source{position:absolute;right:clamp(1.2rem,6vw,7rem);bottom:clamp(3rem,7vh,5rem);z-index:6;max-width:52ch;color:rgba(255,255,255,.48);font-size:.57rem;line-height:1.35;text-align:right}.source a{color:inherit}
 
-    /* Cover */
-    .cover{place-items:center;text-align:center}
-    .cover-mark{position:relative;width:min(25vw,245px);margin:0 auto 1.7rem;opacity:0;transform:scale(.55) rotate(-40deg)}
-    .active .cover-mark{animation:markIn 1.3s .1s cubic-bezier(.16,1,.3,1) forwards}
-    .cover-mark img{width:100%;filter:drop-shadow(0 0 38px rgba(255,216,105,.32))}
-    .cover-mark::before,.cover-mark::after{position:absolute;inset:-24%;content:'';border:1px solid rgba(225,174,38,.27);border-radius:50%;animation:orbit 18s linear infinite}
-    .cover-mark::after{inset:-10%;border-style:dashed;animation-direction:reverse;animation-duration:11s}
-    .cover h1{max-width:12ch;margin-inline:auto}
-    .cover .lead{margin-inline:auto;opacity:0}
-    .active .cover .lead{animation:fadeUp .7s 1.3s ease forwards}
+    /* 01 hook */
+    .hook-copy{max-width:820px}.clock{margin-bottom:1.2rem;color:var(--gold-hi);font:clamp(4.5rem,9vw,9rem)/.72 var(--serif);letter-spacing:-.07em;opacity:0}.active .clock{animation:fadeUp .65s .08s ease forwards}.hook-tag{display:inline-flex;margin-top:1.6rem;padding:.7rem 1rem;border:1px solid rgba(244,94,99,.4);border-radius:999px;background:rgba(244,94,99,.08);color:var(--red);font:700 .76rem ui-monospace,Consolas,monospace;opacity:0;transform:translateY(12px)}.active .hook-tag{animation:fadeUp .5s 1s ease forwards}
 
-    /* Morning */
-    .story-copy{max-width:760px}
-    .clock{margin-bottom:1.4rem;color:var(--gold-hi);font:clamp(4.5rem,9vw,9rem)/.72 var(--serif);letter-spacing:-.07em;opacity:0}
-    .active .clock{animation:fadeUp .7s .1s ease forwards}
-    .loss-pill{display:inline-flex;margin-top:1.6rem;padding:.72rem 1rem;border:1px solid rgba(244,94,99,.42);border-radius:999px;background:rgba(244,94,99,.08);color:var(--red);font:700 .78rem ui-monospace,Consolas,monospace;opacity:0;transform:translateY(12px)}
-    .active .loss-pill{animation:fadeUp .55s 1.05s ease forwards}
+    /* 02 evidence */
+    .evidence-copy{max-width:720px;margin-left:auto;text-align:right}.evidence-copy h2,.evidence-copy .lead{margin-left:auto}.stats{display:flex;justify-content:flex-end;gap:clamp(1.2rem,4vw,4rem);margin-top:2rem}.stat{opacity:0;transform:translateY(20px)}.active .stat{animation:fadeUp .55s var(--delay) ease forwards}.stat strong{display:block;color:var(--red);font:clamp(3rem,5vw,5.5rem)/.9 var(--serif)}.stat small{display:block;max-width:13ch;margin-top:.5rem;color:#d5d0c5;font-size:.66rem;line-height:1.35;letter-spacing:.08em;text-transform:uppercase}
 
-    /* Overload */
-    .overload-copy{max-width:720px;margin-left:auto;text-align:right}
-    .overload-copy h2{margin-left:auto}
-    .overload-copy .lead{margin-left:auto}
-    .metrics{display:flex;justify-content:flex-end;gap:clamp(1.2rem,4vw,3.8rem);margin-top:2rem}
-    .metric{opacity:0;transform:translateY(18px)}
-    .active .metric{animation:fadeUp .55s var(--delay) ease forwards}
-    .metric strong{display:block;color:var(--red);font:clamp(2.2rem,4vw,4.2rem)/1 var(--serif)}
-    .metric small{color:var(--muted);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase}
-    .headline{position:absolute;z-index:2;padding:.65rem .85rem;border:1px solid rgba(244,94,99,.28);border-radius:10px;background:rgba(8,8,8,.86);color:#c9c5bb;font-size:.73rem;opacity:0;backdrop-filter:blur(12px)}
-    .active .headline{animation:headlineIn 6s var(--delay) ease-in-out infinite}
+    /* 03 promise */
+    .promise-copy{max-width:670px}.alert-card{position:absolute;right:8%;top:50%;z-index:4;width:min(390px,34vw);padding:1.2rem;border:1px solid rgba(255,216,103,.46);border-radius:22px;background:rgba(7,7,7,.9);opacity:0;transform:translateY(-35%) translateX(80px) scale(.9);backdrop-filter:blur(20px)}.active .alert-card{animation:alertIn .8s .75s cubic-bezier(.16,1,.3,1) forwards}.alert-top{display:flex;align-items:center;gap:.7rem;margin-bottom:.9rem;color:var(--gold-hi);font-size:.68rem;font-weight:800;letter-spacing:.1em}.alert-top img{width:34px}.alert-top time{margin-left:auto;color:var(--muted)}.alert-card h3{margin:0 0 .45rem;font-size:1rem}.alert-card p{margin:0;color:var(--muted);font-size:.76rem;line-height:1.5}.chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.9rem}.chips span{padding:.3rem .5rem;border:1px solid var(--line);border-radius:99px;color:#d8d3c7;font-size:.61rem}
 
-    /* Alert */
-    .alert-copy{max-width:650px}
-    .phone-ui{position:absolute;right:8%;top:50%;z-index:3;width:min(360px,32vw);padding:1.1rem;border:1px solid rgba(255,216,105,.45);border-radius:22px;background:rgba(7,7,7,.88);opacity:0;transform:translateY(-35%) translateX(80px) scale(.9);backdrop-filter:blur(20px);box-shadow:0 0 70px rgba(225,174,38,.15)}
-    .active .phone-ui{animation:alertArrive .8s .8s cubic-bezier(.16,1,.3,1) forwards}
-    .phone-ui__top{display:flex;align-items:center;gap:.7rem;margin-bottom:.9rem;color:var(--gold-hi);font-size:.7rem;font-weight:800;letter-spacing:.1em}
-    .phone-ui__top img{width:34px}
-    .phone-ui h3{margin:0 0 .45rem;font-size:1rem}
-    .phone-ui p{margin:0;color:var(--muted);font-size:.75rem;line-height:1.5}
-    .phone-ui__meta{display:flex;gap:.45rem;margin-top:.9rem}
-    .phone-ui__meta span{padding:.32rem .5rem;border:1px solid var(--line);border-radius:99px;color:#d9d3c6;font-size:.62rem}
+    /* 04 moat */
+    .moat{--moat-gold:#b98d36;--moat-gold-hi:#d4b567;place-items:center;text-align:center}.moat-copy{width:min(1120px,94vw)}.moat h2{max-width:18ch;margin:.3rem auto 0;font-size:clamp(2.7rem,5.6vw,6rem)}.moat .gold{color:var(--moat-gold-hi)}.contrast-line{margin-bottom:.3rem;color:var(--muted);font-size:.72rem;letter-spacing:.09em;text-transform:uppercase}.contrast-line strong{color:var(--moat-gold-hi)}
+    .intelligence-stage{position:relative;width:min(1040px,90vw);height:min(52vh,470px);margin:1.2rem auto 0}.intelligence-links{position:absolute;inset:0;z-index:0;width:100%;height:100%;overflow:visible}.intelligence-links .capability-path{fill:none;stroke:rgba(185,141,54,.58);stroke-width:1.3;stroke-dasharray:900;stroke-dashoffset:900;filter:drop-shadow(0 0 4px rgba(185,141,54,.18))}.active .intelligence-links .capability-path{animation:drawAgentLink 1.8s var(--delay) cubic-bezier(.22,1,.36,1) forwards,capabilityLinePulse 3.6s calc(var(--delay) + 1.8s) ease-in-out infinite}.intelligence-links .human-loop-path{fill:none;stroke:rgba(105,180,143,.62);stroke-width:1.5;stroke-dasharray:2800;stroke-dashoffset:2800;filter:drop-shadow(0 0 5px rgba(105,180,143,.2))}.active .intelligence-links .human-loop-path{animation:drawHumanLoop 2s 2.8s cubic-bezier(.22,1,.36,1) forwards,loopBreathe 3s 4.8s ease-in-out infinite}.human-loop-energy{fill:none;stroke:rgba(151,220,184,.88);stroke-width:2;stroke-linecap:round;stroke-dasharray:7 28;stroke-dashoffset:0;opacity:0;filter:drop-shadow(0 0 5px rgba(105,180,143,.55))}.active .human-loop-energy{animation:energyAppear .35s 4.8s ease forwards,loopTravel 5s 4.8s linear infinite}.human-loop-runner{fill:#a5e4c4;opacity:0;filter:drop-shadow(0 0 8px rgba(165,228,196,.95))}.loop-label{fill:rgba(137,204,169,.78);font:600 10px var(--sans);letter-spacing:.12em;text-transform:uppercase;opacity:0}.active .loop-label{animation:labelAppear .6s 4.3s ease forwards}.midas-core{position:absolute;top:50%;left:50%;z-index:3;display:grid;width:148px;aspect-ratio:1;border:1px solid rgba(185,141,54,.5);border-radius:50%;background:#11100c;opacity:0;transform:translate(-50%,-50%) scale(.6);place-items:center}.active .midas-core{animation:coreArrive 1.1s .2s cubic-bezier(.16,1,.3,1) forwards,coreFloat 4.5s 1.35s ease-in-out infinite}.midas-core::before,.midas-core::after{position:absolute;inset:-22px;content:'';border:1px solid rgba(185,141,54,.2);border-radius:50%;animation:orbit 16s linear infinite}.midas-core::after{inset:-42px;border-style:dashed;animation-direction:reverse;animation-duration:22s}.midas-core img{width:88px;filter:saturate(.72) brightness(.88) drop-shadow(0 0 14px rgba(185,141,54,.22));animation:coreBreathe 3.2s 1.3s ease-in-out infinite}.midas-core span{position:absolute;top:calc(100% + 52px);color:var(--moat-gold-hi);font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+    .cap-node{position:absolute;z-index:2;display:flex;align-items:center;gap:.8rem;width:230px;min-height:92px;padding:.85rem;border:1px solid var(--line);border-radius:15px;background:#0d0d0c;text-align:left;opacity:0;transform:scale(.88)}.active .cap-node{animation:capabilityConnect 1.05s var(--delay) cubic-bezier(.22,1,.36,1) forwards,capabilityFloat 4.8s calc(var(--delay) + 1.1s) ease-in-out infinite}.cap-node img{flex:0 0 auto;width:52px;height:52px;padding:10px;border:1px solid rgba(185,141,54,.32);border-radius:14px;background:transparent;filter:invert(64%) sepia(34%) saturate(935%) hue-rotate(2deg) brightness(88%) contrast(86%)}.cap-node strong{display:block;color:var(--moat-gold-hi);font-size:.82rem;letter-spacing:.05em;text-transform:uppercase}.cap-node small{display:block;margin-top:.2rem;color:var(--muted);font-size:.61rem;line-height:1.3}.cap-node--watch{top:10%;left:1%}.cap-node--alert{bottom:8%;left:4%}.cap-node--explain{top:10%;right:1%}.cap-node--simulate{right:4%;bottom:8%}.human-node{position:absolute;bottom:-2%;left:50%;z-index:4;display:flex;align-items:center;gap:.6rem;min-width:290px;padding:.55rem .85rem;border:1px solid rgba(105,180,143,.46);border-radius:99px;background:#0c1711;color:#91d0ae;opacity:0;transform:translateX(-50%) translateY(12px)}.human-node::before{flex:0 0 auto;width:9px;height:9px;content:'';border-radius:50%;background:#78bd98;box-shadow:0 0 10px rgba(120,189,152,.7)}.human-node strong{display:block;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase}.human-node small{display:block;margin-top:.08rem;color:rgba(183,220,201,.68);font-size:.52rem}.active .human-node{animation:humanNodeIn .75s 4.3s cubic-bezier(.22,1,.36,1) forwards,humanNodePulse 3s 5.1s ease-in-out infinite}
 
-    /* Midas explanation */
-    .intelligence{place-items:center;text-align:center}
-    .intelligence h2{max-width:15ch;margin-inline:auto}
-    .intelligence .lead{margin-inline:auto}
-    .signal-stage{position:relative;width:min(900px,88vw);height:180px;margin:2.2rem auto 0}
-    .signal-line{position:absolute;top:50%;left:50%;width:0;height:1px;background:var(--gold-hi);box-shadow:0 0 18px var(--gold);transform:translate(-50%,-50%)}
-    .active .signal-line{animation:lineOpen 1.5s .35s cubic-bezier(.16,1,.3,1) forwards}
-    .data-word{position:absolute;padding:.5rem .7rem;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:.68rem;opacity:0}
-    .active .data-word{animation:dataConverge 2s var(--delay) ease forwards}
-    .data-word:nth-child(2){top:3%;left:2%}.data-word:nth-child(3){bottom:3%;left:12%}.data-word:nth-child(4){top:0;right:8%}.data-word:nth-child(5){right:1%;bottom:4%}
-    .signal-mark{position:absolute;top:50%;left:50%;width:95px;opacity:0;transform:translate(-50%,-50%) scale(.4)}
-    .active .signal-mark{animation:signalMark 1s 1.2s cubic-bezier(.16,1,.3,1) forwards}
+    /* 05 proof */
+    .proof-layout{display:grid;grid-template-rows:auto 1fr;gap:1.4rem;min-height:0}.proof-title{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem}.proof-title h2{max-width:none;margin:0;font-size:clamp(2.4rem,4.3vw,4.7rem)}.live-pill{display:inline-flex;align-items:center;gap:.5rem;margin-bottom:.35rem;color:var(--green);font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}.live-pill::before{width:8px;height:8px;content:'';border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+    .flow-canvas{display:grid;grid-template-columns:135px 58px 155px 72px minmax(500px,1fr) 72px 165px;align-items:center;gap:.45rem;min-height:430px;padding:1.8rem 1.35rem;border:1px solid var(--line);border-radius:24px;background:#090908}.flow-node{display:flex;align-items:center;justify-content:center;gap:.75rem;min-height:122px;padding:1rem;border:1px solid var(--line);border-radius:16px;background:#10100e;opacity:0;transform:translateY(12px)}.active .flow-node{animation:fadeUp .7s var(--delay) ease forwards}.flow-node--supervisor{border-color:rgba(255,216,103,.5);background:#17140b}.flow-node--solution{border-color:rgba(105,211,156,.46);background:#0c1711}.flow-node__copy{min-width:0}.flow-node strong{display:block;color:var(--white);font-size:.82rem}.flow-node--supervisor strong{color:var(--gold-hi)}.flow-node--solution strong{color:var(--green)}.flow-node small{display:block;margin-top:.2rem;color:var(--muted);font-size:.62rem;line-height:1.3}.flow-link{position:relative;height:2px;background:rgba(255,216,103,.12);overflow:visible}.flow-link::before{position:absolute;inset:0;content:'';background:var(--gold-hi);transform:scaleX(0);transform-origin:left}.flow-link::after{position:absolute;top:50%;right:-2px;width:9px;height:9px;content:'';border-top:2px solid var(--gold-hi);border-right:2px solid var(--gold-hi);opacity:0;transform:translateY(-50%) rotate(45deg)}.active .flow-link::before{animation:flowLine 1.2s var(--delay) ease forwards}.active .flow-link::after{animation:arrowShow .3s calc(var(--delay) + 1.08s) ease forwards}
+    .specialist-panel{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,1fr);column-gap:1.75rem;row-gap:1.5rem;min-height:310px;padding:1.1rem 1.2rem}.specialist-links{position:absolute;inset:0;z-index:0;width:100%;height:100%;overflow:visible;pointer-events:none}.specialist-links path{fill:none;stroke:rgba(255,216,103,.58);stroke-width:1.4;stroke-dasharray:700;stroke-dashoffset:700;filter:drop-shadow(0 0 4px rgba(255,216,103,.22))}.active .specialist-links path{animation:drawAgentLink 1.15s var(--delay) ease forwards}.agent-role{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;min-height:134px;padding:.9rem;border:1px solid var(--line);border-radius:14px;background:#0d0d0c;opacity:0;transform:scale(.9)}.active .agent-role{animation:agentTrigger .9s var(--delay) ease forwards}.agent-role__copy{text-align:center}.agent-role strong{display:block;color:var(--gold-hi);font-size:.76rem}.agent-role small{display:block;margin-top:.14rem;color:var(--muted);font-size:.59rem;line-height:1.25}.agent-icon{flex:0 0 auto;width:54px;height:54px;color:var(--gold-hi);overflow:visible;filter:drop-shadow(0 0 8px rgba(255,216,103,.15))}.agent-icon .wire{fill:none;stroke:currentColor;stroke-width:.8}.agent-icon .core{fill:currentColor}.flow-output-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.5rem}.flow-output-tags span{padding:.2rem .36rem;border:1px solid rgba(105,211,156,.28);border-radius:99px;color:#bdebd2;font-size:.5rem}
 
-    /* Split comparison */
-    .split{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;z-index:-2}
-    .split-half{position:relative;overflow:hidden}
-    .split-half img{width:100%;height:100%;object-fit:cover;transform:scale(1.08)}
-    .active .split-half:first-child img{animation:panLeft 10s ease-out forwards}
-    .active .split-half:last-child img{animation:panRight 10s ease-out forwards}
-    .split-half::after{position:absolute;inset:0;content:'';background:linear-gradient(to top,rgba(5,5,5,.92),transparent 65%)}
-    .split-half:first-child::after{background:linear-gradient(to top,rgba(30,2,4,.88),rgba(5,5,5,.18) 65%)}
-    .split-divider{position:absolute;top:0;bottom:0;left:50%;z-index:3;width:1px;background:rgba(255,255,255,.4)}
-    .split-copy{display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:8vw;padding-bottom:5vh}
-    .path-copy{opacity:0;transform:translateY(25px)}
-    .active .path-copy:first-child{animation:fadeUp .7s .4s ease forwards}
-    .active .path-copy:last-child{animation:fadeUp .7s .75s ease forwards}
-    .path-copy small{display:block;margin-bottom:.7rem;font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-    .path-copy:first-child small{color:var(--red)}.path-copy:last-child small{color:var(--gold-hi)}
-    .path-copy h3{max-width:14ch;margin:0 0 .7rem;font:400 clamp(1.8rem,3.2vw,3.5rem)/1 var(--serif);letter-spacing:-.04em}
-    .path-copy p{max-width:38ch;margin:0;color:#c8c3b8;line-height:1.5}
+    /* 06 close */
+    .close{place-items:center;text-align:center}.close-mark{position:relative;width:min(24vw,245px);margin:0 auto 1.7rem;opacity:0;transform:scale(.55) rotate(-35deg);isolation:isolate}.active .close-mark{animation:markIn 1.25s .05s cubic-bezier(.16,1,.3,1) forwards}.close-mark img{position:relative;z-index:4;width:100%;filter:drop-shadow(0 0 28px rgba(255,216,103,.24))}.active .close-mark img{animation:finalLogoFloat 4s 1.3s ease-in-out infinite,finalLogoGlow 3s 1.3s ease-in-out infinite}.close-mark::before,.close-mark::after{position:absolute;z-index:1;inset:-24%;content:'';border:1px solid rgba(225,169,29,.28);border-radius:50%;animation:orbit 18s linear infinite}.close-mark::after{inset:-10%;border-style:dashed;animation-direction:reverse;animation-duration:11s}.close-orbit{position:absolute;top:50%;left:50%;z-index:2;width:150%;height:58%;border:1px solid rgba(255,216,103,.26);border-radius:50%;opacity:0;transform:translate(-50%,-50%) rotate(20deg)}.close-orbit--two{width:62%;height:155%;transform:translate(-50%,-50%) rotate(-28deg)}.active .close-orbit{animation:closeOrbitOne 8s 1.1s linear infinite,orbitAppear .7s 1.1s ease forwards}.active .close-orbit--two{animation:closeOrbitTwo 10s 1.1s linear infinite,orbitAppear .7s 1.1s ease forwards}.close-wave{position:absolute;top:50%;left:50%;z-index:0;width:70%;aspect-ratio:1;border:1px solid rgba(255,216,103,.5);border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.7)}.active .close-wave{animation:brandWave 3s 1.2s ease-out infinite}.active .close-wave--two{animation-delay:2.7s}.close-spark{position:absolute;z-index:5;width:5px;height:5px;border-radius:50%;background:var(--gold-hi);opacity:0;filter:drop-shadow(0 0 7px rgba(255,216,103,.9));animation:sparkTwinkle 2.6s var(--delay) ease-in-out infinite}.close-spark--one{top:4%;left:18%}.close-spark--two{top:20%;right:0}.close-spark--three{right:14%;bottom:3%}.close-spark--four{bottom:13%;left:0}.close h2{max-width:17ch;margin-inline:auto}.close .lead{margin-inline:auto}.handoff{display:inline-flex;margin-top:1.6rem;padding:.72rem 1rem;border:1px solid rgba(225,169,29,.42);border-radius:999px;color:var(--gold-hi);font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:0;transform:translateY(10px)}.active .handoff{animation:fadeUp .65s 1.8s ease forwards}
 
-    /* Product */
-    .product-grid{grid-template-columns:.8fr 1.2fr;gap:clamp(2rem,6vw,8rem)}
-    .product-window{padding:1.2rem;border:1px solid var(--line);border-radius:28px;background:#0e0e0d;opacity:0;transform:translateX(60px) scale(.94)}
-    .active .product-window{animation:productIn .9s .3s cubic-bezier(.16,1,.3,1) forwards}
-    .product-top{display:flex;align-items:center;gap:.5rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}
-    .product-top img{width:28px}.product-top strong{margin-right:auto}.product-top span{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
-    .ask{margin:1.2rem 0 1rem 14%;padding:.8rem 1rem;border-radius:14px;background:#282722;font-size:.85rem}
-    .answer{padding:1rem;border:1px solid rgba(225,174,38,.3);border-radius:14px;background:#19160d;color:#f3f0e8;font-size:.82rem;line-height:1.55}
-    .answer strong{color:var(--gold-hi)}
-    .chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.8rem}
-    .chips span{padding:.3rem .5rem;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:.61rem}
-    .journey{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:1.2rem;background:var(--line)}
-    .journey span{padding:.75rem .45rem;background:#11110f;color:var(--muted);font-size:.64rem;text-align:center}
-    .journey span::first-line{color:var(--gold-hi)}
-
-    /* Close */
-    .close-copy{max-width:800px}
-    .close-copy h2{max-width:14ch}
-    .close-url{display:inline-flex;margin-top:1.8rem;padding:.68rem 1rem;border:1px solid rgba(225,174,38,.35);border-radius:999px;color:var(--gold-hi);font:700 .72rem ui-monospace,Consolas,monospace}
-
-    .progress{position:fixed;top:0;left:0;z-index:100;width:100%;height:2px;background:rgba(255,255,255,.06)}
-    .progress span{display:block;width:0;height:100%;background:var(--gold-hi);transition:width .5s ease}
-    .controls{position:fixed;right:1rem;bottom:1rem;z-index:110;display:flex;align-items:center;gap:.45rem}
-    .controls button{display:grid;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:rgba(5,5,5,.72);color:var(--white);cursor:pointer;place-items:center;backdrop-filter:blur(14px)}
-    .controls button:hover{border-color:var(--gold);color:var(--gold-hi)}
-    .counter{min-width:58px;color:var(--muted);font:700 .68rem ui-monospace,Consolas,monospace;text-align:center}
-    .notes{position:fixed;right:1rem;bottom:4.5rem;z-index:120;width:min(440px,calc(100vw - 2rem));padding:1rem 1.15rem;border:1px solid rgba(225,174,38,.42);border-radius:15px;background:rgba(5,5,5,.96);color:#d6d0c4;font-size:.82rem;line-height:1.55;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s}
-    .notes.open{opacity:1;pointer-events:auto;transform:none}
-    .notes strong{display:block;margin-bottom:.4rem;color:var(--gold-hi);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase}
-    .hint{position:fixed;top:1rem;right:1rem;z-index:100;color:rgba(255,255,255,.3);font-size:.62rem}
-
-    @keyframes rise{to{transform:translateY(0)}}
-    @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
-    @keyframes markIn{to{opacity:1;transform:scale(1) rotate(0)}}
-    @keyframes orbit{to{transform:rotate(360deg)}}
-    @keyframes kenBurns{to{transform:scale(1)}}
-    @keyframes headlineIn{0%,100%{opacity:0;transform:translateY(20px)}15%,70%{opacity:1}85%{opacity:0;transform:translateY(-18px)}}
-    @keyframes alertArrive{to{opacity:1;transform:translateY(-50%) translateX(0) scale(1)}}
-    @keyframes lineOpen{to{width:100%}}
-    @keyframes dataConverge{0%{opacity:0}35%{opacity:1}100%{opacity:0;left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%) scale(.6)}}
-    @keyframes signalMark{to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-    @keyframes panLeft{to{transform:scale(1) translateX(-1.5%)}}
-    @keyframes panRight{to{transform:scale(1) translateX(1.5%)}}
-    @keyframes productIn{to{opacity:1;transform:none}}
-
-    @media(max-width:900px){
-      .product-grid{grid-template-columns:1fr}
-      .phone-ui{right:4%;width:min(330px,44vw)}
-      .split-copy{gap:2rem}
-    }
-    @media(max-width:650px){
-      .scene{overflow-y:auto;padding-bottom:5rem}
-      h1{font-size:clamp(3.5rem,18vw,5.5rem)}h2{font-size:clamp(2.8rem,14vw,4.5rem)}
-      .metrics{justify-content:flex-start}.overload-copy{text-align:left}.overload-copy h2,.overload-copy .lead{margin-left:0}
-      .phone-ui{position:relative;right:auto;top:auto;width:100%;margin-top:1.5rem;transform:translateY(20px)}
-      .active .phone-ui{animation:fadeUp .7s .8s ease forwards}
-      .split{grid-template-columns:1fr}.split-half:last-child{display:none}
-      .split-copy{grid-template-columns:1fr}.path-copy:last-child{padding-top:1rem;border-top:1px solid var(--line)}
-      .split-divider{display:none}.journey{grid-template-columns:repeat(2,1fr)}.hint{display:none}
-    }
+    .progress{position:fixed;top:0;left:0;z-index:100;width:100%;height:2px;background:rgba(255,255,255,.06)}.progress span{display:block;width:0;height:100%;background:var(--gold-hi);transition:width .5s ease}.controls{position:fixed;right:1rem;bottom:1rem;z-index:110;display:flex;align-items:center;gap:.45rem}.controls button{display:grid;width:40px;height:40px;border:1px solid var(--line);border-radius:50%;background:rgba(5,5,5,.72);color:var(--white);cursor:pointer;place-items:center;backdrop-filter:blur(14px)}.controls button:hover{border-color:var(--gold);color:var(--gold-hi)}.counter,.timer{min-width:58px;color:var(--muted);font:700 .68rem ui-monospace,Consolas,monospace;text-align:center}.timer{color:var(--green)}.notes{position:fixed;right:1rem;bottom:4.5rem;z-index:120;width:min(500px,calc(100vw - 2rem));padding:1rem 1.15rem;border:1px solid rgba(225,169,29,.42);border-radius:15px;background:rgba(5,5,5,.97);color:#d6d0c4;font-size:.82rem;line-height:1.55;opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s}.notes.open{opacity:1;pointer-events:auto;transform:none}.notes strong{display:block;margin-bottom:.4rem;color:var(--gold-hi);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase}.hint{position:fixed;top:1rem;right:1rem;z-index:100;color:rgba(255,255,255,.3);font-size:.62rem}
+    @keyframes rise{to{transform:translateY(0)}}@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}@keyframes kenBurns{to{transform:scale(1)}}@keyframes alertIn{to{opacity:1;transform:translateY(-50%) translateX(0) scale(1)}}@keyframes markIn{to{opacity:1;transform:scale(1) rotate(0)}}@keyframes orbit{to{transform:rotate(360deg)}}@keyframes flowLine{to{transform:scaleX(1)}}@keyframes arrowShow{to{opacity:1}}@keyframes drawAgentLink{to{stroke-dashoffset:0}}@keyframes capabilityLinePulse{50%{opacity:.55;filter:drop-shadow(0 0 8px rgba(185,141,54,.28))}}@keyframes drawHumanLoop{to{stroke-dashoffset:0}}@keyframes loopBreathe{50%{stroke:rgba(105,180,143,.9);filter:drop-shadow(0 0 9px rgba(105,180,143,.34))}}@keyframes energyAppear{to{opacity:1}}@keyframes loopTravel{to{stroke-dashoffset:-350}}@keyframes labelAppear{to{opacity:1}}@keyframes coreArrive{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}70%{opacity:1;transform:translate(-50%,-50%) scale(1.06);box-shadow:0 0 32px rgba(185,141,54,.14)}100%{opacity:1;transform:translate(-50%,-50%) scale(1);box-shadow:none}}@keyframes coreFloat{50%{transform:translate(-50%,-52%) scale(1.015)}}@keyframes coreBreathe{50%{transform:scale(1.055);filter:saturate(.8) brightness(.94) drop-shadow(0 0 20px rgba(185,141,54,.3))}}@keyframes capabilityConnect{0%{opacity:0;transform:scale(.88)}65%{opacity:1;border-color:rgba(185,141,54,.48);box-shadow:0 0 18px rgba(185,141,54,.12)}100%{opacity:1;transform:scale(1);box-shadow:none}}@keyframes capabilityFloat{50%{transform:translateY(-4px)}}@keyframes humanNodeIn{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes humanNodePulse{50%{box-shadow:0 0 18px rgba(105,180,143,.16);border-color:rgba(105,180,143,.7)}}@keyframes agentTrigger{0%{opacity:0;transform:scale(.9)}55%{opacity:1;border-color:rgba(255,216,103,.58);box-shadow:0 0 22px rgba(255,216,103,.18)}100%{opacity:1;transform:scale(1);box-shadow:none}}
+    @keyframes finalLogoFloat{50%{transform:translateY(-7px) scale(1.025)}}@keyframes finalLogoGlow{50%{filter:drop-shadow(0 0 48px rgba(255,216,103,.48)) brightness(1.08)}}@keyframes closeOrbitOne{to{transform:translate(-50%,-50%) rotate(380deg)}}@keyframes closeOrbitTwo{to{transform:translate(-50%,-50%) rotate(-388deg)}}@keyframes orbitAppear{to{opacity:1}}@keyframes brandWave{0%{opacity:.6;transform:translate(-50%,-50%) scale(.65)}85%,100%{opacity:0;transform:translate(-50%,-50%) scale(1.9)}}@keyframes sparkTwinkle{0%,100%{opacity:0;transform:scale(.5)}35%,65%{opacity:1;transform:scale(1.25)}}
+    @media(max-width:1300px){.flow-canvas{grid-template-columns:115px 42px 130px 50px minmax(420px,1fr) 50px 140px;padding:1.4rem .9rem}.specialist-panel{column-gap:.8rem;row-gap:.9rem;padding:1rem .8rem}.agent-role{min-height:120px;padding:.7rem}.agent-icon{width:46px;height:46px}}
+    @media(max-width:900px){.flow-canvas{grid-template-columns:1fr 24px 1fr}.specialist-panel{grid-column:1/-1;grid-template-columns:repeat(3,1fr)}.flow-link:nth-of-type(2){display:none}.intelligence-stage{transform:scale(.82);transform-origin:center top}.alert-card{right:4%;width:min(360px,43vw)}}
+    @media(max-width:650px){.scene{overflow-y:auto;padding-bottom:5rem}h1{font-size:clamp(3.4rem,18vw,5.4rem)}h2{font-size:clamp(2.7rem,14vw,4.5rem)}.evidence-copy{text-align:left}.evidence-copy h2,.evidence-copy .lead{margin-left:0}.stats{justify-content:flex-start}.alert-card{position:relative;right:auto;top:auto;width:100%;margin-top:1.3rem;transform:translateY(20px)}.active .alert-card{animation:fadeUp .6s .7s ease forwards}.intelligence-stage{display:grid;grid-template-columns:1fr;gap:.65rem;height:auto;transform:none}.intelligence-links,.midas-core::before,.midas-core::after{display:none}.midas-core,.cap-node,.human-node{position:relative;inset:auto!important;left:auto;right:auto;top:auto;bottom:auto;width:100%;transform:none}.midas-core{aspect-ratio:auto;min-height:120px;border-radius:16px}.midas-core span{position:static}.cap-node{width:100%}.human-node{justify-content:center}.active .human-node{animation:fadeUp .75s 4.3s cubic-bezier(.22,1,.36,1) forwards,humanNodePulse 3s 5.1s ease-in-out infinite}.proof-layout{padding-bottom:2rem}.proof-title{align-items:flex-start;flex-direction:column;gap:.4rem}.flow-canvas{grid-template-columns:1fr}.flow-link{width:2px;height:28px;margin:auto}.flow-link::after{right:50%;bottom:-2px;top:auto;transform:translateX(50%) rotate(135deg)}.specialist-panel{grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr)}.specialist-links{display:none}.source{position:relative;right:auto;bottom:auto;margin-top:1rem;text-align:left}.hint{display:none}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
-  <div class="grain"></div>
-  <div class="progress"><span></span></div>
-  <main class="deck" aria-label="Pitch de Midas">
-
-    <section class="scene active" data-note="Empieza con una pausa. No hables de IA. Di: el mercado nunca duerme; nosotros sí. Y cuando despertamos, muchas veces el miedo ya decidió por nosotros.">
-      <header class="scene-head"><span>Midas</span><span>Inteligencia de mercado</span></header>
-      <div class="scene-body cover">
-        <div>
-          <div class="cover-mark"><img src="/midas-mark.svg" alt="Midas"></div>
-          <h1><span class="reveal"><span>El mercado nunca</span></span><span class="reveal"><span><em class="gold">duerme.</em> Tú sí.</span></span></h1>
-          <p class="lead">Y cuando despiertas, alguien ya decidió antes que tú.</p>
-        </div>
-      </div>
+  <div class="grain"></div><div class="progress"><span></span></div>
+  <main class="deck" aria-label="Pitch competitivo de Midas">
+    <section class="scene active" data-duration="20" data-note="Pausa. Son las siete y dos. Antes del primer café, descubres que el mercado cayó mientras dormías. Todavía no sabes qué pasó, pero el miedo ya te exige decidir. El mercado nunca duerme. Nosotros sí.">
+      <img class="scene-bg" src="./midas-cinematic-morning.png" alt=""><div class="veil"></div>
+      <header class="scene-head"><span>Una historia sobre decisiones</span><span>00:00—00:20</span></header>
+      <div class="scene-body"><div class="hook-copy"><div class="clock">07:02</div><h1><span class="reveal"><span>El mercado nunca</span></span><span class="reveal"><span><em class="gold">duerme.</em> Tú sí.</span></span></h1><p class="lead">Cuando despiertas, el miedo ya está intentando decidir por ti.</p><span class="hook-tag">¿VENDO? · ¿COMPRO? · ¿ESPERO?</span></div></div>
       <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>01</span></footer>
     </section>
 
-    <section class="scene" data-note="Son las siete y dos. Antes del primer café, descubres que tu portafolio vale 3.240 dólares menos. Todavía no sabes qué pasó, pero ya sientes que debes hacer algo.">
-      <img class="scene-bg" src="./midas-cinematic-morning.png" alt="">
-      <div class="veil"></div>
-      <header class="scene-head"><span>07:02 · Un jueves cualquiera</span><span>El problema</span></header>
-      <div class="scene-body"><div class="story-copy">
-        <div class="clock">07:02</div>
-        <h2><span class="reveal"><span>Despiertas con</span></span><span class="reveal"><span class="red">$3.240 menos.</span></span></h2>
-        <p class="lead">No sabes qué pasó. Solo sabes que el miedo llegó primero.</p>
-        <span class="loss-pill">PORTAFOLIO · −6.8%</span>
-      </div></div>
+    <section class="scene" data-duration="25" data-note="Este no es un problema imaginario. Dos de cada tres jóvenes inversionistas decide en menos de un día. Más de la mitad termina invirtiendo más de lo planeado por FOMO. En Ecuador, la investigación universitaria confirma que la educación financiera reduce incertidumbre y mejora la disposición a invertir responsablemente.">
+      <img class="scene-bg" src="./midas-cinematic-overload.png" alt=""><div class="veil veil--right"></div>
+      <header class="scene-head"><span>El problema está medido</span><span>00:20—00:45</span></header>
+      <div class="scene-body"><div class="evidence-copy"><h2><span class="reveal"><span>Decidimos rápido.</span></span><span class="reveal"><span class="red">Entendemos tarde.</span></span></h2><div class="stats"><div class="stat" style="--delay:.35s"><strong>66%</strong><small>decide en menos de 24 horas</small></div><div class="stat" style="--delay:.58s"><strong>51%</strong><small>invierte más por FOMO</small></div></div></div></div>
+      <p class="source">Fuentes: Financial Conduct Authority, 2024 · “Percepción de riesgo e intención de invertir”, muestra de 270 estudiantes UNEMI, Ecuador.</p>
       <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>02</span></footer>
     </section>
 
-    <section class="scene" data-note="Abres una aplicación, luego otra y luego otra. Hay información por todas partes, pero ninguna respuesta completa. El problema no es la falta de datos; es el exceso sin contexto.">
-      <img class="scene-bg" src="./midas-cinematic-overload.png" alt="">
-      <div class="veil veil--right"></div>
-      <span class="headline" style="top:14%;left:6%;--delay:.2s">“Compra la caída”</span>
-      <span class="headline" style="bottom:19%;left:12%;--delay:1.4s">Rumor sin confirmar</span>
-      <span class="headline" style="top:24%;left:42%;--delay:2.7s">La Fed cambia el tono</span>
-      <header class="scene-head"><span>La sobrecarga</span><span>Más datos · Menos certeza</span></header>
-      <div class="scene-body"><div class="overload-copy">
-        <h2><span class="reveal"><span>Más información.</span></span><span class="reveal"><span class="red">Menos claridad.</span></span></h2>
-        <div class="metrics">
-          <div class="metric" style="--delay:.4s"><strong>9</strong><small>apps</small></div>
-          <div class="metric" style="--delay:.6s"><strong>147</strong><small>titulares</small></div>
-          <div class="metric" style="--delay:.8s"><strong>0</strong><small>contexto</small></div>
-        </div>
-      </div></div>
+    <section class="scene" data-duration="30" data-note="Por eso construimos Midas. No es otra aplicación que te entrega más noticias. Midas vigila lo que sigues, identifica lo relevante y te avisa con el activo afectado, la confianza y la fuente. Después puedes preguntarle por qué.">
+      <img class="scene-bg" src="./midas-cinematic-alert.png" alt=""><div class="veil"></div>
+      <header class="scene-head"><span>La promesa</span><span>00:45—01:15</span></header>
+      <div class="scene-body"><div class="promise-copy"><h2><span class="reveal"><span>No persigas el mercado.</span></span><span class="reveal"><span class="gold">Deja que el contexto llegue a ti.</span></span></h2><p class="lead">Midas vigila, prioriza y explica antes de que el ruido entierre lo importante.</p></div></div>
+      <article class="alert-card"><div class="alert-top"><img src="/midas-mark.svg" alt=""> ALERTA MIDAS <time>ahora</time></div><h3>El cambio de expectativas sobre tasas presiona tecnología y cripto.</h3><p>3 instrumentos de tu lista afectados · Fuente verificada</p><div class="chips"><span>Impacto alto</span><span>Confianza 82%</span><span>Ver fuentes</span></div></article>
       <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>03</span></footer>
     </section>
 
-    <section class="scene" data-note="Midas cambia el momento exacto en que recibes la información. No te envía todo: te avisa cuando algo relevante afecta lo que sigues, junto con la fuente y el impacto.">
-      <img class="scene-bg" src="./midas-cinematic-alert.png" alt="">
-      <div class="veil"></div>
-      <header class="scene-head"><span>07:02 · Con Midas</span><span>La alerta correcta</span></header>
-      <div class="scene-body"><div class="alert-copy">
-        <h2><span class="reveal"><span>No buscas más noticias.</span></span><span class="reveal"><span class="gold">La noticia correcta te encuentra.</span></span></h2>
-        <p class="lead">Midas detecta qué importa para ti antes de que el ruido lo entierre.</p>
-      </div></div>
-      <article class="phone-ui">
-        <div class="phone-ui__top"><img src="/midas-mark.svg" alt=""> ALERTA MIDAS <span style="margin-left:auto;color:var(--muted)">ahora</span></div>
-        <h3>El cambio de expectativas sobre tasas presiona tecnología y cripto.</h3>
-        <p>3 instrumentos de tu lista afectados · Fuente verificada</p>
-        <div class="phone-ui__meta"><span>Impacto alto</span><span>Confianza 82%</span><span>Ver fuentes</span></div>
-      </article>
+    <section class="scene" data-duration="35" data-note="La diferencia frente a un chatbot es simple: ChatGPT espera una pregunta. Midas vigila, avisa, explica y permite simular antes de decidir. Pero la IA nunca cierra sola el proceso: todo llega a una persona que revisa, aprueba o corrige. Esa decisión retroalimenta a Midas y mantiene al humano dentro del ciclo.">
+      <header class="scene-head"><span>Lo difícil de copiar</span><span>01:15—01:50</span></header>
+      <div class="scene-body moat">
+        <div class="moat-copy">
+          <p class="contrast-line">Un chatbot espera una pregunta. <strong>Midas se anticipa.</strong></p>
+          <h2><span class="reveal"><span>Inteligencia que trabaja</span></span><span class="reveal"><span class="gold">antes de que decidas.</span></span></h2>
+          <div class="intelligence-stage" aria-label="Capacidades conectadas de Midas">
+            <svg class="intelligence-links" viewBox="0 0 1040 470" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <marker id="human-loop-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M0 0 L8 4 L0 8 Z" fill="#78bd98"/>
+                </marker>
+              </defs>
+              <path class="capability-path" style="--delay:.7s" d="M520 235 C410 180 325 85 230 85"/>
+              <path class="capability-path" style="--delay:.7s" d="M520 235 C405 300 335 385 255 385"/>
+              <path class="capability-path" style="--delay:.7s" d="M520 235 C630 180 715 85 810 85"/>
+              <path class="capability-path" style="--delay:.7s" d="M520 235 C635 300 705 385 785 385"/>
+              <path class="capability-path" style="--delay:2.8s" d="M520 235 C520 325 520 400 520 455"/>
+              <path id="human-loop-route" class="human-loop-path" marker-end="url(#human-loop-arrow)" d="M520 455 C250 455 70 400 45 260 C20 110 210 28 520 28 C830 28 1020 110 995 260 C970 400 790 455 520 455"/>
+              <path class="human-loop-energy" d="M520 455 C250 455 70 400 45 260 C20 110 210 28 520 28 C830 28 1020 110 995 260 C970 400 790 455 520 455"/>
+              <circle class="human-loop-runner" r="4.5">
+                <animate attributeName="opacity" from="0" to="1" begin="4.8s" dur=".25s" fill="freeze"/>
+                <animateMotion dur="7s" begin="4.8s" repeatCount="indefinite">
+                  <mpath href="#human-loop-route"/>
+                </animateMotion>
+              </circle>
+              <text class="loop-label" x="88" y="430">REVISA</text>
+              <text class="loop-label" x="458" y="20">RETROALIMENTA</text>
+              <text class="loop-label" x="900" y="430">APRUEBA</text>
+            </svg>
+
+            <article class="cap-node cap-node--watch" style="--delay:1.35s">
+              <img src="/assets/icons/ui/radar.svg" alt="">
+              <div><strong>Vigila</strong><small>Radar activo sobre tus instrumentos.</small></div>
+            </article>
+            <article class="cap-node cap-node--alert" style="--delay:1.35s">
+              <img src="/assets/icons/ui/news.svg" alt="">
+              <div><strong>Avisa</strong><small>Detecta lo relevante antes del ruido.</small></div>
+            </article>
+
+            <div class="midas-core">
+              <img src="/midas-mark.svg" alt="Midas">
+              <span>Núcleo Midas</span>
+            </div>
+
+            <article class="cap-node cap-node--explain" style="--delay:1.35s">
+              <img src="/assets/icons/ui/chat.svg" alt="">
+              <div><strong>Explica</strong><small>Especialistas, confianza y fuentes.</small></div>
+            </article>
+            <article class="cap-node cap-node--simulate" style="--delay:1.35s">
+              <img src="/assets/icons/ui/scenarios.svg" alt="">
+              <div><strong>Simula</strong><small>Ensaya consecuencias antes de actuar.</small></div>
+            </article>
+
+            <div class="human-node">
+              <div><strong>Humano en el loop</strong><small>Revisa · aprueba · corrige · retroalimenta</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>04</span></footer>
     </section>
 
-    <section class="scene" data-note="Midas no es otra fuente de información. Es la capa que conecta noticias, precios, macro y sentimiento para responder la pregunta humana: qué ocurrió, por qué importa y qué debería vigilar.">
-      <header class="scene-head"><span>La diferencia</span><span>Ruido → contexto</span></header>
-      <div class="scene-body intelligence"><div>
-        <h2><span class="reveal"><span>Midas convierte señales aisladas</span></span><span class="reveal"><span>en una historia <em class="gold">explicable.</em></span></span></h2>
-        <p class="lead">Noticias, precios, macro y sentimiento. Una sola respuesta respaldada por evidencia.</p>
-        <div class="signal-stage">
-          <span class="signal-line"></span>
-          <span class="data-word" style="--delay:.2s">NOTICIAS</span>
-          <span class="data-word" style="--delay:.45s">PRECIOS</span>
-          <span class="data-word" style="--delay:.7s">MACRO</span>
-          <span class="data-word" style="--delay:.95s">SENTIMIENTO</span>
-          <img class="signal-mark" src="/midas-mark.svg" alt="">
+    <section class="scene" data-duration="40" data-note="Así llegamos a una solución. Una noticia, alerta o pregunta entra al Supervisor. Si es una consulta puntual, activa al especialista adecuado. Si es un escenario complejo, convoca varias perspectivas. Analista aporta noticias y evidencia; Quant mide precios; Macro interpreta tasas; Sentimiento detecta miedo; Consecuencias construye la cadena causal; y Asesor prepara la síntesis. Midas combina esos aportes en una respuesta, alerta, escenario o briefing que una persona puede revisar.">
+      <header class="scene-head"><span>Prueba real · Flota multiagente</span><span>01:50—02:30</span></header>
+      <div class="scene-body proof-layout">
+        <div class="proof-title">
+          <h2><span class="reveal"><span>Así convertimos un evento</span></span><span class="reveal"><span class="gold">en una solución.</span></span></h2>
+          <span class="live-pill">Desplegado en producción</span>
         </div>
-      </div></div>
-      <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>05</span></footer>
-    </section>
 
-    <section class="scene" data-note="Mismo día, mismo mercado. Sin Midas, persigues titulares, caes en FOMO y descubres tarde la noticia original. Con Midas, la alerta llega a ti, entiendes el impacto y ganas tiempo para decidir.">
-      <div class="split">
-        <div class="split-half"><img src="./midas-cinematic-without.png" alt=""></div>
-        <div class="split-half"><img src="./midas-cinematic-with.png" alt=""></div>
-      </div>
-      <span class="split-divider"></span>
-      <header class="scene-head"><span>El mismo mercado</span><span>Dos vidas distintas</span></header>
-      <div class="scene-body split-copy">
-        <div class="path-copy">
-          <small>Sin Midas · 14:30</small>
-          <h3>Persigues el mercado.</h3>
-          <p>Alerta perdida → FOMO → reacción impulsiva → noticia original siete horas tarde.</p>
-        </div>
-        <div class="path-copy">
-          <small>Con Midas · 07:15</small>
-          <h3>El contexto llega a ti.</h3>
-          <p>Alerta relevante → explicación → escenario → una decisión que puedes defender.</p>
-        </div>
-      </div>
-      <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>06</span></footer>
-    </section>
+        <div class="flow-canvas" aria-label="Flujo multiagente de Midas">
+          <article class="flow-node" style="--delay:.2s">
+            <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><circle class="wire" cx="20" cy="20" r="13"/><path class="wire" d="M16 15c0-3 2-5 5-5s5 2 5 5c0 4-5 4-5 8"/><circle class="core" cx="21" cy="29" r="1.8"/></svg>
+            <div class="flow-node__copy"><strong>Entrada</strong><small>Pregunta, noticia, alerta o escenario.</small></div>
+          </article>
+          <span class="flow-link" style="--delay:.8s" aria-hidden="true"></span>
 
-    <section class="scene" data-note="La experiencia es simple. Ves qué se mueve, preguntas por qué, simulas qué podría ocurrir y guardas el resultado en un informe revisable. No tienes que aprender un terminal financiero.">
-      <header class="scene-head"><span>La experiencia</span><span>Una pregunta humana</span></header>
-      <div class="scene-body product-grid">
-        <div>
-          <h2><span class="reveal"><span>No necesitas otro dashboard.</span></span><span class="reveal"><span>Necesitas una <em class="gold">respuesta.</em></span></span></h2>
-          <p class="lead">Pregúntale a Midas como hablarías con una persona.</p>
-        </div>
-        <div class="product-window">
-          <div class="product-top"><img src="/midas-mark.svg" alt=""><strong>Midas</strong><span></span></div>
-          <div class="ask">¿Por qué cayó mi portafolio y qué debería vigilar ahora?</div>
-          <div class="answer"><strong>Midas</strong><br>La presión se concentra en tecnología y cripto tras el cambio de expectativas sobre tasas. No todos tus activos reaccionaron igual.
-            <div class="chips"><span>Impacto alto</span><span>Confianza 82%</span><span>3 fuentes</span><span>Simular escenario</span></div>
+          <article class="flow-node flow-node--supervisor" style="--delay:1.65s">
+            <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><circle class="wire" cx="20" cy="20" r="12"/><g class="wire"><line x1="20" y1="20" x2="20" y2="7"/><line x1="20" y1="20" x2="32" y2="16"/><line x1="20" y1="20" x2="28" y2="30"/><line x1="20" y1="20" x2="10" y2="29"/><line x1="20" y1="20" x2="8" y2="15"/></g><circle class="core" cx="20" cy="20" r="3.5"/></svg>
+            <div class="flow-node__copy"><strong>Supervisor</strong><small>Clasifica y elige la ruta.</small></div>
+          </article>
+          <span class="flow-link" style="--delay:2.35s" aria-hidden="true"></span>
+
+          <div class="specialist-panel" aria-label="Especialistas activados">
+            <svg class="specialist-links" viewBox="0 0 600 310" preserveAspectRatio="none" aria-hidden="true">
+              <path style="--delay:3s" d="M0 155 Q45 76 100 76 Q420 76 600 155"/>
+              <path style="--delay:4s" d="M0 155 Q130 76 300 76 Q470 76 600 155"/>
+              <path style="--delay:5s" d="M0 155 Q320 76 500 76 Q555 76 600 155"/>
+              <path style="--delay:6s" d="M0 155 Q45 234 100 234 Q420 234 600 155"/>
+              <path style="--delay:7s" d="M0 155 Q130 234 300 234 Q470 234 600 155"/>
+              <path style="--delay:8s" d="M0 155 Q320 234 500 234 Q555 234 600 155"/>
+            </svg>
+            <article class="agent-role" style="--delay:3s">
+              <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><polygon class="wire" points="20,7 32,30 8,30"/><line class="wire" x1="20" y1="7" x2="20" y2="30"/><line class="wire" x1="8" y1="30" x2="26" y2="18"/><circle class="core" cx="20" cy="19" r="2.5"/></svg>
+              <div class="agent-role__copy"><strong>Analista</strong><small>Noticias + evidencia</small></div>
+            </article>
+            <article class="agent-role" style="--delay:4s">
+              <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><polygon class="wire" points="20,8 32,30 8,30"/><line class="wire" x1="20" y1="8" x2="20" y2="22"/><line class="wire" x1="8" y1="30" x2="20" y2="22"/><line class="wire" x1="32" y1="30" x2="20" y2="22"/><circle class="core" cx="20" cy="21" r="2.5"/></svg>
+              <div class="agent-role__copy"><strong>Quant</strong><small>Precio + volatilidad</small></div>
+            </article>
+            <article class="agent-role" style="--delay:5s">
+              <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><polygon class="wire" points="20,6 30,13 27,25 13,25 10,13"/><line class="wire" x1="20" y1="10" x2="20" y2="30"/><line class="wire" x1="12" y1="20" x2="28" y2="20"/><circle class="core" cx="20" cy="20" r="3"/></svg>
+              <div class="agent-role__copy"><strong>Macro</strong><small>Tasas + inflación</small></div>
+            </article>
+            <article class="agent-role" style="--delay:6s">
+              <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><ellipse class="wire" cx="20" cy="20" rx="13" ry="9"/><line class="wire" x1="7" y1="20" x2="33" y2="20"/><polygon class="wire" points="20,11 27,20 20,29 13,20"/><circle class="core" cx="20" cy="20" r="3"/></svg>
+              <div class="agent-role__copy"><strong>Sentimiento</strong><small>Miedo + euforia</small></div>
+            </article>
+            <article class="agent-role" style="--delay:7s">
+              <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><g class="wire"><polygon points="8,20 12,14 16,20 12,26"/><polygon points="16,20 20,14 24,20 20,26"/><polygon points="24,20 28,14 32,20 28,26"/></g><circle class="core" cx="20" cy="20" r="2.5"/></svg>
+              <div class="agent-role__copy"><strong>Consecuencias</strong><small>Causa → efecto</small></div>
+            </article>
+            <article class="agent-role" style="--delay:8s">
+              <svg class="agent-icon" viewBox="0 0 40 40" aria-hidden="true"><g class="wire"><polygon points="20,8 28,20 20,22 12,20"/><polygon points="20,32 28,20 20,18 12,20"/><line x1="20" y1="8" x2="20" y2="32"/></g><circle class="core" cx="20" cy="20" r="2.7"/></svg>
+              <div class="agent-role__copy"><strong>Asesor</strong><small>Síntesis + briefing</small></div>
+            </article>
           </div>
-          <div class="journey"><span>01<br>RADAR</span><span>02<br>PREGUNTA</span><span>03<br>SIMULA</span><span>04<br>REVISA</span></div>
+          <span class="flow-link" style="--delay:9.35s" aria-hidden="true"></span>
+
+          <article class="flow-node flow-node--solution" style="--delay:10.7s">
+            <img class="agent-icon" src="/midas-mark.svg" alt="">
+            <div class="flow-node__copy">
+              <strong>Solución Midas</strong><small>Contrasta confianza y fuentes.</small>
+              <div class="flow-output-tags"><span>Respuesta</span><span>Alerta</span><span>Escenario</span><span>Informe</span></div>
+            </div>
+          </article>
         </div>
+
       </div>
-      <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>07</span></footer>
+      <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>taws-frontend.vercel.app · 05</span></footer>
     </section>
 
-    <section class="scene" data-note="Midas no elimina la incertidumbre y no promete ganancias. Hace algo más honesto: muestra fuentes, confianza y posibles consecuencias para que la decisión final siga siendo tuya.">
-      <img class="scene-bg" src="./midas-cinematic-with.png" alt="">
-      <div class="veil"></div>
-      <header class="scene-head"><span>El resultado</span><span>Humano siempre en control</span></header>
-      <div class="scene-body"><div class="close-copy">
-        <h2><span class="reveal"><span>El mercado sigue siendo incierto.</span></span><span class="reveal"><span>Tú ya no decides desde el <em class="gold">miedo.</em></span></span></h2>
-        <p class="lead">Midas no convierte promesas en oro. Convierte el ruido del mercado en decisiones explicables.</p>
-        <span class="close-url">taws-frontend.vercel.app</span>
-      </div></div>
-      <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>08</span></footer>
+    <section class="scene" data-duration="15" data-note="El mercado seguirá siendo incierto. Pero la decisión ya no tiene que ser ciega. Midas no convierte promesas en oro; convierte el ruido del mercado en decisiones explicables. Ahora déjennos mostrarles Midas funcionando.">
+      <header class="scene-head"><span>Midas</span><span>02:30—02:45</span></header>
+      <div class="scene-body close"><div><div class="close-mark"><span class="close-orbit"></span><span class="close-orbit close-orbit--two"></span><span class="close-wave"></span><span class="close-wave close-wave--two"></span><i class="close-spark close-spark--one" style="--delay:1.4s"></i><i class="close-spark close-spark--two" style="--delay:1.9s"></i><i class="close-spark close-spark--three" style="--delay:2.4s"></i><i class="close-spark close-spark--four" style="--delay:2.9s"></i><img src="/midas-mark.svg" alt="Midas"></div><h2><span class="reveal"><span>El mercado seguirá siendo incierto.</span></span><span class="reveal"><span>La decisión ya no tiene que ser <em class="gold">ciega.</em></span></span></h2><p class="lead">Midas convierte el ruido del mercado en decisiones explicables.</p><span class="handoff">Ahora déjennos mostrarles Midas funcionando</span></div></div>
+      <footer class="scene-foot"><img src="/midas-mark.svg" alt=""><span>06</span></footer>
     </section>
   </main>
 
-  <aside class="notes"><strong>Guion del presentador</strong><span></span></aside>
-  <span class="hint">← → avanzar · N guion · F pantalla completa · P autoplay</span>
-  <nav class="controls" aria-label="Controles">
-    <button class="prev" aria-label="Anterior">←</button>
-    <span class="counter">01 / 08</span>
-    <button class="next" aria-label="Siguiente">→</button>
-    <button class="play" aria-label="Autoplay">P</button>
-    <button class="note" aria-label="Guion">N</button>
-    <button class="full" aria-label="Pantalla completa">⛶</button>
-  </nav>
-
+  <aside class="notes"><strong>Guion del presentador</strong><span></span></aside><span class="hint">← → avanzar · N guion · F pantalla completa · P ensayo · B respaldo</span>
+  <nav class="controls" aria-label="Controles"><span class="timer">00:00</span><button class="prev" aria-label="Anterior">←</button><span class="counter">01 / 06</span><button class="next" aria-label="Siguiente">→</button><button class="play" aria-label="Ensayo automático">P</button><button class="note" aria-label="Guion">N</button><button class="full" aria-label="Pantalla completa">⛶</button></nav>
   <script>
-    (() => {
-      const scenes=[...document.querySelectorAll('.scene')];
-      const progress=document.querySelector('.progress span');
-      const counter=document.querySelector('.counter');
-      const notes=document.querySelector('.notes');
-      const noteCopy=notes.querySelector('span');
-      const playButton=document.querySelector('.play');
-      let current=Math.max(0,Math.min(scenes.length-1,(Number.parseInt(location.hash.slice(1),10)||1)-1));
-      let autoplayId=null;
-      let touchX=0;
-      const two=value=>String(value).padStart(2,'0');
-      function show(index){
-        current=Math.max(0,Math.min(scenes.length-1,index));
-        scenes.forEach((scene,i)=>{
-          scene.classList.toggle('active',i===current);
-          scene.classList.toggle('past',i<current);
-          scene.setAttribute('aria-hidden',i===current?'false':'true');
-        });
-        progress.style.width=`${((current+1)/scenes.length)*100}%`;
-        counter.textContent=`${two(current+1)} / ${two(scenes.length)}`;
-        noteCopy.textContent=scenes[current].dataset.note;
-        history.replaceState(null,'',`#${current+1}`);
-      }
-      const next=()=>show(current===scenes.length-1?0:current+1);
-      const previous=()=>show(current-1);
-      function togglePlay(){
-        if(autoplayId){clearInterval(autoplayId);autoplayId=null;playButton.style.color='';return}
-        autoplayId=setInterval(next,10500);
-        playButton.style.color='var(--gold-hi)';
-      }
-      async function fullscreen(){document.fullscreenElement?await document.exitFullscreen?.():await document.documentElement.requestFullscreen?.()}
-      document.querySelector('.next').onclick=next;
-      document.querySelector('.prev').onclick=previous;
-      document.querySelector('.note').onclick=()=>notes.classList.toggle('open');
-      document.querySelector('.full').onclick=fullscreen;
-      playButton.onclick=togglePlay;
-      document.addEventListener('keydown',event=>{
-        if(['ArrowRight','PageDown',' '].includes(event.key)){event.preventDefault();next()}
-        else if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();previous()}
-        else if(event.key.toLowerCase()==='n')notes.classList.toggle('open');
-        else if(event.key.toLowerCase()==='f')void fullscreen();
-        else if(event.key.toLowerCase()==='p')togglePlay();
-        else if(event.key==='Home')show(0);
-        else if(event.key==='End')show(scenes.length-1);
-      });
-      document.addEventListener('touchstart',event=>touchX=event.changedTouches[0].screenX,{passive:true});
-      document.addEventListener('touchend',event=>{const delta=event.changedTouches[0].screenX-touchX;if(Math.abs(delta)>55)delta<0?next():previous()},{passive:true});
-      show(current);
-    })();
+    (()=>{const scenes=[...document.querySelectorAll('.scene')],progress=document.querySelector('.progress span'),counter=document.querySelector('.counter'),timer=document.querySelector('.timer'),notes=document.querySelector('.notes'),noteCopy=notes.querySelector('span'),playButton=document.querySelector('.play');let current=Math.max(0,Math.min(scenes.length-1,(Number.parseInt(location.hash.slice(1),10)||1)-1)),autoTimeout=null,timerInterval=null,startedAt=null,touchX=0;const two=n=>String(n).padStart(2,'0');function updateTimer(){if(!startedAt)return;const elapsed=Math.floor((Date.now()-startedAt)/1000);timer.textContent=`${two(Math.floor(elapsed/60))}:${two(elapsed%60)}`}function closeZoom(){document.querySelectorAll('.proof-shot.is-zoomed').forEach(shot=>shot.classList.remove('is-zoomed'))}function show(index){closeZoom();current=Math.max(0,Math.min(scenes.length-1,index));scenes.forEach((scene,i)=>{scene.classList.toggle('active',i===current);scene.classList.toggle('past',i<current);scene.setAttribute('aria-hidden',i===current?'false':'true')});progress.style.width=`${((current+1)/scenes.length)*100}%`;counter.textContent=`${two(current+1)} / ${two(scenes.length)}`;noteCopy.textContent=scenes[current].dataset.note;history.replaceState(null,'',`#${current+1}`)}function next(){show(Math.min(current+1,scenes.length-1));if(autoTimeout)schedule()}function previous(){show(Math.max(current-1,0));if(autoTimeout)schedule()}function schedule(){clearTimeout(autoTimeout);const duration=Number(scenes[current].dataset.duration)*1000;autoTimeout=setTimeout(()=>{if(current===scenes.length-1){stopAuto();return}show(current+1);schedule()},duration)}function stopAuto(){clearTimeout(autoTimeout);autoTimeout=null;clearInterval(timerInterval);timerInterval=null;playButton.style.color=''}function toggleAuto(){if(autoTimeout){stopAuto();return}startedAt=Date.now();timer.textContent='00:00';timerInterval=setInterval(updateTimer,250);playButton.style.color='var(--gold-hi)';show(0);schedule()}async function fullscreen(){document.fullscreenElement?await document.exitFullscreen?.():await document.documentElement.requestFullscreen?.()}document.querySelector('.next').onclick=next;document.querySelector('.prev').onclick=previous;document.querySelector('.note').onclick=()=>notes.classList.toggle('open');document.querySelector('.full').onclick=fullscreen;document.querySelectorAll('.proof-shot').forEach(shot=>shot.addEventListener('click',()=>{const opening=!shot.classList.contains('is-zoomed');closeZoom();if(opening)shot.classList.add('is-zoomed')}));playButton.onclick=toggleAuto;document.addEventListener('keydown',event=>{if(['ArrowRight','PageDown',' '].includes(event.key)){event.preventDefault();next()}else if(['ArrowLeft','PageUp'].includes(event.key)){event.preventDefault();previous()}else if(event.key.toLowerCase()==='n')notes.classList.toggle('open');else if(event.key.toLowerCase()==='f')void fullscreen();else if(event.key.toLowerCase()==='p')toggleAuto();else if(event.key.toLowerCase()==='b')window.open('./demo-backup.html','_blank');else if(event.key==='Escape')closeZoom();else if(event.key==='Home')show(0);else if(event.key==='End')show(scenes.length-1)});document.addEventListener('touchstart',event=>touchX=event.changedTouches[0].screenX,{passive:true});document.addEventListener('touchend',event=>{const delta=event.changedTouches[0].screenX-touchX;if(Math.abs(delta)>55)delta<0?next():previous()},{passive:true});window.addEventListener('hashchange',()=>{const index=Math.max(0,Math.min(scenes.length-1,(Number.parseInt(location.hash.slice(1),10)||1)-1));if(index!==current)show(index)});show(current)})();
   </script>
 </body>
 </html>
