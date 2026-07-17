@@ -1,16 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TranslationService } from '../../../../core';
 import { FeaturePageHeaderComponent } from '../../../../shared';
+import { NotesFilter } from '../../domain';
 import { NotesPanelComponent } from '../notes-panel/notes-panel.component';
 
 /**
- * Dedicated notes page (`/notes`). Notes are one global per-user notepad — they were
- * never tied to a scenario or report, so they moved out of the "Notas" tab that used to
- * sit on the Scenario Lab and Reports pages and into their own top-level destination.
+ * The notes inbox (`/notes`): every note the user has, linked or not, each showing what it
+ * is about and linking back to it.
  *
- * All state lives in the root-scoped `NotesStore`, rendered through `NotesPanelComponent`;
- * the `NoteRepository → HttpNoteRepository` binding stays app-wide in `app.config.ts`
- * (a root-provided store can only resolve root-level dependencies).
+ * This is the global view. Writing a note *about* something happens in the annotation
+ * drawer, from the page you are reading — not here.
  */
 @Component({
   selector: 'app-notes-page',
@@ -22,4 +21,18 @@ import { NotesPanelComponent } from '../notes-panel/notes-panel.component';
 })
 export class NotesPageComponent {
   readonly i18n = inject(TranslationService);
+  readonly filter = signal<NotesFilter>('all');
+
+  readonly filters: readonly NotesFilter[] = ['all', 'linked', 'unlinked'];
+
+  filterLabel(filter: NotesFilter): string {
+    switch (filter) {
+      case 'all':
+        return this.i18n.t('notes.page.filter.all');
+      case 'linked':
+        return this.i18n.t('notes.page.filter.linked');
+      case 'unlinked':
+        return this.i18n.t('notes.page.filter.unlinked');
+    }
+  }
 }

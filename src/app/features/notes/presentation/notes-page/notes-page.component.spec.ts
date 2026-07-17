@@ -1,5 +1,6 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
 import { TranslationService } from '../../../../core';
 import { EN_TRANSLATIONS } from '../../../../core/i18n/translations/en';
@@ -43,7 +44,16 @@ const NOTES: Note[] = [
 
 type NotesStoreStub = Pick<
   NotesStore,
-  'notes' | 'isLoading' | 'isSaving' | 'error' | 'isEmpty' | 'load' | 'add' | 'edit' | 'remove'
+  | 'notes'
+  | 'isLoading'
+  | 'isSaving'
+  | 'error'
+  | 'isEmpty'
+  | 'notesFor'
+  | 'load'
+  | 'add'
+  | 'edit'
+  | 'remove'
 >;
 
 const NOTES_STORE_STUB: NotesStoreStub = {
@@ -56,6 +66,7 @@ const NOTES_STORE_STUB: NotesStoreStub = {
   add: () => Promise.resolve(true),
   edit: () => Promise.resolve(true),
   remove: () => Promise.resolve(),
+  notesFor: () => [],
 };
 
 function createFixture() {
@@ -63,6 +74,7 @@ function createFixture() {
   TestBed.configureTestingModule({
     imports: [NotesPageComponent],
     providers: [
+      provideRouter([]),
       { provide: TranslationService, useValue: I18N_STUB },
       { provide: AuthStore, useValue: AUTH_STUB },
       { provide: NotesStore, useValue: NOTES_STORE_STUB },
@@ -99,5 +111,24 @@ describe('NotesPageComponent', () => {
     );
     expect(addButton).not.toBeNull();
     expect(addButton?.textContent).toContain(EN_TRANSLATIONS['notes.panel.add']);
+  });
+
+  it('offers the three filter tabs', () => {
+    const element: HTMLElement = createFixture().nativeElement;
+    const tabs = [...element.querySelectorAll('.notes-page__filter')].map((node) =>
+      node.textContent?.trim(),
+    );
+
+    expect(tabs).toEqual([
+      EN_TRANSLATIONS['notes.page.filter.all'],
+      EN_TRANSLATIONS['notes.page.filter.linked'],
+      EN_TRANSLATIONS['notes.page.filter.unlinked'],
+    ]);
+  });
+
+  it('says notes can be linked, since now they can', () => {
+    const element: HTMLElement = createFixture().nativeElement;
+
+    expect(element.textContent).toContain(EN_TRANSLATIONS['notes.page.subtitle']);
   });
 });

@@ -35,7 +35,13 @@
     @if (store.isLoading()) {
       <p class="notes-panel__status" role="status">{{ i18n.t('notes.panel.loading') }}</p>
     } @else if (isEmpty()) {
-      <p class="notes-panel__empty">{{ i18n.t('notes.panel.empty') }}</p>
+      <p class="notes-panel__empty">
+        {{
+          store.notes().length === 0
+            ? i18n.t('notes.panel.empty')
+            : i18n.t('notes.page.emptyFiltered')
+        }}
+      </p>
     } @else {
       <ul class="notes-panel__list">
         @for (note of visibleNotes(); track note.id) {

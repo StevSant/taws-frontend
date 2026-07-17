@@ -5,6 +5,21 @@
   />
 
   <section class="notes-page__panel feature-panel" [attr.aria-label]="i18n.t('notes.page.title')">
-    <app-notes-panel />
+    <div class="notes-page__filters" role="tablist">
+      @for (option of filters; track option) {
+        <button
+          type="button"
+          role="tab"
+          class="notes-page__filter"
+          [class.notes-page__filter--active]="filter() === option"
+          [attr.aria-selected]="filter() === option"
+          (click)="filter.set(option)"
+        >
+          {{ filterLabel(option) }}
+        </button>
+      }
+    </div>
+
+    <app-notes-panel [showContext]="true" [filter]="filter()" />
   </section>
 </div>

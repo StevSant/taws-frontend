@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslationService } from '../../../../core';
 import { AuthStore } from '../../../auth/application';
 import { NotesStore } from '../../application';
-import { Note, NoteTarget } from '../../domain';
+import { Note, NoteTarget, NotesFilter } from '../../domain';
 import { NoteContextChipComponent } from '../note-context-chip/note-context-chip.component';
 
 const NOTE_MAX_LENGTH = 2000;
@@ -43,9 +43,24 @@ export class NotesPanelComponent {
    * has the same target, so a chip on each row would just be noise. */
   readonly showContext = input(false);
 
+  /** Which slice of the global list to show. Ignored when `target` is set — inside the
+   * drawer every note has the same target, so there is nothing to filter. */
+  readonly filter = input<NotesFilter>('all');
+
   readonly visibleNotes = computed(() => {
     const target = this.target();
-    return target ? this.store.notesFor(target) : this.store.notes();
+    if (target) {
+      return this.store.notesFor(target);
+    }
+    const filter = this.filter();
+    const notes = this.store.notes();
+    if (filter === 'linked') {
+      return notes.filter((note) => note.target !== null);
+    }
+    if (filter === 'unlinked') {
+      return notes.filter((note) => note.target === null);
+    }
+    return notes;
   });
 
   readonly isEmpty = computed(() => !this.store.isLoading() && this.visibleNotes().length === 0);
