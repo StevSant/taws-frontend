@@ -10,6 +10,7 @@ import { RealtimeTurn } from './realtime-turn.model';
  * event schema. One variant per concern, discriminated by `kind`.
  */
 export type RealtimeEvent =
+  | { kind: 'session-started'; conversationId: string }
   | { kind: 'transcript-delta'; delta: string }
   | { kind: 'turn-completed'; turn: RealtimeTurn }
   | { kind: 'speaking-changed'; speaking: boolean }

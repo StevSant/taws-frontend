@@ -15,6 +15,7 @@ import {
   ConversationSummaryDto,
   ConversationTitleDto,
   GenerateTitleRequestDto,
+  RealtimeTurnsRequestDto,
 } from './conversation-dto';
 import { mapConversationDto } from './map-conversation-dto';
 import { mapConversationSummaryDto } from './map-conversation-summary-dto';
@@ -22,6 +23,7 @@ import { SseChatRepository } from './sse-chat-repository';
 
 const CONVERSATIONS_PATH = '/api/v1/chat/conversations';
 const TITLE_PATH = '/api/v1/chat/title';
+const REALTIME_TURNS_PATH = '/api/v1/chat/realtime/turns';
 
 /**
  * Infrastructure adapter for `ChatRepository`, and the only class bound to that port.
@@ -82,5 +84,15 @@ export class HttpChatRepository extends ChatRepository {
       this.http.post<ConversationTitleDto>(`${this.config.apiBaseUrl}${TITLE_PATH}`, payload),
     );
     return dto.title;
+  }
+
+  async persistRealtimeTurns(conversationId: string, turns: readonly ChatMessage[]): Promise<void> {
+    const payload: RealtimeTurnsRequestDto = {
+      conversation_id: conversationId,
+      turns: turns.map((turn) => ({ role: turn.role, content: turn.content })),
+    };
+    await firstValueFrom(
+      this.http.post<void>(`${this.config.apiBaseUrl}${REALTIME_TURNS_PATH}`, payload),
+    );
   }
 }

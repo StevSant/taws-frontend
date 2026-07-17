@@ -38,3 +38,15 @@ export interface GenerateTitleRequestDto {
 export interface ConversationTitleDto {
   title: string;
 }
+
+/** One completed turn in a realtime persistence request. */
+export interface RealtimeTurnDto {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/** Request body for `POST /api/v1/chat/realtime/turns`. */
+export interface RealtimeTurnsRequestDto {
+  conversation_id: string;
+  turns: RealtimeTurnDto[];
+}

@@ -35,6 +35,12 @@ export class ChatSessionsStore {
   private readonly hydratedIds = new Set<string>();
   /** Threads the backend has already titled — never ask it for a title twice. */
   private readonly titledIds = new Set<string>();
+  /**
+   * Threads with a real server row created OUTSIDE the SSE stream — the realtime/voice
+   * persistence path. They must never be ghost-dropped on a transient 404 (read-after-write
+   * lag), because their turns live on the server.
+   */
+  private readonly serverBackedIds = new Set<string>();
   private userId: string | null = null;
 
   readonly sessions = computed(() =>
@@ -88,6 +94,7 @@ export class ChatSessionsStore {
     this.userId = userId;
     this.hydratedIds.clear();
     this.titledIds.clear();
+    this.serverBackedIds.clear();
     this.sessionsSignal.set([]);
     this.activeIdSignal.set(null);
     this.isLoadingSignal.set(true);
@@ -149,6 +156,7 @@ export class ChatSessionsStore {
     this.userId = null;
     this.hydratedIds.clear();
     this.titledIds.clear();
+    this.serverBackedIds.clear();
     this.sessionsSignal.set([]);
     this.activeIdSignal.set(null);
     this.isReadySignal.set(false);
@@ -211,6 +219,7 @@ export class ChatSessionsStore {
     this.sessionsSignal.set(remaining);
     this.hydratedIds.delete(sessionId);
     this.titledIds.delete(sessionId);
+    this.serverBackedIds.delete(sessionId);
 
     if (this.activeIdSignal() === sessionId) {
       if (remaining.length > 0) {
@@ -268,6 +277,73 @@ export class ChatSessionsStore {
         updatedAt: new Date().toISOString(),
       };
     });
+  }
+
+  /**
+   * Records a completed realtime/voice session and binds it to the server `conversationId` the
+   * backend minted for it, so a page refresh rehydrates its turns via `getConversation`. The
+   * turns render immediately (optimistic); the thread is marked hydrated (a later open won't
+   * refetch and clobber them) and server-backed (a transient 404 can't ghost-drop it); and the
+   * server persist is best-effort — a failure only means the turns won't survive a reload.
+   *
+   * With no `conversationId` (an older backend that mints none) it degrades to the previous
+   * local-only behavior via `appendActiveMessages`: the turns show but are not persisted.
+   */
+  appendRealtimeConversation(
+    conversationId: string | null,
+    messages: readonly ChatMessage[],
+  ): void {
+    if (messages.length === 0) {
+      return;
+    }
+
+    if (!conversationId) {
+      this.appendActiveMessages(messages);
+      return;
+    }
+
+    const appended = messages.map((message) => ({ ...message, pending: false }));
+    const now = new Date().toISOString();
+    const existing = this.sessionsSignal().find((session) => session.id === conversationId);
+
+    if (existing) {
+      this.patchSession(conversationId, (session) => {
+        const merged = [...session.messages, ...appended];
+        return {
+          ...session,
+          messages: merged,
+          title: this.deriveTitle(session.title, merged),
+          updatedAt: now,
+        };
+      });
+    } else {
+      const session: ChatSession = {
+        id: conversationId,
+        title: this.deriveTitle(DEFAULT_TITLE_KEY, appended),
+        messages: appended,
+        createdAt: now,
+        updatedAt: now,
+      };
+      this.sessionsSignal.update((sessions) => [session, ...sessions]);
+    }
+
+    this.hydratedIds.add(conversationId);
+    this.serverBackedIds.add(conversationId);
+    this.activeIdSignal.set(conversationId);
+
+    void this.persistRealtimeTurns(conversationId, appended);
+  }
+
+  private async persistRealtimeTurns(
+    conversationId: string,
+    messages: readonly ChatMessage[],
+  ): Promise<void> {
+    try {
+      await this.chatRepository.persistRealtimeTurns(conversationId, messages);
+    } catch {
+      // Best-effort: the turns are already visible locally; a failed persist only means they
+      // won't survive a refresh. Never disrupt the UI over it.
+    }
   }
 
   /**
@@ -383,6 +459,11 @@ export class ChatSessionsStore {
    * sidebar no longer lists (the URL self-heals on the next navigation or reload).
    */
   private dropGhostSession(sessionId: string): void {
+    // A realtime-persisted conversation has a real server row even when a fetch transiently
+    // 404s (read-after-write lag) — never drop it as a ghost.
+    if (this.serverBackedIds.has(sessionId)) {
+      return;
+    }
     this.sessionsSignal.update((sessions) =>
       sessions.filter((session) => session.id !== sessionId),
     );

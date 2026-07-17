@@ -33,6 +33,7 @@ export class RealtimeStore {
   private readonly errorSignal = signal<string | null>(null);
   private readonly permissionDeniedSignal = signal(false);
   private readonly notAvailableSignal = signal(false);
+  private readonly conversationIdSignal = signal<string | null>(null);
   private completedTurns: RealtimeTurn[] = [];
   private pendingCharts: ChartSpec[] = [];
 
@@ -50,6 +51,12 @@ export class RealtimeStore {
    * with just a close button — no red retry alarm.
    */
   readonly notAvailable = this.notAvailableSignal.asReadonly();
+  /**
+   * Server conversation id the backend minted for this voice session (null until the session
+   * starts, or when the deployment's session endpoint returns none). Read on `stop()` so the
+   * completed turns can be persisted and bound to that conversation for refresh hydration.
+   */
+  readonly conversationId = this.conversationIdSignal.asReadonly();
 
   constructor() {
     this.provider.onEvent((event) => this.handleEvent(event));
@@ -108,6 +115,9 @@ export class RealtimeStore {
 
   private handleEvent(event: RealtimeEvent): void {
     switch (event.kind) {
+      case 'session-started':
+        this.conversationIdSignal.set(event.conversationId);
+        return;
       case 'transcript-delta':
         this.liveTranscriptSignal.update((current) => current + event.delta);
         return;
@@ -171,6 +181,7 @@ export class RealtimeStore {
     this.errorSignal.set(null);
     this.permissionDeniedSignal.set(false);
     this.notAvailableSignal.set(false);
+    this.conversationIdSignal.set(null);
     this.completedTurns = [];
     this.pendingCharts = [];
   }

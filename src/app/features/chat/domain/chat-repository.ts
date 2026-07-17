@@ -48,4 +48,14 @@ export abstract class ChatRepository {
    * instead of every client re-deriving one from the first message locally.
    */
   abstract generateTitle(messages: readonly ChatMessage[], threadId: string): Promise<string>;
+
+  /**
+   * Persists completed realtime/voice turns onto `conversationId` (the id the realtime session
+   * minted server-side), so a page refresh rehydrates them via `getConversation`. Only each
+   * turn's role and content are sent — charts are not persisted on this path.
+   */
+  abstract persistRealtimeTurns(
+    conversationId: string,
+    turns: readonly ChatMessage[],
+  ): Promise<void>;
 }

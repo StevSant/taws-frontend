@@ -45,6 +45,8 @@ interface RealtimeSessionResponse {
   model: string;
   expires_at: number;
   tools: unknown[];
+  /** Server-minted conversation this session's turns are persisted onto (absent on older deployments). */
+  conversation_id?: string;
 }
 
 /**
@@ -80,6 +82,8 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
   private micStream: MediaStream | null = null;
   private audioElement: HTMLAudioElement | null = null;
   private tools: unknown[] = [];
+  /** Server conversation this session's turns persist onto, captured from the mint response. */
+  private conversationId: string | null = null;
   private pendingToolCalls = 0;
   private continuationScheduled = false;
   /** Tool calls the model has made since the last user turn — reset on user speech. */
@@ -111,6 +115,11 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
         return;
       }
       this.tools = session.tools;
+      // Surface the server conversation id so the store can bind persisted turns to it.
+      this.conversationId = session.conversation_id ?? null;
+      if (this.conversationId) {
+        this.emit({ kind: 'session-started', conversationId: this.conversationId });
+      }
 
       const pc = new RTCPeerConnection({ iceServers: this.config.realtimeIceServers });
       this.pc = pc;
@@ -209,6 +218,7 @@ export class RealtimeWebrtcService extends RealtimeSessionProvider {
 
   /** Releases the mic, closes the data channel + peer connection, removes the audio sink. */
   private teardown(): void {
+    this.conversationId = null;
     this.pendingToolCalls = 0;
     this.continuationScheduled = false;
     this.visualRequestPending = false;

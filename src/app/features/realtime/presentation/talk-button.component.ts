@@ -13,7 +13,7 @@ import {
 import { AppConfigService, TranslationService } from '../../../core';
 import { prefersReducedMotion } from '../../audio';
 import { RealtimeStore } from '../application';
-import { RealtimeSessionProvider, RealtimeTurn } from '../domain';
+import { RealtimeSessionProvider, RealtimeSessionResult } from '../domain';
 import { RealtimeWebrtcService, isRealtimeSupported } from '../infrastructure';
 import { VoiceModeOverlayComponent } from './voice-mode-overlay.component';
 
@@ -50,7 +50,7 @@ const VOICE_MODE_EXIT_MS = 320;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TalkButtonComponent implements OnDestroy {
-  @Output() readonly sessionClosed = new EventEmitter<readonly RealtimeTurn[]>();
+  @Output() readonly sessionClosed = new EventEmitter<RealtimeSessionResult>();
 
   private readonly store = inject(RealtimeStore);
   private readonly config = inject(AppConfigService);
@@ -123,9 +123,11 @@ export class TalkButtonComponent implements OnDestroy {
   }
 
   private flushSession(): void {
+    // Capture the conversation id BEFORE stop() resets the session state.
+    const conversationId = this.store.conversationId();
     const turns = this.store.stop();
     if (turns.length > 0) {
-      this.sessionClosed.emit(turns);
+      this.sessionClosed.emit({ conversationId, turns });
     }
   }
 

@@ -61,7 +61,7 @@ import {
   WebSpeechTtsProvider,
 } from '../../../audio/infrastructure';
 
-import { RealtimeTurn, TalkButtonComponent } from '../../../realtime';
+import { RealtimeSessionResult, TalkButtonComponent } from '../../../realtime';
 
 import { ChartComponent } from '../../../../shared/charts';
 
@@ -666,14 +666,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     await this.dictation.startDictation();
   }
 
-  saveRealtimeConversation(turns: readonly RealtimeTurn[]): void {
-    const messages: ChatMessage[] = turns.map((turn) => ({
+  saveRealtimeConversation(result: RealtimeSessionResult): void {
+    const messages: ChatMessage[] = result.turns.map((turn) => ({
       id: this.nextMessageId(),
       role: turn.role,
       content: turn.content,
       ...(turn.charts?.length ? { charts: [...turn.charts] } : {}),
     }));
-    this.sessionsStore.appendActiveMessages(messages);
+    this.sessionsStore.appendRealtimeConversation(result.conversationId, messages);
   }
 
   private appendTranscript(transcript: string): void {
