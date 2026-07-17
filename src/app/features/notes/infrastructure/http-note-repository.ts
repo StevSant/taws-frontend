@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AppConfigService } from '../../../core';
-import { Note, NoteRepository } from '../domain';
+import { Note, NoteRepository, NoteTargetRef } from '../domain';
 import { mapNoteDto } from './map-note-dto';
-import { NoteBodyRequestDto, NoteDto } from './note-dto';
+import { NoteBodyRequestDto, NoteCreateRequestDto, NoteDto } from './note-dto';
 
 const NOTES_PATH = '/api/v1/notes';
 
@@ -24,8 +24,10 @@ export class HttpNoteRepository extends NoteRepository {
     return dtos.map(mapNoteDto);
   }
 
-  async create(body: string): Promise<Note> {
-    const payload: NoteBodyRequestDto = { body };
+  async create(body: string, target?: NoteTargetRef): Promise<Note> {
+    const payload: NoteCreateRequestDto = target
+      ? { body, target_kind: target.kind, target_id: target.targetId }
+      : { body };
     const dto = await firstValueFrom(
       this.http.post<NoteDto>(`${this.config.apiBaseUrl}${NOTES_PATH}`, payload),
     );
