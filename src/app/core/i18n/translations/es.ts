@@ -622,6 +622,12 @@ export const ES_TRANSLATIONS = {
   'radar.detail.analyzeNow.disabledHint':
     'No se puede analizar: esta noticia no está vinculada a ningún instrumento.',
   'radar.detail.analyzeNow.error': 'No se pudo analizar la noticia:',
+  'radar.detail.notify.action': 'Enviar alerta a Telegram',
+  'radar.detail.notify.running': 'Analizando relevancia…',
+  'radar.detail.notify.sent': 'Alerta enviada a tu Telegram.',
+  'radar.detail.notify.notRelevant':
+    'Gemini determinó que esta noticia no supera el umbral de relevancia para enviar una alerta.',
+  'radar.detail.notify.error': 'No se pudo enviar la alerta a Telegram:',
   'radar.chart.loading': 'Cargando gráfico…',
   'radar.chart.unavailable': 'El gráfico no está disponible para este instrumento.',
   'radar.detail.asset.loading': 'Cargando datos del activo…',

@@ -1,5 +1,6 @@
 export { NewsRepository } from './news-repository';
 export { NewsNotAnalyzableError } from './news-not-analyzable-error';
+export { NewsNotificationError } from './news-notification-error';
 export { InstrumentRepository } from './instrument-repository';
 export { SignalRepository } from './signal-repository';
 export { SignalReviewRepository } from './signal-review-repository';
@@ -10,6 +11,7 @@ export type { CoinCandidate } from './models/coin-candidate.model';
 export type { RegisterInstrumentResult } from './models/register-instrument-result.model';
 export type { AssetSource } from './models/asset-source.model';
 export type { NewsItem } from './models/news-item.model';
+export type { NewsNotificationResult } from './models/news-notification-result.model';
 export type { NewsAssetImpact } from './models/news-asset-impact.model';
 export type { NewsDetail } from './models/news-detail.model';
 export type { NewsPage } from './models/news-page.model';

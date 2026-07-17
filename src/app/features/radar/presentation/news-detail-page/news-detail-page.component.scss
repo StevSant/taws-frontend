@@ -434,6 +434,18 @@
     color: var(--color-negative, var(--color-text-primary));
   }
 
+  &__notify-error {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--color-negative, var(--color-text-primary));
+  }
+
+  &__notify-success {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--color-gain);
+  }
+
   &__analyze-hint {
     margin: 0;
     font-size: 0.75rem;

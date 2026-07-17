@@ -3,6 +3,7 @@ import { NewsBrowseQuery } from './models/news-browse-query.model';
 import { NewsDetail } from './models/news-detail.model';
 import { NewsFacets } from './models/news-facets.model';
 import { NewsItem } from './models/news-item.model';
+import { NewsNotificationResult } from './models/news-notification-result.model';
 import { NewsPage } from './models/news-page.model';
 import { NewsPageRequest } from './models/news-page-request.model';
 import { RadarFilters } from './models/radar-filters.model';
@@ -69,4 +70,10 @@ export abstract class NewsRepository {
    * distinct sources yet, or the output failed the compliance gate.
    */
   abstract analyzeNewsItem(id: string): Promise<NewsItem>;
+
+  /**
+   * Assesses one news item with Gemini and sends a Telegram alert only when it meets the
+   * configured relevance threshold for the current user.
+   */
+  abstract notifyNewsItem(id: string): Promise<NewsNotificationResult>;
 }

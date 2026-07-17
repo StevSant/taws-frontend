@@ -564,6 +564,11 @@ export interface TranslationDict {
   'radar.detail.analyzeNow.hint': string;
   'radar.detail.analyzeNow.disabledHint': string;
   'radar.detail.analyzeNow.error': string;
+  'radar.detail.notify.action': string;
+  'radar.detail.notify.running': string;
+  'radar.detail.notify.sent': string;
+  'radar.detail.notify.notRelevant': string;
+  'radar.detail.notify.error': string;
   'radar.card.impact.noInstrument': string;
   'radar.chart.loading': string;
   'radar.chart.unavailable': string;

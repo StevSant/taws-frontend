@@ -9,6 +9,7 @@ import {
   NewsFacets,
   NewsItem,
   NewsNotAnalyzableError,
+  NewsNotificationResult,
   NewsPage,
   NewsPageRequest,
   NewsRepository,
@@ -17,11 +18,14 @@ import {
 } from '../domain';
 import { mapNewsDetailDto } from './map-news-detail-dto';
 import { mapNewsItemDto } from './map-news-item-dto';
+import { mapNewsNotificationResponseDto } from './map-news-notification-response-dto';
 import { NewsBrowseResponseDto } from './news-browse-response-dto';
 import { NewsDetailDto } from './news-detail-dto';
 import { NewsFacetsDto } from './news-facets-dto';
 import { NewsItemDto } from './news-item-dto';
 import { NewsListResponseDto } from './news-list-response-dto';
+import { NewsNotificationResponseDto } from './news-notification-response-dto';
+import { toNewsNotificationError } from './to-news-notification-error';
 
 const NEWS_PATH = '/api/v1/news';
 const NEWS_BROWSE_PATH = '/api/v1/news/browse';
@@ -250,6 +254,26 @@ export class HttpNewsRepository extends NewsRepository {
         throw new NewsNotAnalyzableError(readSkipReason(error));
       }
       throw error;
+    }
+  }
+
+  /**
+   * Assesses this item for a Telegram alert. This endpoint runs Gemini, so it shares the
+   * analysis request timeout rather than the shorter normal-news budget.
+   */
+  async notifyNewsItem(id: string): Promise<NewsNotificationResult> {
+    try {
+      const dto = await firstValueFrom(
+        this.http
+          .post<NewsNotificationResponseDto>(
+            `${this.config.apiBaseUrl}${NEWS_PATH}/${encodeURIComponent(id)}/notify`,
+            null,
+          )
+          .pipe(timeout(this.config.analyzeNewsRequestTimeoutMs)),
+      );
+      return mapNewsNotificationResponseDto(dto);
+    } catch (error: unknown) {
+      throw toNewsNotificationError(error);
     }
   }
 }

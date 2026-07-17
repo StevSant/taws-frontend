@@ -45,6 +45,15 @@
             [label]="i18n.t('chat.reference.ask')"
             (pressed)="onAskMidas()"
           />
+          <app-button
+            [label]="
+              store.isNotifying()
+                ? i18n.t('radar.detail.notify.running')
+                : i18n.t('radar.detail.notify.action')
+            "
+            [disabled]="store.isNotifying()"
+            (pressed)="onNotify()"
+          />
           @if (!store.signal()) {
             <app-button
               [label]="
@@ -79,6 +88,19 @@
               }}
             </p>
           }
+        }
+        @if (store.notificationResult(); as notification) {
+          <p class="news-detail__notify-success news-detail__actions-feedback" role="status">
+            {{
+              notification.status === 'sent'
+                ? i18n.t('radar.detail.notify.sent')
+                : i18n.t('radar.detail.notify.notRelevant')
+            }}
+          </p>
+        } @else if (store.notifyError(); as notifyError) {
+          <p class="news-detail__notify-error news-detail__actions-feedback" role="alert">
+            {{ i18n.t('radar.detail.notify.error') }} {{ notifyError }}
+          </p>
         }
       </nav>
 

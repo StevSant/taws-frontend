@@ -178,6 +178,10 @@ export class NewsDetailPageComponent {
     void this.store.analyze();
   }
 
+  onNotify(): void {
+    void this.store.notify();
+  }
+
   onRetry(): void {
     if (this.currentId) {
       void this.store.load(this.currentId);

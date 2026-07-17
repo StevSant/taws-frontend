@@ -607,6 +607,12 @@ export const EN_TRANSLATIONS = {
   'radar.detail.analyzeNow.disabledHint':
     'Cannot analyze: this article is not linked to any instrument.',
   'radar.detail.analyzeNow.error': 'Could not analyze the news item:',
+  'radar.detail.notify.action': 'Send Telegram alert',
+  'radar.detail.notify.running': 'Assessing relevance…',
+  'radar.detail.notify.sent': 'Alert sent to your Telegram.',
+  'radar.detail.notify.notRelevant':
+    'Gemini determined that this news item does not exceed the relevance threshold for sending an alert.',
+  'radar.detail.notify.error': 'Could not send the Telegram alert:',
   'radar.chart.loading': 'Loading chart…',
   'radar.chart.unavailable': 'Chart is not available for this instrument.',
   'radar.detail.asset.loading': 'Loading asset data…',

@@ -4,6 +4,8 @@ import {
   NewsDetail,
   NewsItem,
   NewsNotAnalyzableError,
+  NewsNotificationError,
+  NewsNotificationResult,
   NewsRepository,
   NewsSkipReason,
   Signal,
@@ -45,6 +47,9 @@ export class NewsDetailStore {
   private readonly generatingSignal = signal(false);
   private readonly analyzeErrorSignal = signal<string | null>(null);
   private readonly analyzeRejectionSignal = signal<NewsSkipReason | null>(null);
+  private readonly notificationResultSignal = signal<NewsNotificationResult | null>(null);
+  private readonly notifyingSignal = signal(false);
+  private readonly notifyErrorSignal = signal<string | null>(null);
 
   readonly news = this.newsSignal.asReadonly();
   readonly signal = this.linkedSignal.asReadonly();
@@ -75,6 +80,12 @@ export class NewsDetailStore {
    * outcome ("not enough distinct sources yet"), not a broken request.
    */
   readonly analyzeRejection = this.analyzeRejectionSignal.asReadonly();
+  /** Outcome of the latest Telegram-alert assessment. */
+  readonly notificationResult = this.notificationResultSignal.asReadonly();
+  /** True while Gemini is assessing the item and the alert request is pending. */
+  readonly isNotifying = this.notifyingSignal.asReadonly();
+  /** Failure detail from the latest Telegram-alert request, if any. */
+  readonly notifyError = this.notifyErrorSignal.asReadonly();
 
   /** Primary instrument the article links to — the target of the "Analizar ahora" action. */
   readonly primarySymbol = computed(() => this.newsSignal()?.relatedSymbols[0] ?? null);
@@ -119,6 +130,9 @@ export class NewsDetailStore {
     this.errorSignal.set(null);
     this.analyzeErrorSignal.set(null);
     this.analyzeRejectionSignal.set(null);
+    this.notificationResultSignal.set(null);
+    this.notifyingSignal.set(false);
+    this.notifyErrorSignal.set(null);
     this.newsSignal.set(null);
     this.linkedSignal.set(null);
     this.affectedInstrumentsSignal.set([]);
@@ -191,6 +205,24 @@ export class NewsDetailStore {
     }
   }
 
+  /** Assesses the visible item and sends a Telegram alert only when it is relevant enough. */
+  async notify(): Promise<void> {
+    const news = this.newsSignal();
+    if (!news || this.notifyingSignal()) {
+      return;
+    }
+    this.notifyingSignal.set(true);
+    this.notificationResultSignal.set(null);
+    this.notifyErrorSignal.set(null);
+    try {
+      this.notificationResultSignal.set(await this.newsRepository.notifyNewsItem(news.id));
+    } catch (error: unknown) {
+      this.notifyErrorSignal.set(this.toNotifyErrorMessage(error));
+    } finally {
+      this.notifyingSignal.set(false);
+    }
+  }
+
   /** Push a freshly-fetched detail into view state, keeping the related-news page in range. */
   private apply(detail: NewsDetail): void {
     this.newsSignal.set(detail.news);
@@ -228,5 +260,9 @@ export class NewsDetailStore {
 
   private toErrorMessage(error: unknown): string {
     return error instanceof Error ? error.message : 'Unknown error while loading the news item';
+  }
+
+  private toNotifyErrorMessage(error: unknown): string {
+    return error instanceof NewsNotificationError ? error.message : 'Notification request failed';
   }
 }
