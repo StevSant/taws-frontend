@@ -979,6 +979,8 @@ export const ES_TRANSLATIONS = {
   'briefings.card.linkedSignals.empty': 'No hay señales vinculadas',
   'briefings.card.linkedSignals.unresolved': 'Señal no disponible',
   'briefings.card.linkedSignals.archived': 'Señal archivada',
+  'briefings.card.linkedSignals.archivedCollapsed': 'archivadas · podadas por retención',
+  'briefings.card.linkedSignals.unresolvedCount': 'sin resolver',
   'briefings.card.linkedSignals.confidenceAria': 'Confianza',
   'briefings.card.linkedSignals.impact.positive': 'Positivo',
   'briefings.card.linkedSignals.impact.negative': 'Negativo',

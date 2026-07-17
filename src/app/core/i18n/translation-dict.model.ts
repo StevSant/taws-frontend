@@ -890,6 +890,8 @@ export interface TranslationDict {
   'briefings.card.linkedSignals.empty': string;
   'briefings.card.linkedSignals.unresolved': string;
   'briefings.card.linkedSignals.archived': string;
+  'briefings.card.linkedSignals.archivedCollapsed': string;
+  'briefings.card.linkedSignals.unresolvedCount': string;
   'briefings.card.linkedSignals.confidenceAria': string;
   'briefings.card.linkedSignals.impact.positive': string;
   'briefings.card.linkedSignals.impact.negative': string;

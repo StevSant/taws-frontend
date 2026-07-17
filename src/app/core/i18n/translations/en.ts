@@ -958,6 +958,8 @@ export const EN_TRANSLATIONS = {
   'briefings.card.linkedSignals.empty': 'No linked signals',
   'briefings.card.linkedSignals.unresolved': 'Signal unavailable',
   'briefings.card.linkedSignals.archived': 'Archived signal',
+  'briefings.card.linkedSignals.archivedCollapsed': 'archived · pruned by retention',
+  'briefings.card.linkedSignals.unresolvedCount': 'unresolved',
   'briefings.card.linkedSignals.confidenceAria': 'Confidence',
   'briefings.card.linkedSignals.impact.positive': 'Positive',
   'briefings.card.linkedSignals.impact.negative': 'Negative',

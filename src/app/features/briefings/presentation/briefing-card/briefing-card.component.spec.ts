@@ -111,25 +111,35 @@ describe('BriefingCardComponent', () => {
     expect(resolvedChip.querySelector('.briefing-card__signal-dot')).not.toBeNull();
   });
 
-  it('renders an archived signal as a link without confidence or impact dot', () => {
+  it('collapses archived signals into a deduped disclosure, not per-signal chips', () => {
     const element: HTMLElement = createFixture().nativeElement;
 
-    const archivedChip = element.querySelector<HTMLAnchorElement>(
+    const archived = element.querySelector<HTMLDetailsElement>('details.briefing-card__archived');
+    expect(archived).not.toBeNull();
+    // The summary carries the archived count and the retention label.
+    expect(archived?.querySelector('.briefing-card__archived-count')?.textContent).toContain('1');
+    expect(archived?.textContent).toContain('pruned by retention');
+
+    // The one archived ticker resolves to a radar link tagged with its count,
+    // and never shows a confidence percent or impact dot.
+    const archivedChip = archived?.querySelector<HTMLAnchorElement>(
       'a.briefing-card__signal--archived',
     );
     expect(archivedChip).not.toBeNull();
     expect(archivedChip?.textContent).toContain('MSFT');
-    expect(archivedChip?.textContent).toContain('Archived signal');
+    expect(archivedChip?.textContent).toContain('×1');
     expect(archivedChip?.querySelector('.briefing-card__signal-confidence')).toBeNull();
     expect(archivedChip?.querySelector('.briefing-card__signal-dot')).toBeNull();
   });
 
-  it('renders an unresolved signal as a non-link chip', () => {
+  it('shrinks unresolved signals to a bare count, not a chip', () => {
     const element: HTMLElement = createFixture().nativeElement;
 
-    const unresolvedChip = element.querySelector('.briefing-card__signal--unresolved');
-    expect(unresolvedChip).not.toBeNull();
-    expect(unresolvedChip?.tagName).not.toBe('A');
-    expect(unresolvedChip?.textContent).toContain('Signal unavailable');
+    // No standalone unresolved chip anymore — just a quiet count line.
+    expect(element.querySelector('.briefing-card__signal--unresolved')).toBeNull();
+    const unresolved = element.querySelector('.briefing-card__signals-unresolved');
+    expect(unresolved).not.toBeNull();
+    expect(unresolved?.textContent).toContain('1');
+    expect(unresolved?.textContent).toContain('unresolved');
   });
 });

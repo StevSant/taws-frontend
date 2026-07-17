@@ -11,6 +11,7 @@ import {
 import { ReviewHistoryComponent } from '../review-history/review-history.component';
 import { NotesTriggerChipComponent } from '../../../notes/presentation';
 import { linkedSignalImpactClass } from './linked-signal-impact-class';
+import { GroupedLinkedSignals, groupLinkedSignals } from './group-linked-signals';
 
 const DECISION_LABELS: Record<ReviewDecision, TranslationKey> = {
   reviewed: 'briefings.review.decision.reviewed',
@@ -33,6 +34,9 @@ const PERCENT_MULTIPLIER = 100;
 
 /** How many leading characters of a raw signal id to keep before eliding. */
 const SIGNAL_ID_HEAD = 8;
+
+/** Max archived tickers previewed in the collapsed summary before "+N". */
+const ARCHIVED_PREVIEW_MAX = 4;
 
 /**
  * One generated briefing: summary, disclaimer, linked signal evidence, its
@@ -84,6 +88,31 @@ export class BriefingCardComponent {
    */
   get hasEnrichedSignals(): boolean {
     return this.briefing.linkedSignals.length > 0;
+  }
+
+  private groupedCache?: { source: readonly LinkedSignal[]; value: GroupedLinkedSignals };
+
+  /**
+   * Linked signals partitioned into active / archived / unresolved for display,
+   * memoized by the `linkedSignals` array reference so it recomputes only when
+   * the briefing input changes — not on every OnPush change-detection pass.
+   */
+  get groupedSignals(): GroupedLinkedSignals {
+    const source = this.briefing.linkedSignals;
+    if (this.groupedCache?.source !== source) {
+      this.groupedCache = { source, value: groupLinkedSignals(source) };
+    }
+    return this.groupedCache.value;
+  }
+
+  /** Compact preview of the archived tickers, e.g. "USDT ×12, GOOGL ×3 +2". */
+  get archivedBreakdownLabel(): string {
+    const groups = this.groupedSignals.archived;
+    const shown = groups
+      .slice(0, ARCHIVED_PREVIEW_MAX)
+      .map((group) => `${group.symbol} ×${group.count}`);
+    const rest = groups.length - shown.length;
+    return rest > 0 ? `${shown.join(', ')} +${rest}` : shown.join(', ');
   }
 
   /** A linked signal the backend could not resolve — rendered as a non-link chip. */

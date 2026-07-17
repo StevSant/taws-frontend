@@ -412,6 +412,79 @@
     white-space: nowrap;
   }
 
+  // Archived signals — pruned by retention, deduped by ticker and collapsed
+  // into a quiet disclosure so they never crowd out the live evidence above.
+  &__archived {
+    margin-top: var(--space-2);
+  }
+
+  &__archived-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    list-style: none;
+    padding: 0.3rem 0.5rem;
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-size: 0.74rem;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background: var(--color-surface-raised);
+    }
+  }
+
+  &__archived-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0 0.3rem;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-raised);
+    border: 1px dashed var(--color-border-hi);
+    color: var(--color-text-secondary);
+    font-family: var(--font-family-mono);
+    font-size: 0.64rem;
+    font-weight: 700;
+  }
+
+  &__archived-label {
+    font-style: italic;
+  }
+
+  &__archived-breakdown {
+    min-width: 0;
+    font-family: var(--font-family-mono);
+    font-size: 0.68rem;
+    color: var(--color-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__archived-chips {
+    list-style: none;
+    margin: var(--space-2) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  &__signals-unresolved {
+    margin: var(--space-2) 0 0;
+    color: var(--color-text-faint);
+    font-size: 0.72rem;
+    font-style: italic;
+  }
+
   // -------------------------------------------------------------------------
   // Disclaimer — quiet legal footnote above the action controls.
   // -------------------------------------------------------------------------

@@ -55,40 +55,16 @@
 
     @if (hasEnrichedSignals) {
       <!--
-        Enriched evidence: each linked signal is an in-app link to its asset in
-        the radar (`/radar/:symbol`). An unresolved signal (symbol "—") degrades
-        to a non-link, de-emphasized chip so we never mint a broken link. An
-        archived signal (symbol resolved, but confidence/thesis pruned) keeps
-        the link but drops the confidence percent and impact dot.
+        Enriched evidence. Live signals render individually (impact dot +
+        confidence + thesis). Signals whose source was pruned by retention carry
+        no per-signal information, so they are deduped by ticker and collapsed
+        into one quiet disclosure instead of a wall of identical "archived"
+        chips. Fully unresolved ids (symbol "—") shrink to a bare count.
       -->
-      <ul class="briefing-card__signals">
-        @for (signal of briefing.linkedSignals; track signal.signalId) {
-          <li>
-            @if (isUnresolved(signal)) {
-              <span
-                class="briefing-card__signal briefing-card__signal--unresolved"
-                [title]="signal.signalId"
-              >
-                <span class="briefing-card__signal-marker" aria-hidden="true"></span>
-                <span class="briefing-card__signal-symbol">
-                  {{ i18n.t('briefings.card.linkedSignals.unresolved') }}
-                </span>
-                <span class="briefing-card__signal-id taws-selectable">
-                  {{ shortSignalId(signal.signalId) }}
-                </span>
-              </span>
-            } @else if (isArchived(signal)) {
-              <a
-                class="briefing-card__signal briefing-card__signal--archived"
-                [routerLink]="['/radar', signal.symbol]"
-                [title]="signal.symbol"
-              >
-                <span class="briefing-card__signal-symbol">{{ signal.symbol }}</span>
-                <span class="briefing-card__signal-archived">
-                  {{ i18n.t('briefings.card.linkedSignals.archived') }}
-                </span>
-              </a>
-            } @else {
+      @if (groupedSignals.active.length > 0) {
+        <ul class="briefing-card__signals">
+          @for (signal of groupedSignals.active; track signal.signalId) {
+            <li>
               <a
                 class="briefing-card__signal"
                 [class]="impactClass(signal.impact)"
@@ -117,10 +93,43 @@
                   <span class="briefing-card__signal-title">{{ signal.title }}</span>
                 }
               </a>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (groupedSignals.archived.length > 0) {
+        <details class="briefing-card__archived">
+          <summary class="briefing-card__archived-summary">
+            <span class="briefing-card__archived-count">{{ groupedSignals.archivedTotal }}</span>
+            <span class="briefing-card__archived-label">{{
+              i18n.t('briefings.card.linkedSignals.archivedCollapsed')
+            }}</span>
+            <span class="briefing-card__archived-breakdown">{{ archivedBreakdownLabel }}</span>
+          </summary>
+          <ul class="briefing-card__archived-chips">
+            @for (group of groupedSignals.archived; track group.symbol) {
+              <li>
+                <a
+                  class="briefing-card__signal briefing-card__signal--archived"
+                  [routerLink]="['/radar', group.symbol]"
+                  [title]="group.symbol"
+                >
+                  <span class="briefing-card__signal-symbol">{{ group.symbol }}</span>
+                  <span class="briefing-card__signal-archived">×{{ group.count }}</span>
+                </a>
+              </li>
             }
-          </li>
-        }
-      </ul>
+          </ul>
+        </details>
+      }
+
+      @if (groupedSignals.unresolvedCount > 0) {
+        <p class="briefing-card__signals-unresolved">
+          {{ groupedSignals.unresolvedCount }}
+          {{ i18n.t('briefings.card.linkedSignals.unresolvedCount') }}
+        </p>
+      }
     } @else if (briefing.linkedSignalIds.length > 0) {
       <!--
         Fallback for older/edge responses that carry raw ids but no enriched
