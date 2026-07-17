@@ -48,3 +48,4 @@ export {
   PriceDeltaChipComponent,
 } from './price';
 export { PaginationComponent } from './pagination/pagination.component';
+export { DrawerComponent } from './drawer/drawer.component';

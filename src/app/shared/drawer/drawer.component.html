@@ -1,0 +1,12 @@
+<dialog
+  #dialog
+  class="drawer"
+  [attr.aria-label]="ariaLabel()"
+  (cancel)="onCancel($event)"
+  (click)="onClick($event)"
+  (keydown)="onKeydown($event)"
+>
+  <div class="drawer__panel">
+    <ng-content />
+  </div>
+</dialog>
