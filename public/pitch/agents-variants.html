@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Midas — La leyenda · ruido → oro</title>
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#050505;--white:#f4f1e9;--muted:#aaa69c;--gold:#dfa91d;--gold-hi:#ffd867;
+      --red:#f45e63;--green:#69d39c;--line:rgba(255,255,255,.12);
+      --serif:Georgia,'Times New Roman',serif;
+      --sans:ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--white);font-family:var(--sans)}
+    button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+    .chrome{position:fixed;inset:0 0 auto;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.75rem 1rem;background:linear-gradient(180deg,rgba(5,5,5,.95),transparent);pointer-events:none}
+    .chrome *{pointer-events:auto}
+    .chrome h1{margin:0;font:700 .58rem/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);max-width:40ch}
+    .tabs{display:flex;flex-wrap:wrap;gap:.3rem;justify-content:flex-end}
+    .tabs button{padding:.4rem .65rem;border:1px solid var(--line);border-radius:999px;font-size:.62rem;color:rgba(255,255,255,.5)}
+    .tabs button.active,.tabs button:hover{border-color:rgba(255,216,103,.55);color:var(--gold-hi);background:rgba(255,216,103,.1)}
+    .nav{position:fixed;right:1rem;bottom:1rem;z-index:50;display:flex;gap:.4rem}
+    .nav button{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;background:rgba(5,5,5,.85)}
+    .nav button:hover{border-color:var(--gold);color:var(--gold-hi)}
+    .variant{position:absolute;inset:0;display:none;padding:4rem clamp(1.1rem,4vw,3.5rem) 3.8rem;overflow:hidden}
+    .variant.active{display:grid}
+    .kicker{margin:0 0 .55rem;color:rgba(255,255,255,.42);font:700 .6rem var(--sans);letter-spacing:.18em;text-transform:uppercase}
+    .title{margin:0;font-family:var(--serif);font-weight:400;font-size:clamp(2.5rem,5.8vw,5.8rem);line-height:.88;letter-spacing:-.05em;text-wrap:balance}
+    .title em{color:var(--gold-hi);font-style:normal}
+    .lead{margin:.85rem 0 0;max-width:42ch;color:#cfc9bc;font-size:clamp(.98rem,1.35vw,1.18rem);line-height:1.5}
+
+    .ico{width:28px;height:28px}.ico-lg{width:40px;height:40px}.ico-xl{width:52px;height:52px}
+    .iba{display:grid;place-items:center;border:1px solid rgba(185,141,54,.45);border-radius:14px;background:rgba(185,141,54,.1)}
+
+    /* ===== 1 ALQUIMIA ===== */
+    .v1{grid-template-rows:auto 1fr;gap:1.1rem}
+    .alchemy{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(.8rem,2vw,1.5rem);align-items:stretch;min-height:0;height:100%}
+    .heap,.gold{position:relative;border-radius:22px;border:1px solid var(--line);padding:1.2rem;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;min-height:0}
+    .heap{border-color:rgba(244,94,99,.3);background:linear-gradient(180deg,#1a1010,#0a0808)}
+    .gold{border-color:rgba(255,216,103,.45);background:linear-gradient(180deg,#1a160c,#0a0906);box-shadow:0 0 50px rgba(223,169,29,.1)}
+    .heap h3,.gold h3{margin:0 0 .5rem;font-family:var(--serif);font-weight:400;font-size:clamp(1.6rem,2.8vw,2.4rem)}
+    .heap h3{color:#f5c4c6}.gold h3{color:var(--gold-hi)}
+    .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}
+    .chip{padding:.4rem .65rem;border-radius:999px;font-size:.68rem;letter-spacing:.03em}
+    .chip--junk{border:1px solid rgba(244,94,99,.35);color:#f0b4b6;background:rgba(244,94,99,.08)}
+    .chip--gold{border:1px solid rgba(255,216,103,.4);color:var(--gold-hi);background:rgba(255,216,103,.08)}
+    .touch{position:relative;display:grid;place-items:center;width:min(180px,22vw)}
+    .touch-core{position:relative;z-index:2;width:110px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,216,103,.55);background:radial-gradient(circle at 35% 30%,#2a2212,#090908);box-shadow:0 0 40px rgba(255,216,103,.25)}
+    .touch-core img{width:48%;filter:drop-shadow(0 0 14px rgba(255,216,103,.5))}
+    .touch-label{position:absolute;bottom:-.2rem;left:50%;transform:translate(-50%,100%);white-space:nowrap;color:var(--gold-hi);font:700 .58rem var(--sans);letter-spacing:.16em;text-transform:uppercase}
+    .rays{position:absolute;inset:-10%;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(255,216,103,.15),transparent 30%,transparent 70%,rgba(255,216,103,.12),transparent);animation:spin 12s linear infinite;opacity:.7}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .agents-strip{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1rem}
+    .agents-strip span{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .55rem;border-radius:999px;border:1px solid rgba(255,216,103,.28);background:rgba(5,5,5,.6);color:var(--gold-hi);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase}
+    .agents-strip .iba{width:24px;height:24px;border-radius:8px}
+    .agents-strip .ico{width:16px;height:16px}
+
+    /* ===== 2 TOQUE ===== */
+    .v2{grid-template-rows:auto 1fr;gap:1rem;align-content:start}
+    .touch-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem;min-height:0;height:100%}
+    .stage{position:relative;border-radius:20px;border:1px solid var(--line);padding:1.2rem;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;min-height:280px}
+    .stage--before{background:#100e0e;border-color:rgba(255,255,255,.1)}
+    .stage--touch{background:linear-gradient(180deg,#1a160c,#0b0a08);border-color:rgba(255,216,103,.45);align-items:center;text-align:center}
+    .stage--after{background:#0e100c;border-color:rgba(105,211,156,.3)}
+    .stage .num{color:rgba(255,255,255,.3);font:700 .62rem ui-monospace,monospace;letter-spacing:.14em}
+    .stage h3{margin:.5rem 0;font-family:var(--serif);font-weight:400;font-size:clamp(1.5rem,2.5vw,2.2rem);line-height:1}
+    .stage p{margin:0;color:#cfc9bc;font-size:.88rem;line-height:1.4}
+    .junk-list,.gold-list{margin:.8rem 0 0;padding:0;list-style:none;display:grid;gap:.4rem}
+    .junk-list li,.gold-list li{padding:.55rem .7rem;border-radius:10px;font-size:.78rem}
+    .junk-list li{border:1px solid rgba(255,255,255,.08);color:#bdb7aa;background:rgba(255,255,255,.03)}
+    .gold-list li{border:1px solid rgba(255,216,103,.28);color:#f0e2b0;background:rgba(255,216,103,.06)}
+    .crew6{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem;margin-top:.8rem;width:100%}
+    .crew6 div{display:flex;align-items:center;gap:.4rem;padding:.4rem;border-radius:10px;border:1px solid rgba(255,216,103,.2);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-hi)}
+
+    /* ===== 3 LEYENDA + FLOTA ===== */
+    .v3{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(1.2rem,3vw,2.5rem);align-items:center}
+    .myth{max-width:34ch}
+    .myth .quote{margin:1.2rem 0 0;padding:1rem 0 0;border-top:1px solid rgba(255,216,103,.25);color:#e8e0d0;font-family:var(--serif);font-size:clamp(1.15rem,2vw,1.45rem);line-height:1.35}
+    .trans{display:grid;gap:.55rem}
+    .pair{display:grid;grid-template-columns:1fr auto 1fr;gap:.5rem;align-items:center}
+    .from,.to{padding:.75rem .85rem;border-radius:14px;font-size:.82rem;line-height:1.35}
+    .from{border:1px solid rgba(244,94,99,.3);color:#e8b4b6;background:rgba(244,94,99,.07)}
+    .to{border:1px solid rgba(255,216,103,.35);color:#f0e2b0;background:rgba(255,216,103,.08)}
+    .pair .iba{width:40px;height:40px}
+    .arrow{color:rgba(255,216,103,.5);text-align:center}
+
+    /* ===== 4 PACTOLO ===== */
+    .v4{grid-template-rows:auto 1fr;gap:1rem}
+    .river{position:relative;height:100%;min-height:320px;border-radius:24px;overflow:hidden;border:1px solid rgba(255,216,103,.2);background:#080808}
+    .river img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.25;filter:brightness(.5)}
+    .river-ui{position:relative;z-index:2;height:100%;display:grid;grid-template-rows:1fr auto;padding:1.2rem}
+    .pollution{display:flex;flex-wrap:wrap;gap:.45rem;align-content:flex-start}
+    .nugget{padding:.45rem .7rem;border-radius:999px;border:1px solid rgba(255,255,255,.1);color:#aaa;font-size:.72rem;background:rgba(0,0,0,.35)}
+    .bank{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between;padding:1rem;border-radius:18px;border:1px solid rgba(255,216,103,.4);background:rgba(5,5,5,.88);backdrop-filter:blur(12px)}
+    .bank-left{display:flex;align-items:center;gap:.75rem}
+    .bank-left img{width:42px;filter:drop-shadow(0 0 12px rgba(255,216,103,.4))}
+    .bank-left strong{display:block;font-family:var(--serif);font-weight:400;font-size:1.3rem;color:var(--gold-hi)}
+    .bank-left small{color:var(--muted);font-size:.75rem}
+    .bank-agents{display:flex;flex-wrap:wrap;gap:.35rem}
+    .bank-agents span{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .5rem;border-radius:999px;border:1px solid rgba(255,216,103,.3);color:var(--gold-hi);font-size:.58rem;letter-spacing:.06em;text-transform:uppercase}
+
+    /* ===== 5 MANTRA LEYENDA ===== */
+    .v5{align-content:center;justify-items:center;text-align:center;gap:1.5rem}
+    .big-myth{max-width:920px}
+    .formula{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.6rem;margin-top:1.2rem}
+    .formula .bad,.formula .good{padding:.7rem 1rem;border-radius:999px;font-size:.85rem}
+    .formula .bad{border:1px solid rgba(244,94,99,.35);color:#f0b4b6}
+    .formula .good{border:1px solid rgba(255,216,103,.45);color:var(--gold-hi);background:rgba(255,216,103,.08)}
+    .formula .op{color:rgba(255,255,255,.35);font-size:1.2rem}
+    .formula .midas{display:inline-flex;align-items:center;gap:.45rem;padding:.55rem .9rem;border-radius:999px;border:1px solid rgba(255,216,103,.5);color:var(--gold-hi);font:700 .72rem var(--sans);letter-spacing:.12em;text-transform:uppercase}
+    .formula .midas img{width:22px}
+    .six{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:.55rem;width:min(960px,94vw);margin-top:.4rem}
+    .six article{padding:1rem .75rem;border-radius:16px;border:1px solid rgba(255,216,103,.25);background:#0c0c0b;text-align:left}
+    .six .iba{width:44px;height:44px;margin-bottom:.55rem}
+    .six strong{display:block;font-family:var(--serif);font-weight:400;font-size:1.05rem}
+    .six small{display:block;margin-top:.25rem;color:var(--muted);font-size:.7rem;line-height:1.3}
+
+    @media(max-width:900px){
+      .alchemy,.v3,.touch-row{grid-template-columns:1fr;overflow-y:auto}
+      .touch{width:100%;min-height:140px}
+      .six{grid-template-columns:repeat(2,1fr);overflow-y:auto}
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ico-analyst" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".8"><polygon points="20,7 32,30 8,30"/><line x1="20" y1="7" x2="20" y2="30"/><line x1="8" y1="30" x2="26" y2="18.5"/><line x1="32" y1="30" x2="14" y2="18.5"/></g><circle fill="#ffd867" cx="20" cy="19" r="2.4"/></symbol>
+    <symbol id="ico-quant" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".85"><polygon points="20,8 32,30 8,30"/><line x1="20" y1="8" x2="20" y2="22"/><line x1="8" y1="30" x2="20" y2="22"/><line x1="32" y1="30" x2="20" y2="22"/></g><circle fill="#ffd867" cx="20" cy="21" r="2.3"/></symbol>
+    <symbol id="ico-macro" viewBox="0 0 40 40"><polygon fill="none" stroke="#e1c27a" stroke-width=".8" points="20,6 30,13 27,25 13,25 10,13"/><g stroke="#e1c27a" stroke-width=".6"><line x1="20" y1="10" x2="20" y2="30"/><line x1="12" y1="20" x2="28" y2="20"/></g><circle fill="#ffd867" cx="20" cy="20" r="3.2"/></symbol>
+    <symbol id="ico-sentiment" viewBox="0 0 40 40"><ellipse fill="none" stroke="#e1c27a" stroke-width=".8" cx="20" cy="20" rx="13" ry="9"/><circle fill="#ffd867" cx="20" cy="20" r="3"/></symbol>
+    <symbol id="ico-consequence" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".75"><polygon points="8,20 12,14 16,20 12,26"/><polygon points="16,20 20,14 24,20 20,26"/><polygon points="24,20 28,14 32,20 28,26"/></g><circle fill="#ffd867" cx="20" cy="20" r="2.2"/></symbol>
+    <symbol id="ico-advisor" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".8"><polygon points="20,8 28,20 20,22 12,20"/><polygon points="20,32 28,20 20,18 12,20"/></g><circle fill="#ffd867" cx="20" cy="20" r="2.5"/></symbol>
+  </svg>
+
+  <header class="chrome">
+    <h1>Leyenda Midas · exceso / FOMO / basura → oro</h1>
+    <div class="tabs" id="tabs">
+      <button data-i="0" class="active">1 · Alquimia</button>
+      <button data-i="1">2 · El toque</button>
+      <button data-i="2">3 · Transmutación</button>
+      <button data-i="3">4 · Pactolo</button>
+      <button data-i="4">5 · Fórmula</button>
+    </div>
+  </header>
+
+  <!-- 1 ALQUIMIA -->
+  <section class="variant v1 active">
+    <div>
+      <p class="kicker">La leyenda, actualizada</p>
+      <h2 class="title">Midas no predice el mercado. <em>Lo convierte en oro.</em></h2>
+      <p class="lead">El exceso de información, el FOMO y la basura entran. Criterio, evidencia y decisión salen.</p>
+    </div>
+    <div class="alchemy">
+      <div class="heap">
+        <p class="kicker">Entra</p>
+        <h3>Ruido.</h3>
+        <div class="chips">
+          <span class="chip chip--junk">100 titulares</span>
+          <span class="chip chip--junk">FOMO</span>
+          <span class="chip chip--junk">Grupos de Telegram</span>
+          <span class="chip chip--junk">Hilos sin fuente</span>
+          <span class="chip chip--junk">Pánico a las 3am</span>
+          <span class="chip chip--junk">Opiniones vacías</span>
+        </div>
+      </div>
+      <div class="touch">
+        <div class="rays"></div>
+        <div class="touch-core"><img src="/midas-mark.svg" alt="Midas"></div>
+        <div class="touch-label">El toque</div>
+      </div>
+      <div class="gold">
+        <p class="kicker">Sale</p>
+        <h3>Oro.</h3>
+        <div class="chips">
+          <span class="chip chip--gold">Evidencia citada</span>
+          <span class="chip chip--gold">Números medidos</span>
+          <span class="chip chip--gold">Contexto macro</span>
+          <span class="chip chip--gold">Clima emocional</span>
+          <span class="chip chip--gold">Escenarios</span>
+          <span class="chip chip--gold">Briefing humano</span>
+        </div>
+        <div class="agents-strip" aria-label="Quién hace el toque">
+          <span><div class="iba"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg></div>Analista</span>
+          <span><div class="iba"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-quant"/></svg></div>Quant</span>
+          <span><div class="iba"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-macro"/></svg></div>Macro</span>
+          <span><div class="iba"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg></div>Sentimiento</span>
+          <span><div class="iba"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg></div>Consecuencias</span>
+          <span><div class="iba"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg></div>Asesor</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 EL TOQUE -->
+  <section class="variant v2">
+    <div>
+      <p class="kicker">Tres actos · una leyenda</p>
+      <h2 class="title">Antes del toque. <em>El toque.</em> Después del toque.</h2>
+    </div>
+    <div class="touch-row">
+      <article class="stage stage--before">
+        <div>
+          <div class="num">01</div>
+          <h3>Basura de mercado</h3>
+          <p>Todo llega a la vez. Nada está filtrado.</p>
+          <ul class="junk-list">
+            <li>Alertas que no entiendes</li>
+            <li>FOMO de lo que “todos compran”</li>
+            <li>Hilos sin fecha ni fuente</li>
+            <li>Miedo pidiendo una decisión ya</li>
+          </ul>
+        </div>
+      </article>
+      <article class="stage stage--touch">
+        <div>
+          <div class="num">02</div>
+          <h3>El toque Midas</h3>
+          <p>Seis compañeros tocan el ruido. Cada uno transforma una parte.</p>
+          <div class="crew6">
+            <div><div class="iba" style="width:28px;height:28px;border-radius:8px"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg></div>Analista</div>
+            <div><div class="iba" style="width:28px;height:28px;border-radius:8px"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-quant"/></svg></div>Quant</div>
+            <div><div class="iba" style="width:28px;height:28px;border-radius:8px"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-macro"/></svg></div>Macro</div>
+            <div><div class="iba" style="width:28px;height:28px;border-radius:8px"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg></div>Sentimiento</div>
+            <div><div class="iba" style="width:28px;height:28px;border-radius:8px"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg></div>Consecuencias</div>
+            <div><div class="iba" style="width:28px;height:28px;border-radius:8px"><svg class="ico" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg></div>Asesor</div>
+          </div>
+        </div>
+        <img src="/midas-mark.svg" alt="" style="width:56px;margin-top:1rem;filter:drop-shadow(0 0 16px rgba(255,216,103,.45))">
+      </article>
+      <article class="stage stage--after">
+        <div>
+          <div class="num">03</div>
+          <h3>Oro accionable</h3>
+          <p>Ya no es ruido. Es criterio.</p>
+          <ul class="gold-list">
+            <li>Evidencia con fuente y fecha</li>
+            <li>Magnitud real del movimiento</li>
+            <li>Marco macro que lo explica</li>
+            <li>Briefing que una persona puede revisar</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 3 TRANSMUTACIÓN -->
+  <section class="variant v3">
+    <div class="myth">
+      <p class="kicker">Del mito al producto</p>
+      <h2 class="title">Lo que toca Midas <em>deja de ser basura.</em></h2>
+      <p class="lead">En la leyenda, el rey convertía materia en oro. Aquí, la flota convierte exceso de mercado en inteligencia.</p>
+      <p class="quote">“No te damos más información. Te quitamos la que no sirve.”</p>
+    </div>
+    <div class="trans">
+      <div class="pair">
+        <div class="from">Titulares sin filtro</div>
+        <div class="arrow"><div class="iba"><svg class="ico-lg" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg></div></div>
+        <div class="to">Evidencia citada</div>
+      </div>
+      <div class="pair">
+        <div class="from">Candles que asustan</div>
+        <div class="arrow"><div class="iba"><svg class="ico-lg" viewBox="0 0 40 40"><use href="#ico-quant"/></svg></div></div>
+        <div class="to">Magnitud medida</div>
+      </div>
+      <div class="pair">
+        <div class="from">Rumores de tasas</div>
+        <div class="arrow"><div class="iba"><svg class="ico-lg" viewBox="0 0 40 40"><use href="#ico-macro"/></svg></div></div>
+        <div class="to">Marco macro claro</div>
+      </div>
+      <div class="pair">
+        <div class="from">FOMO / pánico</div>
+        <div class="arrow"><div class="iba"><svg class="ico-lg" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg></div></div>
+        <div class="to">Clima leído a tiempo</div>
+      </div>
+      <div class="pair">
+        <div class="from">“¿Y si…?” en vacío</div>
+        <div class="arrow"><div class="iba"><svg class="ico-lg" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg></div></div>
+        <div class="to">Escenarios ensayados</div>
+      </div>
+      <div class="pair">
+        <div class="from">Caos mental</div>
+        <div class="arrow"><div class="iba"><svg class="ico-lg" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg></div></div>
+        <div class="to">Briefing humano</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 PACTOLO -->
+  <section class="variant v4">
+    <div>
+      <p class="kicker">El río del mito</p>
+      <h2 class="title">El Pactolo lavaba la maldición. <em>Midas lava el ruido.</em></h2>
+      <p class="lead">Arriba flota la basura del mercado. Abajo, la orilla dorada: lo que vale la pena guardar.</p>
+    </div>
+    <div class="river">
+      <img src="./midas-cinematic-overload.png" alt="">
+      <div class="river-ui">
+        <div class="pollution">
+          <span class="nugget">FOMO</span>
+          <span class="nugget">Spam de señales</span>
+          <span class="nugget">Hilos anónimos</span>
+          <span class="nugget">Alertas duplicadas</span>
+          <span class="nugget">Noticias tarde</span>
+          <span class="nugget">Opiniones sin dato</span>
+          <span class="nugget">Pánico colectivo</span>
+          <span class="nugget">Charts sin contexto</span>
+          <span class="nugget">“Confía en mí, bro”</span>
+        </div>
+        <div class="bank">
+          <div class="bank-left">
+            <img src="/midas-mark.svg" alt="">
+            <div>
+              <strong>Orilla dorada</strong>
+              <small>Lo que sobrevive al toque: criterio, no ruido.</small>
+            </div>
+          </div>
+          <div class="bank-agents">
+            <span><svg class="ico" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg> Analista</span>
+            <span><svg class="ico" viewBox="0 0 40 40"><use href="#ico-quant"/></svg> Quant</span>
+            <span><svg class="ico" viewBox="0 0 40 40"><use href="#ico-macro"/></svg> Macro</span>
+            <span><svg class="ico" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg> Sentimiento</span>
+            <span><svg class="ico" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg> Consecuencias</span>
+            <span><svg class="ico" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg> Asesor</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 FÓRMULA -->
+  <section class="variant v5">
+    <div class="big-myth">
+      <p class="kicker">Una frase para el pitch</p>
+      <h2 class="title">Midas convierte el exceso en <em>oro.</em></h2>
+      <div class="formula">
+        <span class="bad">Info de más</span>
+        <span class="op">+</span>
+        <span class="bad">FOMO</span>
+        <span class="op">+</span>
+        <span class="bad">Basura</span>
+        <span class="op">→</span>
+        <span class="midas"><img src="/midas-mark.svg" alt=""> Toque</span>
+        <span class="op">→</span>
+        <span class="good">Criterio</span>
+      </div>
+      <p class="lead" style="margin:1.2rem auto 0">Seis compañeros hacen el toque. Tú te quedas con el oro — y con la decisión.</p>
+    </div>
+    <div class="six">
+      <article><div class="iba"><svg class="ico-xl" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg></div><strong>Analista</strong><small>Basura → evidencia</small></article>
+      <article><div class="iba"><svg class="ico-xl" viewBox="0 0 40 40"><use href="#ico-quant"/></svg></div><strong>Quant</strong><small>Pánico → magnitud</small></article>
+      <article><div class="iba"><svg class="ico-xl" viewBox="0 0 40 40"><use href="#ico-macro"/></svg></div><strong>Macro</strong><small>Rumores → marco</small></article>
+      <article><div class="iba"><svg class="ico-xl" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg></div><strong>Sentimiento</strong><small>FOMO → clima</small></article>
+      <article><div class="iba"><svg class="ico-xl" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg></div><strong>Consecuencias</strong><small>Duda → escenarios</small></article>
+      <article><div class="iba"><svg class="ico-xl" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg></div><strong>Asesor</strong><small>Caos → briefing</small></article>
+    </div>
+  </section>
+
+  <nav class="nav">
+    <button type="button" id="prev">←</button>
+    <button type="button" id="next">→</button>
+  </nav>
+
+  <script>
+    (() => {
+      const variants = [...document.querySelectorAll('.variant')];
+      const tabs = [...document.querySelectorAll('#tabs button')];
+      let current = 0;
+      function show(i) {
+        current = (i + variants.length) % variants.length;
+        variants.forEach((v, idx) => v.classList.toggle('active', idx === current));
+        tabs.forEach((t, idx) => t.classList.toggle('active', idx === current));
+        history.replaceState(null, '', `#${current + 1}`);
+      }
+      tabs.forEach((t) => t.addEventListener('click', () => show(Number(t.dataset.i))));
+      document.getElementById('prev').onclick = () => show(current - 1);
+      document.getElementById('next').onclick = () => show(current + 1);
+      document.addEventListener('keydown', (e) => {
+        if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(current + 1); }
+        else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(current - 1); }
+        else if (/^[1-5]$/.test(e.key)) show(Number(e.key) - 1);
+      });
+      const fromHash = Number.parseInt(location.hash.slice(1), 10);
+      show(Number.isFinite(fromHash) ? fromHash - 1 : 0);
+    })();
+  </script>
+</body>
+</html>
