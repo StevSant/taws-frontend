@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Slide 5 — Design Lab</title>
+<style>
+  :root {
+    --bg:#070706; --surface:#10100e; --text:#f4f1e9; --dim:#9a958a;
+    --gold:#dfa91d; --gold-hi:#ffd867; --line:rgba(255,255,255,.12);
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  * { box-sizing:border-box; margin:0; padding:0 }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); padding:28px 24px 64px }
+  .map { max-width:1280px; margin:0 auto 28px; padding:20px 24px; border:1px solid var(--line); border-radius:18px; background:#0c0c0b }
+  .map h1 { font-family:var(--serif); font-weight:400; font-size:1.55rem; margin-bottom:.75rem }
+  .map dl { display:grid; grid-template-columns:110px 1fr; gap:8px 14px; font-size:.9rem }
+  .map dt { color:var(--gold-hi); font-weight:700; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; padding-top:.2rem }
+  .map dd { color:var(--dim); line-height:1.45 }
+  .pick { margin-top:14px; color:#cfc9bc; font-size:.92rem }
+  .pick strong { color:var(--gold-hi) }
+  .lab { display:grid; gap:28px; max-width:1280px; margin:0 auto }
+  .concept { border:1px solid var(--line); border-radius:20px; overflow:hidden; background:#0a0a09 }
+  .concept > header { padding:16px 18px; border-bottom:1px solid var(--line) }
+  .concept h2 { font-size:.95rem; letter-spacing:.04em }
+  .concept .why { margin-top:4px; color:var(--dim); font-size:.82rem }
+  .stage { position:relative; aspect-ratio:16/9; overflow:hidden; background:#050505 }
+  .gold { color:var(--gold-hi) }
+  .kicker { color:rgba(255,255,255,.38); font:700 .55rem var(--sans); letter-spacing:.16em; text-transform:uppercase }
+
+  /* shared buddies */
+  .buddy { display:flex; flex-direction:column; gap:.4rem; min-width:0 }
+  .buddy .g { width:52px; height:52px; filter:drop-shadow(0 0 12px rgba(255,216,103,.2)) }
+  .buddy strong { color:var(--gold-hi); font-size:.68rem; letter-spacing:.12em; text-transform:uppercase }
+  .buddy span { color:#d6d0c4; font-size:.86rem; line-height:1.35; max-width:18ch }
+
+  /* A — Fundición */
+  .a { position:absolute; inset:0; display:grid; grid-template-rows:1fr auto; padding:4.5% 5% 3.5%; gap:.6rem }
+  .a-bg { position:absolute; inset:-6%; width:112%; height:112%; object-fit:cover; opacity:.28; filter:saturate(.55) brightness(.38) }
+  .a-veil { position:absolute; inset:0; background:
+    radial-gradient(ellipse 45% 50% at 72% 42%, rgba(223,169,29,.18), transparent 60%),
+    linear-gradient(180deg, rgba(5,5,5,.35), rgba(5,5,5,.55) 45%, rgba(5,5,5,.96) 78%) }
+  .a-main { position:relative; z-index:2; display:grid; grid-template-columns:1.05fr .95fr; gap:2rem; align-items:center }
+  .a-copy h2 { font-family:var(--serif); font-weight:400; font-size:clamp(2rem,3.6vw,3.4rem); line-height:.92; letter-spacing:-.03em; max-width:12ch; margin:.5rem 0 .7rem }
+  .a-copy p { color:#c8c2b6; font-size:.95rem; max-width:28ch; line-height:1.45 }
+
+
+
+
+      .a-forge {
+        position:relative; display:grid; grid-template-columns:auto minmax(0,1fr);
+        align-items:center; gap:clamp(1.2rem,2.5vw,2rem); justify-self:end; width:min(100%,440px);
+      }
+      .a-alch {
+        position:relative; display:flex; flex-direction:column; align-items:center; gap:.2rem;
+        padding:.2rem 0;
+      }
+      .a-word {
+        position:relative; z-index:2; font-family:var(--serif);
+        font-size:clamp(1.55rem,2.4vw,2.1rem); letter-spacing:-.02em; line-height:1;
+      }
+      .a-word.in { color:#d9a5a8 }
+      .a-word.out { color:var(--gold-hi); text-shadow:0 0 20px rgba(255,216,103,.28) }
+      .a-fall {
+        position:relative; width:2px; height:clamp(32px,5vh,48px);
+        border-radius:99px; overflow:visible;
+      }
+      .a-fall--in {
+        background:linear-gradient(180deg,rgba(217,165,168,.65),rgba(255,216,103,.2));
+      }
+      .a-fall--out {
+        background:linear-gradient(180deg,rgba(255,216,103,.25),rgba(255,216,103,.85));
+      }
+      .a-fall span {
+        position:absolute; left:50%; width:5px; height:5px; margin-left:-2.5px; border-radius:50%; opacity:0;
+      }
+      .a-fall--in span { background:#e8b0b3; box-shadow:0 0 6px rgba(232,176,179,.7); animation:fallIn 1.8s linear infinite }
+      .a-fall--out span { background:#ffd867; box-shadow:0 0 7px rgba(255,216,103,.8); animation:fallOut 1.8s linear infinite }
+      .a-fall span:nth-child(1){ animation-delay:0s }
+      .a-fall span:nth-child(2){ animation-delay:.36s }
+      .a-fall span:nth-child(3){ animation-delay:.72s }
+      .a-fall span:nth-child(4){ animation-delay:1.08s }
+      .a-fall span:nth-child(5){ animation-delay:1.44s }
+      .a-core {
+        position:relative; z-index:3; width:clamp(88px,9.5vw,108px); aspect-ratio:1; border-radius:50%;
+        display:grid; place-items:center;
+        border:1px solid rgba(255,216,103,.42);
+        background:radial-gradient(circle at 38% 30%,#2c2210,#090908 72%);
+        box-shadow:0 0 0 1px rgba(255,216,103,.06),0 0 36px rgba(223,169,29,.22);
+        margin:.15rem 0;
+      }
+      .a-core img {
+        position:relative; z-index:2; width:46%;
+        filter:drop-shadow(0 0 10px rgba(255,216,103,.4));
+      }
+      /* hide leftover disco layers if markup still has them */
+      .a-core-aura,.a-core-ring,.a-core-ring--2,.a-core-flash { display:none !important }
+      .a-decide {
+        display:flex; flex-direction:column; gap:.45rem; min-width:0;
+        padding:.85rem 1rem; border-left:1px solid rgba(105,180,143,.4);
+      }
+      .a-decide-kicker {
+        margin:0; color:#91d0ae; font:700 .58rem var(--sans); letter-spacing:.14em; text-transform:uppercase;
+      }
+      .a-decide-kicker::before {
+        content:''; display:inline-block; width:7px; height:7px; margin-right:.45rem;
+        border-radius:50%; background:#78bd98; box-shadow:0 0 8px rgba(120,189,152,.7);
+        vertical-align:middle;
+      }
+      .a-decide-line {
+        margin:0; color:#d8d2c6; font-family:var(--serif); font-size:clamp(1.05rem,1.6vw,1.35rem); line-height:1.25;
+      }
+      .a-decide-line em { color:#9fd9b8; font-style:normal }
+      .a-decide-steps { display:flex; flex-wrap:wrap; gap:.35rem }
+      .a-decide-steps span {
+        padding:.22rem .48rem; border:1px solid rgba(105,180,143,.32); border-radius:999px;
+        color:rgba(145,208,174,.88); font:700 .52rem var(--sans); letter-spacing:.08em; text-transform:uppercase;
+      }
+      @keyframes fallIn { 0%{ top:-10%; opacity:0 } 15%{ opacity:1 } 100%{ top:100%; opacity:0 } }
+      @keyframes fallOut { 0%{ top:-10%; opacity:0 } 15%{ opacity:1 } 100%{ top:100%; opacity:0 } }
+      @media(max-width:980px){
+        .a-forge{grid-template-columns:1fr; justify-self:stretch; width:100%}
+        .a-decide{border-left:0; border-top:1px solid rgba(105,180,143,.35); padding:.7rem 0 0}
+      }
+
+      .a-crew { position:relative; z-index:2; display:grid; grid-template-columns:repeat(6,1fr); gap:1rem;
+    padding-top:1.2rem; border-top:1px solid rgba(255,255,255,.1) }
+
+  /* B — Consejo */
+  .b { position:absolute; inset:0; display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:0 }
+  .b-left { position:relative; padding:6% 7%; display:flex; flex-direction:column; justify-content:center;
+    border-right:1px solid rgba(255,255,255,.08); background:
+    linear-gradient(135deg, #0a0907 0%, #12100c 100%) }
+  .b-left h2 { font-family:var(--serif); font-weight:400; font-size:clamp(2.1rem,3.5vw,3.3rem); line-height:.92; max-width:11ch; margin:.55rem 0 .85rem }
+  .b-left p { color:#bdb7ab; max-width:26ch; line-height:1.45; font-size:.95rem }
+  .b-alchemy { display:flex; align-items:center; gap:.7rem; margin-top:1.6rem; color:rgba(255,255,255,.4); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase }
+  .b-alchemy em { font-style:normal; font-family:var(--serif); font-size:1.15rem; letter-spacing:0; text-transform:none; color:#e8e0d0 }
+  .b-alchemy em.out { color:var(--gold-hi) }
+  .b-mark { width:28px; height:28px }
+  .b-right { position:relative; padding:5% 5%; display:grid; place-items:center;
+    background:radial-gradient(ellipse 70% 60% at 50% 40%, rgba(223,169,29,.07), transparent 70%) }
+  .b-right img.bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.12; filter:saturate(.5) brightness(.4) }
+  .b-grid { position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem 1.6rem; width:100% }
+  .b-grid .buddy { padding:.2rem 0 }
+  .b-grid .g { width:58px; height:58px }
+  .b-grid span { font-size:.9rem; max-width:16ch }
+
+  /* C — Mural */
+  .c { position:absolute; inset:0; display:grid; grid-template-rows:auto 1fr; padding:3.5% 3.5% 2.5% }
+  .c-top { display:flex; align-items:end; justify-content:space-between; gap:2rem; margin-bottom:1.4rem }
+  .c-top h2 { font-family:var(--serif); font-weight:400; font-size:clamp(1.8rem,3vw,2.8rem); line-height:.95; max-width:14ch }
+  .c-top p { color:#bdb7ab; font-size:.9rem; max-width:22ch; line-height:1.4; text-align:right }
+  .c-wall { display:grid; grid-template-columns:repeat(6,1fr); gap:0; min-height:0; border-top:1px solid rgba(255,255,255,.1); border-bottom:1px solid rgba(255,255,255,.1) }
+  .c-wall .buddy { padding:1.4rem 1rem; border-right:1px solid rgba(255,255,255,.08); justify-content:center; height:100%; gap:.65rem;
+    background:linear-gradient(180deg, rgba(255,216,103,.03), transparent 40%) }
+  .c-wall .buddy:last-child { border-right:0 }
+  .c-wall .g { width:64px; height:64px }
+  .c-wall strong { font-size:.72rem }
+  .c-wall span { font-size:.92rem; max-width:12ch }
+</style>
+</head>
+<body>
+
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-analyst" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".8"><polygon points="20,7 32,30 8,30"/><line x1="20" y1="7" x2="20" y2="30"/><line x1="8" y1="30" x2="26" y2="18.5"/><line x1="32" y1="30" x2="14" y2="18.5"/></g><circle fill="#ffd867" cx="20" cy="19" r="2.4"/></symbol>
+  <symbol id="ico-quant" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".85"><polygon points="20,8 32,30 8,30"/><line x1="20" y1="8" x2="20" y2="22"/><line x1="8" y1="30" x2="20" y2="22"/><line x1="32" y1="30" x2="20" y2="22"/></g><circle fill="#ffd867" cx="20" cy="21" r="2.3"/></symbol>
+  <symbol id="ico-macro" viewBox="0 0 40 40"><polygon fill="none" stroke="#e1c27a" stroke-width=".8" points="20,6 30,13 27,25 13,25 10,13"/><g stroke="#e1c27a" stroke-width=".6"><line x1="20" y1="10" x2="20" y2="30"/><line x1="12" y1="20" x2="28" y2="20"/></g><circle fill="#ffd867" cx="20" cy="20" r="3.2"/></symbol>
+  <symbol id="ico-sentiment" viewBox="0 0 40 40"><ellipse fill="none" stroke="#e1c27a" stroke-width=".8" cx="20" cy="20" rx="13" ry="9"/><circle fill="#ffd867" cx="20" cy="20" r="3"/></symbol>
+  <symbol id="ico-consequence" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".75"><polygon points="8,20 12,14 16,20 12,26"/><polygon points="16,20 20,14 24,20 20,26"/><polygon points="24,20 28,14 32,20 28,26"/></g><circle fill="#ffd867" cx="20" cy="20" r="2.2"/></symbol>
+  <symbol id="ico-advisor" viewBox="0 0 40 40"><g fill="none" stroke="#e1c27a" stroke-width=".8"><polygon points="20,8 28,20 20,22 12,20"/><polygon points="20,32 28,20 20,18 12,20"/></g><circle fill="#ffd867" cx="20" cy="20" r="2.5"/></symbol>
+</svg>
+
+<section class="map">
+  <h1>Slide 5 — agentes / leyenda</h1>
+  <dl>
+    <dt>Por qué</dt>
+    <dd>Mostrar que Midas transforma exceso en criterio, y que los 6 agentes son compañeros — sin saturar ni quedar vacío.</dd>
+    <dt>Quién</dt>
+    <dd>Jueces del hackathon / pitch en vivo — 40s, fullscreen, se tiene que entender a distancia.</dd>
+    <dt>Fuente</dt>
+    <dd>Pitch Midas: negro #050505, oro #ffd867, serif headline, glifos Brand Lab, cinematic stills.</dd>
+  </dl>
+  <p class="pick">Elige <strong>A</strong>, <strong>B</strong> o <strong>C</strong> y lo monto en el pitch.</p>
+</section>
+
+<main class="lab">
+  <article class="concept">
+    <header>
+      <h2>A — Fundición</h2>
+      <p class="why">Hero cinematic + toque central grande. Agentes como cast bar abajo. Presencia sin chips.</p>
+    </header>
+    <div class="stage">
+      <div class="a">
+        <img class="a-bg" src="./midas-cinematic-overload.png" alt="">
+        <div class="a-veil"></div>
+        <div class="a-main">
+          <div class="a-copy">
+            <p class="kicker">La flota</p>
+            <h2>Midas convierte el exceso <span class="gold">en oro.</span></h2>
+            <p>El mercado no duerme. Tus compañeros tampoco.</p>
+          </div>
+                    <div class="a-forge" aria-label="Transmutación y humano en el loop">
+            <div class="a-alch">
+              <span class="a-word in">Ruido</span>
+              <div class="a-fall a-fall--in" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+                            <div class="a-core">
+                <img src="/midas-mark.svg" alt="Midas">
+              </div>
+<div class="a-fall a-fall--out" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <span class="a-word out">Oro</span>
+            </div>
+            <div class="a-decide">
+              <p class="a-decide-kicker">Humano en el loop</p>
+              <p class="a-decide-line">La flota prepara. <em>Tú decides.</em></p>
+              <div class="a-decide-steps">
+                <span>Revisa</span><span>Aprueba</span><span>Corrige</span><span>Retroalimenta</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="a-crew"><div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg>
+      <strong>Analista</strong>
+      <span>Contrasta antes de que creas.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-quant"/></svg>
+      <strong>Quant</strong>
+      <span>Sin número, no hay opinión.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-macro"/></svg>
+      <strong>Macro</strong>
+      <span>El mapa grande, no el zoom del día.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg>
+      <strong>Sentimiento</strong>
+      <span>Separa el pánico del mercado del tuyo.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg>
+      <strong>Consecuencias</strong>
+      <span>Impacto real antes de actuar.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg>
+      <strong>Asesor</strong>
+      <span>Briefing listo. Tú decides.</span>
+    </div></div>
+      </div>
+    </div>
+  </article>
+
+  <article class="concept">
+    <header>
+      <h2>B — Consejo</h2>
+      <p class="why">Split editorial (como Mateo/Sofía). Leyenda a la izquierda, flota en grilla 3×2 a la derecha.</p>
+    </header>
+    <div class="stage">
+      <div class="b">
+        <div class="b-left">
+          <p class="kicker">La flota</p>
+          <h2>Midas convierte el exceso <span class="gold">en oro.</span></h2>
+          <p>El mercado no duerme. Tus compañeros tampoco.</p>
+          <div class="b-alchemy">
+            <em>Ruido</em>
+            <img class="b-mark" src="/midas-mark.svg" alt="">
+            <em class="out">Oro</em>
+          </div>
+        </div>
+        <div class="b-right">
+          <img class="bg" src="./midas-cinematic-with.png" alt="">
+          <div class="b-grid"><div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg>
+      <strong>Analista</strong>
+      <span>Contrasta antes de que creas.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-quant"/></svg>
+      <strong>Quant</strong>
+      <span>Sin número, no hay opinión.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-macro"/></svg>
+      <strong>Macro</strong>
+      <span>El mapa grande, no el zoom del día.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg>
+      <strong>Sentimiento</strong>
+      <span>Separa el pánico del mercado del tuyo.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg>
+      <strong>Consecuencias</strong>
+      <span>Impacto real antes de actuar.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg>
+      <strong>Asesor</strong>
+      <span>Briefing listo. Tú decides.</span>
+    </div></div>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="concept">
+    <header>
+      <h2>C — Mural</h2>
+      <p class="why">Los compañeros son la slide. Headline corto arriba; seis columnas a altura completa.</p>
+    </header>
+    <div class="stage">
+      <div class="c">
+        <div class="c-top">
+          <div>
+            <p class="kicker">La flota</p>
+            <h2>Midas convierte el exceso <span class="gold">en oro.</span></h2>
+          </div>
+          <p>El mercado no duerme.<br>Tus compañeros tampoco.</p>
+        </div>
+        <div class="c-wall"><div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-analyst"/></svg>
+      <strong>Analista</strong>
+      <span>Contrasta antes de que creas.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-quant"/></svg>
+      <strong>Quant</strong>
+      <span>Sin número, no hay opinión.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-macro"/></svg>
+      <strong>Macro</strong>
+      <span>El mapa grande, no el zoom del día.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-sentiment"/></svg>
+      <strong>Sentimiento</strong>
+      <span>Separa el pánico del mercado del tuyo.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-consequence"/></svg>
+      <strong>Consecuencias</strong>
+      <span>Impacto real antes de actuar.</span>
+    </div>
+<div class="buddy ">
+      <svg class="g" viewBox="0 0 40 40"><use href="#ico-advisor"/></svg>
+      <strong>Asesor</strong>
+      <span>Briefing listo. Tú decides.</span>
+    </div></div>
+      </div>
+    </div>
+  </article>
+</main>
+</body>
+</html>
